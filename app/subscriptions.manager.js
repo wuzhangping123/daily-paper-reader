@@ -17,9 +17,9 @@ window.SubscriptionsManager = (function () {
   let quickRun30dStandardBtn = null;
   let quickRunOpenWorkflowPanelBtn = null;
   let quickRunConferenceBtn = null;
-  let quickRunYearSelect = null;
-  let quickRunConferenceSelect = null;
   let quickRunMsgEl = null;
+  let selectedConference = 'ICML';
+  let selectedConferenceYears = [];
   let resetContentBtn = null;
   let resetContentMsgEl = null;
   let adminDailyTabBtn = null;
@@ -75,7 +75,7 @@ window.SubscriptionsManager = (function () {
   ].join('\n');
 
   const QUICK_RUN_CONFERENCES = [
-    'NeurIPS',
+    'NIPS',
     'ICML',
   ];
 
@@ -362,26 +362,47 @@ window.SubscriptionsManager = (function () {
     return out;
   };
 
-  const fillQuickRunOptions = (yearSelectEl, confSelectEl) => {
-    if (yearSelectEl && !yearSelectEl._dprQuickRunOptionsFilled) {
-      yearSelectEl._dprQuickRunOptionsFilled = true;
-      const currentYear = new Date().getFullYear();
-      for (let y = currentYear; y >= currentYear - 2; y -= 1) {
-        const opt = document.createElement('option');
-        opt.value = String(y);
-        opt.textContent = String(y);
-        yearSelectEl.appendChild(opt);
-      }
+  const initializeConferenceChoices = () => {
+    const currentYear = new Date().getFullYear();
+    if (!selectedConferenceYears.length) {
+      selectedConferenceYears = [String(currentYear)];
     }
+  };
 
-    if (confSelectEl && !confSelectEl._dprQuickRunOptionsFilled) {
-      confSelectEl._dprQuickRunOptionsFilled = true;
-      QUICK_RUN_CONFERENCES.forEach((name) => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        confSelectEl.appendChild(opt);
-      });
+  const getConferenceYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    return [currentYear, currentYear - 1, currentYear - 2].map((year) => String(year));
+  };
+
+  const renderConferenceChoiceButtons = () => {
+    const conferenceWrap = document.getElementById('arxiv-admin-conference-choice-group');
+    const yearWrap = document.getElementById('arxiv-admin-conference-year-group');
+    if (conferenceWrap) {
+      conferenceWrap.innerHTML = QUICK_RUN_CONFERENCES
+        .map((name) => {
+          const active = name === selectedConference;
+          return `<button
+            class="dpr-choice-pill${active ? ' is-active' : ''}"
+            type="button"
+            data-conference-choice="${name}"
+            aria-pressed="${active ? 'true' : 'false'}"
+          >${name}</button>`;
+        })
+        .join('');
+    }
+    if (yearWrap) {
+      const selectedYears = new Set(selectedConferenceYears);
+      yearWrap.innerHTML = getConferenceYearOptions()
+        .map((year) => {
+          const active = selectedYears.has(year);
+          return `<button
+            class="dpr-choice-pill${active ? ' is-active' : ''}"
+            type="button"
+            data-conference-year="${year}"
+            aria-pressed="${active ? 'true' : 'false'}"
+          >${year}</button>`;
+        })
+        .join('');
     }
   };
 
@@ -494,18 +515,18 @@ window.SubscriptionsManager = (function () {
     return runQuickFetch(days, quickRunMsgEl || msgEl, tip, options);
   };
 
-  const runQuickConferencePlaceholder = (yearSelectEl, confSelectEl, msgEl) => {
-    const year = (yearSelectEl && yearSelectEl.value) || '';
-    const conf = String((confSelectEl && confSelectEl.value) || '').trim();
-    if (!year || !conf) {
+  const runQuickConferencePlaceholder = (msgEl) => {
+    const years = selectedConferenceYears.slice();
+    const conf = String(selectedConference || '').trim();
+    if (!years.length || !conf) {
       if (msgEl) {
-        msgEl.textContent = '请先选择年份和会议名。';
+        msgEl.textContent = '请先选择会议和年份。';
         msgEl.style.color = '#c00';
       }
       return;
     }
     if (msgEl) {
-      msgEl.textContent = `${year} ${conf} 的会议论文抓取功能暂未接入。`;
+      msgEl.textContent = `${conf} ${years.join(', ')} 的会议论文抓取功能暂未接入。`;
       msgEl.style.color = '#c90';
     }
   };
@@ -812,16 +833,13 @@ window.SubscriptionsManager = (function () {
                 会议论文任务暂未接入前端触发；后续可在这里接入公开状态检查与上传。
               </div>
 
-              <div class="chat-quick-run-row">
-                <label for="arxiv-admin-quick-run-conference-select">会议</label>
-                <select id="arxiv-admin-quick-run-conference-select">
-                  <option value="">选择会议</option>
-                </select>
+              <div class="dpr-choice-field">
+                <div class="chat-quick-run-title">会议</div>
+                <div id="arxiv-admin-conference-choice-group" class="dpr-choice-row"></div>
               </div>
-              <div class="chat-quick-run-row">
-                <label for="arxiv-admin-quick-run-year-select">年份</label>
-                <select id="arxiv-admin-quick-run-year-select" multiple size="3">
-                </select>
+              <div class="dpr-choice-field">
+                <div class="chat-quick-run-title">年份</div>
+                <div id="arxiv-admin-conference-year-group" class="dpr-choice-row"></div>
               </div>
               <button
                 id="arxiv-admin-quick-run-conference-run-btn"
@@ -1042,10 +1060,6 @@ window.SubscriptionsManager = (function () {
     quickRunConferenceBtn = document.getElementById(
       'arxiv-admin-quick-run-conference-run-btn',
     );
-    quickRunYearSelect = document.getElementById('arxiv-admin-quick-run-year-select');
-    quickRunConferenceSelect = document.getElementById(
-      'arxiv-admin-quick-run-conference-select',
-    );
     quickRunMsgEl = document.getElementById('arxiv-admin-quick-run-msg');
     resetContentBtn = document.getElementById('arxiv-admin-reset-content-btn');
     resetContentMsgEl = document.getElementById('arxiv-admin-reset-content-msg');
@@ -1054,16 +1068,8 @@ window.SubscriptionsManager = (function () {
       quickRunConferenceBtn.classList.add('chat-quick-run-item--disabled');
       quickRunConferenceBtn.title = '会议论文抓取功能暂未接入';
     }
-    fillQuickRunOptions(quickRunYearSelect, quickRunConferenceSelect);
-    if (quickRunYearSelect && !quickRunYearSelect.value) {
-      const currentYear = String(new Date().getFullYear());
-      Array.from(quickRunYearSelect.options || []).forEach((opt) => {
-        opt.selected = opt.value === currentYear;
-      });
-    }
-    if (quickRunConferenceSelect && !quickRunConferenceSelect.value) {
-      quickRunConferenceSelect.value = 'ICML';
-    }
+    initializeConferenceChoices();
+    renderConferenceChoiceButtons();
     [quickRun10dBtn, quickRun30dBtn, quickRun30dStandardBtn].forEach((btn) => {
       if (!btn) return;
       if (!btn.dataset.defaultTitle) {
@@ -1124,11 +1130,44 @@ window.SubscriptionsManager = (function () {
     if (quickRunConferenceBtn && !quickRunConferenceBtn._bound) {
       quickRunConferenceBtn._bound = true;
       quickRunConferenceBtn.addEventListener('click', () => {
-        runQuickConferencePlaceholder(
-          quickRunYearSelect,
-          quickRunConferenceSelect,
-          quickRunMsgEl,
-        );
+        runQuickConferencePlaceholder(quickRunMsgEl);
+      });
+    }
+
+    const conferenceChoiceGroup = document.getElementById('arxiv-admin-conference-choice-group');
+    if (conferenceChoiceGroup && !conferenceChoiceGroup._bound) {
+      conferenceChoiceGroup._bound = true;
+      conferenceChoiceGroup.addEventListener('click', (e) => {
+        const btn = e.target && e.target.closest
+          ? e.target.closest('[data-conference-choice]')
+          : null;
+        if (!btn) return;
+        const nextConference = normalizeText(btn.getAttribute('data-conference-choice') || '');
+        if (!nextConference) return;
+        selectedConference = nextConference;
+        renderConferenceChoiceButtons();
+      });
+    }
+
+    const conferenceYearGroup = document.getElementById('arxiv-admin-conference-year-group');
+    if (conferenceYearGroup && !conferenceYearGroup._bound) {
+      conferenceYearGroup._bound = true;
+      conferenceYearGroup.addEventListener('click', (e) => {
+        const btn = e.target && e.target.closest
+          ? e.target.closest('[data-conference-year]')
+          : null;
+        if (!btn) return;
+        const year = normalizeText(btn.getAttribute('data-conference-year') || '');
+        if (!year) return;
+        const current = new Set(selectedConferenceYears);
+        if (current.has(year)) {
+          if (current.size <= 1) return;
+          current.delete(year);
+        } else {
+          current.add(year);
+        }
+        selectedConferenceYears = getConferenceYearOptions().filter((item) => current.has(item));
+        renderConferenceChoiceButtons();
       });
     }
 
