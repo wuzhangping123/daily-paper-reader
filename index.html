@@ -96,6 +96,16 @@
         splash.hidden = true;
       }
     };
+    window.DPRPrefetchDocsifyShell = function () {
+      try {
+        fetch('docs/_sidebar.md', {
+          method: 'GET',
+          cache: 'force-cache',
+        }).catch(function () {});
+      } catch {
+        // ignore
+      }
+    };
     document.addEventListener('dpr-docsify-ready', window.DPRHideInitialSplash);
     window.addEventListener('load', function () {
       window.setTimeout(window.DPRHideInitialSplash, 300);
@@ -315,6 +325,10 @@
       },
       window.DPR_RUNTIME_SOURCE_BACKENDS || {},
     );
+
+    if (typeof window.DPRPrefetchDocsifyShell === 'function') {
+      window.DPRPrefetchDocsifyShell();
+    }
 
     window.DPRLoadAssets([
       { type: 'style', path: 'app/vendor/docsify/4/lib/themes/vue.css' },
