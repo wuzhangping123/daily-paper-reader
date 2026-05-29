@@ -25,3 +25,65 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: hsi-denoise
+      description: 高光谱影像噪声去除
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: low-rank denoising
+          keyword_cn: 低秩去噪
+          query: low-rank representation for denoising
+        - keyword: deep learning denoising
+          keyword_cn: 深度学习去噪
+          query: deep learning for hyperspectral denoising
+        - keyword: hyperspectral stripe noise removal
+          keyword_cn: 高光谱条纹噪声去除
+          query: stripe noise removal in hyperspectral remote sensing images
+        - keyword: high-dimensional tensor recovery
+          keyword_cn: 高维张量恢复
+          query: high-dimensional tensor data recovery for hyperspectral images
+        - keyword: remote sensing radiometric correction
+          keyword_cn: 遥感相对辐射校正
+          query: relative radiometric correction for remote sensing images
+        - keyword: hyperspectral image denoising
+          keyword_cn: 高光谱影像去噪
+          query: hyperspectral image denoising techniques
+      intent_queries:
+        - query: hyperspectral image denoising using deep neural networks
+          query_cn: 使用深度神经网络的高光谱图像去噪
+          enabled: true
+          source: manual
+          note: ''
+        - query: state of the art hyperspectral image restoration and denoising methods
+          query_cn: 最先进的高光谱影像恢复与去噪方法
+          enabled: true
+          source: manual
+          note: ''
+        - query: hyperspectral image stripe noise removal using deep learning
+          query_cn: 使用深度学习的高光谱影像条纹噪声去除
+          enabled: true
+          source: manual
+          note: ''
+        - query: tensor based approaches for hyperspectral image anomaly detection and restoration
+          query_cn: 基于张量的高光谱影像异常检测与恢复方法
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-05-29T07:48:31.516Z'
+source_backends:
+  arxiv:
+    papers_table: arxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_arxiv_papers
+    vector_rpc_exact: match_arxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_arxiv_papers_bm25
+    sync_table: arxiv_sync_status
+    sync_success_value: success
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
