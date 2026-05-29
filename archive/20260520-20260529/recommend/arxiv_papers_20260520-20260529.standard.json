@@ -1,0 +1,285 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-05-29T07:55:41.903297+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 3,
+    "deep_cap": 6,
+    "deep_selected": 3,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2605.24769v1",
+      "source": "arxiv",
+      "title": "Leveraging pretrained RGB denoisers for hyperspectral image restoration",
+      "abstract": "Hyperspectral image restoration faces several challenges, including limited training data, strong sensor specificity, and high spectral dimensionality. These limitations hinder the learning of robust hyperspectral priors, motivating the reuse of priors learned from large-scale RGB data. In this work, we propose a minimally trained, lightweight adapter that repurposes frozen pretrained RGB denoisers for hyperspectral restoration through a projection mapping. The method denoises low-dimensional spectral projections and reconstructs the hyperspectral cube through constrained linear aggregation, while preserving plug-and-play compatibility and the stability properties of the underlying RGB denoiser. Experiments on denoising, deblurring, and super-resolution across multiple datasets demonstrate consistent improvements over hyperspectral-specific baselines, showing the strong transferability of large-scale RGB priors.",
+      "authors": [
+        "Daniele Picone",
+        "Mohamad Jouni",
+        "Mauro Dalla-Mura"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "eess.IV"
+      ],
+      "published": "2026-05-23T23:05:11+00:00",
+      "link": "https://arxiv.org/pdf/2605.24769v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "leverages pretrained RGB denoisers for hyperspectral restoration",
+      "llm_evidence_cn": "利用预训练RGB去噪器进行高光谱图像恢复",
+      "llm_evidence": "利用预训练RGB去噪器进行高光谱图像恢复",
+      "canonical_evidence": "利用预训练RGB去噪器进行高光谱图像恢复",
+      "llm_tldr_en": "Proposes a lightweight adapter to repurpose frozen RGB denoisers for hyperspectral restoration, achieving competitive denoising, deblurring, and super-resolution with minimal training.",
+      "llm_tldr_cn": "高光谱图像恢复面临训练数据有限、传感器特异性强等挑战，导致难以学习鲁棒的高光谱先验。本文提出一种轻量级适配器，通过投影映射重用预训练的RGB去噪器，对低维光谱投影进行去噪并重建高光谱立方体。实验表明该方法在去噪、去模糊和超分辨率任务上表现优异，且保持即插即用兼容性和稳定性。该方法有效缓解了高光谱数据稀缺问题，为高光谱恢复提供了一种高效且实用的方案。",
+      "llm_tldr": "高光谱图像恢复面临训练数据有限、传感器特异性强等挑战，导致难以学习鲁棒的高光谱先验。本文提出一种轻量级适配器，通过投影映射重用预训练的RGB去噪器，对低维光谱投影进行去噪并重建高光谱立方体。实验表明该方法在去噪、去模糊和超分辨率任务上表现优异，且保持即插即用兼容性和稳定性。该方法有效缓解了高光谱数据稀缺问题，为高光谱恢复提供了一种高效且实用的方案。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "deep learning for hyperspectral denoising",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.25677v1",
+      "source": "arxiv",
+      "title": "Tensor train methods for high-dimensional nonlinear filtering problems with correlated noise",
+      "abstract": "Nonlinear filtering with correlated noise leads to a Duncan-Mortensen-Zakai (DMZ) equation in the form of a stochastic partial differential equation (SPDE). Unlike the independent noise case, the presence of correlation prevents the classical invertible transformation that reduces the DMZ equation to a deterministic partial differential equation, requiring a direct numerical treatment of the SPDE. This paper develops a tensor train (TT) based framework for solving medium- to high-dimensional DMZ equations with correlated noise. Spatial discretization transforms the SPDE into a high-dimensional stochastic differential system, which is efficiently compressed using TT approximation. A semi-implicit Milstein scheme is employed for temporal integration to ensure stability and accuracy. Under suitable regularity assumptions, we establish a convergence analysis of the proposed method. In particular, the spatial error is controlled by both the mesh size and the prescribed TT approximation accuracy. In the temporal direction, the convergence is proved by estimating stochastic integrals involving drifted observations, without invoking a change-of-measure argument. Numerical experiments demonstrate that the proposed method achieves stable and accurate performance for cubic sensor problems. In challenging multi-modal settings, where particle filter and extended Kalman filter deteriorate, the proposed method maintains accuracy and effectively captures the posterior distribution.",
+      "authors": [
+        "Yuhua Meng",
+        "Stephen S. -T. Yau",
+        "Zhiwen Zhang"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-05-25T10:32:46+00:00",
+      "link": "https://arxiv.org/pdf/2605.25677v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "tensor train for high-dimensional data recovery with noise",
+      "llm_evidence_cn": "张量列用于带噪声的高维数据恢复",
+      "llm_evidence": "张量列用于带噪声的高维数据恢复",
+      "canonical_evidence": "张量列用于带噪声的高维数据恢复",
+      "llm_tldr_en": "Develops a tensor train framework for nonlinear filtering with correlated noise, enabling efficient recovery of high-dimensional tensor data from noisy observations.",
+      "llm_tldr_cn": "带相关噪声的非线性滤波问题难以直接数值求解。本文提出基于张量列（TT）的框架，通过TT近似压缩高维随机微分系统，并采用半隐式Milstein方案进行时间积分。该方法直接处理高维张量数据恢复，且针对相关噪声，与高光谱图像去噪中的张量恢复需求高度吻合。",
+      "llm_tldr": "带相关噪声的非线性滤波问题难以直接数值求解。本文提出基于张量列（TT）的框架，通过TT近似压缩高维随机微分系统，并采用半隐式Milstein方案进行时间积分。该方法直接处理高维张量数据恢复，且针对相关噪声，与高光谱图像去噪中的张量恢复需求高度吻合。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.28613v1",
+      "source": "arxiv",
+      "title": "Implicit Regularization in Perturbed Deep Matrix Factorization: Spectral Conditions and Stability",
+      "abstract": "This paper studies the stability of low-rank implicit regularization in perturbed deep matrix factorization, where the target matrix is corrupted by a noise matrix. We first derive sufficient spectral conditions under which gradient descent exhibits a low-rank phase in the noiseless setting. These conditions show how the target spectrum, initialization, and step size jointly determine the existence of a nonempty low-rank interval. We then analyze the perturbed gradient descent dynamics, proving convergence guarantees and quantifying how the perturbation affects iteration complexity and eigenvalue recovery. Finally, we show that the low-rank phase persists under perturbation, with explicit dependence on the perturbation size. Numerical experiments support the theoretical findings.",
+      "authors": [
+        "Jingzhe Wang",
+        "Hung-Hsu Chou"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.LG",
+        "stat.ML"
+      ],
+      "published": "2026-05-27T15:26:50+00:00",
+      "link": "https://arxiv.org/pdf/2605.28613v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "low-rank implicit regularization under noise perturbation for matrix factorization",
+      "llm_evidence_cn": "噪声扰动下矩阵分解的低秩隐式正则化",
+      "llm_evidence": "噪声扰动下矩阵分解的低秩隐式正则化",
+      "canonical_evidence": "噪声扰动下矩阵分解的低秩隐式正则化",
+      "llm_tldr_en": "Studies stability of low-rank implicit regularization in deep matrix factorization under noise, providing spectral conditions and convergence guarantees.",
+      "llm_tldr_cn": "该文理论分析了在噪声矩阵扰动下深度矩阵分解中低秩隐式正则化的稳定性，给出了梯度下降保持低秩阶段的谱条件，并证明低秩相位在扰动下仍然存在。研究为低秩表示去噪提供了坚实的理论基础，直接关联用户对低秩表示去噪的需求。",
+      "llm_tldr": "该文理论分析了在噪声矩阵扰动下深度矩阵分解中低秩隐式正则化的稳定性，给出了梯度下降保持低秩阶段的谱条件，并证明低秩相位在扰动下仍然存在。研究为低秩表示去噪提供了坚实的理论基础，直接关联用户对低秩表示去噪的需求。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2605.22197v1",
+      "source": "arxiv",
+      "title": "A Residual-Subspace Constraint Framework for Fourier Ptychographic Microscopy",
+      "abstract": "The reconstruction fidelity of computational optical imaging is fundamentally constrained by the model-reality gap, i.e., the inevitable discrepancy between idealized forward models and the physical imaging process. Conventional paradigms attempt to bridge this gap through exhaustive system calibration or explicit parameter estimation, which are often computationally intensive and prone to severe non-convex stagnation. This paper introduces a Residual-Subspace Constraint Framework (RSCF) to achieve robust Fourier ptychographic microscopy. Instead of treating residuals as unstructured errors, RSCF leverages subspace decomposition to decouple low-rank, systematic mismatches from stochastic noise, thereby isolating stable information manifolds that remain invariant to forward-model inaccuracies. By embedding this subspace constraint into the iterative engine, the framework selectively suppresses error-amplifying components, enabling high-fidelity phase and amplitude recovery without explicit hardware calibration. Numerical simulations and experimental validations demonstrate that RSCF yields superior convergence acceleration and artifact suppression under severe optical aberrations and LED misalignment. This information-centric paradigm provides a versatile, model-agnostic strategy to enhance robustness across diverse computational imaging modalities.",
+      "authors": [
+        "Sui-peng Wang",
+        "Si-yi Xie",
+        "Chang-tao Cai",
+        "Zhun Wei",
+        "Rui Chen"
+      ],
+      "primary_category": "physics.optics",
+      "categories": [
+        "physics.optics"
+      ],
+      "published": "2026-05-21T09:01:42+00:00",
+      "link": "https://arxiv.org/pdf/2605.22197v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "low-rank subspace decomposition for noise removal",
+      "llm_evidence_cn": "低秩子空间分解用于噪声去除",
+      "llm_evidence": "低秩子空间分解用于噪声去除",
+      "canonical_evidence": "低秩子空间分解用于噪声去除",
+      "llm_tldr_en": "Introduces a residual-subspace constraint framework using low-rank decomposition to separate systematic mismatches from stochastic noise, applicable to imaging denoising.",
+      "llm_tldr_cn": "计算光学成像中模型与现实差距导致重建质量受限。本文提出残差子空间约束框架（RSCF），利用子空间分解将低秩系统偏差与随机噪声解耦，从而隔离稳定信息流形。该方法直接涉及低秩表示用于去噪的核心思想，可推广至高光谱图像中的噪声去除任务。",
+      "llm_tldr": "计算光学成像中模型与现实差距导致重建质量受限。本文提出残差子空间约束框架（RSCF），利用子空间分解将低秩系统偏差与随机噪声解耦，从而隔离稳定信息流形。该方法直接涉及低秩表示用于去噪的核心思想，可推广至高光谱图像中的噪声去除任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.21381v1",
+      "source": "arxiv",
+      "title": "Disentangling Generation and Regression in Stochastic Interpolants for Controllable Image Restoration",
+      "abstract": "Recent advances in Image Restoration (IR) have been largely driven by generative methods such as Diffusion Models and Flow Matching, which excel in synthesizing realistic textures while suffering from slow multi-step inference and compromised pixel fidelity. In contrast, classical regression-based IR methods excel precisely in these aspects, offering single-step efficiency and high pixel-level reconstruction fidelity. To bridge this gap, we propose DiSI, a unified framework that Disentangles the underlying Stochastic Interpolant process into independent generation and regression components. This decoupling endows DiSI with remarkable versatility, enabling a continuous and controllable transition from a pure regression process to a fully generative one. Technically, we instantiate this framework with two specific sampling trajectories, accompanied by a unified sampler for high-quality, few-step inference on arbitrary trajectories. Furthermore, we design a dual-branch U-Net style transformer network in pixel space, using a dedicated branch to enhance conditional guidance while ensuring high throughput. Extensive experiments demonstrate that DiSI efficiently achieves competitive results on various IR tasks, while uniquely offering the inference-time flexibility to control the distortion-perception trade-off within a single model.",
+      "authors": [
+        "Yi Liu",
+        "Jia Ma",
+        "Wengen Li",
+        "Jihong Guan",
+        "Shuigeng Zhou",
+        "Yichao Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-05-20T16:41:32+00:00",
+      "link": "https://arxiv.org/pdf/2605.21381v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "unified generative and regression framework for image restoration",
+      "llm_evidence_cn": "统一生成与回归的图像恢复框架",
+      "llm_evidence": "统一生成与回归的图像恢复框架",
+      "canonical_evidence": "统一生成与回归的图像恢复框架",
+      "llm_tldr_en": "Proposes DiSI to disentangle generation and regression in stochastic interpolants for controllable image restoration, balancing fidelity and realism.",
+      "llm_tldr_cn": "该文提出DiSI框架，将随机插值过程解耦为独立的生成与回归组件，实现从纯回归到纯生成的可控过渡。在图像恢复任务中兼顾像素保真度和纹理真实性。该方法可迁移至高光谱图像恢复，作为先进的恢复方法。",
+      "llm_tldr": "该文提出DiSI框架，将随机插值过程解耦为独立的生成与回归组件，实现从纯回归到纯生成的可控过渡。在图像恢复任务中兼顾像素保真度和纹理真实性。该方法可迁移至高光谱图像恢复，作为先进的恢复方法。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.28331v1",
+      "source": "arxiv",
+      "title": "Transfer learning RGB models to hyperspectral images with trainable tensor decompositions",
+      "abstract": "Transfer learning makes it possible to use large vision networks on a variety of domains, by specializing their models' general filters to new tasks. However, these networks assume the input images to have 3 input channels, making them incompatible with multi- or hyperspectral images. Current approaches that mitigate this incompatibility sacrifice information in either the image, or the model. This work proposes a novel approach that preserves the image and spatial information present in the model by using partially trainable tensor decompositions. We create such decompositions of pretrained convolutional filters, separating the filters into spatial and spectral components. The spectral components are then replaced with trainable components of higher channel dimensionality. This creates hyperspectral filters that can specialize to new datasets, while retaining the spatial patterns of the original filter. Experiments on a variety of hyperspectral datasets show that our approach is more accurate and robust than other hyperspectral transfer learning methods.",
+      "authors": [
+        "Mariette Schönfeld",
+        "Laurens Devos",
+        "Wannes Meert",
+        "Hendrik Blockeel"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-05-27T11:34:27+00:00",
+      "link": "https://arxiv.org/pdf/2605.28331v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "trainable tensor decompositions for hyperspectral transfer learning",
+      "llm_evidence_cn": "用于高光谱迁移学习的可训练张量分解",
+      "llm_evidence": "用于高光谱迁移学习的可训练张量分解",
+      "canonical_evidence": "用于高光谱迁移学习的可训练张量分解",
+      "llm_tldr_en": "Proposes partially trainable tensor decompositions to adapt pretrained RGB models to hyperspectral images, preserving spatial and spectral information.",
+      "llm_tldr_cn": "本文提出一种部分可训练的张量分解方法，将预训练RGB模型的卷积滤波器分解为空间和光谱成分，并替换光谱成分以适应高光谱图像。该方法在不牺牲图像或模型信息的前提下实现了从RGB到高光谱的迁移学习，为高光谱图像深度学习（包括去噪）提供了有效工具。实验表明该方法在多个任务中优于现有适配策略。",
+      "llm_tldr": "本文提出一种部分可训练的张量分解方法，将预训练RGB模型的卷积滤波器分解为空间和光谱成分，并替换光谱成分以适应高光谱图像。该方法在不牺牲图像或模型信息的前提下实现了从RGB到高光谱的迁移学习，为高光谱图像深度学习（包括去噪）提供了有效工具。实验表明该方法在多个任务中优于现有适配策略。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "deep learning for hyperspectral denoising",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.24621v1",
+      "source": "arxiv",
+      "title": "Phase-Aware Wavelet-Based-Scattering Encoder-Decoder for Dense Predictions",
+      "abstract": "Scattering transforms achieve Lipschitz stability and translation invariance, but dense prediction tasks require preserving spatial structure lost in global averaging. We propose Phase-Aware Scattering Encoder-Decoder, which restores this information by explicitly preserving phase in skip connections. On image denoising (BSD68), breaking translation invariance improves PSNR by $+2.17$~dB; phase preservation adds $+1.03$~dB. A novel spatial shuffling ablation ($-1.26$~dB penalty) demonstrates phase encodes location-dependent structure. We conduct a preliminary extensibility study on a second dense prediction task (ISIC skin lesion segmentation), with full cross-validation as ongoing work. This work advances principled wavelet-deep learning integration, showing how phase information complements scattering's stability-expressiveness trade-off in pixel-level prediction.",
+      "authors": [
+        "Ghassen Marrakchi",
+        "Basarab Matei"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-05-23T15:12:43+00:00",
+      "link": "https://arxiv.org/pdf/2605.24621v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deep learning denoising with wavelet scattering",
+      "llm_evidence_cn": "基于小波散射的深度学习去噪",
+      "llm_evidence": "基于小波散射的深度学习去噪",
+      "canonical_evidence": "基于小波散射的深度学习去噪",
+      "llm_tldr_en": "Proposes phase-aware wavelet scattering encoder-decoder for dense predictions, showing significant gains on image denoising task, indicating transferable denoising method.",
+      "llm_tldr_cn": "密集预测任务（如去噪）要求保留空间结构，而传统小波散射因全局平均丢失位置信息。本文提出相位感知小波散射编解码器，通过显式保留跳跃连接中的相位信息来恢复空间结构。在BSD68图像去噪上，打破平移不变性提升2.17dB，相位保留再增1.03dB。该方法为深度学习去噪提供了新思路，可直接迁移至高光谱图像去噪。",
+      "llm_tldr": "密集预测任务（如去噪）要求保留空间结构，而传统小波散射因全局平均丢失位置信息。本文提出相位感知小波散射编解码器，通过显式保留跳跃连接中的相位信息来恢复空间结构。在BSD68图像去噪上，打破平移不变性提升2.17dB，相位保留再增1.03dB。该方法为深度学习去噪提供了新思路，可直接迁移至高光谱图像去噪。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "deep learning for hyperspectral denoising",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

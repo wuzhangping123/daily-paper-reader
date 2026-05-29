@@ -1,0 +1,3225 @@
+Title: Tensor train methods for high-dimensional nonlinear filtering problems with correlated noise
+
+URL Source: https://arxiv.org/pdf/2605.25677v1
+
+Published Time: Tue, 26 May 2026 02:06:11 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+# Tensor train methods for high-dimensional nonlinear filtering problems with correlated noise 
+
+Yuhua Meng ∗ Stephen S.-T. Yau † Zhiwen Zhang ‡
+
+May 26, 2026 
+
+Abstract 
+
+Nonlinear filtering with correlated noise leads to a Duncan-Mortensen-Zakai (DMZ) equa-tion in the form of a stochastic partial differential equation (SPDE). Unlike the independent noise case, the presence of correlation prevents the classical invertible transformation that reduces the DMZ equation to a deterministic partial differential equation, requiring a direct numerical treatment of the SPDE. This paper develops a tensor train (TT) based frame-work for solving medium- to high-dimensional DMZ equations with correlated noise. Spatial discretization transforms the SPDE into a high-dimensional stochastic differential system, which is efficiently compressed using TT approximation. A semi-implicit Milstein scheme is employed for temporal integration to ensure stability and accuracy. Under suitable regular-ity assumptions, we establish a convergence analysis of the proposed method. In particular, the spatial error is controlled by both the mesh size and the prescribed TT approximation accuracy. In the temporal direction, the convergence is proved by estimating stochastic integrals involving drifted observations, without invoking a change-of-measure argument. Numerical experiments demonstrate that the proposed method achieves stable and accurate performance for cubic sensor problems. In challenging multi-modal settings, where particle filter and extended Kalman filter deteriorate, the proposed method maintains accuracy and effectively captures the posterior distribution. 
+
+Keywords: convergence analysis, correlated noise, nonlinear filtering problem, stochastic partial differential equation (SPDE), Tensor Train decomposition 
+
+# 1 Introduction 
+
+The nonlinear filtering (NLF) problem concerns the estimation of an unobservable stochastic state process xt from noisy observations {ys : 0 ≤ s ≤ t}. Its study dates back to the early 1960s, when the Kalman filter [12] and the Kalman–Bucy filter [13] were introduced, providing optimal estimation for linear systems under Gaussian assumptions. For nonlinear dynamics, extensions such as the extended Kalman filter (EKF) and the unscented Kalman filter have been developed, but they remain restricted by Gaussian assumptions. Particle filters (PF) offer greater flexibility, as they can handle nonlinear and non-Gaussian problems. However, PFs suffer from well-known issues such as weight degeneracy and sample impoverishment, and their computational cost increases rapidly with the state dimension, limiting their effectiveness in high-dimensional settings. An alternative formulation of the NLF problem is based on stochastic partial differential equations (SPDEs). In particular, the conditional probability density of xt
+
+> ∗
+
+Department of Mathematics, The University of Hong Kong, Pokfulam Road, Hong Kong SAR, P.R.China. Email: yvette00@connect.hku.hk. 
+
+> †
+
+Corresponding author. Department of Mathematical Sciences, Tsinghua University, Beijing 100084, P. R. China. Email: yau@uic.edu. 
+
+> ‡
+
+Corresponding author. Department of Mathematics, The University of Hong Kong, Pokfulam Road, Hong Kong SAR, P.R. China, and the Materials Innovation Institute for Life Sciences and Energy (MILES), HKU-SIRI, Shenzhen, 518045, P.R. China. Email: zhangzw@hku.hk. 
+
+1
+
+> arXiv:2605.25677v1 [math.NA] 25 May 2026
+
+given the observation history σ{ys : 0 ≤ s ≤ t} satisfies the Kushner-Stratonovich equation [17, 36], which is a nonlinear and nonlocal SPDE. By introducing the Radon-Nikodym derivative, this equation can be transformed into a linear SPDE governing the unnormalized conditional density, known as the Duncan-Mortensen-Zakai (DMZ) equation [8, 27, 42]. Various numerical methods have been proposed for solving the DMZ equation, including the splitting-up algorithm [1], and the S3 algorithm [19]. Alternatively, the Yau-Yau algorithm transforms the DMZ equation into a deterministic partial differential equation (PDE), enabling an efficient offline-online decomposition [40, 41, 23, 38, 18]. The methods mentioned above are developed under the assumption that the Brownian motions driving xt and yt are mutually independent. When the noises are correlated, the KF, PF, and their variants can be readily generalized [11, 21, 14], but they suffer from the same limitations discussed earlier. For the SPDE-based approach, available results remain limited. Extensions of the splitting-up algorithm to correlated noise have been established in [10, 22], where numerical experiments are restricted to low-dimensional settings. Hermite-Galerkin methods demonstrate their effectiveness in 2D NLF problems [37]. Reference [20] solves a 5D NLF problem in the linear case. Solving NLF problems with correlated noise remains challenging in medium- to high-dimensional settings. A fundamental difficulty in solving the DMZ equation numerically is the rapid growth of storage and computation cost with respect to the dimension. To address this issue, we employ the tensor train (TT) decomposition, which provides an efficient low-rank representation for high-dimensional tensors. By compressing the tensor to a low-rank structure, TT has been applied to a range of medium- to high-dimensional PDEs, including the Fokker-Planck equation [6], stochastic elliptic equations [5], parabolic PDEs [32], and Helmholtz equations [9]. In the context of nonlinear filtering, TT-based methods have also been developed for the DMZ equation. In particular, a TT-based finite difference method (FDM) was proposed for the independent noise case in [18], and further improved under a functional polyadic assumption in [25]. Besides the TT method, several other approaches are available to mitigate the curse of dimensionality. For example, in spectral methods, hyperbolic cross approximation [24] and scaling or translating factors [37] have been introduced to reduce complexity. This paper extends the application of TT-based FDM to the DMZ equation with correlated noise. The main contributions of this paper are summarized as follows: 
+
+• We develop a TT-based semi-implicit Milstein method for solving the DMZ equation with correlated noise, where the classical transformation to a deterministic PDE is no longer applicable. 
+
+• We rigorously establish convergence of the proposed method in both space and time. In particular, the temporal convergence is proved by directly estimating stochastic integrals involving drifted observations, without invoking a change-of-measure argument. 
+
+• Numerical experiments demonstrate that the TT method provides a more favorable accuracy-cost tradeoff in the tested high-dimensional nonlinear examples. To solve the DMZ equation, we first discretize it directly, which leads to a high-dimensional SDE. To render this system computationally tractable, we approximate the semi-discrete system in TT format, so that all the high-dimensional full arrays are represented in compressed form. Under suitable assumptions on the spatial regularity of the exact solution and certain conditions on the signal process model (1), we establish convergence of the semi-discrete TT scheme with respect to the mesh size and the prescribed TT approximation accuracy. A variety of numerical schemes may be employed for SDEs; see [16] and references therein. To balance stability and efficiency, we adopt a semi-implicit Milstein scheme for temporal dis-cretization. The temporal convergence is established by deriving suitable estimates for the related stochastic multiple integrals and applying a general convergence theorem from [26]. In 2contrast to existing convergence analysis for the DMZ equation, which often relies on a change of measure and subsequent transformation back to the original measure via H¨ older inequality [22, 7, 28], our analysis is carried out directly under the original probability measure. This avoids the loss of integrability inherent in measure-change arguments and leads to a more direct convergence analysis for SDEs driven by drifted observation processes. To assess the performance of the proposed TT-based method, numerical experiments are presented on NLF problems with nonlinear dynamics and multi-modal problems. The approach is compared with PF and EKF in representative test cases. The results demonstrate that, by directly approximating the conditional probability density function and exploiting the TT format, the proposed method exhibits improved stability and accuracy in nonlinear regimes and successfully captures multi-modal features that are challenging for classical techniques. The rest of the paper is organized as follows. Section 2 presents the DMZ equation, TT approximation, and the notation used in the time discretization scheme. The tensor train method is introduced in Section 3. The convergence in space and time is proved in Sections 4 and 5. In Section 6, we provide some numerical results. 
+
+# 2 Preliminaries 
+
+2.1 DMZ equation 
+
+The signal process with correlated noise is modeled by 
+
+(
+
+dx t = f (xt)dt + G(xt)dv t + ρ(xt)dw t,dy t = h(xt)dt + dw t, (1) where xt ∈ Rd is the system state, yt ∈ Rd is the observation at time t, f and h are Rd-valued functions, G and ρ are matrix-valued functions, and vt and wt are standard Brownian motions. The unnormalized conditional density of xt given the observation history {ys : 0 ≤ s ≤ t} is governed by the DMZ equation [8, 27, 42]: 
+
+du (t, x ) = L0udt +
+
+> d
+
+X
+
+> k=1
+
+Lkudy kt , (2) where 
+
+L0(·) = 12
+
+X
+
+> ij
+
+∂2 (GG ⊤ + ρρ ⊤)ij · 
+
+∂x i∂x j
+
+−
+
+> d
+
+X
+
+> k=1
+
+∂∂x k
+
+(fk·),
+
+Lk(·) = hk · − 
+
+> d
+
+X
+
+> i=1
+
+∂∂x i
+
+(ρik ·).
+
+The DMZ equation is a stochastic partial differential equation (SPDE) driven by yt. If ρ(x) ≡ 0, then the state process and the observation process in (1) are independent. In this case, (2) can be transformed into a deterministic PDE via an invertible exponential transformation [4, 40]. For the correlated noise setting considered here, no analogous transformation is available. Therefore, the SPDE (2) needs to be treated directly. 
+
+2.2 Tensor Train decomposition 
+
+Finite difference methods are widely used to solve differential equations, but they suffer from the curse of dimensionality. In particular, the discretization of a d-dimensional PDE leads to a d-dimensional full grid tensor of size N1 × · · · × Nd. This results in exponential growth in 3memory requirements and the number of arithmetic operations with respect to d. To enable an efficient numerical solution of higher-dimensional problems, it is necessary to exploit low-rank tensor representations, such as the Tensor Train (TT) decomposition. The TT format was proposed as a stable approximation for a high-dimensional full tensor [31]. Given a full grid tensor A ∈ RN1×···× Nd , its unfolding matrices are defined by 
+
+Ak = Ak(i1, . . . , i k; ik+1 , . . . , i d) = A(i1, . . . , i d).
+
+It was proved in [31] that A admits a decomposition of the form 
+
+A(i1, . . . , i d) = G1(i1)G2(i2) · · · Gd(id), (3) where r0 = rd = 1, and Gk(ik) is an rk−1 × rk matrix with rk ≤ rank( Ak). A tensor A is said to be in TT format if it is written in (3); rk is referred to as the TT-rank, and Gk as the cores of the TT decomposition. Furthermore, if the unfolding matrices Ak have low-rank approximations, i.e., 
+
+Ak = Rk + Ek, || Ek|| F = εk, k = 1 , ..., d − 1,
+
+then the TT-SVD algorithm [31] gives a TT approximation B with TT-rank rank( Rk) and an error bound || A − B|| F ≤
+
+qPd−1 
+
+> k=1
+
+ε2
+
+> k
+
+. The number of parameters in the TT format (3) is O(N dr 2), where N and r are upper bounds on the mode size and TT-rank, respectively. Accordingly, the computational cost of basic linear algebra operations grows only polynomially with respect to d [31]. However, constructing the TT approximation from a full array requires 
+
+O(N dr2) operations, which remains exponential in d. To tackle this problem, various fast approximation algorithms have been proposed [33, 34]. For a multi-dimensional matrix M of size ( n1 × · · · × nd) × (m1 × · · · × md), the corresponding TT format is also available [29, 15, 30]. 
+
+2.3 Itˆ o–Taylor Expansion and Notation 
+
+To derive and analyze the time-discrete approximation of the semi-discrete scheme (6), we recall the notation used in the stochastic Taylor expansion, following standard references such as [16]. Specifically, the framework will be used to estimate multiple stochastic integrals and their convergence rates. 
+
+Time grid and filtration. Let 0 = τ0 < τ 1 < · · · < τ NT = T be a uniform time partition with step size δ = TNT . Let ( Ft)t≥0 be a non-decreasing filtration, such that xt, yt and U(t) are 
+
+Ft-adapted. Denote ˆUn (0 ≤ n ≤ NT ) as the time-discrete approximation of the semi-discrete scheme (6). Each ˆUn is Fτn -measurable, and the initial value satisfies ˆU0 = U(0). For brevity, we write Eτn := E(·|F τn ). 
+
+Multi-index notation. For a multi-index α = ( j1, ..., j l) with ji = 0 , 1, ..., d , define its length 
+
+l(α) = l, and let ν denote the empty index with l(ν) = 0. Let n(α) denote the number of zero components in α. We use the standard notations −α := ( j2, ..., j l), α − := ( j1, ..., j l−1), with the convention −(j) = ( j)− = ν. Define the set of multi-indices 
+
+M := {(j1, ..., j l)|ji = 0 , 1, ..., d, l = 1 , 2, ... } ∪ { ν}.
+
+For γ ∈ { 0.5, 1, 1.5, . . . }, define 
+
+Aγ := {α ∈ M | l(α) + n(α) ≤ 2γ or l(α) = n(α) = γ + 12 },
+
+and its remainder set 
+
+B(Aγ ) := {α ∈ M \ A γ : −α ∈ A γ }.
+
+4Stochastic multiple integrals. For α ∈ M , define the differential operators recursively 
+
+Lν = I, Lα = L−αLj1 , α = ( j1, ..., j l),
+
+where Lj is defined in (9). To define the stochastic multiple integrals, denote Hv as the set of all the adapted right-continuous stochastic processes g = {g(t), t ≥ 0} with |g(t)| < ∞ almost surely for ∀t > 0; H(0) as all those with R t 
+
+> 0
+
+|g(s)|ds < ∞, ∀t > 0 almost surely; and H(1) as all those with R t 
+
+> 0
+
+|g(s)|2ds, ∀t > 0 with probability 1. Denote H(j) = H(1) . For α = ( j1, ..., j l) ∈ M ,define the stochastic multiple integrals over [ τ, t ]: 
+
+Iα[g(·)] τ,t = g(t), if α = ν, Iα[g(·)] τ,t =
+
+Z tτ
+
+Iα−[g(·)] τ,s ds, if jl = 0 ,Iα[g(·)] τ,t =
+
+Z tτ
+
+Iα−[g(·)] τ,s dy jl 
+
+> s
+
+, if 1 ≤ jl ≤ d, (4) where Hα is the set of adapted right-continuous stochastic process g with Iα−[g]τ,t ∈ H (jl). For 
+
+g ≡ 1, we write Iα;τ,t as shorthand, and set Inα = Iα;τn,τ n+1 .
+
+Itˆ o-Taylor expansion. The solution U(t) of (6) admits the representation 
+
+U(t) = X
+
+> α∈A γ
+
+LαU(τ )Iα;τ,t + X 
+
+> α∈B (Aγ)
+
+LαIα[U(·)] τ,t . (5) which forms the basis for time discretization and error analysis in the sequel. 
+
+# 3 TT-based discretization of the DMZ equation 
+
+Throughout the paper, let Id (N ) 
+
+> d
+
+denote the d-dimensional identity tensor of mode size N .
+
+Assumption 3.1. Assume that G(x)G(x)⊤ and ρ(x)ρ(x)⊤ are diagonal matrices with non-negative diagonal entries. Moreover, there exist constants λG, ΛG, Λρ > 0 such that λG|ξ|2 ≤
+
+ξ⊤G(x)G(x)⊤ξ ≤ ΛG|ξ|2, and ξ⊤ρ(x)ρ(x)⊤ξ ≤ Λρ|ξ|2, for all x ∈ Rd and ξ ∈ Rd.
+
+Assumption 3.2. Assume that ρij (x) and Gij (x) belong to C4 
+
+> b
+
+, i.e., they are four times con-tinuously differentiable and all derivatives up to order four are bounded. 
+
+Assumption 3.3. f (x) : Rd → Rd and h(x) : Rd → Rd are C1 with bounded derivatives, hence Lipschitz continuous with constants Lf , Lh, i.e., |f (x) − f (y)| ≤ Lf |x − y|, |h(x) − h(y)| ≤ 
+
+Lh|x − y|.
+
+Assumption 3.4. The drift function satisfies linear growth bound: |f (x)|2 ≤ K(1 + |x|2). The observation function h is uniformly bounded: |h(x)| < C h.
+
+Assumption 3.1 is introduced for simplicity. In fact, the discretization method can be readily generalized to the case where G, ρ are general matrices. The corresponding difference method is outlined in the Appendix. The assumptions are set for technical proof; however, the proposed method may still per-form well even when they are not satisfied, as demonstrated in the numerical experiments in Subsection 6.1. 
+
+Spatial discretization. To apply the discretization, we constrain the domain to a cube I =[−L, L ]d, and define the functions xi,r := −L + r · ∆x with step ∆ x = 2LN +1 , r ∈ 12 Z.5Under Assumption 3.1, we have the semi-discrete scheme: 
+
+dU(t) = L0U(t)dt +
+
+> d
+
+X
+
+> k=1
+
+LkU(t)dy kt , (6) where Lj is the discretized operator of Lj , 0 ≤ j ≤ d. Specifically, in one-dimensional space, define 
+
+C1 = 1∆x
+
+
+
+1 0 0 · · · 0
+
+−1 1 0 · · · 00 −1 1 · · · 00 0 −1 . . . 0... ... . . . . . . 10 0 · · · 0 −1
+
+ 
+
+> (N+1) ×N
+
+,
+
+C1 = 12∆ x tridiag( −1, 0, 1) , (C1 ∈ RN ×N ).
+
+With this definition, −C⊤ 
+
+> 1
+
+C1 and C1 are the discretized Laplace operator and central difference operator on [ −L, L ], with homogeneous Dirichlet boundary conditions. For k = 1 , ..., d , define 
+
+C(k) 
+
+> d
+
+= Id (N ) 
+
+> k−1
+
+⊗ C1 ⊗ Id (N )
+
+> d−k
+
+,
+
+C(k) 
+
+> d
+
+= Id (N ) 
+
+> k−1
+
+⊗ C1 ⊗ Id (N )
+
+> d−k
+
+.
+
+Denote the grid points and mid-edge points in one direction by xi = ( xi, 1, ..., x i,N ) and xk =(xi, 12
+
+, x i, 32
+
+, ..., x i,N + 12
+
+), respectively. The points tensor in the whole domain considered is ob-tained by 
+
+X = x1 × · · · × xd, (7) 
+
+X (k) = x1 × · · · × xk × · · · × xd. (8) For functions g : Rd → R, define the diagonal matrix Mg = diag( g(X )). If g = Akk , where A is a matrix-valued function, then define Mg = diag( g(X (k))). The discretized versions of Lj (0 ≤ j ≤ d) are given by 
+
+L0 = 12 (∆ρ + ∆G) − Cd − M(0) ,
+
+Lk = M(k) − X
+
+> i
+
+Mρik C(i) 
+
+> d
+
+. (9) where 
+
+∆∗ =
+
+> d
+
+X
+
+> i=1
+
+−(C(i) 
+
+> d
+
+)⊤M∗∗ ⊤ 
+
+> ii
+
+C(i) 
+
+> d
+
+, Cd =
+
+> d
+
+X
+
+> k=1
+
+Mfk C(k) 
+
+> d
+
+,
+
+M(0) = Mdiv( f ), M(k) = Mhk −∇· (ρ·k ).
+
+TT approximation. For efficiency, we replace U(t) and Lj with their TT approximations 
+
+eU(t) and eLj , achieving relative accuracy ε. That is, the TT semi-discrete scheme is 
+
+d eU(t) = eL0 eU(t)dt +
+
+> d
+
+X
+
+> k=1
+
+eLk eU(t)dy kt , (10) 6with 
+
+|| eU(0) − U(0) || F ≤ ε|| U(0) || F , (11) 
+
+|| eL0 − L0|| F ≤ ε(∆ x)d/ 2+2 || L0|| F , (12) 
+
+|| eLk − Lk|| F ≤ ε(∆ x)d/ 2+1 || Lk|| F . (13) The scaling with (∆ x)d/ 2 ensures that the absolute error is independent of the mesh size. Specifically, due to the sparsity of the matrix Lj , 0 ≤ j ≤ d, we have 
+
+|| L0|| F ≤ CL
+
+(∆ x)2+ d/ 2 , || Lk|| F ≤ CL
+
+(∆ x)1+ d/ 2 , (14) where CL > 0 is independent of ∆ x.
+
+Time discretization. We discretize the time interval [0 , T ] by a uniform partition 0 = t0 <t1 < t 2 < · · · < t NT = T , where tn+1 − tn = δ = TNT . To achieve strong order one accuracy, we apply the semi-implicit Milstein method ˆUn+1 = ˆUn + δ
+
+2 ( e∆G + e∆ρ) ˆUn+1 − ( eCd + fM(0) ) ˆUnδ
+
++
+
+> d
+
+X
+
+> j=1
+
+eLj ˆUnIn 
+
+> (j)
+
++
+
+> d
+
+X
+
+> i,j =1
+
+eL(i,j ) ˆUnIn
+
+> (i,j )
+
+, (15) where I(j), I(i,j ) are defined in (4). The implicit treatment of the diffusion operator requires solving a linear system. In our implementation, the inverse of the matrix Id (N ) 
+
+> d
+
+− δ 
+
+> 2
+
+( e∆G + e∆ρ) is pre-computed once. Although a sparse matrix does not imply sparsity of its inverse, numerical experiments indicate that the inverse has a low TT-rank (see Table 1), which enables efficient implementation of the implicit method. The overall procedure is summarized in Algorithm 1. Table 1: TT-rank bound of ( Id (N ) 
+
+> d
+
+− δ 
+
+> 2
+
+(∆G + ∆ρ)) −1 for different dimensions d and DOF per spatial direction. (In this example, G is an orthogonal matrix, ρ(x) = diag( x). The stopping criterion for the Newton–Schulz iteration is ∥A−1 
+
+> k
+
+A − I∥F /∥I∥F < 5 × 10 −5.) DOF per direction d = 2 d = 4 d = 6 d = 8 10 5 6 6 620 7 8 9 940 10 10 10 10 60 12 13 13 14 
+
+Remark 3.5. Suppose the TT-rank of the tensors in the online stage is bounded by r. With mode size N and dimension d, the computational cost is O(dN r 3) for tensor addition and 
+
+O(dN 2r4) for matrix–vector multiplication. Since each online time step involves O(d2) tensor additions and 2 matrix–vector multiplications, the overall complexity per step is O(d3N r 3 +
+
+dN 2r4). This polynomial dependence on d indicates that the TT method alleviates the curse of dimensionality. 
+
+Remark 3.6. For i̸ = j, the multiple stochastic integral I(i,j ) cannot be expressed solely in terms of the increments In 
+
+> (i)
+
+and In
+
+> (j)
+
+. In practical implementations, a common approximation is given by I(i,j ) ≈ 12 In
+
+> (i)
+
+In
+
+> (j)
+
+. The impact of this approximation on convergence is discussed in Section V. 
+
+7Algorithm 1 TT-based semi-implicit Milstein scheme for DMZ equation  
+
+> 1:
+
+Offline stage: Precomputation  
+
+> 2:
+
+Compute the TT approximations e∆G, e∆ρ, eCd, fM(0) , and eLk, respectively, as defined in (9), and set fMR = Id − δ( eCd + fM(0) ) and eL(i,j ) = eLi eLj . 
+
+> 3:
+
+Compute fML := ( Id (N ) 
+
+> d
+
+− δ 
+
+> 2
+
+(∆G + ∆ρ)) −1 by the Newton-Schulz iteration in TT format. TT-rounding is used to control the growth of the TT-rank.  
+
+> 4:
+
+Approximate the initial distribution function u0 by its discretized TT format eU0. 
+
+> 5:
+
+Online stage: Time stepping  
+
+> 6:
+
+Input: fML, fMR, eLi, eL(i,j ), and observations {y(tn)} 
+
+> 7:
+
+Output: Approximation ˆUn of u(tn) 
+
+> 8:
+
+for n = 0 to NT − 1 do  
+
+> 9:
+
+Compute the stochastic integral approximations: ˆI(i,j ) = 12 ∆yitn ∆yjtn , (i̸ = j), ˆI(i,i ) = 12
+
+ (∆ yitn )2 − δ 
+
+> 10:
+
+Compute the update operator: 
+
+Mupdate =
+
+> d
+
+X
+
+> j=1
+
+eLj ∆yjtn +
+
+> d
+
+X
+
+> i,j =1
+
+eL(i,j ) ˆI(i,j ) 
+
+> 11:
+
+Update the solution: 
+
+y =  fMR + Mupdate 
+
+ ˆUn, ˆUn+1 = fMLy 
+
+> 12:
+
+Compute statistics with the approximation ˆUn 
+
+> 13:
+
+end for 
+
+# 4 Semi-discrete and TT Approximation Error Analysis 
+
+In this section, we analyze the errors arising from the spatial discretization and TT approxima-tion. We first establish the convergence rate with respect to the mesh size, and then derive the error induced by TT truncation. A combined error estimate is given at the end of this section. 
+
+4.1 Spatial discretization error estimate 
+
+We begin by analyzing structural properties of the discretized operator in (9) associated with the semi-discrete scheme (6). These properties are used to establish and derive the spatial convergence rate in Theorem 4.3 and stability estimate in Lemma 4.4. 
+
+Lemma 4.1. For functions g : Rd → R, if g ∈ C4 with bounded derivatives, and g ≥ 0, then there exist constants h0 > 0 and c0 > 0, independent of ∆x, such that ∀ξ ∈ RN d
+
+, 0 < ∆x ≤ h0
+
+and M(k) 
+
+> g
+
+= diag( g(X (k))) ,
+
+ξ⊤(−(C(k) 
+
+> d
+
+)⊤M(k) 
+
+> g
+
+C(k) 
+
+> d
+
++ ( C(k) 
+
+> d
+
+)⊤MgC(k) 
+
+> d
+
+)ξ < c 0(ξ⊤ξ).
+
+Proof Here we give the proof for the 1D case. The proof for d > 1 can be directly generalized from this. For d = 1, define dj := ξj − ξj−1, and add the artificial boundary ξ0 = ξN +1 = 0. With this setting, 
+
+C1ξ = 1∆x (d1, d 2, ..., d N , d N +1 )⊤,
+
+8C1ξ = 12∆ x (d1 + d2, d 2 + d3, ..., d N + dN +1 )⊤.
+
+Since g ∈ C4 
+
+> b
+
+, Taylor’s expansion gives, uniformly in i,
+
+g(xi−1) + g(xi)2 = g(xi−1/2) + (∆ x)2
+
+8 g′′ (xi− 12
+
+) + Ri,
+
+where |Ri| < (∆ x)4 
+
+> 384
+
+|| g(4) || L∞ . Therefore, for ∆ x < h 0
+
+1(∆ x)2 | − g(xi−1/2) + g(xi−1) + g(xi)2 |
+
+=| g′′ (xi− 12
+
+)8 + Ri| ≤ || g′′ || L∞
+
+8 + h20
+
+384 || g(4) || L∞ =: c0
+
+2By the positivity of g, the following estimate holds, 
+
+ξ⊤(−(C)⊤ 
+
+> 1
+
+M(k) 
+
+> g
+
+C1)ξ + ξ⊤(C1)⊤MgC1ξ
+
+= 1(∆ x)2
+
+
+
+− 
+
+> N+1
+
+X
+
+> i=1
+
+g(xi−1/2)d2 
+
+> i
+
++
+
+> N
+
+X
+
+> j=1
+
+g(xj )( dj + dj+1 
+
+2 )2
+
+≤ 1(∆ x)2
+
+
+
+− 
+
+> N+1
+
+X
+
+> i=1
+
+g(xi−1/2)d2 
+
+> i
+
++
+
+> N
+
+X
+
+> j=1
+
+g(xj ) d2 
+
+> j
+
++ d2
+
+> j+1
+
+2
+
+
+
+≤ 1(∆ x)2 
+
+> N+1
+
+X
+
+> i=1
+
+(−g(xi−1/2) + g(xi−1) + g(xi)2 )d2
+
+> i
+
+≤2 
+
+> N+1
+
+X
+
+> i=1
+
+( g′′ (xi− 12
+
+)8 + Ri)( ξ2 
+
+> i
+
++ ξ2
+
+> i−1
+
+) ≤ c0ξ⊤ξ
+
+□
+
+Similar properties for the discretized Laplace operator and forward difference operators are proved in [39]. To establish stability for the semi-discrete system, we next estimate the logarithmic norm of certain matrix operators. For a square matrix A, the logarithmic norm is defined by μ(A) := sup x̸=0 (x⊤Ax/x ⊤x), or equivalently, μ(A) = μmax ( A+A⊤ 
+
+> 2
+
+). 
+
+Lemma 4.2. Let g(x) : I → R be a Lipschitz continuous function, i.e., for ∀x, y ∈ I, there exists a positive constant Lg such that |g(x) − g(y)| ≤ Lg|x − y|. Let G = diag( g(X )) ∈ RN d×N d
+
+be the diagonal matrix, where X is defined in (7) . Then we have the estimate 
+
+μ(±GC (k) 
+
+> d
+
+), μ (±C(k) 
+
+> d
+
+G) ≤ Lg
+
+2 . (16) 
+
+Proof It suffices to prove the bound for C(k) 
+
+> d
+
+G. By the definition of C(k) 
+
+> d
+
+in (9), and its asymmetry, for i, j ∈ { 1, .., N }d, we have 
+
+ C(k) 
+
+> d
+
+G + G(C(k) 
+
+> d
+
+)⊤ 
+
+> i,j
+
+=
+
+  
+
+> g(Xi+ek)−g(Xi)2∆ x
+
+, j = i + ek,  
+
+> g(Xi)−g(Xi−ek)2∆ x
+
+, j = i − ek,
+
+0, others .
+
+Therefore, the Gershgorin circle theorem yields 
+
+μ(C(k) 
+
+> d
+
+G) = λmax ( C(k) 
+
+> d
+
+G + G(C(k) 
+
+> d
+
+)⊤
+
+2 )9≤ 12 · 2 · max i(g(Xi+ek ) − g(Xi)) 2∆ x ≤ Lg
+
+2 .
+
+□
+
+For the grid functions ui, i ∈ { 1, ..., N }d, we introduce the scaled discrete L2 norm || u|| := q
+
+(∆ x)d P 
+
+> i
+
+u2 
+
+> i
+
+, which is consistent with the continuous L2 norm. The 2 norm of vector is defined as |u| := 
+
+qP 
+
+> i
+
+u2 
+
+> i
+
+. Using the operator bounds established above, we now derive a stability estimate for the semi-discrete scheme (6) in this norm. With the stability result, Theorem 4.3 estimates the error between the semi-discrete solution 
+
+U(t) and the exact solution u(x, t ) in ∆ x-scaling L2 norm. 
+
+Theorem 4.3. Given smooth initial data u(0 , x ), suppose that the strong solution u(x, t ) of the Zakai equation (2) and its derivatives with respect to x up to order 4 are uniformly bounded on 
+
+I for 0 ≤ t ≤ T , T < ∞. Define ui(t) = u(t, x i), (u(X )) i = ui, and the error Ei(t) = ui(t) − Ui.If 0 < ∆x < h 0, then we have the error estimate for the semi-discrete scheme (6) ,
+
+E(||E (t)|| 22) ≤ eKFD  
+
+> 0t
+
+(tK FD  
+
+> 1
+
+(∆ x)4 + E(||E (0) || 22)) ,
+
+for some positive constants KFD  
+
+> i
+
+independent of ∆x.
+
+Proof. With the regularity assumption that the spatial derivatives of u are uniformly bounded up to order 4, and by Taylor expansion with respect to physical variables x, the function u(X , t ) solves the SDE 
+
+du = ( L0u + τ 0(t)) dt +
+
+> d
+
+X
+
+> k=1
+
+(Lku + τ k(t)) dy kt , (17) where the truncation error τj , 0 ≤ j ≤ d satisfies 
+
+|τ j 
+
+> i
+
+(t)| ≤ A((∆ x)2), (18) for all i, j and for some A > 0 that depends on f and T . Subtracting (6) from (17) yields the evolution of E(t)
+
+dE = ( L0E + τ 0)dt +
+
+> d
+
+X
+
+> k=1
+
+(LkE + τ k)dy kt . (19) By Itˆ o’s formula and (9), the evolution equation of ||E (t)|| 2 is (∆ x)−dd||E (t)|| 2
+
+=2( E⊤L0E + E⊤τ 0)dt + 2 
+
+> d
+
+X
+
+> k=1
+
+(E⊤LkE + E⊤τ k)dy kt +
+
+> d
+
+X
+
+> k=1
+
+|LkE + τ k|2dt 
+
+= E⊤(∆ρ + ∆G)E − 2E⊤(Cd + M(0) )E + 2 E⊤τ 0dt 
+
++ 2 
+
+> d
+
+X
+
+> k=1
+
+(E⊤M(k)E − X
+
+> i
+
+E⊤Mρik C(i) 
+
+> d
+
+E + E⊤τ k)dy kt
+
++
+
+> d
+
+X
+
+> k=1
+
+(E⊤L⊤ 
+
+> k
+
+LkE + 2 E⊤L⊤ 
+
+> k
+
+τ k + |τ k|2)dt 
+
+=E⊤(( ∆ρ + ∆G) + 
+
+> d
+
+X
+
+> k=1
+
+L⊤ 
+
+> k
+
+Lk)E dt − 2E⊤(Cd + M(0) )Edt 
+
+10 + 2( E⊤τ 0 +
+
+> d
+
+X
+
+> k=1
+
+E⊤L⊤ 
+
+> k
+
+τ k)dt +
+
+> d
+
+X
+
+> k=1
+
+|τ k|2dt 
+
++ 2 
+
+> d
+
+X
+
+> k=1
+
+(E⊤(M(k) − X
+
+> i
+
+Mρik C(i) 
+
+> d
+
+)E + E⊤τ k)dy kt . (20) Before estimating the global upper bound, we analyze some involved terms. First, 
+
+E⊤L⊤ 
+
+> k
+
+LkE =E⊤M2(k)E − 2 X
+
+> i
+
+E⊤M(k)Mρik C(i) 
+
+> d
+
+E
+
++ E⊤ C(i)
+
+> d
+
+⊤(X
+
+> ij
+
+Mρik Mρjk )C(j) 
+
+> d
+
+E. (21) By the property of diagonal matrix and the definition of M(k), we can bound by E⊤M2(k)E <
+
+(Ch + dC ρ′ )2|E| 2, where Cρ′ is the bound of first-order derivatives of ρ. Similarly, E⊤M(0) E <dL f |E| 2, E⊤M(k)E < (Ch + dC ρ′ )|E| 2.A direct result of Lemma 4.2 and Assumption 3.2, 3.3 yields that E⊤M(k)Mρik C(i) 
+
+> d
+
+E <c2|E| 2, with c2 > 0 depends on h and ρ. Similarly, E⊤CdE < dL f 
+
+> 2
+
+|E| 2, E⊤Mρik C(i) 
+
+> d
+
+E < Cρ′ 
+
+> 2
+
+|E| 2.The summation over k of last term on the right hand side in (21) can be further simplified with the definition of M∗ and the Assumption 3.1, 
+
+X
+
+> k
+
+E⊤ C(i)
+
+> d
+
+⊤(X
+
+> ij
+
+Mρik Mρjk )C(j) 
+
+> d
+
+E
+
+= X
+
+> ij
+
+E⊤ C(i)
+
+> d
+
+⊤Mρρ ⊤ 
+
+> ij
+
+C(j) 
+
+> d
+
+E = X
+
+> i
+
+E⊤ C(i)
+
+> d
+
+⊤Mρρ ⊤ 
+
+> ii
+
+C(i) 
+
+> d
+
+E.
+
+By Cauchy’s inequality and (18), for 0 ≤ j ≤ d, 1 ≤ k ≤ d,2E⊤τ j ≤ E ⊤E + ( 2L
+
+∆x )dA2(∆ x)4,
+
+2E⊤L⊤ 
+
+> k
+
+τ k ≤ c1 E⊤L⊤ 
+
+> k
+
+LkE + 1
+
+c1
+
+( 2L
+
+∆x )dA2(∆ x)4,
+
+where 0 < c 1 < λG 
+
+> Λρ
+
+.Integrating both sides over [0 , t ], taking the expectation, and applying Assumption 3.3, 3.4, Lemma 4.1, Lemma 4.2, and the estimates mentioned above, we obtain (∆ x)−d
+
+E ||E (t)|| 2 − E(||E (0) || 2)
+
+
+
+≤
+
+Z t
+
+> 0
+
+E
+
+
+
+E⊤(( ∆ρ + ∆G) + (1 + c1)
+
+> d
+
+X
+
+> k=1
+
+L⊤ 
+
+> k
+
+Lk)E
+
+
+
+dr 
+
++  3dL f + 1 + Chd(2 Ch + 3 dC ρ′ + 2)  Z t
+
+> 0
+
+E |E| 2 dr 
+
++
+
+Z t
+
+> 0
+
+(1 + dc1
+
++ (1 + Ch)d)(2 L)dA2(∆ x)−d+4 dr 
+
+≤
+
+Z t
+
+> 0
+
+E
+
+
+
+E⊤  −
+
+> d
+
+X
+
+> k=1
+
+(C(k) 
+
+> d
+
+)⊤M(GG ⊤−c1ρρ ⊤)kk C(k)
+
+> d
+
+E
+
+
+
+dr 
+
++ (1 + c1)
+
+Z t
+
+> 0
+> d
+
+X
+
+> k=1
+
+E
+
+
+
+E⊤M2(k)E
+
+
+
+dr − 2(1 + c1)
+
+Z t
+
+> 0
+> d
+
+X
+
+> i,k =1
+
+E
+
+
+
+E⊤M(k)Mρik C(k) 
+
+> d
+
+E
+
+
+
+dr 
+
+11 +
+
+
+
+3dL f + 1 + Chd(2 Ch + 3 dC ρ′ + 2) + d(1 + c1)c0
+
+ Z t
+
+> 0
+
+E |E| 2 dr 
+
++
+
+Z t
+
+> 0
+
+(1 + dc1
+
++ (1 + Ch)d)(2 L)dA2(∆ x)−d+4 dr 
+
+≤
+
+Z t
+
+> 0
+
+KFD 0 E |E| 2 dr + tK FD 1 (∆ x)−d+4 , (22) where KFD 0 = 3 dL f + 1 + Chd(2 Ch + 3 dC ρ′ + 2) + d(1 + c1)( c0 + ( Ch + dC ρ′ )2 + 2 dc 2), KFD 1 =1 + dc1 + (1 + Ch)d are independent of ∆ x. Apply the Gr¨ onwall’s inequality, we have the error bound 
+
+E(||E (t)|| 2) ≤ eKFD 0 t(tK FD 1 (∆ x)4 + E(||E (0) || 2)) .
+
+□
+
+4.2 TT approximation error estimate 
+
+In this subsection, we study the error introduced by the TT approximation. To control the propagation of the low-rank approximation error, we first establish a stability estimate of the semi-discrete scheme. 
+
+Lemma 4.4. The semi-discrete scheme (6) is stable, i.e., 
+
+E(|| U(t)|| 2) ≤ eKUtE(|| U(0) || 2) (23) 
+
+for some positive constant KU independent of ∆x.
+
+Proof. Apply Itˆ o’s formula, the norm || U(t)|| 2 satisfies (∆ x)−d d|| U(t)|| 2
+
+=2 U⊤L0U dt + 2 
+
+> d
+
+X
+
+> k=1
+
+U⊤LkU dy kt +
+
+> d
+
+X
+
+> k=1
+
+|LkU|2 dt. 
+
+Integrate both sides over [0 , t ] and take the expectation, similarly to the proof in 4.3, we obtain (∆ x)−d
+
+E(|| U(t)|| 2) − E(|| U(0) || 2)
+
+
+
+≤
+
+Z t
+
+> 0
+
+E
+
+
+
+U⊤
+
+(∆ρ + ∆G) + 
+
+> d
+
+X
+
+> k=1
+
+L⊤ 
+
+> k
+
+Lk
+
+
+
+U
+
+
+
+dr + 2 
+
+Z t
+
+> 0
+
+E
+
+
+
+− U⊤(Cd + M(0) )U
+
+
+
+dr 
+
++ dC h(2 Ch + 3 dC ρ′ )
+
+Z t
+
+> 0
+
+E |U|2 dr 
+
+≤
+
+Z t
+
+> 0
+
+E(U⊤∆GU)dr +
+
+Z t
+
+> 0
+> d
+
+X
+
+> k=1
+
+E
+
+
+
+U⊤M2(k)U
+
+
+
+dr − 2
+
+Z t
+
+> 0
+> d
+
+X
+
+> i,k =1
+
+E
+
+
+
+U⊤M(k)Mρik C(k) 
+
+> d
+
+U
+
+
+
+dr 
+
++  dc 0 + 3 dL f + dC h(2 Ch + 3 dC ρ′ ) Z t
+
+> 0
+
+E |U|2 dr 
+
+≤KU
+
+Z t
+
+> 0
+
+E |U|2 dr, 
+
+where KU = dc 0 + 3 dL f + dC h(2 Ch + 3 dC ρ′ ) + d(Ch + dC ρ′ )2 + 2 d2c2 . Here we use Lemma 4.1, 4.2, and Assumptions 3.3, 3.4. Finally, Gr¨ onwall’s inequality yields the upper bound 
+
+E || U(t)|| 2 ≤ eKUtE || U(0) || 2.
+
+12 □
+
+With the stability estimate of the semi-discrete scheme (6), we can now establish the TT approximation error. 
+
+Theorem 4.5. Suppose the assumptions in Lemma 4.3 are satisfied. With the prescribed ac-curacy of TT approximation determined in (11), we have the error estimate between the semi-discrete solution U(t) and the semi-discrete TT solution eU(t) of (10) . Specifically, for the grid function eEi(t) := Ui(t) − eUi(t), the error estimate is 
+
+E || eE|| 2 ≤ eKTT  
+
+> 0t
+
+(ε2KTT  
+
+> 1
+
+|| U(0) || 2 + E(|| eE(0) || 2)) ,
+
+where KTT  
+
+> 0
+
+, K TT  
+
+> 1
+
+> 0 are independent of ε and t.
+
+Proof. Subtracting (10) from (6) and using Itˆ o’s lemma, we have the evolution equation for || eE|| 2:
+
+d|| eE|| 22
+
+=2(∆ x)dh eE⊤L0 eE − eE⊤ L0 − eL0
+
+ eE + eE⊤ L0 − eL0
+
+U
+
+
+
+dt +
+
+> d
+
+X
+
+> k=1
+
+
+
+Lk eE 2 +  Lk − eLk
+
+ eE 2
+
++  Lk − eLk
+
+U 2 − 2 eE⊤L⊤
+
+> k
+
+ Lk − eLk
+
+  eE − U − 2 eE⊤ Lk − eLk
+
+⊤ Lk − eLk
+
+U
+
+
+
+dt 
+
++ 2 
+
+> d
+
+X
+
+> k=1
+
+ eE⊤Lk eE − eE⊤ Lk − eLk
+
+ eE + eE⊤ Lk − eLk
+
+U
+
+
+
+dy kt
+
+i
+
+.
+
+Notice the fact that x⊤Ax ≤ || A|| F |x|2 , and |Ax|2 ≤ || A|| 2 
+
+> F
+
+|x|2 . Combine this with (11), (14) we have eE⊤(Lj − eLj ) eE ≤ εC L| eE| 2, |(Lj − eLj ) eE| 2 ≤ εC L| eE| 2. By Cauchy’s inequality, we have 2 eE⊤(Lj − eLj )U ≤ | eE| 2 + |(Lj − eLj )U|2,
+
+2 eE⊤L⊤ 
+
+> k
+
+y ≤ c1
+
+2 |Lk eE| 2 + 2
+
+c1
+
+|y|2.
+
+where 0 < c 1 < λG 
+
+> Λρ
+
+. Similar to the upper bound estimate in the proof of Theorem (4.3), we have (∆ x)−d
+
+E || eE(t)|| 2 − E(|| eE(0) || 2)
+
+
+
+≤
+
+Z t
+
+> 0
+
+E
+
+ eE⊤ 2L0 + (1 + c1)
+
+> d
+
+X
+
+> k=1
+
+L⊤ 
+
+> k
+
+Lk
+
+ eE
+
+
+
+ds +
+
+
+
+1 + Ch + dC h(2 Ch + 3 dC ′
+
+> ρ
+
+)+ εC L(1 + (2 + 2
+
+c1
+
+)dεC L + 2 dC h)
+
+ Z t
+
+> 0
+
+E || eE|| 2ds + ε2C2
+
+> L
+
+(1 + 2 d + 2dc1
+
++ Ch)
+
+Z t
+
+> 0
+
+E || U|| 2ds 
+
+≤
+
+Z t
+
+> 0
+
+E
+
+ eE⊤  −
+
+> d
+
+X
+
+> k=1
+
+(C(k) 
+
+> d
+
+)⊤M(GG ⊤−c1ρρ ⊤)kk C(k)
+
+> d
+
+ eE
+
+
+
+dr + 2 
+
+Z t
+
+> 0
+
+E
+
+
+
+− eE⊤(Cd + M(0) ) eE
+
+
+
+dr 
+
++
+
+Z t
+
+> 0
+> d
+
+X
+
+> k=1
+
+E
+
+ eE⊤ M2(k) − 2
+
+> d
+
+X
+
+> i=1
+
+M(k)Mρik C(k)
+
+> d
+
+ eE
+
+
+
+dr 
+
++
+
+
+
+1 + Ch + dC h(2 Ch + 3 dC ′
+
+> ρ
+
+) + εC L(1 + (2 + 2
+
+c1
+
+)dεC L + 2 dC h)
+
+ Z t
+
+> 0
+
+E || eE|| 2ds 
+
++ ε2C2
+
+> L
+
+(1 + 2 d + 2dc1
+
++ Ch)
+
+Z t
+
+> 0
+
+eKUs|| U(0) || 2ds 
+
+≤KTT 0
+
+Z t
+
+> 0
+
+E || eE|| 2ds + ε2KTT 1 || U(0) || 2,
+
+13 where 
+
+KTT 0 =1 + Ch + dC h(2 Ch + 3 dC ′
+
+> ρ
+
+) + 3 dL f + d(Ch + dC ρ′ ) + 2 d2c2
+
++ εC L(1 + (2 + 2
+
+c1
+
+)dεC L + 2 dC h),KTT 1 = C2
+
+> L
+
+(1 + 2 d + 2dc1
+
++ Ch) ·  eKUt − 1 1
+
+KU
+
+.
+
+By Gr¨ onwall’s inequality, the error bound is obtained as 
+
+E || eE|| 2 ≤ eKTT 0 t(ε2KTT 1 || U(0) || 2 + E(|| eE(0) || 2)) .
+
+□
+
+Combining Theorem 4.3 and Theorem 4.5, the error estimate of the TT semi-discrete scheme (10) is directly obtained. 
+
+Theorem 4.6. Suppose the assumptions in Theorem 4.3 and Theorem 4.5 are all satisfied, and let || U(0) || = 1 , then the TT semi-discrete solution eU(t) has error 
+
+E || eU(t) − u(t, X )|| 2
+
+≤tK 1eK0t
+
+(∆ x)4 + ε2 + E(||E (0) || 2) + E(|| eE(0) || 2)
+
+
+
+,
+
+where K0, K 1 > 0 are independent of t and ∆x.
+
+Proof. By Theorem 4.3 and Theorem 4.5, we have 
+
+E || eU(t) − u(t, X )|| 2 ≤ 2E ||E (t)|| 2 + 2 E || eE(t)|| 2
+
+≤2eKFD 0 t(tK FD 1 (∆ x)4 + E(||E (0) || 2)) + 2 eKTT 0 t(ε2KTT 1 || U(0) || 2 + E(|| eE(0) || 2)) 
+
+≤tK 1eK0t
+
+(∆ x)4 + ε2 + E(||E (0) || 2) + E(|| eE(0) || 2)
+
+
+
+.
+
+□
+
+# 5 Time discretization error estimate 
+
+For a fixed mesh size ∆ x, we now try to derive the temporal convergence analysis. For simplicity, we assume that the prescribed TT accuracy ε is small enough such that the TT approximation 
+
+eLj has the same bound for logarithmic norm and matrix norm as the original ones Lj . Therefore, we write eLj as Lj in this section. Throughout the section, K is a generic constant independent of δ.The stability analysis of the numerical scheme relies on the estimate of stochastic multiple integrals of the observation process yt.
+
+Lemma 5.1. Let α = ( j1, . . . , j l) be a multi-index with 0 ≤ ji ≤ d, 0 ≤ τ < t ≤ τ + δ, and assume δ < 1
+
+> C2
+> h
+
+. Then, for any g ∈ H α,
+
+Eτ
+
+ |Iα[g(·)] τ,t |2 ≤ 4l(α)−n(α)δ l(α)+ n(α)Rτ,t (g), (24) 
+
+where 
+
+Rτ,t (g) := sup  
+
+> τ≤r≤t
+
+Eτ
+
+ |g(r)|2 ,l(α), n(α) are defined in Section 2. Consequently, |Eτ (Iα;τ,t )| ≤ 2(l(α)−n(α)) δ 12 (l(α)+ n(α)) . More-over, for the semi-discrete solution U(·), Eτ
+
+ |Iα[U(·)] τ,t |2 ≤ 4l(α)−n(α)δl(α)+ n(α)eKUδ|U(τ )|2.
+
+14 Remark 5.2. The estimate order coincides with the classical bound for multiple Itˆ o integrals driven by Brownian motion. The exponential growth in l(α) is harmless in the sequel, as only multi-indices of bounded length appear in the Itˆ o-Taylor expansion. 
+
+The proof of Lemma 5.1 follows the same inductive argument as Lemma 5.7.3 in [16], with minor modifications to accommodate the drifted setting. To avoid distraction, we leave it in Appendix B. The following lemma provides a sharper estimate tailored to some specific stochastic multiple integrals. 
+
+Lemma 5.3. There exists a constant K > 0, independent of δ, such that for all t ≥ τ with 
+
+t − τ ≤ δ, and 1 ≤ i, j, k ≤ d,
+
+Eτ [I(k); τ, t ] ≤ Kδ, 
+
+Eτ [I(k, 0); τ, t ] + Eτ [I(0 , k ); τ, t ] ≤ Kδ 2,
+
+Eτ [I(i, j, k ); τ, t ] ≤ Kδ 2.
+
+Proof. (I) First consider |Eτ (I(k); τ,t )|, by the zero conditional expectation of Brownian motion, we have 
+
+|Eτ (I(k); τ,t )| = |Eτ (
+
+Z tτ
+
+hk(xs)ds +
+
+Z tτ
+
+dw s)|
+
+=|Eτ (
+
+Z tτ
+
+hk(xs)ds )| ≤ Eτ (
+
+Z tτ
+
+|hk(xs)|ds ) ≤ Chδ. 
+
+(II) For Eτ (I(k, 0); τ,t ), 
+
+|Eτ (I(k, 0) ; τ, t )|
+
+=|Eτ (
+
+Z tτ
+
+Z s2
+
+> τ
+
+hk(xs1 )ds 1ds 2 +
+
+Z tτ
+
+Z s2
+
+> τ
+
+dw s1 ds 2)|≤ Ch
+
+2 δ2.
+
+where we use the zero first moment of multiple stochastic integrals of Brownian motion. The es-timate of Eτ (I(0 ,k ); τ,t ) follows analogously, since the stochastic part again has zero first moment, and the deterministic part has the same bound. (III) For k1, k 2, k 3 = 1 , ..., d , using dy kt = hk(xt)dt + dw kt , the multiple stochastic integral 
+
+I(k1,k 2,k 3); τ,t can be expanded as the sum of terms containing three ds , two ds and one dw , one 
+
+ds and two dw , and three dw . According to Lemma 5.7.3 in [16], the terms containing at least one ds are bounded by Kδ 2. The terms containing three dw vanish since the stochastic multiple integral of Brownian motions has zero first moment. Therefore, we have 
+
+|Eτ (I(k1,k 2,k 3); τ,t )) |≤Kδ 2 + |Eτ (
+
+Z tτ
+
+Z s3
+
+> τ
+
+Z s2
+
+> τ
+
+dw k1 
+
+> s1
+
+dw k2 
+
+> s2
+
+dw k3 
+
+> s3
+
+)| = Kδ 2
+
+□
+
+The Milstein method achieves strong order one convergence for SDEs driven by Brownian motion; see [16] for detailed analysis. However, the semi-discrete DMZ equation (6) is driven by a drifted observation process. As a result, the classical convergence analysis cannot be applied directly. To establish the convergence order of the semi-implicit Milstein method, we invoke the theorem proposed in [26]. A key requirement of the theorem is the stability of the considered scheme. In particular, for a fixed mesh size ∆ x, the semi-implicit scheme is stable if the time step δ is small enough. 15 Lemma 5.4. Assume the stability conditions are satisfied: 
+
+δ < 1
+
+C2
+
+> h
+
+(25) 
+
+then the approximation ˆUn obtained by the semi-implicit Milstein method (15) satisfies 
+
+E(|| ˆUn|| 2) ≤ eKstab τn E || ˆU0|| 2, (26) 
+
+where Kstab is some positive constant independent of δ.
+
+Proof. Denote Id := Id (N ) 
+
+> d
+
+for simplicity. First consider the upper bound of || (Id − 
+
+> δ
+> 2
+
+(∆G + ∆ρ)) −1|| 2. Under Assumption (3.1), ∆G + ∆ρ is symmetric negative definite. Thus, 
+
+λmin (Id − δ 
+
+> 2
+
+(∆G + ∆ρ)) > 1, and consequently 
+
+(Id − δ
+
+2 (∆G + ∆ρ)) −1
+
+> 2
+
+≤ 1. (27) In particular, it is bounded by 1 uniformly with respect to ∆ x. Now consider the bound for 
+
+E |(Id −A0δ+P 
+
+> k
+
+LkIn 
+
+> (k)
+
++P 
+
+> k1,k 2
+
+Lk1 Lk2 In
+
+> (k1,k 2)
+
+) ˆUn|2, where A0 = Cd +M(0) . By the estimate in Lemma 5.1 and Lemma 5.3, we have 
+
+Eτn
+
+ |(Id − A0δ + X
+
+> k
+
+LkIn 
+
+> (k)
+
++ X
+
+> k1,k 2
+
+L(k1,k 2)In
+
+> (k1,k 2)
+
+) ˆUn|2
+
+≤ (1 + Kstab δ)| ˆUn|2, (28) where Kstab is a positive constant independent of δ. The detailed derivation of (28) refers to Appendix C, where the stability conditions (25) are used to control the estimate. Using Lemma 5.1 and Lemma 5.3, the conditional expectation of I(k),n , I(k1,k 2),n and their products are of order at most O(δ) in conditional expectation. Hence, the whole expression admits the bound in (28). Combining (15), (27) and (28), we have 
+
+E | ˆUn+1 |2 = E
+
+
+
+Eτn
+
+ | ˆUn+1 |2
+
+≤|| (Id − δ
+
+2 (∆G + ∆ρ)) −1|| 22Eτn
+
+ |(Id − A0δ) + X
+
+> k
+
+LkIn 
+
+> (k)
+
++ X
+
+> k1,k 2
+
+L(k1,k 2)In
+
+> (k1,k 2)
+
+) ˆUn|2
+
+≤(1 + Kstab δ)E | ˆUn|2. (29) Iterating the one-step estimate and using (1 + Kstab δ)n ≤ eKstab τn , we have 
+
+E || ˆUn+1 || 2 ≤ eKstab τn+1 E || ˆU0|| 2.
+
+□
+
+Remark 5.5. From Appendix C, the constant Kstab in the time-discretization convergence result 
+
+(26) depends on the spatial mesh size through the factor 1∆x . For a fixed mesh size and finite terminal time T < ∞, Kstab remains finite. Such dependence is standard in the convergence analysis in the time direction of numerical schemes for the semi-discrete scheme arising from spatial discretization. In fact, the convergence of general SDE numerical schemes relies on the Lipschitz constants of the drift and diffusion terms. In the case we consider, the Lipschitz constants are essentially the matrix norms of the discretized spatial operators, which are typically scaled by 1∆x . A similar result can be found in [35]. Therefore, the present result focuses on time-discretization convergence under fixed spatial resolution, while spatial convergence is addressed separately. 
+
+16 The convergence of the semi-implicit Milstein scheme (15) is established using the theorem provided in [26]. 
+
+Lemma 5.6. Let Utk ,X(ti) be the exact solution of (6) with initial condition U(tk) = X, and 
+
+ˆUtk ,X(ti) its stable numerical approximation at time ti under the condition that ˆUi = X. For simplicity, we write U(t) := Ut0,U(0) (t), ˆUn := ˆUt0,U(0) (τn). Assume that the numerical scheme is stable: 
+
+E(| ˆUn|2) ≤ K 1 + E(| ˆU(0) |2). (30) 
+
+Assume also that the local one-step errors satisfy, for all n = 0 , 1, . . . , N − 1,
+
+Eτn
+
+ Uτn,X(τn+1 ) − ˆUτn,X(τn+1 ) ≤ Kp1 + |X|2δp1 ,
+
+Eτn
+
+ |Uτn,X(τn+1 ) − ˆUτn,X(τn+1 )|2 ≤ K 1 + |X|2δ2p2 ,
+
+where p1 ≥ p2 + 12 and p2 ≥ 12 . Then, for all n = 0 , 1, . . . , N ,
+
+h
+
+E |U(τn) − ˆUn|2i1/2
+
+≤ K 1 + E(|U(0) |2)1/2δ p2− 12 . (31) As a combination of Lemma 5.4 and Lemma 5.6, we have the convergence result for the semi-implicit Milstein scheme (15). 
+
+Theorem 5.7. If the stability conditions in Lemma 5.4 are satisfied, then the ideal semi-implicit Milstein scheme with exact iterated stochastic integrals has strong convergence order one, i.e., 
+
+|E(|U(τn) − ˆUn|2)|1/2 ≤ K(1 + E(|U(0) |2)) 1/2δ. 
+
+Proof. By Lemma 5.6, it suffices to derive the one-step expected deviation and mean-square error of the scheme. The Itˆ o-Taylor expansion of U(τn+1 ) is given by 
+
+U(τn+1 ) = U(τn) + δL0U(τn) + 
+
+> d
+
+X
+
+> k=1
+
+LkIn
+
+> (k)
+
+U(τn) + X
+
+> k1,k 2
+
+L(k1,k 2)In
+
+> (k1,k 2)
+
+U(τn) + δ2
+
+2 L20U(τn)+ X
+
+> k
+
+ L(0 ,k )In 
+
+> (0 ,k )
+
++ L(k, 0) In
+
+> (k, 0)
+
+U(τn) + X
+
+> k1,k 2,k 3
+
+L(k1,k 2,k 3)In
+
+> (k1,k 2,k 3)
+
+U(τn) + R, (32) where R = P 
+
+> α∈B (A1.5)
+
+LαIα[U(·)] τn,τ n+1 , then by Lemma 5.1, R is bounded by |Eτn (R)| ≤ 
+
+K(1+ |U(τn)|2)1/2δ2, Eτn (|R|2) ≤ K(1+ |U(τn)|2)δ4. For simplicity, denote ∆d := 12
+
+ ∆G +∆ρ
+
+.Apply the Itˆ o-Taylor expansion to ∆dU(τn+1 ), we have 
+
+∆dU(τn+1 ) = ∆d
+
+
+
+U(τn) + δL0U(τn) + 
+
+> d
+
+X
+
+> k=1
+
+LkIn
+
+> (k)
+
+U(τn)
+
+
+
++ R1, (33) where R1 = ∆d
+
+P 
+
+> α∈B (A0.5)
+
+Iα[U(·)] τn,τ n+1 , then by Lemma 5.1, we have |Eτn (R1)| ≤ K(1 + 
+
+|U(τn)|2)1/2δ, Eτn (|R1|2) ≤ K(1 + |U(τn)|2)δ2. Substitute (33) into (32), the U(τn+1 ) is ex-pressed in 
+
+U(τn+1 ) = U(τn) + δ∆dU(τn+1 ) − δ(Cd + M(0) )U(τn)+   dX
+
+> k=1
+
+LkIn 
+
+> (k)
+
++ X
+
+> k1,k 2
+
+L(k1,k 2)In
+
+> (k1,k 2)
+
+U(τn) + R2 (34) 17 where 
+
+R2 = δ2
+
+2 L20U(τn) + X
+
+> k
+
+ L(0 ,k )In 
+
+> (0 ,k )
+
++ L(k, 0) In
+
+> (k, 0)
+
+U(τn)+ X
+
+> k1,k 2,k 3
+
+L(k1,k 2,k 3)In
+
+> (k1,k 2,k 3)
+
+U(τn) + R, 
+
++ δ∆d
+
+
+
+δL0U(τn) + 
+
+> d
+
+X
+
+> k=1
+
+LkIn
+
+> (k)
+
+U(τn)
+
+
+
++ δR 1.
+
+By the integral estimate in Lemma, (5.1) (5.3), we have |Eτn (R2)| ≤ K(1 + |U(τn)|2)1/2δ2,
+
+Eτn (|R2|2) ≤ K(1 + |U(τn)|2)δ3.For local truncation error, assume that ˆUn = U(τn). Subtract (15) from (34), 
+
+U(τn+1 ) − ˆUn+1 = δ∆d(U(τn+1 ) − ˆUn+1 ) + R2,
+
+by the operator norm estimate in Lemma 5.4, we have 
+
+|Eτn (Uτn,U(τn)(τn+1 ) − ˆUτn,U(τn)(τn+1 )) |≤| Eτn (R2)| ≤ Kp1 + |U(τn)|2δ2.
+
+Similarly, 
+
+Eτn (|Uτn,U(τn)(τn+1 ) − ˆUτn,U(τn)(τn+1 )|2)
+
+≤Eτn |R2|2 ≤ K(1 + |U(τn)|2)δ3.
+
+By Lemma 5.6 and the stability estimate in Lemma 5.4, the convergence order of the semi-implicit method is 1, i.e., |E(|U(τn) − ˆUn|2)|1/2 ≤ K(1 + E(|U(0) |2)) 1/2δ. □
+
+Remark 5.8. The convergence analysis in Section 5 assumes that the stochastic integrals I(i,j )
+
+are available exactly. This separates the temporal discretization error associated with the Itˆ o-Taylor expansion from the additional error introduced by approximating these integrals. In practical implementations, the terms I(i,j ), i̸ = j, are usually approximated, for example by 
+
+In 
+
+> (i,j )
+
+≈ 12 In
+
+> (i)
+
+In
+
+> (j)
+
+, which may reduce the strong temporal convergence order to 1/2. Hence, Theo-rem 5.7 should be interpreted as a convergence result for the ideal Milstein-type scheme with exact iterated stochastic integrals. Its main purpose is to prove the convergence rate of Itˆ o-Taylor-based discretization for a drifted observation process without a change of probability measure. In the implementation, we still adopt the Milstein-type scheme because it is observed to provide better robustness than the Euler method. 
+
+# 6 Numerical Experiments 
+
+6.1 Cubic sensor example 
+
+The cubic sensor problem is defined by the signal model with a cubic observation function: 
+
+(dx t = ( Adxt + sin(1 .5xt)) dt + 1√5 dv t + 
+
+> √25
+
+dw t,dy (k) 
+
+> t
+
+= ( x(k) 
+
+> t
+
+)3dt + dw (k) 
+
+> t
+
+, k = 1 , ..., d. (35) where Ad ∈ Rd×d, and (Ad)ij =
+
+
+
+−0.8, i = j, 
+
+−0.1, i − j = 1 ,
+
+0, others ,
+
+18 The highly nonlinear observation model makes it difficult to estimate the state of the system. Here we truncate Zakai’s equation (2) within the cube [ −2.2, 2.2] d, and the degree of freedom (DOF) in each direction is N = 8. The terminal time is T = 20s, with time step δ = 0 .01s. The estimation error is measured by the root mean squared error (RMSE): RMSE := 1
+
+√dN T
+
+vuut NTX
+
+> k=1
+
+|x(tk) − ˆx(tk)|2
+
+For each dimension, 100 independent trials were conducted to evaluate the performance of the proposed TT method and the PF. The average RMSE and online CPU time are summarized in Table 2. Notably, due to the strong nonlinearity of the observation function h and the violation of the Gaussian assumption, the EKF exhibited extreme numerical instability, with a failure rate exceeding 97% across all trials; hence, its results are omitted from the comparison. To ensure a fair evaluation, the PF method was implemented with varying particle counts. While the computational cost of PF scales with the number of particles, its estimation accuracy deteriorates as the dimension increases. As evidenced in Table 2, even with a significantly large number of particles, PF consistently yields higher RMSE than the TT method, while incurring substantially higher computational burden. For instance, in the 7D case, the TT method achieves an RMSE of 0.4472 in 21.19s, whereas PF with 11,000 particles still has a higher RMSE (0.4920) and requires 128.88s. Moreover, for a fixed number of particles, the performance of PF degrades noticeably as the dimension increases. For example, with 7,000 particles, the RMSE of PF increases from 0.5064 in 7D to 0.5923 in 9D. A similar trend is observed with 9,000 particles, where the RMSE increases from 0.4960 to 0.5542. In contrast, the proposed TT method maintains stable accuracy across different dimensions, demonstrating its robustness in high-dimensional settings. Compared with PF, it achieves a more favorable balance between accuracy and computational cost. Notably, even when the num-ber of particles is increased, PF exhibits significant degradation in performance as the dimension grows, whereas the TT method remains stable. These results demonstrate that the TT-based approach provides an effective and real-time solution for medium- to high-dimensional nonlinear filtering problems where traditional methods fail or become computationally prohibitive. The prediction results of the TT method, PF, and EKF in a single trial for the 7D problem are depicted in Fig. 1. In this trial, the EKF diverges numerically from around t = 3 s.
+
+6.2 Multi-mode example 
+
+For the multi-mode case, we consider the problem 
+
+
+
+dx (1)  
+
+> t
+
+=  0.5 sin x(1)  
+
+> t
+
++ 0 .2 sin x(2) 
+
+> t
+
+dt + dev(1)  
+
+> t
+
+,dx (2)  
+
+> t
+
+=  0.6 sin x(2)  
+
+> t
+
++ 0 .2 sin x(3) 
+
+> t
+
+dt + dev(2)  
+
+> t
+
+,dx (3)  
+
+> t
+
+=  0.8 sin x(3)  
+
+> t
+
++ 0 .2 sin x(4) 
+
+> t
+
+dt + dev(3)  
+
+> t
+
+,dx (4)  
+
+> t
+
+= 0 .5 sin x(4)  
+
+> t
+
+dt + dev(4) 
+
+> t
+
+dy (k) 
+
+> t
+
+=  0.2( x(k) 
+
+> t
+
+)2 + cos(0 .6x(k) 
+
+> t
+
+)dt + dw (k) 
+
+> t
+
+,
+
+(36) where k = 1 , ..., 4, dev(k) 
+
+> t
+
+= 
+
+> √30 10
+
+dv (k) 
+
+> t
+
++ 15√10 x(k) 
+
+> t
+
+dw (k) 
+
+> t
+
+. This experiment solves the problem within the cube [ −4.5, 4.5] 4 and over time interval [0 , 20]. Set the DOF at each direction as N = 25 and time step as δ = 0 .01 s.The drift function f and correlation function ρ are odd functions, and the observation function h is an even function. Given these settings, it can be readily verified that the posterior marginal density functions of xt are bimodal and symmetric with respect to the x-axis. In the numerical experiment, the TT method recovers the symmetric bimodal density func-tion since it directly computes the density function, which can be seen from the heatmap in 19 Fig. 2. However, each particle only randomly chooses one possible mode to predict the state. Although we have multiple particles in the PF to approximate the distribution, numerical re-sults show that it lacks the ability to recover the symmetric distribution due to randomness. Specifically, the heatmap in Figure 3 shows that the approximated density tends to concentrate near a certain mode, deviating from the exact posterior density function. As for the EKF, it exhibits instability in the multi-mode example and diverges from the ground truth state. Table 2: Average RMSE and Online CPU Time of the TT method and PF on problem (35) (d ∈ { 5, 7, 9}) over 100 trials. 
+
+Dimension (d) Method RMSE Avg. Time (s) 
+
+5D 
+
+TT (Proposed) 0.4301 9.69 
+
+PF (2k particles) 0.5123 8.23 PF (3k particles) 0.4772 14.74 PF (4k particles) 0.4762 22.84 7D 
+
+TT (Proposed) 0.4472 21.19 
+
+PF (5k particles) 0.5223 34.64 PF (7k particles) 0.5064 59.51 PF (9k particles) 0.4960 91.13 PF (11k particles) 0.4920 128.88 9D (T=10s) 
+
+TT (Proposed) 0.4691 18.51 
+
+PF (5k particles) 0.5999 18.13 PF (7k particles) 0.5923 30.98 PF (9k particles) 0.5542 47.04 Time      
+
+> 0510 15 20
+> State
+> -1.5 -1 -0.5 00.5 1Real State PF EKF TT
+
+(a) 1st Dimension Time      
+
+> 0510 15 20
+> State
+> -1.5 -1 -0.5 00.5
+
+(b) 3rd Dimension Time      
+
+> 0510 15 20
+> State
+> -1.5 -1 -0.5 00.5
+
+(c) 5th Dimension Time      
+
+> 0510 15 20
+> State
+> -1.5 -1 -0.5 00.5 1
+
+(d) 7th Dimension 
+
+Figure 1: Tracking results of the TT method, PF (5k particles), and EKF in a single trial for the 7D cubic sensor problem (35). 20 Time     
+
+> 0510 15 20 State
+> -4 -3 -2 -1 01234
+> 00.1 0.2 0.3 0.4 0.5 0.6
+
+(a) 1st Dimension Time      
+
+> 0510 15 20 State
+> -4 -3 -2 -1 01234
+> 00.1 0.2 0.3 0.4 0.5 0.6
+
+(b) 2nd Dimension Time      
+
+> 0510 15 20 State
+> -4 -3 -2 -1 01234
+> 00.1 0.2 0.3 0.4 0.5 0.6
+
+(c) 3rd Dimension Time      
+
+> 0510 15 20 State
+> -4 -3 -2 -1 01234
+> 00.1 0.2 0.3 0.4 0.5 0.6
+
+(d) 4th Dimension 
+
+Figure 2: Tracking results of TT method for 4D multi-mode sensor problem (36). Background heatmap shows the recovered marginal density function, and the red line is the true state trajectory. Time     
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+> 00.05 0.1 0.15 0.2
+
+(a) 1st Dimension Time      
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+> 00.05 0.1 0.15 0.2
+
+(b) 2nd Dimension Time      
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+> 00.05 0.1 0.15 0.2
+
+(c) 3rd Dimension Time      
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+> 00.05 0.1 0.15 0.2
+
+(d) 4th Dimension 
+
+Figure 3: Tracking results of PF method (5000 particles) for 4D multi-mode sensor problem (36). Background heatmap shows normalized histograms of the marginal densities, and the red line is the true state trajectory. Time     
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+> Real State PF
+
+(a) 1st Dimension Time      
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+
+(b) 2nd Dimension Time      
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+
+(c) 3rd Dimension Time      
+
+> 0510 15 20
+> State
+> -4 -3 -2 -1 01234
+
+(d) 4th Dimension 
+
+Figure 4: Tracking results of EKF method for 4D multi-mode sensor problem (36). 21 7 Conclusions 
+
+In this paper, we develop a tensor train-based method for nonlinear filtering problems with correlated noise. By discretizing the DMZ equation, we obtain a high-dimensional SDE, which is efficiently represented in the TT format. Under suitable assumptions on the spatial regularity of the DMZ solution, as well as on the drift and observation functions in the signal process model (1), we establish the spatial convergence of the TT semi-discrete system. For the temporal discretization, we employ a semi-implicit Milstein method and prove con-vergence by estimating related stochastic integrals, without invoking a change-of-measure argu-ment. Numerical results demonstrate that the proposed method achieves accurate and stable performance in real time for problems up to 7D, and remains computationally tractable in higher dimensions, outperforming the particle filter and the extended Kalman filter. In future work, we will extend the proposed method to more complex observation models and further improve its scalability for higher-dimensional and challenging nonlinear systems. In addition, we will develop dynamically low-dimensional approximation methods (see e.g.,[2, 3]) to solve NLF problems with time-varying drift and observation functions. 
+
+# A Discretization method for more general case 
+
+If Assumption (3.1) is generalized to the case in which GG ⊤ and ρρ ⊤ are not diagonal matri-ces, this gives rise to mixed second-order derivatives ∂2u∂x i∂x j . In order to maintain the spatial convergence of ||E|| 2 at a rate of O((∆ x)4 + ε2), we should update the discretized operator L0
+
+by 
+
+L0 = 12 (∆ρ + ∆G + Mmix ) − Cd − Mmix (0) ,
+
+where 
+
+Mmix := X
+
+> i̸=j
+
+C(i) 
+
+> d
+
+M(GG ⊤+ρρ ⊤)ij C(j) 
+
+> d
+
+,
+
+Mmix (0) := Mdiv( f ) − δ
+
+2 M∇· (∇· (GG ⊤+ρρ ⊤)) .
+
+As for time discretization, we can generalize the semi-implicit Milstein method (15) by ˆUn+1 = ˆUn + 12 ( e∆G + e∆ρ) ˆUn+1 δ
+
++ ( 12 fMmix − eCd − fMmix (0) ) ˆUnδ
+
++
+
+> d
+
+X
+
+> j=1
+
+eLj ˆUnIn 
+
+> (j)
+
++
+
+> d
+
+X
+
+> i,j =1
+
+eL(i,j ) ˆUnIn
+
+> (i,j )
+
+,
+
+In this case, we need the additional assumption that G ∈ C4 
+
+> b
+
+as ρ does. The proof of spatial and temporal convergence follows the same general framework as in Section 4. The main difference lies in the presence of mixed derivative terms, which introduce additional cross terms in the discrete energy estimates. These terms can be controlled using the symmetry and positive definiteness of the diffusion matrices GG ⊤ and ρρ ⊤, together with the second-order accuracy of the mixed difference operators Mmix (0) .22 B Proof of Lemma (5.1) 
+
+Proof. We shall prove it by induction. First, consider α with l(α) = 1. If α = (0), then 
+
+Eτ (|I(0) [g(·)] τ,t |2) = Eτ (|
+
+Z tτ
+
+g(z)dz |2)
+
+≤Eτ (δ
+
+Z tτ
+
+|g(z)|2dz ) ≤ δ2Rτ,t (g). (37) If α = ( j), j = 1 , ..., d , then 
+
+Eτ (|I(k)[g(·)] τ,t |2)=Eτ
+
+
+
+|
+
+Z tτ
+
+g(z)hk(xz )dz +
+
+Z tτ
+
+g(z)dw kz |2
+
+≤2Eτ
+
+
+
+|
+
+Z tτ
+
+g(z)hk(xz )dz |2 + |
+
+Z tτ
+
+g(z)dw kz |2
+
+≤2Eτ
+
+
+
+δ
+
+Z tτ
+
+|g(z)hk(xz )|2dz +
+
+Z tτ
+
+s|g(z)|2dz 
+
+
+
+≤4Eτ
+
+ Z tτ
+
+|g(z)|2dz 
+
+
+
+≤ 4δRτ,t (g). (38) Now suppose that the estimate holds for l(α) = k, consider α = ( j1, ..., j k, j k+1 ). If jk+1 = 0, by the inductive assumption, 
+
+Eτ (|Iα[g(·)τ,t ]|2)=Eτ
+
+ Z tτ
+
+Iα−[g(·)] τ,z dz 2
+
+≤ Eτ
+
+
+
+δ
+
+Z tτ
+
+|Iα−[g(·)] τ,z |2dz 
+
+
+
+≤4l(α−)−n(α−)δ
+
+Z tτ
+
+(z − τ )l(α−)+ n(α−)Rτ,t (g)
+
+≤4l(α)−n(α)δl(α)+ n(α)Rτ,t (g). (39) If jk+1 = 1 , ..., d , then by Itˆ o isometry, δ < 1
+
+> C2
+> h
+
+and inductive assumption, 
+
+Eτ (|Iα[g(·)τ,t ]|2)=Eτ
+
+ Z tτ
+
+Iα−[g(·)] τ,z hk+1 (xz )dz +
+
+Z tτ
+
+Iα−[g(·)] τ,z dw k+1 
+
+> z
+> 2
+
+
+
+≤2Eτ
+
+ Z tτ
+
+Iα−[g(·)] τ,z hk+1 (xz )dz 2 +
+
+Z tτ
+
+Iα−[g(·)] τ,z dw k+1 
+
+> z
+> 2
+
+
+
+≤2Eτ
+
+
+
+C2
+
+> h
+
+δ
+
+Z tτ
+
+|Iα−[g(·)] ρ,z |2dz +
+
+Z tτ
+
+|Iα−[g(·)] τ,z |2dz 
+
+
+
+≤4
+
+Z tτ
+
+Eτ (|Iα−[g(·)] τ,z |2)dz 
+
+≤4l(α)−n(α)δl(α)+ n(α) sup  
+
+> τ≤s≤t
+
+Eτ (|g(s)|2). (40) Then (24) follows. By Cauchy-Schwarz inequality, 
+
+|Eτ (Iα;τ,t )| ≤ pEα;τ,t ≤ 2l(α)−n(α)δ 12 (l(α)+ n(α)) .
+
+Substitute g(·) by U(·), with Lemma 5.1, we have sup  
+
+> τ≤s≤t
+
+Eτ (|U(·)|2) ≤ sup  
+
+> τ≤s≤t
+
+eKUs|U(τ )|2 ≤ eKUδ|U(τ )|2,
+
+23 the estimates follows: 
+
+Eτ (|Iα[U(·)] τ,t |2) ≤ 4l(α)−n(α)δl(α)+ n(α)eKUδ|U(τ )|2.
+
+□
+
+# C Estimate in the proof of Lemma 5.4 
+
+In this section, we give a detailed derivation of (28). Recall that the term is given by 
+
+Eτn
+
+ |(I − A0δ + X
+
+> k
+
+LkIn 
+
+> (k)
+
++ X
+
+> k1,k 2
+
+L(k1,k 2)In
+
+> (k1,k 2)
+
+) ˆUn|2
+
+= |(I − A0δ) ˆUn|2
+
+| {z }
+
+> :=I
+
++ 2 X
+
+> k
+
+Eτn (In
+
+> (k)
+
+) ˆU⊤ 
+
+> n
+
+(I − A0δ)⊤Lk ˆUn
+
+| {z }
+
+> :=II
+
++ X
+
+> k1,k 2
+
+Eτn (In
+
+> (k1)
+
+In
+
+> (k2)
+
+) ˆU⊤ 
+
+> n
+
+L⊤ 
+
+> k1
+
+Lk2 ˆUn
+
+| {z }
+
+> :=III
+
++ 2 X
+
+> k1,k 2
+
+Eτn
+
+ In
+
+> (k1,k 2)
+
+ ˆU⊤ 
+
+> n
+
+(I − δA⊤ 
+
+> 0
+
+)L(k1,k 2) ˆUn
+
+| {z }
+
+> :=IV
+
++ 2 X
+
+> k0,k 1,k 2
+
+Eτn
+
+ In
+
+> (k1,k 2)
+
+In
+
+> (k0)
+
+ ˆU⊤ 
+
+> n
+
+L⊤ 
+
+> k0
+
+Lk2 Lk1 ˆUn
+
+| {z }
+
+> :=V
+
++ X
+
+> k1,k 2,k ′
+> 1,k ′
+> 2
+
+Eτn
+
+ In
+
+> (k′
+> 1,k ′
+> 2)
+
+In
+
+> (k1,k 2)
+
+ ˆU⊤ 
+
+> n
+
+L⊤ 
+
+> k′
+> 1
+
+L⊤ 
+
+> k′
+> 2
+
+Lk2 Lk1 ˆUn
+
+| {z }
+
+> :=VI
+
+.
+
+Before the estimate, we present some commonly used facts. For γ ∈ R, x ∈ Rn, A ∈ Rn×n,
+
+|γx⊤Ax | ≤ | γ| max( μ(A), μ (−A)) |x|2. The logarithmic norm has the subadditivity property: 
+
+μ(A + B) ≤ μ(A) + μ(B). If A is a diagonal matrix with a being the bound of the entries, then 
+
+μ(±(C(i) 
+
+> d
+
+)⊤AC (j) 
+
+> d
+
+) ≤ a 
+
+> (∆ x)2
+
+.In order to give a clean proof while indicating the dependence of the estimate on ∆ x, here we introduce the generic constant c, which is independent of δ and ∆ x.Now we estimate the terms separately. By the Lemma (4.2), and Assumption (3.3), (3.4), I is bounded by I = | ˆUn|2 − 2δ ˆU⊤ 
+
+> n
+
+A0 ˆUn + δ2|A0 ˆUn|2
+
+≤| ˆUn|2 + 2 δμ (−A0)| ˆUn|2 + δ2(|Cd ˆUn|2 + |M(0) ˆU|2)
+
+≤
+
+
+
+1 + cδ + cδ 2 1(∆ x)2
+
+
+
+| ˆUn|2 (41) For the term II, II ≤ X
+
+> k
+
+|Eτn (In
+
+> (k)
+
+)| · | ˆUn|2 · | max  μ(Lk − δA⊤ 
+
+> 0
+
+Lk), μ (−Lk + δA⊤ 
+
+> 0
+
+Lk)|≤c(δ + δ2
+
+(∆ x)2 ) ˆUn|2. (42) 24 For the term III, we first estimate |Eτn (In
+
+(k1)In
+
+(k2))|.
+
+|Eτn (In
+
+(k1)In
+
+(k2))|
+
+= Eτn
+
+ Z τn+1 
+
+τn
+
+hk1 (xt)dt ·
+
+Z τn+1 
+
+τn
+
+wk2
+
+t dt +
+
+Z τn+1 
+
+τn
+
+hk2 (xt)dt ·
+
+Z τn+1 
+
+τn
+
+wk1
+
+t dt 
+
++
+
+Z τn+1 
+
+τn
+
+hk1 (xt)dt ·
+
+Z τn+1 
+
+τn
+
+hk2 (xt)dt +
+
+Z τn+1 
+
+τn
+
+wk1
+
+t dt ·
+
+Z τn+1 
+
+τn
+
+wk2
+
+t dt 
+
+
+
+≤
+
+
+
+Eτn
+
+  Z τn+1 
+
+τn
+
+hk1 (xt)dt 2Eτn
+
+  Z τn+1 
+
+τn
+
+wk2
+
+t dt 21/2
+
++
+
+
+
+Eτn
+
+  Z τn+1 
+
+τn
+
+hk2 (xt)dt 2Eτn
+
+  Z τn+1 
+
+τn
+
+wk1
+
+t dt 21/2
+
++ C2
+
+hδ2 + δk1,k 2 δ
+
+≤C2
+
+hδ2 + 2 Chδ3/2 + δk1,k 2 δ, (43) where δij refers to the kronecker delta function. Then III ≤ X
+
+k1̸ =k2
+
+(2 sC hδ3/2 + C2
+
+hδ2)| ˆUn|2 · max  μ(L⊤
+
+k1 Lk2 ), μ (−L⊤
+
+k1 Lk2 )|
+
++ X
+
+k
+
+(2 Chδ3/2 + C2
+
+hδ2 + δ)|| Lk|| 22| ˆUn|2
+
+≤c δ
+
+(∆ x)2 | ˆUn|2 (44) For the term IV, by the integral estimate in Lemma 5.1, IV ≤ X
+
+k1,k 2
+
+Eτn
+
+ In
+
+(k1,k 2)
+
+ | ˆUn|2 · max 
+
+
+
+μ (I − δA⊤
+
+0 )Lk2 Lk1
+
+, μ   − (I − δA⊤
+
+0 )Lk2 Lk1
+
+
+
+≤c δ
+
+(∆ x)2 | ˆUn|2 (45) For the term V and VI, V ≤ X
+
+k0,k 1,k 2
+
+|Eτn
+
+ In
+
+(k1,k 2)∆In
+
+(k0)
+
+| · || L⊤
+
+k0 Lk1 Lk2 || 2| ˆUn|2
+
+≤c δ3/2
+
+(∆ x)3 | ˆUn|2 (46) and VI ≤ X
+
+k1,k 2,k ′
+
+> 1
+
+,k ′
+
+> 2
+
+|Eτn
+
+ In
+
+(k′
+
+> 1
+
+,k ′
+
+> 2
+
+)In
+
+(k1,k 2)
+
+| · || (L(k′
+
+> 1
+
+,k ′
+
+> 2
+
+))⊤L(k1,k 2)|| 2| ˆUn|2
+
+≤c δ2
+
+(∆ x)4 | ˆUn|2 (47) Combining (41), (42), (44), (45), (46) and (47), the estimate is obtained as 
+
+Eτn
+
+ |(I − A0δ + X
+
+k
+
+LkIn
+
+(k) + X
+
+k1,k 2
+
+Lk2 Lk1 In
+
+(k1,k 2)) ˆUn|2
+
+≤(1 + Kstab δ)| ˆUn|2, (48) where Kstab is independent of δ. □
+
+25 References 
+
+[1] Allan Bensoussan, Roland Glowinski, and Aurel Rascanu. “Approximation of the Zakai equation by the splitting up method”. In: SIAM journal on control and optimization 28.6 (1990), pp. 1420–1431. [2] Mulin Cheng, Thomas Y Hou, and Zhiwen Zhang. “A dynamically bi-orthogonal method for time-dependent stochastic partial differential equations I: Derivation and algorithms”. In: Journal of Computational Physics 242 (2013), pp. 843–868. [3] Mulin Cheng, Thomas Y Hou, and Zhiwen Zhang. “A dynamically bi-orthogonal method for time-dependent stochastic partial differential equations II: Adaptivity and generaliza-tions”. In: Journal of Computational Physics 242 (2013), pp. 753–776. [4] Mark HA Davis. “On a multiplicative functional transformation arising in nonlinear fil-tering theory”. In: Zeitschrift f¨ ur Wahrscheinlichkeitstheorie und verwandte Gebiete 54.2 (1980), pp. 125–139. [5] Sergey Dolgov, Boris N Khoromskij, Alexander Litvinenko, and Hermann G Matthies. “Polynomial chaos expansion of random coefficients and the solution of stochastic partial differential equations in the tensor train format”. In: SIAM/ASA Journal on Uncertainty Quantification 3.1 (2015), pp. 1109–1135. [6] Sergey V Dolgov, Boris N Khoromskij, and Ivan V Oseledets. “Fast solution of parabolic problems in the tensor train/quantized tensor train format with initial application to the Fokker–Planck equation”. In: SIAM Journal on Scientific Computing 34.6 (2012), A3016– A3038. [7] Wenhui Dong, Xue Luo, and Stephen Shing-Toung Yau. “Brownian and Poisson bridges: Application to nonlinear filtering problems and error estimates”. In: Asian Journal of Mathematics 29.3 (2025), pp. 253–282. [8] Tyrone Edward Duncan. Probability densities for diffusion processes with applications to nonlinear filtering theory and detection theory . Stanford University, 1967. [9] Yani Feng, Michael K Ng, Kejun Tang, and Zhiwen Zhang. “Functional tensor train neural network for solving high-dimensional PDEs”. In: arXiv:2510.13386 (2025). [10] Patrick Florchinger and FranC ¸ ois le Gland. “Time-discretization of the Zakai equation for diffusion processes observed in correlated noise”. In: Stochastics: An International Journal of Probability and Stochastic Processes 35.4 (1991), pp. 233–256. [11] Andrew H Jazwinski. Stochastic processes and filtering theory . Courier Corporation, 2007. [12] R. E. Kalman. “A New Approach to Linear Filtering and Prediction Problems”. In: Jour-nal of Basic Engineering 82.1 (Mar. 1960), pp. 35–45. issn : 0021-9223. doi : 10.1115/1. 3662552 .[13] R. E. Kalman and R. S. Bucy. “New Results in Linear Filtering and Prediction Theory”. In: Journal of Basic Engineering 83.1 (Mar. 1961), pp. 95–108. issn : 0021-9223. [14] Jiayi Kang, Xiuqiong Chen, Yangtianze Tao, and Stephen Shing-Toung Yau. “Optimal transportation particle filter for linear filtering systems with correlated noises”. In: IEEE Transactions on Aerospace and Electronic Systems 58.6 (2022), pp. 5190–5203. [15] Vladimir A Kazeev and Boris N Khoromskij. “Low-rank explicit QTT representation of the Laplace operator and its inverse”. In: SIAM journal on matrix analysis and applica-tions 33.3 (2012), pp. 742–758. [16] Peter E. Kloeden and Eckhard Platen. “Numerical Solution of Stochastic Differential Equations”. In: Comput.math.appl 20.1 (2005), pp. 8–12. 26 [17] Harold J Kushner. “Dynamical equations for optimal nonlinear filtering”. In: Journal of Differential Equations 3.2 (1967), pp. 179–190. [18] Sijing Li, Zhongjian Wang, Stephen S.-T. Yau, and Zhiwen Zhang. “Solving nonlinear filtering problems using a tensor train decomposition method”. In: IEEE Transactions on Automatic Control 68.7 (2022), pp. 4405–4412. [19] Sergey Lototsky, Remigijus Mikulevicius, and Boris L Rozovskii. “Nonlinear filtering re-visited: a spectral approach”. In: SIAM Journal on Control and Optimization 35.2 (1997), pp. 435–461. [20] Sergey V Lototsky. “Nonlinear filtering of diffusion processes in correlated noise: analysis by separation of variables”. In: Applied Mathematics & Optimization 47.2 (2003), pp. 167– 194. [21] Xue Luo and Huimin Miao. “Feedback particle filter with correlated noises”. In: 2019 IEEE 58th Conference on Decision and Control (CDC) . IEEE. 2019, pp. 1637–1643. [22] Xue Luo, Ting Pan, and Wenhui Dong. “Convergence Analysis of Splitting-Up Algorithm of the Zakai’s Equation with Correlated Noises”. In: Journal of Systems Science and Complexity 36.3 (2023), pp. 922–946. [23] Xue Luo and Stephen S.-T. Yau. “Complete real time solution of the general nonlinear filtering problem without memory”. In: IEEE Transactions on Automatic Control 58.10 (2013), pp. 2563–2578. [24] Xue Luo and Stephen S.-T. Yau. “Hermite spectral method with hyperbolic cross approx-imations to high-dimensional parabolic PDEs”. In: SIAM Journal on Numerical Analysis 
+
+51.6 (2013), pp. 3186–3212. [25] Yuhua Meng, Zhongjian Wang, Stephen S.-T. Yau, and Zhiwen Zhang. “Regularity esti-mate and sparse approximation of pathwise robust Duncan-Mortensen-Zakai equation”. In: arXiv preprint arXiv:2509.19093 (2025). [26] GN Mil–shtein. “A theorem on the order of convergence of mean-square approximations of solutions of systems of stochastic differential equations”. In: Theory of Probability & Its Applications 32.4 (1988), pp. 738–741. [27] Richard Edgar Mortensen. Optimal control of continuous-time stochastic systems . Univer-sity of California, Berkeley, 1966. [28] Nigel John Newton. “Discrete approximations for Markov-chain filters”. PhD thesis. Uni-versity of London, 1984. [29] Ivan Oseledets, Eugene Tyrtyshnikov, and Nickolai Zamarashkin. “Tensor-train ranks for matrices and their inverses”. In: Computational Methods in Applied Mathematics 11.3 (2011), pp. 394–403. [30] Ivan V Oseledets. “Approximation of 2 d × 2d matrices using tensor decomposition”. In: 
+
+SIAM Journal on Matrix Analysis and Applications 31.4 (2010), pp. 2130–2145. [31] Ivan V Oseledets. “Tensor-train decomposition”. In: SIAM Journal on Scientific Comput-ing 33.5 (2011), pp. 2295–2317. [32] Lorenz Richter, Leon Sallandt, and Nikolas N¨ usken. “From continuous-time formulations to discretization schemes: tensor trains and robust regression for BSDEs and parabolic PDEs”. In: Journal of Machine Learning Research 25.248 (2024), pp. 1–40. [33] Dmitry Savostyanov and Ivan Oseledets. “Fast adaptive interpolation of multi-dimensional arrays in tensor train format”. In: The 2011 International Workshop on Multidimensional (nD) Systems . IEEE. 2011, pp. 1–8. 27 [34] Dmitry V Savostyanov. “Quasioptimality of maximum-volume cross interpolation of ten-sors”. In: Linear Algebra and its Applications 458 (2014), pp. 217–244. [35] Qin Sheng and Eduardo Servin Torres. “A nonconventional stability approach for a non-linear Crank–Nicolson method solving degenerate Kawarada problems”. In: Applied Math-ematics Letters 144 (2023), p. 108730. [36] Ruslan Leontyevich Stratonovich. “Optimum nonlinear systems which bring about a sepa-ration of a signal with constant parameters from noise”. In: Radiofizika 2.6 (1959), pp. 892– 901. [37] Zeju Sun and Stephen Shing-Toung Yau. “Solving nonlinear filtering problems with cor-related noise based on Hermite–Galerkin spectral method”. In: Automatica 156 (2023), p. 111176. [38] Zhongjian Wang, Xue Luo, Stephen S.-T. Yau, and Zhiwen Zhang. “Proper orthogonal decomposition method to nonlinear filtering problems in medium-high dimension”. In: 
+
+IEEE Transactions on Automatic Control 65.4 (2019), pp. 1613–1624. [39] Steven M Wise, Cheng Wang, and John S Lowengrub. “An energy-stable and conver-gent finite-difference scheme for the phase field crystal equation”. In: SIAM Journal on Numerical Analysis 47.3 (2009), pp. 2269–2288. [40] Shing-Tung Yau and Stephen S.-T. Yau. “Real time solution of nonlinear filtering problem without memory I”. In: Mathematical Research Letters 7.6 (2000), pp. 671–693. [41] Shing-Tung Yau and Stephen S.-T. Yau. “Real time solution of the nonlinear filtering problem without memory II”. In: SIAM Journal on Control and Optimization 47.1 (2008), pp. 163–195. [42] Moshe Zakai. “On the optimal filtering of diffusion processes”. In: Zeitschrift f¨ ur Wahrschein-lichkeitstheorie und verwandte Gebiete 11.3 (1969), pp. 230–243. 28
