@@ -1,0 +1,39 @@
+{
+  "label": "2026-05-29",
+  "date": "2026-05-29",
+  "generated_at": "2026-05-29T20:47:30",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202605/29/2605.23531v2-pixie-prompted-pixel-space-low-light-image-enhancement",
+      "section": "quick",
+      "title_en": "PixIE: Prompted Pixel-Space Low-Light Image Enhancement",
+      "authors": "Ruirui Lin, Guoxi Huang, David Bull, Nantheera Anantrasirichai",
+      "date": "2026-05-22",
+      "pdf": "https://arxiv.org/pdf/2605.23531v2",
+      "score": "6.0",
+      "evidence": "深度学习低光图像增强含去噪，可应用于高光谱",
+      "tldr": "低光图像存在噪声、对比度损失和语义模糊，增强需联合去噪与细节恢复。PixIE通过交叉尺度去噪保留结构，再利用DINO语义提示的像素块进行逐像素调制，配合空间通道压缩和多感受野嵌入提升效率与鲁棒性。在LLIE基准上PSNR提升1.9-15.0%，LPIPS降低8.5-44.4%，细节更清晰，纹理更稳定。该方法兼顾重建保真度与感知质量。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Low-light images suffer from severe noise, contrast loss, and semantic ambiguity, making enhancement a joint problem of denoising and detail recovery. We propose PixIE, a feed-forward pixel-space LLIE framework semantically prompted by a vision foundation model. PixIE first performs cross-scale denoising to suppress noise and preserve structure, then refines details using DINO-Prompted Pixel Blocks (DPPBs), which inject intermediate DINOv3 features through patch-conditioned, spatially continuous per-pixel modulation. To make pixel-space attention efficient across scales, we introduce Spatial-Channel Compaction (SCC), which jointly reduces the spatial token grid and channel dimension. We further propose Multi-Receptive-Field Pixel Embedding (MRPE) to provide neighborhood-aware pixel representations before semantic prompting, improving robustness to signal-dependent noise beyond point-wise embeddings. Experiments on LLIE benchmarks show that PixIE improves average PSNR by 1.9-15.0% over recent state-of-the-art methods and reduces LPIPS by 8.5-44.4%. Qualitative comparisons further show sharper details and more stable textures, improving both reconstruction fidelity and perceptual quality.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202605/29/2605.25567v2-rao-blackwellized-score-matching-on-manifolds",
+      "section": "quick",
+      "title_en": "Rao-Blackwellized Score Matching on Manifolds",
+      "authors": "Divit Rawal",
+      "date": "2026-05-25",
+      "pdf": "https://arxiv.org/pdf/2605.25567v2",
+      "score": "6.0",
+      "evidence": "流形上去噪分数匹配，深度学习去噪方法",
+      "tldr": "去噪得分匹配在流形上因法向噪声通道发散而出现奇异性。通过条件于最近点投影进行Rao-Blackwellized预测，可消除该奇异性并得到L2最优估计。小噪声展开显示其等于内在Riemannian得分加上由Tweedie项和外在曲率项组成的σ²修正。该方法在平坦情形退化为标准高斯DSM，在球面上修正项简化。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We study denoising score matching (DSM) when the latent distribution is supported on a smooth embedded manifold $M \\subset \\mathbb{R}^D$. Under ambient Gaussian corruption, the tangent denoising target contains a singular normal-fiber noise channel whose variance diverges as $d/σ^2$ as $σ\\to 0^+$. We show that conditioning on the nearest-point projection $π(X)$ canonically removes this singularity: the resulting conditional expectation is the unique $L^2$-optimal Rao-Blackwellized predictor of the tangent DSM target among all estimators depending only on the projected observation $π(X)$. We then compute the small-noise expansion of this canonical target and show that it equals the intrinsic Riemannian score up to an explicit order-$σ^2$ correction that decomposes into an intrinsic Tweedie term and an extrinsic curvature term involving the Weingarten and Ricci operators. In the flat case, the construction reduces exactly to ordinary lower-dimensional Gaussian DSM, while on $S^d$ the extrinsic correction simplifies to the scalar factor $(1-d/2)\\nabla_M \\log q$; this extrinsic $σ^2$ correction cancels identically on $S^2$, though the intrinsic Tweedie term remains.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
