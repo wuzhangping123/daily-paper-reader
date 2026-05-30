@@ -1,0 +1,39 @@
+{
+  "label": "2026-05-30",
+  "date": "2026-05-30",
+  "generated_at": "2026-05-30T20:32:39",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202605/30/2605.24593v1-self-supervised-dynamic-heterogeneous-degradation-modeling-for-unified-zero-shot-image-restoration",
+      "section": "quick",
+      "title_en": "Self-supervised Dynamic Heterogeneous Degradation Modeling for Unified Zero-Shot Image Restoration",
+      "authors": "XiaoWan Hu, Jing Yang, HeNan Liu, HuaQiu Li, Mai Xu",
+      "date": "2026-05-23",
+      "pdf": "https://arxiv.org/pdf/2605.24593v1",
+      "score": "7.0",
+      "evidence": "统一零样本图像恢复框架，处理多种退化，适用于高光谱去噪",
+      "tldr": "现有零样本图像恢复方法依赖堆叠层或预训练特征，缺乏物理一致性先验，导致训练负担重、采样成本高，且在复杂退化下易陷入次优解。本文提出UP-ZeroIR框架，将异构退化重参数化为紧凑的物理同质分布，在潜在空间直接优化，并引入动态质量精炼策略自适应调整扩散轨迹。在单种和混合退化任务上均取得最优性能。该工作为零样本图像恢复提供了物理先验驱动的高效解决方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Zero-shot image restoration provides a flexible way to handle diverse degradations without task-specific training. However, existing methods typically rely on stacked layers or pre-trained features to enhance degradation expression, while overlooking physically consistent priors. The insufficient degradation prompts impose the heavy training burden and high sampling costs during zero-shot diffusion. Moreover, the fixed inference trajectory often collapses to suboptimal solutions under complex corruptions. We observe that heterogeneous degradations can be reparameterized into a minimal set of physically coherent parameters for compact representation. Based on this insight, we first propose a unified physical zero-shot image restoration (UP-ZeroIR) framework that explicitly models heterogeneous degradations into a homogeneous all-in-one distribution. The distribution can be optimized directly in the latent space, enabling principled solution exploration and effective prompt adaptation. Besides, we introduce a dynamic quality-refinement strategy that adaptively adjusts the diffusion trajectory for robust globally optimal convergence. Extensive experiments demonstrate that our method achieves state-of-the-art performance across both single and mixed degradations. Our code is available at https://github.com/yangjinglyy/UP-ZeroIR",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202605/30/2605.27990v1-geometry-correct-diffusion-posterior-sampling-with-denoiser-pullback-curvature-guidance-and-manifold-aligned-damping",
+      "section": "quick",
+      "title_en": "Geometry-Correct Diffusion Posterior Sampling with Denoiser-Pullback Curvature Guidance and Manifold-Aligned Damping",
+      "authors": "Seunghyeok Shin, Minwoo Kim, Dabin Kim, Hongki Lim",
+      "date": "2026-05-27",
+      "pdf": "https://arxiv.org/pdf/2605.27990v1",
+      "score": "6.0",
+      "evidence": "通过扩散后验采样和去噪器引导的去噪方法",
+      "tldr": "扩散后验采样依赖手工标量引导权重，在问题曲率大时不稳定。本文提出几何校正方法，用每噪声水平的阻尼高斯牛顿校正替代标量引导，通过去噪器拉回似然梯度并采用残差对齐的秩一阻尼，避免计算雅可比矩阵。该方法在FFHQ和ImageNet逆问题上取得有竞争力的PSNR/SSIM/LPIPS，运行速度明显快于多数基线；在加速MRI重建上达到最佳PSNR/SSIM。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Diffusion posterior sampling conditions diffusion priors on measurements, but data-consistency updates are typically scaled by hand-tuned guidance weights and can destabilize sampling under stiff, operator-dependent curvature. We replace scalar guidance with a per-noise-level damped Gauss--Newton correction computed in diffusion-state coordinates. The correction pulls likelihood gradients back through the denoiser, uses a one-sided curvature model that avoids forward denoiser Jacobians, and applies diffusion-calibrated rank-one damping aligned with the denoiser residual. Each correction is solved with matrix-free GMRES using automatic differentiation, and sampling proceeds with a variance-preserving Langevin transition with a closed-form drift/noise split. On FFHQ and ImageNet across inverse problems, it achieves competitive PSNR/SSIM/LPIPS while running markedly faster than most of the compared baselines; on accelerated MRI reconstruction, it achieves the best PSNR/SSIM among the compared baselines.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

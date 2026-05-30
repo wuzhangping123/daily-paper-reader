@@ -6,27 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-05-29
-- 运行时间：2026-05-29 20:47:24 UTC
+- 最新运行日期：2026-05-30
+- 运行时间：2026-05-30 20:32:31 UTC
 - 运行状态：成功
 - 本次总论文数：2
 - 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今天速读了2篇论文，分别涉及低光图像增强和流形上的得分匹配。最值得关注的方向是提示驱动的像素级低光增强方法，以及Rao-Blackwell化技巧在流形统计推断中的应用。建议进一步了解这两种技术如何提升图像质量或高维数据建模的准确性。
-- 详情：[/202605/29/README](/202605/29/README)
+今日速读2篇论文，聚焦零样本图像恢复与扩散采样新方法。  
+最值得关注7.0分文章：自监督动态退化建模实现统一零样本图像恢复。  
+建议下一步重点阅读该文，了解其异质退化建模与跨场景泛化思路。
+- 详情：[/202605/30/README](/202605/30/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [PixIE: Prompted Pixel-Space Low-Light Image Enhancement](/202605/29/2605.23531v2-pixie-prompted-pixel-space-low-light-image-enhancement)  
+1. [Self-supervised Dynamic Heterogeneous Degradation Modeling for Unified Zero-Shot Image Restoration](/202605/30/2605.24593v1-self-supervised-dynamic-heterogeneous-degradation-modeling-for-unified-zero-shot-image-restoration)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：统一零样本图像恢复框架，处理多种退化，适用于高光谱去噪
+2. [Geometry-Correct Diffusion Posterior Sampling with Denoiser-Pullback Curvature Guidance and Manifold-Aligned Damping](/202605/30/2605.27990v1-geometry-correct-diffusion-posterior-sampling-with-denoiser-pullback-curvature-guidance-and-manifold-aligned-damping)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：深度学习低光图像增强含去噪，可应用于高光谱
-2. [Rao-Blackwellized Score Matching on Manifolds](/202605/29/2605.25567v2-rao-blackwellized-score-matching-on-manifolds)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：流形上去噪分数匹配，深度学习去噪方法
+   evidence：通过扩散后验采样和去噪器引导的去噪方法
 
 
 <div class="dpr-home-promo-card">

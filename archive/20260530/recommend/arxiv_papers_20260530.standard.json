@@ -1,0 +1,96 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-05-30T20:30:23.395712+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2605.24593v1",
+      "source": "arxiv",
+      "title": "Self-supervised Dynamic Heterogeneous Degradation Modeling for Unified Zero-Shot Image Restoration",
+      "abstract": "Zero-shot image restoration provides a flexible way to handle diverse degradations without task-specific training. However, existing methods typically rely on stacked layers or pre-trained features to enhance degradation expression, while overlooking physically consistent priors. The insufficient degradation prompts impose the heavy training burden and high sampling costs during zero-shot diffusion. Moreover, the fixed inference trajectory often collapses to suboptimal solutions under complex corruptions. We observe that heterogeneous degradations can be reparameterized into a minimal set of physically coherent parameters for compact representation. Based on this insight, we first propose a unified physical zero-shot image restoration (UP-ZeroIR) framework that explicitly models heterogeneous degradations into a homogeneous all-in-one distribution. The distribution can be optimized directly in the latent space, enabling principled solution exploration and effective prompt adaptation. Besides, we introduce a dynamic quality-refinement strategy that adaptively adjusts the diffusion trajectory for robust globally optimal convergence. Extensive experiments demonstrate that our method achieves state-of-the-art performance across both single and mixed degradations. Our code is available at https://github.com/yangjinglyy/UP-ZeroIR",
+      "authors": [
+        "XiaoWan Hu",
+        "Jing Yang",
+        "HeNan Liu",
+        "HuaQiu Li",
+        "Mai Xu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-05-23T14:08:23+00:00",
+      "link": "https://arxiv.org/pdf/2605.24593v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "unified zero-shot image restoration framework handling diverse degradations, applicable to hyperspectral denoising",
+      "llm_evidence_cn": "统一零样本图像恢复框架，处理多种退化，适用于高光谱去噪",
+      "llm_evidence": "统一零样本图像恢复框架，处理多种退化，适用于高光谱去噪",
+      "canonical_evidence": "统一零样本图像恢复框架，处理多种退化，适用于高光谱去噪",
+      "llm_tldr_en": "Proposes a unified physical zero-shot image restoration method that reparameterizes heterogeneous degradations into physically coherent parameters, enabling flexible zero-shot diffusion for any corruption including denoising.",
+      "llm_tldr_cn": "本文针对零样本图像恢复中退化表达不充分、采样成本高的问题，提出将异构退化重参数化为物理一致的最小参数集，实现统一的物理零样本图像恢复框架。该方法无需任务特定训练，可处理包括噪声在内的多种退化，具备迁移至高光谱图像去噪的潜力。实验证明其在多种退化下表现优异。",
+      "llm_tldr": "本文针对零样本图像恢复中退化表达不充分、采样成本高的问题，提出将异构退化重参数化为物理一致的最小参数集，实现统一的物理零样本图像恢复框架。该方法无需任务特定训练，可处理包括噪声在内的多种退化，具备迁移至高光谱图像去噪的潜力。实验证明其在多种退化下表现优异。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.27990v1",
+      "source": "arxiv",
+      "title": "Geometry-Correct Diffusion Posterior Sampling with Denoiser-Pullback Curvature Guidance and Manifold-Aligned Damping",
+      "abstract": "Diffusion posterior sampling conditions diffusion priors on measurements, but data-consistency updates are typically scaled by hand-tuned guidance weights and can destabilize sampling under stiff, operator-dependent curvature. We replace scalar guidance with a per-noise-level damped Gauss--Newton correction computed in diffusion-state coordinates. The correction pulls likelihood gradients back through the denoiser, uses a one-sided curvature model that avoids forward denoiser Jacobians, and applies diffusion-calibrated rank-one damping aligned with the denoiser residual. Each correction is solved with matrix-free GMRES using automatic differentiation, and sampling proceeds with a variance-preserving Langevin transition with a closed-form drift/noise split. On FFHQ and ImageNet across inverse problems, it achieves competitive PSNR/SSIM/LPIPS while running markedly faster than most of the compared baselines; on accelerated MRI reconstruction, it achieves the best PSNR/SSIM among the compared baselines.",
+      "authors": [
+        "Seunghyeok Shin",
+        "Minwoo Kim",
+        "Dabin Kim",
+        "Hongki Lim"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-05-27T05:29:35+00:00",
+      "link": "https://arxiv.org/pdf/2605.27990v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "denoising method via diffusion posterior sampling with denoiser guidance",
+      "llm_evidence_cn": "通过扩散后验采样和去噪器引导的去噪方法",
+      "llm_evidence": "通过扩散后验采样和去噪器引导的去噪方法",
+      "canonical_evidence": "通过扩散后验采样和去噪器引导的去噪方法",
+      "llm_tldr_en": "Proposes geometry-correct diffusion posterior sampling with damped Gauss-Newton correction using the denoiser, improving stability and data consistency for inverse problems including denoising.",
+      "llm_tldr_cn": "该论文针对扩散后验采样中数据一致性更新不稳定问题，提出几何校正方法。采用每噪声级别的阻尼高斯-牛顿校正，通过去噪器拉回似然梯度，避免显式计算雅可比矩阵。该方法适用于多种逆问题（包括去噪），为高光谱图像去噪提供了先进的概率框架。",
+      "llm_tldr": "该论文针对扩散后验采样中数据一致性更新不稳定问题，提出几何校正方法。采用每噪声级别的阻尼高斯-牛顿校正，通过去噪器拉回似然梯度，避免显式计算雅可比矩阵。该方法适用于多种逆问题（包括去噪），为高光谱图像去噪提供了先进的概率框架。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
