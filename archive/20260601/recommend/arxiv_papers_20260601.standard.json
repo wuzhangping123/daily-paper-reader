@@ -1,0 +1,135 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-01T22:44:17.495636+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2605.25331v1",
+      "source": "arxiv",
+      "title": "Infrared Single-Pixel Hyperspectral Imaging via Spatial-Temporal Multiplexing",
+      "abstract": "Near-infrared (NIR) hyperspectral imaging is widely used to reveal morphological and chemical information. However, conventional spectral imagers usually rely on costly focal plane arrays and suffer from data redundancy and inefficiencies in spatial-spectral data acquisition. Here, we devise and implement a single-pixel NIR hyperspectral imaging system based on high-fidelity spectrum-to-time mapping and high-precision spatial-encoding compressive measurements. The system employs a single-mode telecommunication fiber for temporal dispersion and a programmable spatial light modulator to impose structured spatial patterns, with all signals detected by a single InGaAs photodetector. By correlating temporally stretched waveforms with spatial encodings, we reconstruct 64$\\times$64 spatially resolved hyperspectral datacubes spanning 50 spectral bands over the 1550-1600 nm range. Furthermore, real-time monitoring of dynamic liquid injection is demonstrated at a datacube refreshing rate of 12 Hz under sub-Nyquist sampling. The presented architecture features single-pixel simplicity, high optical throughput, and efficient data acquisition, which would pave a novel way for NIR spectral imaging in biomedical diagnostics and material characterization.",
+      "authors": [
+        "Ben Sun",
+        "Kun Huang",
+        "Zhibin Zhao",
+        "Beibei Dong",
+        "Jianan Fang",
+        "Heping Zeng"
+      ],
+      "primary_category": "physics.optics",
+      "categories": [
+        "physics.optics"
+      ],
+      "published": "2026-05-25T01:26:01+00:00",
+      "link": "https://arxiv.org/pdf/2605.25331v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "hyperspectral imaging with compressive sensing, relevant to high-dimensional tensor data recovery",
+      "llm_evidence_cn": "高光谱成像结合压缩感知，与高维张量数据恢复相关",
+      "llm_evidence": "高光谱成像结合压缩感知，与高维张量数据恢复相关",
+      "canonical_evidence": "高光谱成像结合压缩感知，与高维张量数据恢复相关",
+      "llm_tldr_en": "Proposes a single-pixel NIR hyperspectral imaging system using spectrum-to-time mapping and compressive spatial encoding, enabling efficient acquisition and recovery of high-dimensional data.",
+      "llm_tldr_cn": "针对传统高光谱成像成本高、数据冗余的问题，提出了一种基于时空复用的单像素近红外高光谱成像系统。该系统利用频谱-时间映射和压缩空间编码实现高效采集，通过单探测器恢复三维数据立方体。实验验证了系统在光谱保真度和空间分辨率上的优势，为低成本高光谱成像提供了新方案。",
+      "llm_tldr": "针对传统高光谱成像成本高、数据冗余的问题，提出了一种基于时空复用的单像素近红外高光谱成像系统。该系统利用频谱-时间映射和压缩空间编码实现高效采集，通过单探测器恢复三维数据立方体。实验验证了系统在光谱保真度和空间分辨率上的优势，为低成本高光谱成像提供了新方案。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.29088v1",
+      "source": "arxiv",
+      "title": "A Deep Learning Iterative Framework for Sentinel-1 Stripmap Enhancement Based on Azimuth Doppler Decomposition",
+      "abstract": "Synthetic Aperture Radar (SAR) imagery enables all-weather, day-and-night Earth observation; however, it remains difficult to interpret due to speckle noise and other intrinsic imaging artifacts. Sentinel-1 (S1) constitutes one of the most widely used spaceborne SAR missions, offering systematic global coverage, high temporal resolution, dual-polarization imaging, and free data availability. Among S1 modes, Stripmap (SM) provides the highest resolution, yet speckle noise and spatial constraints often hinder applications requiring finer spatial detail. This motivates the need for effective image enhancement strategies. In this work, we propose a self-supervised enhancement framework for S1 SM imagery based on azimuth subaperture decomposition. The method exploits the physical consistency between subaperture reconstructions and the corresponding full-aperture image to generate paired training data without external sensors, simulated ground truth, or multi-temporal stacks. The proposed framework integrates single- and multi-frame learning and incorporates an iterative inference scheme that progressively refines image quality. Experiments on real S1 SM data show that the proposed approach consistently outperforms the widely adopted self-supervised deep learning baseline MERLIN, in terms of PSNR and SSIM, while MERLIN attains higher ENL, highlighting a trade-off between structural fidelity and speckle smoothing. Overall, the results demonstrate that subaperture-based supervision provides a physically grounded, reproducible, and operationally viable approach for SAR image enhancement using S1 data. It is worth noting that the proposed approach can be extended to other SAR platforms, polarizations, and acquisition modes.",
+      "authors": [
+        "Juan Francisco Amieva",
+        "Christian Ayala",
+        "Roberto Del Prete",
+        "Mikel Galar"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-05-27T20:41:54+00:00",
+      "link": "https://arxiv.org/pdf/2605.29088v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "stripe noise removal in SAR imagery similar to hyperspectral stripe noise",
+      "llm_evidence_cn": "SAR影像条带噪声去除与高光谱条带噪声类似",
+      "llm_evidence": "SAR影像条带噪声去除与高光谱条带噪声类似",
+      "canonical_evidence": "SAR影像条带噪声去除与高光谱条带噪声类似",
+      "llm_tldr_en": "Proposes a self-supervised deep learning framework for Sentinel-1 Stripmap enhancement via azimuth Doppler decomposition, effectively reducing speckle noise and artifacts.",
+      "llm_tldr_cn": "该文针对Sentinel-1条带模式SAR图像受散斑噪声和成像伪影影响的问题，提出了一种基于方位向多普勒分解的自监督深度学习增强框架。方法利用方位向分解指导去噪，无需配对数据。实验证明该方法能有效提升图像分辨率并抑制噪声。该工作可扩展至类似高光谱遥感图像中的条带噪声去除问题。",
+      "llm_tldr": "该文针对Sentinel-1条带模式SAR图像受散斑噪声和成像伪影影响的问题，提出了一种基于方位向多普勒分解的自监督深度学习增强框架。方法利用方位向分解指导去噪，无需配对数据。实验证明该方法能有效提升图像分辨率并抑制噪声。该工作可扩展至类似高光谱遥感图像中的条带噪声去除问题。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "stripe noise removal in hyperspectral remote sensing images",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.30973v1",
+      "source": "arxiv",
+      "title": "SCALMU: Synthetically-trained Coupling of Adaptive Learned Multiplicative Updates for Hyperspectral-Multispectral Fusion",
+      "abstract": "HyperSpectral-MultiSpectral Image (HSI-MSI) fusion enables high-resolution hyperspectral imaging by combining the rich spectral information of low-spatial-resolution hyperspectral images with the detailed spatial structure of multispectral images. Classical methods such as Coupled Nonnegative Matrix Factorization (CNMF) benefit from a strong physical interpretability but suffer from inferior results compared to their deep-learning counterparts. To address this limitation, we propose SCALMU (Synthetically-trained Coupling of Adaptive Learned Multiplicative Updates), a novel unrolled neural network architecture that integrates adaptive learnable matrices within the classical framework of CNMF multiplicative updates, improving its results. Due to its architectural proximity with CNMF, the resulting algorithm preserves physical interpretability and nonnegativity constraints. To overcome data scarcity for training, we additionally generate a synthetic HSI-MSI dataset via the dead leaves model, enabling synthetic supervision. SCALMU is then trained end-to-end on this dataset. Experiments demonstrate SCALMU's superiority over state-of-the-art methods on several datasets. The code is available at https://github.com/xinxinxu99/SCALMU.git",
+      "authors": [
+        "Xinxin Xu",
+        "Yann Gousseau",
+        "Christophe Kervazo",
+        "Saïd Ladjal"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.GR",
+        "eess.SP"
+      ],
+      "published": "2026-05-29T08:13:38+00:00",
+      "link": "https://arxiv.org/pdf/2605.30973v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "hyperspectral-multispectral fusion with learned multiplicative updates",
+      "llm_evidence_cn": "高光谱-多光谱融合，使用学习乘法更新",
+      "llm_evidence": "高光谱-多光谱融合，使用学习乘法更新",
+      "canonical_evidence": "高光谱-多光谱融合，使用学习乘法更新",
+      "llm_tldr_en": "Proposes SCALMU, an unrolled neural network integrating adaptive learnable matrices into CNMF multiplicative updates for HSI-MSI fusion, achieving superior results on simulated and real data.",
+      "llm_tldr_cn": "高光谱-多光谱图像融合旨在结合高光谱丰富光谱信息与多光谱高空间分辨率。经典CNMF方法物理可解释但效果逊于深度学习方法。本文提出SCALMU，一种新型展开网络架构，在CNMF乘法更新框架中集成自适应可学习矩阵。实验表明该方法在模拟和真实数据上均取得优异融合性能，为高光谱数据恢复提供了新思路。",
+      "llm_tldr": "高光谱-多光谱图像融合旨在结合高光谱丰富光谱信息与多光谱高空间分辨率。经典CNMF方法物理可解释但效果逊于深度学习方法。本文提出SCALMU，一种新型展开网络架构，在CNMF乘法更新框架中集成自适应可学习矩阵。实验表明该方法在模拟和真实数据上均取得优异融合性能，为高光谱数据恢复提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

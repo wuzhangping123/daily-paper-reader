@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-01",
+  "date": "2026-06-01",
+  "generated_at": "2026-06-01T22:45:44",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/01/2605.25331v1-infrared-single-pixel-hyperspectral-imaging-via-spatial-temporal-multiplexing",
+      "section": "quick",
+      "title_en": "Infrared Single-Pixel Hyperspectral Imaging via Spatial-Temporal Multiplexing",
+      "authors": "Ben Sun, Kun Huang, Zhibin Zhao, Beibei Dong, Jianan Fang, Heping Zeng",
+      "date": "2026-05-25",
+      "pdf": "https://arxiv.org/pdf/2605.25331v1",
+      "score": "6.0",
+      "evidence": "高光谱成像结合压缩感知，与高维张量数据恢复相关",
+      "tldr": "近红外高光谱成像依赖昂贵焦平面阵列，数据冗余且采集效率低。本文提出基于光谱-时间映射和空间编码压缩测量的单像素成像系统，采用单模光纤和空间光调制器实现单InGaAs探测器成像。通过关联时间拉伸波形与空间编码，重建64×64像素、50波段（1550-1600 nm）的高光谱数据立方体。在亚奈奎斯特采样下以12Hz帧率实时监测动态液体注入。该架构具备单像素简单性、高光通量和高效数据采集优势，为生物医学和材料表征提供新方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Near-infrared (NIR) hyperspectral imaging is widely used to reveal morphological and chemical information. However, conventional spectral imagers usually rely on costly focal plane arrays and suffer from data redundancy and inefficiencies in spatial-spectral data acquisition. Here, we devise and implement a single-pixel NIR hyperspectral imaging system based on high-fidelity spectrum-to-time mapping and high-precision spatial-encoding compressive measurements. The system employs a single-mode telecommunication fiber for temporal dispersion and a programmable spatial light modulator to impose structured spatial patterns, with all signals detected by a single InGaAs photodetector. By correlating temporally stretched waveforms with spatial encodings, we reconstruct 64$\\times$64 spatially resolved hyperspectral datacubes spanning 50 spectral bands over the 1550-1600 nm range. Furthermore, real-time monitoring of dynamic liquid injection is demonstrated at a datacube refreshing rate of 12 Hz under sub-Nyquist sampling. The presented architecture features single-pixel simplicity, high optical throughput, and efficient data acquisition, which would pave a novel way for NIR spectral imaging in biomedical diagnostics and material characterization.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/01/2605.29088v1-a-deep-learning-iterative-framework-for-sentinel-1-stripmap-enhancement-based-on-azimuth-doppler-decomposition",
+      "section": "quick",
+      "title_en": "A Deep Learning Iterative Framework for Sentinel-1 Stripmap Enhancement Based on Azimuth Doppler Decomposition",
+      "authors": "Juan Francisco Amieva, Christian Ayala, Roberto Del Prete, Mikel Galar",
+      "date": "2026-05-27",
+      "pdf": "https://arxiv.org/pdf/2605.29088v1",
+      "score": "6.0",
+      "evidence": "SAR影像条带噪声去除与高光谱条带噪声类似",
+      "tldr": "针对Sentinel-1条带模式图像受斑点噪声影响且空间细节受限的问题，提出一种基于方位子孔径分解的自监督增强框架。通过子孔径重建与全孔径图像间的物理一致性生成训练数据，无需外部传感器或真实标签。集成单帧与多帧学习及迭代推理，逐步提升图像质量。在真实数据上相比MERLIN基线取得更高PSNR和SSIM，但ENL较低，表明在结构保真度与平滑间存在权衡。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Synthetic Aperture Radar (SAR) imagery enables all-weather, day-and-night Earth observation; however, it remains difficult to interpret due to speckle noise and other intrinsic imaging artifacts. Sentinel-1 (S1) constitutes one of the most widely used spaceborne SAR missions, offering systematic global coverage, high temporal resolution, dual-polarization imaging, and free data availability. Among S1 modes, Stripmap (SM) provides the highest resolution, yet speckle noise and spatial constraints often hinder applications requiring finer spatial detail. This motivates the need for effective image enhancement strategies. In this work, we propose a self-supervised enhancement framework for S1 SM imagery based on azimuth subaperture decomposition. The method exploits the physical consistency between subaperture reconstructions and the corresponding full-aperture image to generate paired training data without external sensors, simulated ground truth, or multi-temporal stacks. The proposed framework integrates single- and multi-frame learning and incorporates an iterative inference scheme that progressively refines image quality. Experiments on real S1 SM data show that the proposed approach consistently outperforms the widely adopted self-supervised deep learning baseline MERLIN, in terms of PSNR and SSIM, while MERLIN attains higher ENL, highlighting a trade-off between structural fidelity and speckle smoothing. Overall, the results demonstrate that subaperture-based supervision provides a physically grounded, reproducible, and operationally viable approach for SAR image enhancement using S1 data. It is worth noting that the proposed approach can be extended to other SAR platforms, polarizations, and acquisition modes.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/01/2605.30973v1-scalmu-synthetically-trained-coupling-of-adaptive-learned-multiplicative-updates-for-hyperspectral-multispectral-fusion",
+      "section": "quick",
+      "title_en": "SCALMU: Synthetically-trained Coupling of Adaptive Learned Multiplicative Updates for Hyperspectral-Multispectral Fusion",
+      "authors": "Xinxin Xu, Yann Gousseau, Christophe Kervazo, Saïd Ladjal",
+      "date": "2026-05-29",
+      "pdf": "https://arxiv.org/pdf/2605.30973v1",
+      "score": "6.0",
+      "evidence": "高光谱-多光谱融合，使用学习乘法更新",
+      "tldr": "针对高光谱与多光谱图像融合任务，经典CNMF方法物理可解释性强但性能不及深度学习方法。本文提出SCALMU，将自适应可学习矩阵集成到CNMF乘性更新框架中，形成新型展开神经网络。利用死叶模型构建合成数据集进行端到端训练。实验表明SCALMU在多个数据集上超越现有方法，并保持了非负性和物理可解释性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "HyperSpectral-MultiSpectral Image (HSI-MSI) fusion enables high-resolution hyperspectral imaging by combining the rich spectral information of low-spatial-resolution hyperspectral images with the detailed spatial structure of multispectral images. Classical methods such as Coupled Nonnegative Matrix Factorization (CNMF) benefit from a strong physical interpretability but suffer from inferior results compared to their deep-learning counterparts. To address this limitation, we propose SCALMU (Synthetically-trained Coupling of Adaptive Learned Multiplicative Updates), a novel unrolled neural network architecture that integrates adaptive learnable matrices within the classical framework of CNMF multiplicative updates, improving its results. Due to its architectural proximity with CNMF, the resulting algorithm preserves physical interpretability and nonnegativity constraints. To overcome data scarcity for training, we additionally generate a synthetic HSI-MSI dataset via the dead leaves model, enabling synthetic supervision. SCALMU is then trained end-to-end on this dataset. Experiments demonstrate SCALMU's superiority over state-of-the-art methods on several datasets. The code is available at https://github.com/xinxinxu99/SCALMU.git",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
