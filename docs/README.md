@@ -6,32 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-01
-- 运行时间：2026-06-01 22:45:39 UTC
+- 最新运行日期：2026-06-02
+- 运行时间：2026-06-02 21:36:09 UTC
 - 运行状态：成功
-- 本次总论文数：3
+- 本次总论文数：2
 - 精读区：0
-- 速读区：3
+- 速读区：2
 
 ### 今日简报（AI）
-1) 今日推荐3篇遥感与高光谱图像处理论文，均为速读6.0分，涉及红外单像素成像、Sentinel-1条带增强及多光谱融合技术。  
-2) 值得关注的2个方向：基于时空复用的单像素高光谱成像方法，以及深度学习驱动的自适应多光谱融合框架（SCALMU）。  
-3) 建议普通读者优先阅读SCALMU论文，了解合成训练策略在多传感器数据融合中的实用性。
-- 详情：[/202606/01/README](/202606/01/README)
+今天速读了两篇论文，覆盖真实图像恢复生成基准与超图张量PCA理论阈值。
+
+最值得关注的是《GGT-100K》，它提出了首个通用真实世界图像恢复的生成式真值数据集（7/10分）。
+
+建议您优先了解图像恢复中生成式方法的评估改进，再抽空看一眼超图低度估计的数学结论。
+- 详情：[/202606/02/README](/202606/02/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Infrared Single-Pixel Hyperspectral Imaging via Spatial-Temporal Multiplexing](/202606/01/2605.25331v1-infrared-single-pixel-hyperspectral-imaging-via-spatial-temporal-multiplexing)  
+1. [GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration](/202606/02/2605.31039v1-ggt-100k-generative-ground-truth-for-generalizable-real-world-image-restoration)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：提出真实图像恢复的生成地面真值，可迁移至高光谱去噪
+2. [Low-degree estimation thresholds in planted hypergraphs and tensor PCA](/202606/02/2605.30113v1-low-degree-estimation-thresholds-in-planted-hypergraphs-and-tensor-pca)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：高光谱成像结合压缩感知，与高维张量数据恢复相关
-2. [A Deep Learning Iterative Framework for Sentinel-1 Stripmap Enhancement Based on Azimuth Doppler Decomposition](/202606/01/2605.29088v1-a-deep-learning-iterative-framework-for-sentinel-1-stripmap-enhancement-based-on-azimuth-doppler-decomposition)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：SAR影像条带噪声去除与高光谱条带噪声类似
-3. [SCALMU: Synthetically-trained Coupling of Adaptive Learned Multiplicative Updates for Hyperspectral-Multispectral Fusion](/202606/01/2605.30973v1-scalmu-synthetically-trained-coupling-of-adaptive-learned-multiplicative-updates-for-hyperspectral-multispectral-fusion)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：高光谱-多光谱融合，使用学习乘法更新
+   evidence：研究张量PCA中的低度估计，为张量数据恢复提供理论见解
 
 
 <div class="dpr-home-promo-card">

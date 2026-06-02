@@ -1,0 +1,95 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-02T21:33:06.288136+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2605.31039v1",
+      "source": "arxiv",
+      "title": "GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration",
+      "abstract": "Real-world image restoration (IR) is bottlenecked by the scarcity of high-quality paired training data. Synthetic datasets are abundant but often fail to model real-world degradations, while real-world paired datasets are expensive and difficult to capture. As a result, IR models trained on these datasets show limited generalization in real-world scenarios. In this work, we propose Generative Ground Truth (GGT) by using generative multimodal foundation models (MFMs) to produce high-quality (HQ) targets from real-world low-quality (LQ) images. We first conduct a systematic evaluation of nine state-of-the-art MFMs, including Nano-Banana-2 and GPT-Image-2, on images of various scenes and degradation types. The results demonstrate that Nano-Banana-2 with VLM-based adaptive prompting shows the highest capability to synthesize perceptually realistic and content-faithful HQ targets, which can serve as the GGT for the LQ input. We then employ Nano-Banana-2 to build a GGT synthesis pipeline, which involves multi-stage quality control to ensure data reliability, and construct GGT-100K, an LQ-HQ paired dataset comprising 103,707 training pairs and covering diverse scenes and complex real-world degradations. A test set of 500 image pairs is also established. Extensive experiments show that GGT-100K consistently improves the real-world generalization of a wide range of IR models, with particularly strong benefits for finetuning generative models for IR tasks. Our results suggest that MFMs can serve as practical tools for restoration-oriented data generation, and GGT-100K is a useful resource to expand the generalization boundaries of real-world IR models.",
+      "authors": [
+        "Xiangtao Kong",
+        "Jixin Zhao",
+        "Lingchen Sun",
+        "Rongyuan Wu",
+        "Lei Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-05-29T09:18:11+00:00",
+      "link": "https://arxiv.org/pdf/2605.31039v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes generative ground truth for real-world image restoration, transferable to hyperspectral denoising",
+      "llm_evidence_cn": "提出真实图像恢复的生成地面真值，可迁移至高光谱去噪",
+      "llm_evidence": "提出真实图像恢复的生成地面真值，可迁移至高光谱去噪",
+      "canonical_evidence": "提出真实图像恢复的生成地面真值，可迁移至高光谱去噪",
+      "llm_tldr_en": "This paper introduces Generative Ground Truth (GGT) using multimodal foundation models to create high-quality targets for real-world image restoration, addressing training data scarcity.",
+      "llm_tldr_cn": "该论文针对真实图像恢复中高质量配对数据稀缺的问题，提出利用生成多模态基础模型从低质量图像生成高质量目标的方法。评估了九个主流模型，并构建了GGT-100K数据集。该方法可有效提升图像恢复模型的泛化能力，其思想可迁移至高光谱图像去噪领域。",
+      "llm_tldr": "该论文针对真实图像恢复中高质量配对数据稀缺的问题，提出利用生成多模态基础模型从低质量图像生成高质量目标的方法。评估了九个主流模型，并构建了GGT-100K数据集。该方法可有效提升图像恢复模型的泛化能力，其思想可迁移至高光谱图像去噪领域。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.30113v1",
+      "source": "arxiv",
+      "title": "Low-degree estimation thresholds in planted hypergraphs and tensor PCA",
+      "abstract": "A central question in high-dimensional statistics is to understand statistical--computational gaps: regimes in which recovering a hidden signal is information-theoretically possible but conjectured to be computationally intractable. The low-degree framework offers a concrete way to study this gap by restricting attention to estimators that are polynomials of degree at most $D$ in the observed data. In this paper, we study low-degree estimation in planted dense subhypergraph, sparse tensor PCA, and tensor PCA with a general prior.   For the planted dense subhypergraph model on $n$ vertices, we identify two regimes depending on whether the planted set is larger or smaller than $\\sqrt{n}$. Above this scale, we identify a sharp threshold for low-degree estimation. Below this scale, we establish hardness in the regimes predicted by prior work, thereby resolving a question of Schramm and Wein (2022) and Sohn and Wein (2025). For sparse tensor PCA, we identify an analogous sharp phase transition. For tensor PCA with a general prior, we prove a low-degree estimation lower bound at the critical signal scale, matching the degree--signal tradeoff suggested by prior work.   Our lower bounds apply to degree $D=n^δ$, where $n$ is the dimension and $δ>0$ is a constant, and we complement them with corresponding low-degree upper bounds. In addition, for planted dense subhypergraph and sparse tensor PCA above the $\\sqrt{n}$ scale, we convert our upper bounds into polynomial-time algorithms that achieve almost exact recovery above the sharp threshold, yielding polynomial-time algorithms succeeding up to this threshold. Our proofs extend the framework of Sohn and Wein (2025) through a conditional variant that yields the correct signal-to-noise ratio in settings where the unconditional approach is insufficient.",
+      "authors": [
+        "Daniel Fu",
+        "Youngtak Sohn"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "cs.CC",
+        "cs.DS",
+        "math.PR"
+      ],
+      "published": "2026-05-28T15:49:59+00:00",
+      "link": "https://arxiv.org/pdf/2605.30113v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "studies low-degree estimation in tensor PCA, providing insights for tensor data recovery",
+      "llm_evidence_cn": "研究张量PCA中的低度估计，为张量数据恢复提供理论见解",
+      "llm_evidence": "研究张量PCA中的低度估计，为张量数据恢复提供理论见解",
+      "canonical_evidence": "研究张量PCA中的低度估计，为张量数据恢复提供理论见解",
+      "llm_tldr_en": "This paper establishes sharp thresholds for low-degree estimation in planted hypergraphs and tensor PCA, relevant to high-dimensional tensor recovery.",
+      "llm_tldr_cn": "该论文研究了植入侵入超图和张量PCA中的低度估计阈值，揭示了统计计算之间的差距。张量PCA的结果直接关系高维张量数据的恢复问题，为理解张量方法在恢复任务中的可行性提供了理论指导。",
+      "llm_tldr": "该论文研究了植入侵入超图和张量PCA中的低度估计阈值，揭示了统计计算之间的差距。张量PCA的结果直接关系高维张量数据的恢复问题，为理解张量方法在恢复任务中的可行性提供了理论指导。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

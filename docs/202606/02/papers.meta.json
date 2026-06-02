@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-02",
+  "date": "2026-06-02",
+  "generated_at": "2026-06-02T21:36:15",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/02/2605.31039v1-ggt-100k-generative-ground-truth-for-generalizable-real-world-image-restoration",
+      "section": "quick",
+      "title_en": "GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration",
+      "authors": "Xiangtao Kong, Jixin Zhao, Lingchen Sun, Rongyuan Wu, Lei Zhang",
+      "date": "2026-05-29",
+      "pdf": "https://arxiv.org/pdf/2605.31039v1",
+      "score": "7.0",
+      "evidence": "提出真实图像恢复的生成地面真值，可迁移至高光谱去噪",
+      "tldr": "真实图像修复因缺乏高质量配对数据而受限。本文提出利用生成式多模态基础模型（如Nano-Banana-2）为真实低质量图像生成高质量目标（GGT），并构建包含10万多对图像的GGT-100K数据集。实验表明该数据集显著提升多种修复模型的真实世界泛化能力，尤其对生成模型微调效果突出。该工作展示了MFM在修复数据生成中的实用价值，为扩展真实场景图像修复的边界提供了宝贵资源。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Real-world image restoration (IR) is bottlenecked by the scarcity of high-quality paired training data. Synthetic datasets are abundant but often fail to model real-world degradations, while real-world paired datasets are expensive and difficult to capture. As a result, IR models trained on these datasets show limited generalization in real-world scenarios. In this work, we propose Generative Ground Truth (GGT) by using generative multimodal foundation models (MFMs) to produce high-quality (HQ) targets from real-world low-quality (LQ) images. We first conduct a systematic evaluation of nine state-of-the-art MFMs, including Nano-Banana-2 and GPT-Image-2, on images of various scenes and degradation types. The results demonstrate that Nano-Banana-2 with VLM-based adaptive prompting shows the highest capability to synthesize perceptually realistic and content-faithful HQ targets, which can serve as the GGT for the LQ input. We then employ Nano-Banana-2 to build a GGT synthesis pipeline, which involves multi-stage quality control to ensure data reliability, and construct GGT-100K, an LQ-HQ paired dataset comprising 103,707 training pairs and covering diverse scenes and complex real-world degradations. A test set of 500 image pairs is also established. Extensive experiments show that GGT-100K consistently improves the real-world generalization of a wide range of IR models, with particularly strong benefits for finetuning generative models for IR tasks. Our results suggest that MFMs can serve as practical tools for restoration-oriented data generation, and GGT-100K is a useful resource to expand the generalization boundaries of real-world IR models.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/02/2605.30113v1-low-degree-estimation-thresholds-in-planted-hypergraphs-and-tensor-pca",
+      "section": "quick",
+      "title_en": "Low-degree estimation thresholds in planted hypergraphs and tensor PCA",
+      "authors": "Daniel Fu, Youngtak Sohn",
+      "date": "2026-05-28",
+      "pdf": "https://arxiv.org/pdf/2605.30113v1",
+      "score": "6.0",
+      "evidence": "研究张量PCA中的低度估计，为张量数据恢复提供理论见解",
+      "tldr": "高维统计中的统计-计算差距是核心问题。本文利用低度多项式框架，研究植入稠密子超图、稀疏张量PCA及一般先验张量PCA的估计阈值。在植入子超图中，当植入规模大于√n时出现尖锐阈值，低于此尺度验证了先前预测的困难性。稀疏张量PCA同样存在类似相变。主要贡献包括匹配的低度上下界，并将上界转化为几乎精确恢复的多项式时间算法，拓展了条件变体方法。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "A central question in high-dimensional statistics is to understand statistical--computational gaps: regimes in which recovering a hidden signal is information-theoretically possible but conjectured to be computationally intractable. The low-degree framework offers a concrete way to study this gap by restricting attention to estimators that are polynomials of degree at most $D$ in the observed data. In this paper, we study low-degree estimation in planted dense subhypergraph, sparse tensor PCA, and tensor PCA with a general prior.   For the planted dense subhypergraph model on $n$ vertices, we identify two regimes depending on whether the planted set is larger or smaller than $\\sqrt{n}$. Above this scale, we identify a sharp threshold for low-degree estimation. Below this scale, we establish hardness in the regimes predicted by prior work, thereby resolving a question of Schramm and Wein (2022) and Sohn and Wein (2025). For sparse tensor PCA, we identify an analogous sharp phase transition. For tensor PCA with a general prior, we prove a low-degree estimation lower bound at the critical signal scale, matching the degree--signal tradeoff suggested by prior work.   Our lower bounds apply to degree $D=n^δ$, where $n$ is the dimension and $δ>0$ is a constant, and we complement them with corresponding low-degree upper bounds. In addition, for planted dense subhypergraph and sparse tensor PCA above the $\\sqrt{n}$ scale, we convert our upper bounds into polynomial-time algorithms that achieve almost exact recovery above the sharp threshold, yielding polynomial-time algorithms succeeding up to this threshold. Our proofs extend the framework of Sohn and Wein (2025) through a conditional variant that yields the correct signal-to-noise ratio in settings where the unconditional approach is insufficient.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
