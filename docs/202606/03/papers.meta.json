@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-03",
+  "date": "2026-06-03",
+  "generated_at": "2026-06-03T22:09:06",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/03/2606.00584v1-spectra-guided-neural-tucker-factorization",
+      "section": "quick",
+      "title_en": "Spectra-Guided Neural Tucker Factorization",
+      "authors": "Fusheng Wang, Yikai Hou",
+      "date": "2026-05-30",
+      "pdf": "https://arxiv.org/pdf/2606.00584v1",
+      "score": "7.0",
+      "evidence": "适用于高光谱数据恢复的张量补全方法",
+      "tldr": "高维不完整张量补全任务中，现有方法对时空周期性建模采用离散表示，导致参数冗余且泛化受限。本文提出光谱引导神经塔克分解（SG-NTF），将时间标量映射至连续光谱空间以抽象周期模式，并引入时空共门控机制通过乘法调制显式筛选潜在交互。在多个真实高维不完整张量上的实验表明，SG-NTF以显著更少的参数取得了与现有方法相当甚至更优的补全精度，验证了连续光谱表示与门控滤波的有效性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "This paper proposes Spectra-Guided Neural Tucker Factorization (SG-NTF) for High-Dimensional and Incomplete (HDI) tensor completion. Circumventing discrete representational limits, SG-NTF maps scalar timestamps into a continuous spectral space to abstract temporal periodicities. Concurrently, a Spatio-Temporal Co-Gating (STCG) mechanism explicitly filters latent interactions via multiplicative modulation on spatiotemporal contexts. Evaluations on real-world HDI tensors verify that SG-NTF maintains competitive completion accuracy with parameter efficiency.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/03/2606.00122v1-mathematical-framework-for-perception-driven-parameter-choice-in-image-denoising",
+      "section": "quick",
+      "title_en": "Mathematical framework for perception-driven parameter choice in image denoising",
+      "authors": "Saara Isoranta, Emilia L. K. Blåsten, Lílian Ferreira de Freitas, Jukka Häkkinen, Markus Juvonen, Samuli Siltanen",
+      "date": "2026-05-28",
+      "pdf": "https://arxiv.org/pdf/2606.00122v1",
+      "score": "6.0",
+      "evidence": "适用于高光谱图像去噪的参数选择框架",
+      "tldr": "图像去噪参数选择需符合人类视觉感知。该研究结合数学与心理学方法，通过全变分去噪算法生成不同参数的照片样本，组织人类参与者进行对比测试，并运用心理测量缩放分析结果。关键结果是获得HaarPSI值作为阈值，用于离散化参数网格，最终生成心理测量尺度化的公开图像集。该工作为感知驱动成像提供了数学框架和实验基础。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We approach image denoising from a perception-driven perspective: how can we select the parameters that are best suited for human visual perception? We combine research methods in mathematics and psychology to develop a mathematical framework for measuring perceived similarity. We construct a sample set of differently denoised photographs by using the same base image as input data and by tuning the parameter value in a total variation denoising algorithm. A comparison test is conducted with human participants to survey perceived differences between the images. Analyzing the results with psychometric scaling provides us with a HaarPSI value to use as a threshold in discretizing parameter grids. As a result, we obtain psychometrically scaled, openly available image sets that are ready to use in further experiments in perception-driven imaging, as well as a framework for ensuing experiments involving comparison tests.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/03/2606.01048v1-decoupled-residual-denoising-diffusion-models-for-unified-and-data-efficient-image-to-image-translation",
+      "section": "quick",
+      "title_en": "Decoupled Residual Denoising Diffusion Models for Unified and Data Efficient Image-to-Image Translation",
+      "authors": "Ziyue Lin, Jiahe Hou, Hongyu Xia, Xinrui Xie, Feifei Wang, Yuyin Zhou, Wei Wang, Jiawei Liu, Liangqiong Qu",
+      "date": "2026-05-31",
+      "pdf": "https://arxiv.org/pdf/2606.01048v1",
+      "score": "6.0",
+      "evidence": "去噪扩散模型可作为深度神经网络方法用于高光谱图像去噪",
+      "tldr": "图像翻译中扩散模型通过噪声注入可实现域对齐，但现有方法将噪声和残差同时移除导致对齐效果过早退化。为此提出解耦残差扩散模型DRDD，将扩散过程分为随机噪声扩散和确定性残差扩散两个独立阶段，保留域对齐和流形提升效果。噪声扩散仅用未配对目标域图像训练，大幅提升数据效率。理论分析和实验表明DRDD兼容主流扩散模型，在有限配对数据下实现鲁棒统一的图像翻译，简化了跨任务域的统一映射学习。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We propose Decoupled Residual Denoising Diffusion models (DRDD) for unified and data-efficient image-to-image (I2I) translation. While diffusion models have advanced I2I translation in terms of quality and diversity, we uncover a previously under-explored property in diffusion models. Crucially, beyond its conventional role of manifold lifting (i.e., moving data off low-dimensional manifolds), injecting Gaussian noise facilitates domain harmonization by implicitly aligning feature distributions across domains, a property particularly advantageous for unified I2I translation. However, existing diffusion models prematurely erode this harmonization effect, as noise and residuals are simultaneously removed in a single coupled diffusion process. To address this, DRDD decouples the diffusion process into two sequential and independent diffusion stages: (1) a stochastic noise diffusion for domain harmonization and manifold lifting, and (2) a deterministic residual diffusion that learns the core semantic mapping entirely within the fixed-noise domain. This decoupling preserves harmonization and manifold lifting effects throughout the transformation, substantially simplifying the learning of unified mappings across diverse tasks and domains. Notably, the noise diffusion stage is trained exclusively on abundant, unpaired target-domain images, greatly improving data efficiency. Comprehensive theoretical and empirical analysis demonstrates that DRDD is broadly compatible with mainstream diffusion models and consistently delivers robust, unified I2I translation, even under limited paired data. Our code is available at https://github.com/HKU-HealthAI/DRDD.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

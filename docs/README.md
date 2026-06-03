@@ -6,31 +6,30 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-02
-- 运行时间：2026-06-02 21:36:09 UTC
+- 最新运行日期：2026-06-03
+- 运行时间：2026-06-03 22:09:01 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：3
 - 精读区：0
-- 速读区：2
+- 速读区：3
 
 ### 今日简报（AI）
-今天速读了两篇论文，覆盖真实图像恢复生成基准与超图张量PCA理论阈值。
-
-最值得关注的是《GGT-100K》，它提出了首个通用真实世界图像恢复的生成式真值数据集（7/10分）。
-
-建议您优先了解图像恢复中生成式方法的评估改进，再抽空看一眼超图低度估计的数学结论。
-- 详情：[/202606/02/README](/202606/02/README)
+今日速读三篇论文，涵盖光谱引导张量分解、感知驱动去噪参数选择及解耦残差扩散图像翻译。最值得关注的是《Spectra-Guided Neural Tucker Factorization》（7.0分）与《Decoupled Residual Denoising Diffusion Models》（6.0分）所代表的张量建模与统一图像翻译方向。建议优先精读高分解的论文，其余两篇可作为对比或扩展阅读。
+- 详情：[/202606/03/README](/202606/03/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [GGT-100K: Generative Ground Truth for Generalizable Real-World Image Restoration](/202606/02/2605.31039v1-ggt-100k-generative-ground-truth-for-generalizable-real-world-image-restoration)  
+1. [Spectra-Guided Neural Tucker Factorization](/202606/03/2606.00584v1-spectra-guided-neural-tucker-factorization)  
    标签：评分：7.0/10、query:hsi-denoise
-   evidence：提出真实图像恢复的生成地面真值，可迁移至高光谱去噪
-2. [Low-degree estimation thresholds in planted hypergraphs and tensor PCA](/202606/02/2605.30113v1-low-degree-estimation-thresholds-in-planted-hypergraphs-and-tensor-pca)  
+   evidence：适用于高光谱数据恢复的张量补全方法
+2. [Mathematical framework for perception-driven parameter choice in image denoising](/202606/03/2606.00122v1-mathematical-framework-for-perception-driven-parameter-choice-in-image-denoising)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：研究张量PCA中的低度估计，为张量数据恢复提供理论见解
+   evidence：适用于高光谱图像去噪的参数选择框架
+3. [Decoupled Residual Denoising Diffusion Models for Unified and Data Efficient Image-to-Image Translation](/202606/03/2606.01048v1-decoupled-residual-denoising-diffusion-models-for-unified-and-data-efficient-image-to-image-translation)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：去噪扩散模型可作为深度神经网络方法用于高光谱图像去噪
 
 
 <div class="dpr-home-promo-card">

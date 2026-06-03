@@ -1,0 +1,138 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-03T22:07:00.479341+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.00584v1",
+      "source": "arxiv",
+      "title": "Spectra-Guided Neural Tucker Factorization",
+      "abstract": "This paper proposes Spectra-Guided Neural Tucker Factorization (SG-NTF) for High-Dimensional and Incomplete (HDI) tensor completion. Circumventing discrete representational limits, SG-NTF maps scalar timestamps into a continuous spectral space to abstract temporal periodicities. Concurrently, a Spatio-Temporal Co-Gating (STCG) mechanism explicitly filters latent interactions via multiplicative modulation on spatiotemporal contexts. Evaluations on real-world HDI tensors verify that SG-NTF maintains competitive completion accuracy with parameter efficiency.",
+      "authors": [
+        "Fusheng Wang",
+        "Yikai Hou"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-05-30T07:24:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.00584v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "tensor completion method applicable to hyperspectral data recovery",
+      "llm_evidence_cn": "适用于高光谱数据恢复的张量补全方法",
+      "llm_evidence": "适用于高光谱数据恢复的张量补全方法",
+      "canonical_evidence": "适用于高光谱数据恢复的张量补全方法",
+      "llm_tldr_en": "Proposes SG-NTF for high-dimensional tensor completion, mapping timestamps to continuous spectral space and using spatio-temporal co-gating, achieving competitive accuracy.",
+      "llm_tldr_cn": "本文针对高维不完全张量补全问题，提出光谱引导的神经Tucker分解（SG-NTF），通过将时间戳映射到连续光谱空间抽象周期性，并利用时空共门控机制过滤潜在交互。在真实高维张量数据上的实验表明，该方法以参数效率保持竞争性的补全精度，可应用于高光谱图像恢复等任务。",
+      "llm_tldr": "本文针对高维不完全张量补全问题，提出光谱引导的神经Tucker分解（SG-NTF），通过将时间戳映射到连续光谱空间抽象周期性，并利用时空共门控机制过滤潜在交互。在真实高维张量数据上的实验表明，该方法以参数效率保持竞争性的补全精度，可应用于高光谱图像恢复等任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.00122v1",
+      "source": "arxiv",
+      "title": "Mathematical framework for perception-driven parameter choice in image denoising",
+      "abstract": "We approach image denoising from a perception-driven perspective: how can we select the parameters that are best suited for human visual perception? We combine research methods in mathematics and psychology to develop a mathematical framework for measuring perceived similarity. We construct a sample set of differently denoised photographs by using the same base image as input data and by tuning the parameter value in a total variation denoising algorithm. A comparison test is conducted with human participants to survey perceived differences between the images. Analyzing the results with psychometric scaling provides us with a HaarPSI value to use as a threshold in discretizing parameter grids. As a result, we obtain psychometrically scaled, openly available image sets that are ready to use in further experiments in perception-driven imaging, as well as a framework for ensuing experiments involving comparison tests.",
+      "authors": [
+        "Saara Isoranta",
+        "Emilia L. K. Blåsten",
+        "Lílian Ferreira de Freitas",
+        "Jukka Häkkinen",
+        "Markus Juvonen",
+        "Samuli Siltanen"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "math.NA"
+      ],
+      "published": "2026-05-28T09:31:37+00:00",
+      "link": "https://arxiv.org/pdf/2606.00122v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "parameter selection framework for denoising applicable to hyperspectral",
+      "llm_evidence_cn": "适用于高光谱图像去噪的参数选择框架",
+      "llm_evidence": "适用于高光谱图像去噪的参数选择框架",
+      "canonical_evidence": "适用于高光谱图像去噪的参数选择框架",
+      "llm_tldr_en": "Develops a psychometric scaling framework to choose denoising parameters optimized for human perception, using total variation denoising and human experiments.",
+      "llm_tldr_cn": "本文针对图像去噪中的参数选择问题，提出一个结合数学与心理学的框架，通过心理物理缩放方法量化感知相似度，并以总变分去噪算法为例进行参数选择。该框架为高光谱图像去噪等领域的参数自适应提供了可迁移的方法论。",
+      "llm_tldr": "本文针对图像去噪中的参数选择问题，提出一个结合数学与心理学的框架，通过心理物理缩放方法量化感知相似度，并以总变分去噪算法为例进行参数选择。该框架为高光谱图像去噪等领域的参数自适应提供了可迁移的方法论。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.01048v1",
+      "source": "arxiv",
+      "title": "Decoupled Residual Denoising Diffusion Models for Unified and Data Efficient Image-to-Image Translation",
+      "abstract": "We propose Decoupled Residual Denoising Diffusion models (DRDD) for unified and data-efficient image-to-image (I2I) translation. While diffusion models have advanced I2I translation in terms of quality and diversity, we uncover a previously under-explored property in diffusion models. Crucially, beyond its conventional role of manifold lifting (i.e., moving data off low-dimensional manifolds), injecting Gaussian noise facilitates domain harmonization by implicitly aligning feature distributions across domains, a property particularly advantageous for unified I2I translation. However, existing diffusion models prematurely erode this harmonization effect, as noise and residuals are simultaneously removed in a single coupled diffusion process. To address this, DRDD decouples the diffusion process into two sequential and independent diffusion stages: (1) a stochastic noise diffusion for domain harmonization and manifold lifting, and (2) a deterministic residual diffusion that learns the core semantic mapping entirely within the fixed-noise domain. This decoupling preserves harmonization and manifold lifting effects throughout the transformation, substantially simplifying the learning of unified mappings across diverse tasks and domains. Notably, the noise diffusion stage is trained exclusively on abundant, unpaired target-domain images, greatly improving data efficiency. Comprehensive theoretical and empirical analysis demonstrates that DRDD is broadly compatible with mainstream diffusion models and consistently delivers robust, unified I2I translation, even under limited paired data. Our code is available at https://github.com/HKU-HealthAI/DRDD.",
+      "authors": [
+        "Ziyue Lin",
+        "Jiahe Hou",
+        "Hongyu Xia",
+        "Xinrui Xie",
+        "Feifei Wang",
+        "Yuyin Zhou",
+        "Wei Wang",
+        "Jiawei Liu",
+        "Liangqiong Qu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-05-31T06:38:18+00:00",
+      "link": "https://arxiv.org/pdf/2606.01048v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "denoising diffusion model applicable to hyperspectral image denoising as deep neural network method",
+      "llm_evidence_cn": "去噪扩散模型可作为深度神经网络方法用于高光谱图像去噪",
+      "llm_evidence": "去噪扩散模型可作为深度神经网络方法用于高光谱图像去噪",
+      "canonical_evidence": "去噪扩散模型可作为深度神经网络方法用于高光谱图像去噪",
+      "llm_tldr_en": "Proposes Decoupled Residual Denoising Diffusion models for image-to-image translation; the denoising mechanism could be adapted for hyperspectral denoising tasks.",
+      "llm_tldr_cn": "该论文提出了一种解耦残差去噪扩散模型（DRDD），用于统一且数据高效的图像到图像翻译任务。通过发现在扩散模型中注入高斯噪声有助于域对齐，论文设计了解耦残差去噪过程。尽管主要面向翻译，其去噪扩散框架可直接迁移至高光谱图像去噪场景，为深度神经网络去噪方法提供了新思路。实验表明该方法在多个I2I任务上表现优异，具有通用性。",
+      "llm_tldr": "该论文提出了一种解耦残差去噪扩散模型（DRDD），用于统一且数据高效的图像到图像翻译任务。通过发现在扩散模型中注入高斯噪声有助于域对齐，论文设计了解耦残差去噪过程。尽管主要面向翻译，其去噪扩散框架可直接迁移至高光谱图像去噪场景，为深度神经网络去噪方法提供了新思路。实验表明该方法在多个I2I任务上表现优异，具有通用性。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
