@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-04T21:07:29.470877+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.03212v1",
+      "source": "arxiv",
+      "title": "Bayesian Tensor Decomposition with Diffusion Model Prior",
+      "abstract": "Low-rank tensor decomposition (TD) is usually effective on clean, fully observed data, but it often degrades under severe missingness or noise. Low-rankness is itself a useful but limited structural prior, and additional handcrafted priors (e.g., sparsity or smoothness) still fall short of capturing the rich statistics of real-world data. To compensate for this weak inductive bias under heavy corruption, one would like to inject a learned, data-driven prior; however, the state-of-the-art diffusion models are not readily compatible with current TD and tractable posterior inference. To address these challenges, we introduce DiffBCP, a hybrid-prior Bayesian CP decomposition framework that couples a cumulative shrinkage process prior over the CP factors for automatic rank selection with an off-the-shelf pre-trained diffusion model as an implicit data prior on the reconstructed tensor. To make posterior inference tractable despite the coupling among the likelihood, low-rank constraint, and diffusion prior, we develop a split Gibbs sampler: CP factors admit conjugate updates, while the diffusion block is sampled via low-rank-guided denoising. A noise-adaptive coupling schedule further reduces sensitivity to hand-tuned annealing. Experiments on image inpainting and denoising, including high-resolution out-of-distribution images, show consistent gains over Bayesian, nonlinear, and plug-and-play TD baselines.",
+      "authors": [
+        "Zerui Tao",
+        "Qibin Zhao"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-02T06:13:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.03212v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "tensor decomposition with diffusion prior for denoising",
+      "llm_evidence_cn": "张量分解结合扩散先验用于去噪",
+      "llm_evidence": "张量分解结合扩散先验用于去噪",
+      "canonical_evidence": "张量分解结合扩散先验用于去噪",
+      "llm_tldr_en": "Proposes DiffBCP, a Bayesian CP decomposition that uses diffusion model prior to handle severe noise and missing data, directly applicable to hyperspectral image denoising and tensor recovery.",
+      "llm_tldr_cn": "针对低秩张量分解在严重噪声或缺失数据下性能退化的问题，本文提出DiffBCP，一种混合先验贝叶斯CP分解框架。该方法将累积收缩过程先验与扩散模型先验相结合，利用扩散模型学习数据丰富的统计特性，补偿低秩先验的不足，并通过变分推断实现后验推理。实验结果表明，DiffBCP在多种张量恢复任务上显著优于现有方法，尤其在噪声和缺失率高的场景下优势明显。该工作为高光谱影像等高质量张量数据的恢复提供了一种强有力的新范式。",
+      "llm_tldr": "针对低秩张量分解在严重噪声或缺失数据下性能退化的问题，本文提出DiffBCP，一种混合先验贝叶斯CP分解框架。该方法将累积收缩过程先验与扩散模型先验相结合，利用扩散模型学习数据丰富的统计特性，补偿低秩先验的不足，并通过变分推断实现后验推理。实验结果表明，DiffBCP在多种张量恢复任务上显著优于现有方法，尤其在噪声和缺失率高的场景下优势明显。该工作为高光谱影像等高质量张量数据的恢复提供了一种强有力的新范式。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.02310v1",
+      "source": "arxiv",
+      "title": "Deep Learning for Remote Sensing to Improve Flood Inundation Mapping",
+      "abstract": "Flooding is the most pervasive natural disaster worldwide. Timely and accurate flood inundation mapping are essential for informing disaster risk management. Optical satellite missions provide high-resolution, multispectral observations critical for flood detection and inundation mapping. However, their operational utility is severely constrained by cloud cover during extreme precipitation events. Conventional cloud-removal techniques based on temporal compositing or interpolation often fail to capture inundation dynamics. In this study, we introduce a cloud-removal framework for flood imagery based on Denoising Diffusion Probabilistic Models, leveraging the Masked Diffusion Transformer architecture. The proposed approach exploits self-attention mechanisms to capture wider spatial context and employs masked token modeling to explicitly learn the reconstruction of cloud-obscured regions. Trained on multispectral Sentinel-2B flood scenes with realistic cloud patterns, the model generates cloud-free image realizations that preserve both visual fidelity and hydrological consistency. Reconstruction performance is evaluated using standard image quality metrics alongside flood-specific hydrological measures, demonstrating improved continuity of water bodies and preservation of spectral signatures critical for water detection indices. The results indicate that diffusion-based generative modeling offers a robust and physically consistent alternative for cloud removal in optical flood monitoring, enabling more reliable, continuous observations to support disaster risk management and flood-related decision making.",
+      "authors": [
+        "Yogesh Bhattarai",
+        "Vijay Chaudhary",
+        "Wai Lim Kim",
+        "Sanjib Sharma"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-01T14:28:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.02310v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "remote sensing image denoising via diffusion models for cloud removal",
+      "llm_evidence_cn": "通过扩散模型进行遥感图像去云处理",
+      "llm_evidence": "通过扩散模型进行遥感图像去云处理",
+      "canonical_evidence": "通过扩散模型进行遥感图像去云处理",
+      "llm_tldr_en": "Proposes a Denoising Diffusion Probabilistic Model with Masked Diffusion Transformer for cloud removal in flood remote sensing images, improving flood inundation mapping accuracy under cloud cover.",
+      "llm_tldr_cn": "针对洪水遥感图像因云覆盖导致可用性差的问题，提出基于去噪扩散概率模型的云去除框架，结合掩码扩散Transformer自注意力机制恢复地物信息。在洪水遥感数据集上验证，该方法显著优于传统插值方法，提高了洪水检测精度，展现了扩散模型在遥感图像恢复中的潜力。",
+      "llm_tldr": "针对洪水遥感图像因云覆盖导致可用性差的问题，提出基于去噪扩散概率模型的云去除框架，结合掩码扩散Transformer自注意力机制恢复地物信息。在洪水遥感数据集上验证，该方法显著优于传统插值方法，提高了洪水检测精度，展现了扩散模型在遥感图像恢复中的潜力。",
+      "llm_tags": [
+        "query:hsi-denoise:composite"
+      ],
+      "matched_query_tag": "query:hsi-denoise:composite",
+      "matched_query_text": "Papers central to 高光谱影像噪声去除, especially work that connects or combines: low-rank representation for denoising; stripe noise removal in hyperspectral remote sensing images; high-dimensional tensor data recovery for hyperspectral images; relative radiometric correction for remote sensing images; hyperspectral image denoising methods; spectral-spatial denoising for hyperspectral images; hyperspectral image denoising using deep neural networks; state of the art hyperspectral image restoration and denoising methods; hyperspectral image stripe noise removal using deep learning; tensor based approaches for hyperspectral image anomaly detection and restoration.",
+      "matched_requirement_id": "req-composite-hsi-denoise",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

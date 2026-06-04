@@ -1,6 +1,11 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-04 <!--dpr-date:20260604-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/04/2606.03212v1-bayesian-tensor-decomposition-with-diffusion-model-prior" data-sidebar-item="{&quot;title&quot;: &quot;Bayesian Tensor Decomposition with Diffusion Model Prior&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.03212v1-bayesian-tensor-decomposition-with-diffusion-model-prior&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;张量分解结合扩散先验用于去噪&quot;}">Bayesian Tensor Decomposition with Diffusion Model Prior</a>
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/04/2606.02310v1-deep-learning-for-remote-sensing-to-improve-flood-inundation-mapping" data-sidebar-item="{&quot;title&quot;: &quot;Deep Learning for Remote Sensing to Improve Flood Inundation Mapping&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.02310v1-deep-learning-for-remote-sensing-to-improve-flood-inundation-mapping&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;通过扩散模型进行遥感图像去云处理&quot;}">Deep Learning for Remote Sensing to Improve Flood Inundation Mapping</a>
   * 2026-05-06 ~ 2026-06-04 <!--dpr-date:20260506-20260604-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/20260506-20260604/2605.13664v1-hadar-based-thermal-infrared-hyperspectral-image-restoration" data-sidebar-item="{&quot;title&quot;: &quot;HADAR-Based Thermal Infrared Hyperspectral Image Restoration&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2605.13664v1-hadar-based-thermal-infrared-hyperspectral-image-restoration&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;热红外高光谱图像恢复处理传感器噪声&quot;}">HADAR-Based Thermal Infrared Hyperspectral Image Restoration</a>

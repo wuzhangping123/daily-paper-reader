@@ -6,33 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-05-06 ~ 2026-06-04
-- 运行时间：2026-06-04 05:45:42 UTC
+- 最新运行日期：2026-06-04
+- 运行时间：2026-06-04 21:09:25 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：0
-- 速读区：4
+- 本次总论文数：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-本期日报聚焦4篇图像复原论文，其中3篇高评分速读文章分别探索热红外高光谱、全场景统一复原及扩散模型增强方法。最值得关注方向：HADAR热红外高光谱复原（9.0分）与实例条件低秩残差的全场景复原（8.0分）。建议优先阅读这两篇，以快速掌握高光谱与通用复原的前沿技术。
-- 详情：[/20260506-20260604/README](/20260506-20260604/README)
+今日共收录2篇论文，精读1篇《Bayesian Tensor Decomposition with Diffusion Model Prior》（8.0分），速读1篇深度学习遥感洪水淹没图。最值得关注的是贝叶斯张量分解与扩散模型先验的结合方向，模型性能突出。建议普通读者优先精读该论文，理解扩散模型如何提升张量分解的灵活性与鲁棒性。
+- 详情：[/202606/04/README](/202606/04/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Bayesian Tensor Decomposition with Diffusion Model Prior](/202606/04/2606.03212v1-bayesian-tensor-decomposition-with-diffusion-model-prior)  
+   标签：评分：8.0/10、query:hsi-denoise
+   evidence：张量分解结合扩散先验用于去噪
 
 ### 速读区论文标签
-1. [HADAR-Based Thermal Infrared Hyperspectral Image Restoration](/20260506-20260604/2605.13664v1-hadar-based-thermal-infrared-hyperspectral-image-restoration)  
-   标签：评分：9.0/10、query:hsi-denoise
-   evidence：热红外高光谱图像恢复处理传感器噪声
-2. [Continuous Expert Assembly: Instance-Conditioned Low-Rank Residuals for All-in-One Image Restoration](/20260506-20260604/2605.06127v1-continuous-expert-assembly-instance-conditioned-low-rank-residuals-for-all-in-one-image-restoration)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：低秩残差用于图像恢复，与低秩表示去噪直接相关
-3. [HIR-ALIGN: Enhancing Hyperspectral Image Restoration via Diffusion-Based Data Generation](/20260506-20260604/2605.13581v1-hir-align-enhancing-hyperspectral-image-restoration-via-diffusion-based-data-generation)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：基于扩散数据增强的高光谱图像恢复
-4. [Leveraging pretrained RGB denoisers for hyperspectral image restoration](/20260506-20260604/2605.24769v1-leveraging-pretrained-rgb-denoisers-for-hyperspectral-image-restoration)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：利用预训练RGB去噪器进行高光谱图像去噪
+1. [Deep Learning for Remote Sensing to Improve Flood Inundation Mapping](/202606/04/2606.02310v1-deep-learning-for-remote-sensing-to-improve-flood-inundation-mapping)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：通过扩散模型进行遥感图像去云处理
 
 
 <div class="dpr-home-promo-card">
