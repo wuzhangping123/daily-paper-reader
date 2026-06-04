@@ -1,0 +1,69 @@
+{
+  "label": "2026-05-06 ~ 2026-06-04",
+  "date": "2026-05-06 ~ 2026-06-04",
+  "generated_at": "2026-06-04T05:45:48",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "20260506-20260604/2605.13664v1-hadar-based-thermal-infrared-hyperspectral-image-restoration",
+      "section": "quick",
+      "title_en": "HADAR-Based Thermal Infrared Hyperspectral Image Restoration",
+      "authors": "Cheng Dai, Jiale Lin, Bingxuan Song, Yifei Chen, Jiashuo Chen, Xin Yuan, Fanglin Bao",
+      "date": "2026-05-13",
+      "pdf": "https://arxiv.org/pdf/2605.13664v1",
+      "score": "9.0",
+      "evidence": "热红外高光谱图像恢复处理传感器噪声",
+      "tldr": "热红外高光谱图像受传感器退化影响严重，现有恢复方法缺乏热物理认知。提出HAIR框架，基于HADAR渲染方程和大气下行辐射方程，利用温度、发射率和纹理物理三元组进行分解-合成恢复。在DARPA和FTIR数据集上，HAIR在去噪、修复、光谱校准和超分辨率任务中全面超越现有方法，建立了物理一致性和噪声鲁棒性的新基准，显著提升客观精度与视觉质量。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Thermal-infrared (TIR) hyperspectral imagery (HSI) provides critical scene information for various applications. However, its practical utility is severely limited by unique sensor degradations beyond the capabilities of existing restoration methods, which are ignorant of underlying thermal physics. Here, we propose HAIR (HADAR-based Image Restoration) as a physics-driven framework for ground-based TIR-HSI restoration. HAIR utilizes the HADAR rendering equation (HRE) and combines it with the atmospheric downwelling radiative transfer equation (RTE) to model TIR-HSI using temperature, emissivity, and texture (TeX) physical triplets. This physical model leads to a TeX decompose-synthesize strategy that guarantees physical consistency and spatio-spectral noise resilience, in stark contrast to existing approaches. Moreover, our framework uses a forward-modeled atmospheric downwelling reference, along with spectral smoothness of emissivity and blackbody radiation, to enable spectral calibration and generation that would otherwise be elusive. Our extensive experiments on the outdoor DARPA Invisible Headlights dataset and in-lab FTIR measurements show that HAIR consistently outperforms state-of-the-art methods across denoising, inpainting, spectral calibration, and spectral super-resolution, establishing a benchmark in objective accuracy and visual quality.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "20260506-20260604/2605.06127v1-continuous-expert-assembly-instance-conditioned-low-rank-residuals-for-all-in-one-image-restoration",
+      "section": "quick",
+      "title_en": "Continuous Expert Assembly: Instance-Conditioned Low-Rank Residuals for All-in-One Image Restoration",
+      "authors": "Haisen He, Xiangyu Zou, SongLin Dong, Heng Li, Yihong Gong, Zhiheng Ma",
+      "date": "2026-05-07",
+      "pdf": "https://arxiv.org/pdf/2605.06127v1",
+      "score": "8.0",
+      "evidence": "低秩残差用于图像恢复，与低秩表示去噪直接相关",
+      "tldr": "现实图像退化未知且组合，要求全合一恢复模型自适应。现有方法受限于全局调制或静态专家路由，难以处理空间变化和组合退化。提出连续专家组装（CEA），通过交叉注意力超适配器生成实例条件低秩基，为每个空间token动态组装残差更新。在多个基准上超越现有方法，尤其擅长空间变化和组合退化，且保持参数和效率优势。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Real-world image degradation is often unknown, spatially non-uniform, and compositional, requiring all-in-one restoration models to adapt a single set of weights to diverse local corruption patterns without test-time degradation labels. Existing methods typically modulate a shared backbone with global prompts or degradation descriptors, or route features through predefined expert pools. However, compact global conditioning can bottleneck localized degradation evidence, while static expert routing may produce homogeneous updates or rely on unstable sparse assignments. We propose \\textbf{Continuous Expert Assembly} (CEA), a token-wise dynamic parameterization framework for all-in-one image restoration. CEA employs a lightweight \\textbf{Cross-Attention Hyper-Adapter} to probe intermediate spatial features and synthesize instance-conditioned low-rank routing bases and residual directions. Each spatial token then assembles its own residual update via dense signed dot-product affinities over the generated rank-wise components, avoiding external prompts, static expert banks, and discrete Top-   selection. The resulting assembly rule also admits a linear-attention perspective, making its dense token-wise routing behavior transparent. Experiments on AIO-3, AIO-5, and CDD-11 show that CEA improves average restoration quality over strong prompt-, descriptor-, and expert-based baselines, with the clearest gains on spatially varying and compositional degradations, while maintaining favorable parameter, FLOP, and runtime efficiency.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "20260506-20260604/2605.13581v1-hir-align-enhancing-hyperspectral-image-restoration-via-diffusion-based-data-generation",
+      "section": "quick",
+      "title_en": "HIR-ALIGN: Enhancing Hyperspectral Image Restoration via Diffusion-Based Data Generation",
+      "authors": "Li Pang, Heng Zhao, Yijia Zhang, Deyu Meng, Xiangyong Cao",
+      "date": "2026-05-13",
+      "pdf": "https://arxiv.org/pdf/2605.13581v1",
+      "score": "8.0",
+      "evidence": "基于扩散数据增强的高光谱图像恢复",
+      "tldr": "高光谱图像恢复因目标域缺乏干净参考而性能下降。本文提出HIR-ALIGN，一种即插即用目标自适应数据增强框架，通过三个步骤：用现成模型生成代理HSI；利用blur-robust unCLIP扩散模型生成目标对齐RGB，再经光谱变换模块合成HSI；在代理和目标对齐HSI上微调预训练网络。在降噪和超分辨率任务上，该方法显著优于仅源域训练基线和代表性无监督方法。理论分析证明增强微调可降低目标域风险，改进分布覆盖并控制谱偏差。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral image (HSI) restoration is crucial for reliable analysis, as real HSIs suffer from degradations like noise, blur, and resolution loss. However, existing models trained on source data often fail on target domains lacking clean references, a common occurrence in practice. To address this issue, we present HIR-ALIGN, a plug-and-play target-adaptive augmentation framework that enhances hyperspectral image restoration by augmenting limited training images with synthetic data that closely matches the target distribution using no extra data. It consists of three stages: (i) proxy generation, where off-the-shelf restoration models restore degraded target observations to produce semantics-preserving proxy HSIs that approximate target-domain clean images; (ii) distribution-adaptive synthesis, where a blur-robust unCLIP diffusion model generates target-aligned RGBs from proxy RGBs, with prompt conditioning and embedding-space noise initialization. Then, a warp-based spectral transfer module synthesizes HSIs by aligning each generated RGB with the proxy RGB, estimating soft patch-wise transport weights, and applying these weights and learnable local interpolation kernels to the proxy HSI; and (iii) aligned supervised finetuning, where restoration networks pretrained on the source distribution are finetuned using both the proxy HSIs and synthesized target-aligned HSIs, and are then deployed on degraded target images. We further provide theoretical analysis showing that augmentation-based finetuning can achieve lower target-domain restoration risk by jointly improving target distribution coverage and controlling spectral bias. Extensive experiments on simulated and real datasets across denoising and super-resolution tasks demonstrate that HIR-ALIGN consistently improves source-only supervised baselines, outperforming both source-only counterparts and representative unsupervised methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "20260506-20260604/2605.24769v1-leveraging-pretrained-rgb-denoisers-for-hyperspectral-image-restoration",
+      "section": "quick",
+      "title_en": "Leveraging pretrained RGB denoisers for hyperspectral image restoration",
+      "authors": "Daniele Picone, Mohamad Jouni, Mauro Dalla-Mura",
+      "date": "2026-05-23",
+      "pdf": "https://arxiv.org/pdf/2605.24769v1",
+      "score": "8.0",
+      "evidence": "利用预训练RGB去噪器进行高光谱图像去噪",
+      "tldr": "高光谱图像恢复面临训练数据少、传感器特异性强和光谱维度高等挑战。本文提出一种轻量适配器，通过投影映射将预训练RGB去噪器冻结并用于高光谱恢复，先对低维光谱投影去噪再通过约束线性聚合重建。在多个数据集上的去噪、去模糊和超分辨率实验中，该方法一致超越高光谱专用基线。结果表明大规模RGB先验可有效迁移至高光谱任务，为缓解数据稀缺提供了新思路。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral image restoration faces several challenges, including limited training data, strong sensor specificity, and high spectral dimensionality. These limitations hinder the learning of robust hyperspectral priors, motivating the reuse of priors learned from large-scale RGB data. In this work, we propose a minimally trained, lightweight adapter that repurposes frozen pretrained RGB denoisers for hyperspectral restoration through a projection mapping. The method denoises low-dimensional spectral projections and reconstructs the hyperspectral cube through constrained linear aggregation, while preserving plug-and-play compatibility and the stability properties of the underlying RGB denoiser. Experiments on denoising, deblurring, and super-resolution across multiple datasets demonstrate consistent improvements over hyperspectral-specific baselines, showing the strong transferability of large-scale RGB priors.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
