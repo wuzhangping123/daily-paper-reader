@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-05",
+  "date": "2026-06-05",
+  "generated_at": "2026-06-05T20:35:43",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/05/2606.03806v1-tex-1500-a-paired-real-world-lwir-hyperspectral-dataset-and-benchmark-for-temperature-emissivity-texture-decomposition",
+      "section": "quick",
+      "title_en": "TeX-1500: A Paired Real-World LWIR Hyperspectral Dataset and Benchmark for Temperature-Emissivity-Texture Decomposition",
+      "authors": "Cheng Dai, Jiale Lin, Hongyi Xu, Bingxuan Song, Ziyang Xie, Fanglin Bao",
+      "date": "2026-06-02",
+      "pdf": "https://arxiv.org/pdf/2606.03806v1",
+      "score": "7.0",
+      "evidence": "用于温度-发射率-纹理分解的高光谱数据集和基准",
+      "tldr": "温度-发射率-纹理（TeX）分解从长波红外高光谱成像中恢复物体热状态与材料光谱，但缺乏配对监督数据。本文构建TeX-1500大规模配对数据集，包含1522个真实场景对，覆盖多地多时相，并提供TeX-UNet波长感知基线模型。实验表明，该数据集可有效支持有监督的HSI-to-TeX分解，为零样本迁移提供可测量基准，推动物理属性为中心的热感知研究。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Temperature-emissivity-texture (TeX) decomposition seeks to recover object heat state, material spectral response, and visible-like geometric texture from long-wave infrared hyperspectral imaging (LWIR HSI). Existing TeX pipelines are mainly scene-specific inverse solvers, and the lack of paired LWIR HSI-TeX supervision has limited learning-based decomposition. To address this gap, we introduce TeX-1500, a large-scale paired LWIR HSI-TeX dataset and benchmark for supervised HSI-to-TeX decomposition. TeX-1500 contains 1,522 calibrated real-scene pairs from DARPA Invisible Headlights (DARPA IH) pushbroom imagery and our FTIR acquisitions, covering five locations, four seasons, diverse acquisition times, heterogeneous wavelength layouts, and two sensor families. Each sample stores a calibrated valid-band radiance cube, calibrated wavelength positions, and aligned temperature, emissivity, and texture supervision constructed through a consistent restoration and TeX-construction protocol. We further provide TeX-UNet, a simple wavelength-aware baseline that maps calibrated HSI bands and wavelength positions to TeX fields. Experiments on the held-out DARPA IH pushbroom scenes and zero-/few-shot transfer to FTIR scenes show that TeX-1500 provides usable paired supervision and a measurable benchmark for data-driven physical-property-centered thermal perception.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/05/2606.05759v1-physics-guided-deep-unfolding-for-blind-cross-sensor-spectral-super-resolution-via-learning-the-spectral-transformation-function",
+      "section": "quick",
+      "title_en": "Physics-Guided Deep Unfolding for Blind Cross-Sensor Spectral Super-Resolution via Learning the Spectral Transformation Function",
+      "authors": "Zhaolin Li, Jinsong Chen, Shanxin Guo, Tuo Zhang, Xinglong Zhang, Pan Chen",
+      "date": "2026-06-04",
+      "pdf": "https://arxiv.org/pdf/2606.05759v1",
+      "score": "6.0",
+      "evidence": "通过深度展开进行高光谱图像重建，与张量数据恢复相关",
+      "tldr": "跨传感器光谱超分辨率面临未知光谱退化，现有方法依赖固定响应函数。本文提出物理引导深度展开网络PGU-Net，交替优化高光谱图像和可学习的光谱变换函数。在CAVE、NTIRE2022和真实无人机跨传感器数据集上，PGU-Net准确恢复STF并提升重建性能。该方法兼具物理可解释性与强表示能力，为盲跨传感器高光谱重建提供了有效方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral imaging provides rich spectral information for quantitative remote sensing, yet hyperspectral sensors remain costly and thus unavailable in many UAV deployments. Spectral super-resolution (SSR) seeks to reconstruct hyperspectral images (HSIs) from multispectral images (MSIs). Most existing SSR methods assume a fixed and known spectral response function (SRF) and are therefore limited to single-sensor settings. In practical cross-sensor scenarios, the spectral degradation from HSI to MSI is unknown and varies with sensor characteristics and scene content, which renders HSI reconstruction ill-posed. This paper proposes a physics-guided deep unfolding network, termed PGU-Net, to address blind cross-sensor SSR by jointly estimating the HSI and a learnable spectral transformation function (STF). PGU-Net unrolls an alternating optimization procedure into an end-to-end trainable architecture with stages, where each stage sequentially updates the HSI and the STF. Both modules combine learnable proximal networks with differentiable closed-form solvers, enabling physical interpretability while retaining strong representation capacity. Experiments on benchmark datasets (CAVE and NTIRE 2022) with multiple SRFs demonstrate accurate recovery of the STF (degradation operator) and improved reconstruction performance over state-of-the-art SSR methods. Furthermore, evaluations on a real UAV cross-sensor dataset (Headwall Nano HSI and DJI P4 Multispectral MSI) verify the effectiveness and robustness of PGU-Net under truly blind conditions, and suggest that the estimated STF may exhibit land-cover-related differences.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

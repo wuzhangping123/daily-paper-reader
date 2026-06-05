@@ -1,0 +1,487 @@
+Title: TeX-1500: A Paired Real-World LWIR Hyperspectral Dataset and Benchmark for Temperature-Emissivity-Texture Decomposition
+
+URL Source: https://arxiv.org/pdf/2606.03806v1
+
+Published Time: Wed, 03 Jun 2026 01:35:57 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+> PREPRINT 2026 1
+
+# TeX-1500: A Paired Real-World LWIR Hyperspectral Dataset and Benchmark for Temperature–Emissivity–Texture Decomposition 
+
+Cheng Dai, Jiale Lin, Hongyi Xu, Bingxuan Song, Ziyang Xie, and Fanglin Bao 
+
+Abstract —Temperature–emissivity–texture (TeX) decomposi-tion seeks to recover object heat state, material spectral response, and visible-like geometric texture from long-wave infrared hyper-spectral imaging (LWIR HSI). Existing TeX pipelines are mainly scene-specific inverse solvers, and the lack of paired LWIR HSI– TeX supervision has limited learning-based decomposition. To address this gap, we introduce TeX-1500 , a large-scale paired LWIR HSI–TeX dataset and benchmark for supervised HSI-to-TeX decomposition. TeX-1500 contains 1,522 calibrated real-scene pairs from DARPA Invisible Headlights (DARPA IH) pushbroom imagery and our FTIR acquisitions, covering five locations, four seasons, diverse acquisition times, heterogeneous wavelength layouts, and two sensor families. Each sample stores a calibrated valid-band radiance cube, calibrated wavelength positions, and aligned temperature, emissivity, and texture supervision con-structed through a consistent restoration and TeX-construction protocol. We further provide TeX-UNet, a simple wavelength-aware baseline that maps calibrated HSI bands and wavelength positions to TeX fields. Experiments on the held-out DARPA IH pushbroom scenes and zero-/few-shot transfer to FTIR scenes show that TeX-1500 provides usable paired supervision and a measurable benchmark for data-driven physical-property-centered thermal perception. 
+
+Index Terms —Thermal infrared imaging, hyperspectral imag-ing, HADAR, temperature–emissivity–texture decomposition, dataset 
+
+I. I NTRODUCTION 
+
+# MODERN visual perception relies heavily on RGB, depth, and infrared sensing, but these measurements often describe scene appearance rather than physical quanti-ties. RGB depends on reflected illumination and is sensitive to lighting and atmospheric changes [1]–[3]; depth sensors can fail on missing geometry, reflective surfaces, transparent objects, and adverse weather [4]–[9]; and infrared images mix object self-emission, material response, and environmental ra-diation [10]–[12]. These limitations arise because conventional visual signals are sensing proxies: they describe how a scene appears to a sensor, rather than directly representing the object’s stable physical properties. 
+
+TeX-1500 dataset is at https://huggingface.co/datasets/jialelin2007/ TeX-1500, and the TeX-1500 benchmark protocol, TeX-UNet code and pretrained models are at https://github.com/dccc2025/TeX-1500. Cheng Dai, Hongyi Xu, Ziyang Xie and Fanglin Bao are with the School of Science, Westlake University, Hangzhou 310030, China. Jiale Lin and Bingxuan Song are with the School of Engineering, Westlake University, Hangzhou 310030, China. E-mails: {daicheng, linjiale, xuhongyi, songbingxuan, xiezhiyang, baofan-glin }@westlake.edu.cn. Cheng Dai and Jiale Lin contributed equally to this work. Corresponding author: Fanglin Bao. 
+
+TeX decomposition aims to replace this appearance-centered view with a physical-property-centered representation. TeX separates temperature T , emissivity e, and geometric texture 
+
+X, which respectively describe heat state, material spectral response, and scene-dependent lighting structure. HADAR-SGD [4] and HADAR-SLOT [12] have shown the promise of recovering TeX from thermal measurements. However, ex-isting TeX pipelines are largely scene-specific inverse solvers whose performance depends on grouping, initialization, regu-larization, and iterative optimization settings. This makes them valuable for constructing individual TeX reconstructions, but insufficient as a scalable training and evaluation protocol for learning-based HSI-to-TeX decomposition. A key missing component for learning-based TeX decom-position is paired supervision across real scenes and sen-sors. Such supervision requires calibrated LWIR hyperspectral inputs aligned with temperature, emissivity, and texture la-bels, rather than isolated TeX reconstructions from individual scenes. Constructing these pairs is nontrivial for real LWIR HSI: raw measurements may contain corrupted bands, stripe artifacts, stochastic noise, wavelength shifts, sensor-dependent valid-band layouts, and scene-dependent sky radiation. With-out a consistent restoration protocol, these acquisition artifacts can be absorbed into the TeX labels and become spurious supervision for neural models. This paper presents TeX-1500 , a paired LWIR HSI–TeX dataset and initial benchmark designed to support supervised HSI-to-TeX learning and evaluation. We construct TeX-1500 
+
+from DARPA IH pushbroom imagery [13] and our FTIR ac-quisitions using a consistent construction protocol, producing calibrated HSI–TeX pairs across locations, seasons, acquisition times, wavelength layouts, and sensor families. The resulting dataset enables both within-sensor evaluation on held-out DARPA IH secnes and cross-sensor evaluation through zero-/few-shot transfer to FTIR scenes. Our contributions are summarized as follows:  
+
+> •
+
+We release TeX-1500 , a paired LWIR HSI–TeX dataset containing 1,522 real-scene samples from DARPA IH pushbroom data and our FTIR acquisitions.  
+
+> •
+
+We provide a consistent construction protocol that con-verts restored and wavelength-calibrated LWIR HSI into aligned temperature, emissivity, and texture supervision.  
+
+> •
+
+We establish an initial learning-based benchmark with TeX-UNet, using its prediction performance on held-out DARPA IH test split scenes and zero-/few-shot transfer to FTIR scenes to demonstrate the learnability of TeX-1500 .  
+
+> arXiv:2606.03806v1 [cs.CV] 2 Jun 2026 PREPRINT 2026 2
+
+II. R ELATED WORK 
+
+A. Datasets for Thermal Perception 
+
+Existing spectral and thermal datasets have enabled many learning-based tasks by exposing information beyond broad-band RGB, but most public benchmarks are not designed for thermal physical-property estimation. VIS–NIR hyperspectral datasets such as CAVE [14], Har-vard [15], ICVL [16], ARAD-1K [17], Houston [18], and WHU-Hi [19] have supported spectral reconstruction, remote-sensing classification, multimodal fusion, and low-light per-ception [20]–[23]. Their measurements, however, are domi-nated by reflected solar or artificial illumination. As a result, they provide rich appearance spectra but do not carry the long-wave self-emission and material-response cues needed for temperature–emissivity–texture decomposition [4]. Visible–infrared paired datasets move closer to thermal perception, but they provide broadband thermal images rather than wavelength-resolved LWIR radiance. KAIST [24], CVC14 [25], TNO [26], MFNet [27], Freiburg [28], LLVIP [29], Boson-Night [30], and MSRS [31] have sup-ported detection, segmentation, image fusion, and low-light enhancement by combining visible appearance with thermal contrast [32]–[34]. These benchmarks are valuable for ther-mal appearance modeling; however, their broadband thermal channel collapses the spectral variation needed to disentangle temperature, emissivity, and texture [4], [11], [12]. LWIR hyperspectral datasets provide the spectral measure-ments needed for this physical decomposition, yet paired TeX supervision remains missing. Existing Telops datasets [35]– [37] and DARPA IH dataset [13] contain real long-wave spectral imagery and have supported tasks such as target analysis and thermal remote sensing. Their public releases, however, do not provide calibrated ground-based LWIR HSI paired with aligned temperature, emissivity, and texture fields. 
+
+TeX-1500 addresses this dataset gap by releasing calibrated HSI–TeX supervisions across locations, seasons, acquisition times, wavelength layouts, and sensor families. 
+
+B. LWIR HSI Applications and TeX Solvers 
+
+Beyond datasets, prior LWIR HSI methods show that long-wave spectra contain physical information useful for inference. LWIR HSI has been used for passive ranging, classifica-tion, target analysis, thermal retrieval, and physically guided reconstruction [13], [35]–[40]. Recent infrared generation, neural rendering, and compressive HSI methods also introduce temperature- or material-aware priors [41]–[43]. Together, these studies show that LWIR spectra encode physical cues beyond broadband thermal contrast. However, they typically use these cues for a downstream task or as intermediate priors, rather than providing complete temperature, emissivity, and texture targets paired with LWIR HSI measurements. Model-based TeX solvers make this physical decomposition explicit. HADAR-SGD [4] estimates temperature, emissivity, and texture by fitting a thermal rendering equation with a material library; HADAR-SLOT [12] removes the library assumption through autonomous estimation of emissivity [44]; and HAIR [11] couples the HADAR rendering equation with    
+
+> Fig. 1. Acquisition-time distribution of TeX-1500 .Samples span diverse daytime, nighttime, and transitional thermal conditions, capturing variations in object heat state, thermal contrast, and downwelling environmental radiance.
+
+downwelling radiative transfer to restore degraded LWIR HSI. These solvers establish the physical basis of TeX decomposi-tion, but their per-scene optimization depends on choices such as grouping, initialization, regularization, and optimization settings. TeX-1500 complements this line of work by con-verting TeX decomposition from per-scene optimization into a paired learning benchmark with calibrated LWIR HSI inputs, constructed TeX supervision, and fixed evaluation settings for neural baselines such as TeX-UNet. III. D ATASET 
+
+A. Dataset overview TeX-1500 is a paired learning benchmark for LWIR TeX de-composition. It contains 1,522 real-scene samples, each pairing a calibrated wavelength-resolved thermal radiance cube with aligned temperature T , emissivity e, and texture X supervi-sion. The dataset is designed to move TeX decomposition from model-based, hand-tuned scene-specific optimization toward supervised HSI-to-TeX learning across scenes, wavelength layouts, and sensors. Table I summarizes the two complementary data sources. The DARPA IH pushbroom subset [13] provides the large-scale outdoor backbone, with geographically separated sites, natural and man-made content, held-out validation/test lo-cations, broad acquisition-time variation, and dense LWIR spectral sampling. Our FTIR subset provides the cross-sensor and close-range material counterpart, including plants, plaster, metal, face, cement, plastic, and glass under a different spec-tral layout. Figs. 8–14 show representative paired HSI–TeX samples from these splits. Figs. 1–3 summarize the main distributional axes that a learning-based TeX decomposer must handle. Acquisition time changes object heat state, thermal contrast, and downwelling environmental radiance; spectral coverage determines which wavelength-dependent material cues are observable; and se-mantic composition controls the diversity of material and ge-ometry encountered during training and evaluation. Together, these statistics define TeX-1500 as both a paired supervision resource and an evaluation setting for cross-scene, cross-band, and cross-sensor TeX decomposition. 
+
+B. Dataset construction and distribution TeX-1500 converts DARPA IH outdoor pushbroom HSIs [13] 1 and our FTIR acquisitions into paired HSI–TeX    
+
+> 1The original DARPA IH release contains 3,604 hyperspectral images; the current benchmark retains 1,380 DARPA IH images after repeated-scene removal for better class balance. PREPRINT 2026 3
+> TABLE I DATASET COMPOSITION OF TEX-1500.
+
+Split Location Scenes Images Dates Wavelengths ( μm) Spatial size Bands 
+
+DARPA IH pushbroom subset 
+
+Train Sidewinder Range, TPG, AZ 12 204 2021.08 8.1–13.2 260 × 1500 256 Train Loring Commerce Center, ME 44 404 2021.12 6.8–13.1 8.0–13.1 
+
+480 × 1700 260 × 1800 
+
+250 256 Train Avon Park Air Force Range, FL 18 488 2022.04 6.8–13.1 8.0–13.1 
+
+260 × 1200 480 × 1700 
+
+250 256 Valid Sidewinder Range, TPG, AZ 8 51 2020.09 8.1–13.2 260 × 1280 256 Test Fort A. P. Hill, VA 18 233 2021.04 8.1–13.2 260 × 1600 256 
+
+FTIR subset 
+
+Train Wuhan University, China 38 111 2024.02–2025.11 7.9–11.5 320 × 256 86 Test Wuhan University, China 16 31 2026.01 7.9–11.5 320 × 256 86/124/277                  
+
+> Note. The wavelength ranges are nominal wavelengths. The statistics summarize the main distribution of the paired HSI–TeX samples.
+> Fig. 2. Spectral coverage of TeX-1500 .DARPA IH pushbroom and FTIR observations occupy thermal-infrared wavelength ranges with overlapping LWIR atmospheric-window coverage, while retaining sensor-specific band limits, sampling densities, and valid-band layouts.
+> Fig. 3. Semantic-class distribution of TeX-1500 .The DARPA IH subset (left) and FTIR subset (right) are summarized by their top-7 category proportions.
+
+samples through a common construction pipeline. The DARPA IH train/validation/test split uses held-out scenes and acquisition dates to test geographic and temporal generalization, while the FTIR split emphasizes changes in sensor layout, scene content, and material type for cross-camera evaluation. Each raw HSI is restored before TeX annotation. We remove corrupted bands, suppress tractable degradations, calibrate wavelength shifts, and estimate the sky signal required by the TeX construction protocol. The output is a calibrated valid-band radiance cube paired with aligned temperature T ,emissivity e, and texture X fields. 
+
+1) HSI denoising: For a degraded input Y ∈ RH×W ×C ,distorted boundary pixels are first cropped to obtain Y′ ∈
+
+Rh×w×C . The band-wise stochastic noise score s1,k is esti-mated via HySime [45], with threshold τ1 = 0 .01 . For pushb-room data, a stripe score is computed from the cross-track row-mean profile rk ∈ Rh as s2,k =
+
+q
+
+h−1 Phi=1 (ri,k − ˜ri,k )2,where ˜rk = rk ∗ gσ is a Gaussian-smoothed baseline with 
+
+σ = 10 .0. FTIR data use only s1,k , whereas pushbroom data use both degradation scores: 
+
+Ωc =
+
+(
+
+k ∈ { 1, . . . , C }
+
+(
+
+s1,k > τ 1, FTIR ,s1,k > τ 1 ∨ s2,k > τ 2, PB .
+
+)
+
+.
+
+(1) Here the stripe threshold is τ2 = 0 .03 . To avoid over-masking, the discarded ratio is capped by γmax = 0 .7. Let T (Ω , s, K )
+
+return the K largest-score indices, with sk = s1,k for FTIR and sk = s1,k + s2,k for pushbroom. The dead-band set is 
+
+Ωd =
+
+(
+
+Ωc, |Ωc| ≤ ⌊ γmax C⌋,
+
+T (Ω c, {sk}, ⌊γmax C⌋), otherwise . (2) The valid-band set is Ωg = {1, . . . , C } \ Ωd, and the usable radiance cube is cropped as 
+
+Yg = Y′(: , :, Ωg ) ∈ Rh×w×Cg , Cg = |Ωg |. (3) On Ωg , pushbroom stripe artifacts are removed by decompos-ing the valid cube into a clean component Z and stripe S:
+
+min 
+
+> Z,S
+
+12 ∥Y g − Z − S∥ 2 
+
+> F
+
++ λ1∥∇ xZ∥ 1 + α(s2,k )∥∇ y Z∥ 1
+
++ λ3∥∇ yy Z∥ 1 + λ4∥∇ xS∥ 1 + λ5∥S∥ 1,
+
+(4) where α(s2,k ) = ms 2,k with m = 2 . Residual stochastic perturbations are removed via FastHyDe [46] with s1,k .
+
+2) HSI calibration: We follow the first two stages of HAIR [11] to obtain denoised HSIs, calibrated wavelengths, and calibrated sky signals. Because view-specific sky simula-tion is impractical for each observation, we combine a physics-generated atmospheric reference with the spectral features measured in the HSI. First, the atmospheric record nearest in space and time is used to generate a high-resolution near-ground downwelling reference sr ∈ RCr with libRadtran [47]. Second, the observed atmospheric signature is extracted from the cleaned valid-band HSI. Aligning these two spectra yields both the calibrated operating wavelengths and the local cali-brated sky signal. PREPRINT 2026 4
+
+Specifically, we average the cleaned valid-band cube 
+
+Ydenoised ∈ Rh×w×Cg over all pixels to obtain a scene-level spectrum y ∈ RCg . Given y, asymmetric least-squares (ALS) baseline separation [48] decomposes it into a smooth thermal baseline b and an atmospheric component by solving 
+
+min  
+
+> b
+> |Ωg|
+
+X
+
+> i=1
+
+ωi(yi − bi)2 + β 
+
+> |Ωg|
+
+X
+
+> i=3
+
+(∆ 2bi)2, (5) where ∆2bi = bi − 2bi−1 + bi−2, β = 10 4, and ωi are the iteratively updated asymmetric weights. The observed atmospheric signature is s = y − b ∈ RCg .Calibration distinguishes the nominal wavelength λk from the actual operating wavelength λ∗ 
+
+> k
+
+= ak 2 + bk + d, with shift ∆λk = λ∗ 
+
+> k
+
+− λk. Given λ∗
+
+> k
+
+, the libRadtran reference is projected to the sensor domain with a normalized Gaussian spectral response function and matched to the observed am-plitude via Z-score normalization: 
+
+ˆs(k) = μs + σsZ
+
+
+
+> Cr
+
+X
+
+> j=1
+
+sr(j)exp 
+
+h
+
+− (λr,j −λ∗ 
+
+> k)2
+> 2σ2
+
+iPCr 
+
+> ℓ=1
+
+exp 
+
+h
+
+− (λr,ℓ −λ∗ 
+
+> k)2
+> 2σ2
+
+i .
+
+
+
+(6) Here Z(·) denotes Z-score normalization, μs and σs are the mean and standard deviation of s, and σ is the effective band-width. Unlike HAIR, which interpolates back to a nominal wavelength grid, we compute Eq. (6) only for k ∈ Ωg . The parameters are estimated by 
+
+(σ∗, a ∗, b ∗, d ∗) = arg min  
+
+> σ,a,b,d
+
+∥ˆs − s∥22. (7) The resulting ˆs(k) is the calibrated sky signal used by the TeX label-construction protocol at wavelength ν = λ∗
+
+> k
+
+. The cali-brated HSI is obtained by re-associating each valid radiance band with its calibrated wavelength, 
+
+Yc(x, y, λ ∗
+
+> k
+
+) = Ydenoised (x, y, k ), k ∈ Ωg . (8) 
+
+3) HSI–TeX pair construction: TeX-1500 constructs paired supervision from the calibrated valid-band HSIs. The TeX decomposition is implemented with an optimization pipeline adapted from HADAR-SLOT [12]. We first separate sky and non-sky pixels via matched filter, and then generate tempera-ture, emissivity, and texture fields under the same construction protocol. 2 Each dataset sample is stored as: 
+
+ Yc ∈ Rh×w×Cg , {λ∗
+
+> k
+
+}k∈Ωg , T, e ({λ∗
+
+> k
+
+}k∈Ωg ), X  . (9) This preserves the physical band locations, the image-specific valid-band layout, and wavelength-independent TeX fields for paired HSI–TeX learning. We do not interpolate the calibrated wavelengths back to the nominal grid, as in HAIR, because this step does not add information useful for TeX decomposition.    
+
+> 2The physical derivation of the radiative-transfer model, including the new definition of texture X, will be presented in coming work (HADAR-v2). In this definition, Xis designed to be governed by scene geometry and scene emissivity, i.e., intrinsic object/scene properties, making it a stable and learnable target for HSI-to-TeX decomposition.
+
+Algorithm 1 HSI preprocess 
+
+Require: Raw HSI Y ∈ RH×W ×C , camera type ξ ∈ { PB , FTIR },nominal wavelengths {λk }Ck=1 , and local atmospheric record. 
+
+Ensure: Denoised HSI Ydenoised , calibrated wavelengths {λ∗ 
+
+> k
+
+}k∈Ωg ,and calibrated sky signal ˆs. 
+
+> 1:
+
+Crop distorted boundary pixels to obtain Y′ ∈ Rh×w×C . 
+
+> 2:
+
+Estimate stochastic noise scores {s1,k }Ck=1 . 
+
+> 3:
+
+if ξ = PB then  
+
+> 4:
+
+Estimate stripe scores {s2,k }Ck=1 . 
+
+> 5:
+
+end if  
+
+> 6:
+
+Determine the dead-band set Ωd and the valid-band set Ωg . 
+
+> 7:
+
+Crop out the valid-band HSI Yg = Y′(: , :, Ωg ). 
+
+> 8:
+
+if ξ = PB then  
+
+> 9:
+
+Remove stripe artifacts on Ωg . 
+
+> 10:
+
+end if  
+
+> 11:
+
+Denoise stochastic perturbations to obtain Ydenoised . 
+
+> 12:
+
+Generate the reference sr from the nearest atmospheric record.  
+
+> 13:
+
+Extract an observed atmospheric signature from Ydenoised . 
+
+> 14:
+
+Estimate {λ∗ 
+
+> k
+
+}k∈Ωg and σ by aligning the observed signature with the libRadtran reference.  
+
+> 15:
+
+Obtain the calibrated sky signal ˆs(k) at ν = λ∗ 
+
+> k
+
+. 
+
+> 16:
+
+Re-associate valid radiance bands with calibrated wavelengths.  
+
+> 17:
+
+return Ydenoised , {λ∗ 
+
+> k
+
+}k∈Ωg , and ˆs.
+
+C. Dataset quality assessment and validation 
+
+We assess TeX-1500 through visual label quality, scene-level stability, and learnability. The evaluation asks whether the construction produces coherent paired TeX labels across scenes and whether a simple neural baseline can learn the HSI-to-TeX mapping. 
+
+1) Better TeX quality than prior works: As shown in Fig. 4, the TeX-1500 construction produces visually coherent TeX maps on both DARPA IH and FTIR scenes. Compared with the TeX maps produced by HADAR-SGD [4], the TeX-1500 
+
+construction yields fields with smoother spatial consistency, more balanced exposure, and clearer scene structure, while HADAR-SGD outputs exhibit stronger spatial non-uniformity. This visual improvement is important for learning-based TeX decomposition, where label artifacts can be absorbed by the model as spurious supervision. 
+
+2) Dataset stability and quality across scenes: We verify construction stability by randomly sampling paired data from each scene, as shown in Figs. 8–14. These examples cover the DARPA IH training, validation, and testing splits as well as the FTIR subset, exposing changes in location, season, sensor setting, and scene composition. Across these subsets, the recovered TeX fields remain visually stable under the same construction protocol: thermal ghosting in the infrared observations is substantially reduced, while the temperature, emissivity, and texture channels retain interpretable scene structures. This scene-level stability is important because TeX-1500 
+
+is intended as a benchmark for cross-camera and cross-environment TeX decomposition. These samples show that the same construction pipeline can produce coherent paired HSI– TeX data across outdoor pushbroom scenes and close-range FTIR acquisitions. Quantitative evaluation of temperature and emissivity consistency and accuracy is left to coming work. 3   
+
+> 3Temperature and emissivity consistency and accuracy will be evaluated and presented in coming work (HADAR-v2). PREPRINT 2026 5
+> Fig. 4. TeX label (right) visual quality compared with HADAR-SGD (left).
+
+D. Dataset learnability assessment 
+
+We further evaluate TeX-1500 as paired supervision for learning-based HSI-to-TeX inversion. As an initial baseline, we train TeX-UNet 4 (Fig. 5), a lightweight vanilla U-Net-based model that maps calibrated HSI bands and their spectra to temperature, emissivity, and texture fields. This experiment provides a direct learnability check: if a simple model trained on TeX-1500 can reproduce held-out TeX maps and transfer to independent FTIR measurements, then the paired labels provide usable supervision for subse-quent model development rather than only visually plausible reconstructions. 
+
+1) Data preprocessing: Before training, we clip each paired HSI–TeX sample with np.percentile(1,99) to sup-press isolated outliers. We normalize emissivity e and texture 
+
+X, because e is mainly used through spectral-line shape for material recognition and X is used for visual texture display. Temperature T is evaluated in Kelvin because its absolute physical accuracy must be preserved. 56 
+
+2) Training strategy: We train TeX-UNet on the DARPA IH training split, use the DARPA IH validation split for model         
+
+> 4Code and checkpoints are at https://github.com/dccc2025/TeX-1500.
+> 5The current framework does not solve low-reflectance-object recovery or physically accurate emissivity estimation, because physical emissivity recovery is affected by observation signal-to-noise ratio and radiometric correction. These issues, together with temperature and emissivity accuracy, will be presented, evaluated, and addressed in coming work (HADAR-v2).
+> 6The TeX-1500 dataset based on HADAR-v2 will be released soon.
+> Fig. 5. TeX-UNet baseline for HSI-to-TeX inversion. The model takes calibrated HSI bands and their wavelength positions as input and predicts temperature T, emissivity e, and texture X.
+
+selection, and report the DARPA IH test split in Table III. During training, each sample is formed by a random 224 ×224 
+
+spatial crop and a random selection of 64 valid spectral bands with their calibrated wavelength positions. Spatial rotations and flips are used for augmentation, and spectral augmen-tation is applied through random band sampling and small wavelength perturbations. The training objective combines mean-squared reconstruc-tion losses for the three TeX fields with a third-order spectral smoothness regularizer on emissivity: 
+
+L = ∥ ˆT − T ∥22 + ∥ˆe − e∥22 + ∥ ˆX − X∥22 + λs∥∆3 
+
+> λ
+
+ˆe∥22. (10) We set λs = 0 .01 . The remaining training hyperparameters are summarized in Table II. 
+
+3) Inference strategy: During inference, we apply TeX-UNet to the full spatial image and handle variable spectral layouts through repeated 64-band sampling, as detailed in Algorithm 2. We sample until every valid band is selected at least five times, average all TeX predictions, and evaluate the resulting full-scene outputs on DARPA IH test scenes and FTIR zero-shot and few-shot settings. 
+
+Algorithm 2 Full-scene variable-band TeX inference 
+
+Require: Calibrated HSI Yc, valid-band set Ωg , calibrated wave-lengths {λ∗ 
+
+> k
+
+}k∈Ωg , trained TeX-UNet fθ , band count Cs = 64 ,minimum coverage m = 5 .
+
+Ensure: Full-scene prediction ( ˆT , ˆe, ˆX). 
+
+> 1:
+
+Initialize prediction accumulator A ← 0, count accumulator 
+
+N ← 0, and band coverage nk ← 0 for all k ∈ Ωg . 
+
+> 2:
+
+while min k∈Ωg nk < m do  
+
+> 3:
+
+Randomly sample S ⊂ Ωg with |S| = Cs. 
+
+> 4:
+
+Run (TS , e S , X S ) = fθ (Yc(: , :, S ), {λ∗ 
+
+> k
+
+}k∈S ). 
+
+> 5:
+
+Add (TS , e S , X S ) to A and increment N . 
+
+> 6:
+
+Update nk ← nk + 1 for all k ∈ S. 
+
+> 7:
+
+end while  
+
+> 8:
+
+return ( ˆT , ˆe, ˆX) = A/N .PREPRINT 2026 6
+
+Fig. 6. TeX-UNet results on the DARPA IH test split. The model is trained on the DARPA IH training split and evaluated on DARPA IH test scenes. The predicted TeX maps (left) preserve the main temperature, emissivity, and texture structures of the ground-truth labels (right). TABLE II 
+
+TEX-UN ET TRAINING HYPERPARAMETERS .                                      
+
+> Setting Value Training input Random 224 ×224 crop and sampling of 64 valid bands Spectral encoding Wavelength encoding enabled for the 64 selected bands Normalization Scene-level normalization with 1st/99th percentile clipping Optimizer AdamW, β= (0 .9,0.98) , weight decay 10 −4
+> DARPA IH training Random init, 12k steps, LR 1.5×10 −4, 1k warmup FTIR fine-tune FTIR from DARPA IH checkpoint, 2k steps, LR 3×10 −5,200-step warmup LR schedule Cosine decay to 0.05 ×the base LR Batch/GPU 32 per GPU, bf16 precision, gradient clipping at 1.0 U-Net config Depths [2 ,2,2,2,2] , channels [64 ,128 ,256 ,352 ,480] ,trunk/head dims 240/224 Inference Full-scene inference, detailed in Algorithm 2 Hardware 8×NVIDIA RTX PRO 6000, 96 GB
+
+TABLE III 
+
+TEX-UN ET INVERSION RESULTS .
+
+Test split Temperature T Emissivity e Texture X
+
+MAE (K) MAPE (%) MSE SAM MSE Deg DARPA IH-test 7.3284 2.5488 0.0453 0.2267 0.0311 0.5206 FTIR-zeroshot-test 5.8309 1.9753 0.0674 0.0451 0.0219 0.2995 FTIR-fewshot-test 4.1004 1.3830 0.0458 0.1970 0.0220 0.2224     
+
+> Note. eand Xare normalized.
+
+Fig. 7. Zero-shot and few-shot transfer to FTIR scenes. TeX-UNet is first trained on the DARPA IH training split and then evaluated on FTIR data. The columns compare zero-shot prediction (left), few-shot fine-tuned prediction (middle) and ground truth (right), respectively, for T , e, and X;few-shot fine-tuning produces outputs closer to the ground truth than zero-shot transfer. 
+
+The preliminary results show that TeX-UNet produces TeX maps close to the ground-truth labels on DARPA IH test scenes (Fig. 6). Our FTIR scenes, zero-shot transfer already recovers recognizable TeX structures, and few-shot fine-tuning further moves the predictions toward the ground truth (Fig. 7). This gap between zero-shot and few-shot performance indicates that FTIR HSI provides learnable cross-sensor supervision rather than only a visualization target. Temperature is reported in Kelvin, while emissivity and texture are reported in normalized space (Table III). Since emissivity amplitude is sensitive to sensor-dependent calibration, SAM is included as the primary spectral-shape metric for e.IV. C ONCLUSION 
+
+This paper presents TeX-1500 , a paired LWIR HSI–TeX dataset and initial benchmark for learning-based temperature– emissivity–texture decomposition. The dataset contains 1,522 calibrated real-scene samples from DARPA IH pushbroom data and FTIR acquisitions, pairing wavelength-resolved ther-mal radiance with aligned temperature, emissivity, and texture fields. By combining diverse outdoor pushbroom scenes with PREPRINT 2026 7
+
+close-range FTIR measurements, TeX-1500 provides a data foundation for studying cross-scene, cross-band, and cross-sensor thermal perception grounded in physical quantities. We further validate the dataset through visual quality anal-ysis, scene-level stability checks, and a TeX-UNet baseline. The results show that the constructed TeX labels are visually coherent across DARPA IH and FTIR scenes, that TeX-UNet can recover held-out DARPA IH TeX structures, and that FTIR zero-shot/few-shot experiments provide a measurable cross-sensor learnability setting. TeX-1500 therefore turns TeX de-composition from a primarily model-based, hand-tuned inverse problem into a supervised benchmark for developing data-driven HSI-to-TeX methods. ACKNOWLEDGMENT 
+
+The authors thank Liqin Cao and Yanfei Zhong from the State Key Laboratory of Information Engineering in Surveying, Mapping and Remote Sensing, Wuhan University, for provid-ing the imaging equipment and scene support. We thank Xin Yuan from the School of Engineering, Westlake University, for his guidance on dataset construction and planning. We also thank Du Wang, Chenjun Zhao, and Jiashuo Chen for their assistance with data collection. PREPRINT 2026 8
+
+Fig. 8. Training set samples from TeX-1500 DARPA IH pushbroom subset at Sidewinder Range, TPG, AZ in August 2021. Panels show 
+
+T (in K), e, X, and HSI-band radiance ( W · m−2 · sr −1 · μm−1). PREPRINT 2026 9
+
+Fig. 9. Training set samples from TeX-1500 DARPA IH pushbroom subset at Loring Commerce Center, ME in December 2021. 
+
+Panels show T (in K), e, X, and HSI-band radiance ( W · m−2 · sr −1 · μm−1). PREPRINT 2026 10 
+
+Fig. 10. Training set samples from TeX-1500 DARPA IH pushbroom subset at Avon Park Air Force Range, FL in April 2022. 
+
+Panels show T (in K), e, X, and HSI-band radiance ( W · m−2 · sr −1 · μm−1). PREPRINT 2026 11 
+
+Fig. 11. Validation set samples from TeX-1500 DARPA IH pushbroom subsetat Sidewinder Range, TPG, AZ in September 2020. 
+
+Panels show T (in K), e, X, and HSI-band radiance ( W · m−2 · sr −1 · μm−1). PREPRINT 2026 12 
+
+Fig. 12. Testing set samples from TeX-1500 DARPA IH pushbroom subset at Fort A. P. Hill, VA in April 2021. Panels show T (in K), e, X,and HSI-band radiance ( W · m−2 · sr −1 · μm−1). PREPRINT 2026 13 
+
+Fig. 13. Training set samples from TeX-1500 FTIR subset. Panels show T (in K), e, X, and HSI-band radiance ( W · m−2 · sr −1 ·
+
+μm−1). 
+
+Fig. 14. Testing set samples from TeX-1500 FTIR subset. Panels show T (in K), e, X, and HSI-band radiance ( W · m−2 · sr −1 ·
+
+μm−1). PREPRINT 2026 14 
+
+REFERENCES [1] X. Tang, X. He, J. Xu, X. Gu, and J. Sun, “ Learning Continuous Wasserstein Barycenter Space for Generalized All-in-One Image Restoration ,” IEEE Transactions on Pattern Analysis & Machine Intelligence , no. 01, pp. 1–16, Feb. 5555. [Online]. Available: https://doi.ieeecomputersociety.org/10.1109/TPAMI.2026.3669121 [2] K. He, J. Sun, and X. Tang, “Single image haze removal using dark channel prior,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 33, no. 12, pp. 2341–2353, 2011. [3] Y. Cui, W. Ren, B. Shi, and A. Knoll, “ Visual-in-Visual: A Unified and Efficient Baseline for Image Restoration ,” IEEE Transactions on Pattern Analysis & Machine Intelligence , no. 01, pp. 1–18, Mar. 5555. [Online]. Available: https://doi.ieeecomputersociety.org/10.1109/ TPAMI.2026.3669720 [4] F. Bao, X. Wang, S. H. Sureshbabu, G. Sreekumar, L. Yang, V. Aggar-wal, V. N. Boddeti, and Z. Jacob, “Heat-assisted detection and ranging,” 
+
+Nature , vol. 619, no. 7971, pp. 743–748, 2023. [5] M. Bijelic, T. Gruber, F. Mannan, F. Kraus, W. Ritter, K. Dietmayer, and F. Heide, “Seeing through fog without seeing fog: Deep multi-modal sensor fusion in unseen adverse weather,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2020, pp. 11 682–11 692. [6] J. Park, K. Kim, and H. Shim, “Rethinking data augmentation for robust lidar semantic segmentation in adverse weather,” in Computer Vision – ECCV 2024 . Springer, 2024, pp. 320–336. [7] Y. Almalioglu, M. Turan, N. Trigoni, and A. Markham, “Deep learning-based robust positioning for all-weather autonomous driving,” Nature machine intelligence , vol. 4, no. 9, pp. 749–760, 2022. [8] B. Wang, M.-Y. Zheng, J.-J. Han, X. Huang, X.-P. Xie, F. Xu, Q. Zhang, and J.-W. Pan, “Non-line-of-sight imaging with picosecond temporal resolution,” Physical Review Letters , vol. 127, no. 5, p. 053602, 2021. [9] J.-T. Ye, Y. Sun, W. Li, J.-W. Zeng, Y. Hong, Z.-P. Li, X. Huang, X. Xue, X. Yuan, F. Xu et al. , “Real-time non-line-of-sight computational imaging using spectrum filtering and motion compensation,” Nature Computational Science , vol. 4, no. 12, pp. 920–927, 2024. [10] F. Bao, S. Jape, A. Schramka, J. Wang, T. E. McGraw, and Z. Jacob, “Why thermal images are blurry,” Optics Express , vol. 32, no. 3, pp. 3852–3865, 2024. [11] C. Dai, J. Lin, B. Song, Y. Chen, J. Chen, X. Yuan, and F. Bao, “Hadar-based thermal infrared hyperspectral image restoration,” 2026. [Online]. Available: https://arxiv.org/abs/2605.13664 [12] H. Xu, D. Wang, C. Zhao, J. Chen, J. Lin, L. Cao, Y. Zhong, Y. She, and F. Bao, “Universal computational thermal imaging overcoming the ghosting effect,” 2026. [Online]. Available: https: //arxiv.org/abs/2604.01542 [13] F. Yellin, S. McCloskey, C. Hill, E. Smith, and B. Clipp, “Concurrent band selection and traversability estimation from long-wave hyperspec-tral imagery in off-road settings,” in Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , 2024, pp. 7483– 7492. [14] F. Yasuma, T. Mitsunaga, D. Iso, and S. K. Nayar, “Generalized assorted pixel camera: postcapture control of resolution, dynamic range, and spectrum,” IEEE transactions on image processing , vol. 19, no. 9, pp. 2241–2253, 2010. [15] A. Chakrabarti and T. Zickler, “Statistics of real-world hyperspectral images,” in CVPR 2011 , 2011, pp. 193–200. [16] B. Arad and O. Ben-Shahar, “Sparse recovery of hyperspectral signal from natural rgb images,” in European conference on computer vision .Springer, 2016, pp. 19–34. [17] B. Arad, R. Timofte, R. Yahel, N. Morag, A. Bernat, Y. Cai, J. Lin, Z. Lin, H. Wang, Y. Zhang et al. , “Ntire 2022 spectral recovery challenge and data set,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 863–881. [18] C. Debes, A. Merentitis, R. Heremans, J. Hahn, N. Frangiadakis, T. van Kasteren, W. Liao, R. Bellens, A. Piˇ zurica, S. Gautama, W. Philips, S. Prasad, Q. Du, and F. Pacifici, “Hyperspectral and lidar data fusion: Outcome of the 2013 grss data fusion contest,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 7, no. 6, pp. 2405–2418, 2014. [19] X. Hu, Y. Zhong, C. Luo, and X. Wang, “Whu-hi: Uav-borne hy-perspectral with high spatial resolution (h2) benchmark datasets for hyperspectral image classification,” arXiv preprint arXiv:2012.13920 ,2020. [20] Y. Cong, S. Khanna, C. Meng, P. Liu, E. Rozi, Y. He, M. Burke, D. Lo-bell, and S. Ermon, “Satmae: Pre-training transformers for temporal and multi-spectral satellite imagery,” Advances in Neural Information Processing Systems , vol. 35, pp. 197–211, 2022. [21] D. Hong, B. Zhang, X. Li, Y. Li, C. Li, J. Yao, N. Yokoya, H. Li, P. Ghamisi, X. Jia et al. , “Spectralgpt: Spectral remote sensing foun-dation model,” IEEE transactions on pattern analysis and machine intelligence , vol. 46, no. 8, pp. 5227–5244, 2024. [22] N. A. A. Braham, C. M. Albrecht, J. Mairal, J. Chanussot, Y. Wang, and X. X. Zhu, “Spectralearth: Training hyperspectral foundation models at scale,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 2025. [23] D. Wang, M. Hu, Y. Jin, Y. Miao, J. Yang, Y. Xu, X. Qin, J. Ma, L. Sun, C. Li, C. Fu, H. Chen, C. Han, N. Yokoya, J. Zhang, M. Xu, L. Liu, L. Zhang, C. Wu, B. Du, D. Tao, and L. Zhang, “Hypersigma: Hyperspectral intelligence comprehension foundation model,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 47, no. 8, pp. 6427–6444, 2025. [24] S. Hwang, J. Park, N. Kim, Y. Choi, and I. So Kweon, “Multispectral pedestrian detection: Benchmark dataset and baseline,” in Proceedings of the IEEE conference on computer vision and pattern recognition ,2015, pp. 1037–1045. [25] A. Gonz´ alez, Z. Fang, Y. Socarras, J. Serrat, D. V´ azquez, J. Xu, and A. M. L´ opez, “Pedestrian detection at day/night time with visible and fir cameras: A comparison,” Sensors , vol. 16, no. 6, p. 820, 2016. [26] A. Toet, “The tno multiband image data collection,” Data in brief ,vol. 15, p. 249, 2017. [27] Q. Ha, K. Watanabe, T. Karasawa, Y. Ushiku, and T. Harada, “Mfnet: Towards real-time semantic segmentation for autonomous vehicles with multi-spectral scenes,” in 2017 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2017, pp. 5108–5115. [28] J. Vertens, J. Z¨ urn, and W. Burgard, “Heatnet: Bridging the day-night domain gap in semantic segmentation with thermal images,” in 2020 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2020, pp. 8461–8468. [29] X. Jia, C. Zhu, M. Li, W. Tang, and W. Zhou, “Llvip: A visible-infrared paired dataset for low-light vision,” in Proceedings of the IEEE/CVF international conference on computer vision , 2021, pp. 3496–3504. [30] J. Xiao, D. Tortei, E. Roura, and G. Loianno, “Long-range uav thermal geo-localization with satellite imagery,” in 2023 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2023, pp. 5820–5827. [31] L. Tang, J. Yuan, H. Zhang, X. Jiang, and J. Ma, “Piafusion: A progres-sive infrared and visible image fusion network based on illumination aware,” Information Fusion , vol. 83, pp. 79–92, 2022. [32] L. Tang, C. Li, and J. Ma, “Mask-difuser: A masked diffusion model for unified unsupervised image fusion,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 48, no. 1, pp. 591–608, 2026. [33] Z. Zhao, H. Bai, Y. Zhu, J. Zhang, S. Xu, Y. Zhang, K. Zhang, D. Meng, R. Timofte, and L. Van Gool, “Ddfm: Denoising diffusion model for multi-modality image fusion,” in Proceedings of the IEEE/CVF international conference on computer vision , 2023, pp. 8082–8093. [34] J. Xiao, R. Nayak, N. Zhang, D. Tortei, and G. Loianno, “Thermalgen: Style-disentangled flow-based generative models for rgb-to-thermal im-age translation,” Advances in Neural Information Processing Systems ,vol. 38, pp. 33 111–33 133, 2026. [35] W. Liao, X. Huang, F. Van Coillie, S. Gautama, A. Piˇ zurica, W. Philips, H. Liu, T. Zhu, M. Shimoni, G. Moser et al. , “Processing of multires-olution thermal hyperspectral and digital color data: Outcome of the 2014 ieee grss data fusion contest,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 8, no. 6, pp. 2984–2996, 2015. [36] D. Wang, L. Cao, L. Gao, F. Ye, and Y. Zhong, “Spectral noise resistance split window atmospheric compensation for airborne thermal infrared hyperspectral,” in IGARSS 2025-2025 IEEE International Geoscience and Remote Sensing Symposium . IEEE, 2025, pp. 1244–1248. [37] D. Wang, L.-Q. Cao, Y.-H. Du, H.-Y. Xiong, F.-W. Ye, and Y.-F. Zhong, “Toward noise-resilient retrieval of land surface temperature and emissivity using airborne thermal infrared hyperspectral imagery,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 231, pp. 532–551, 2026. [38] U. Dorken Gallastegi, H. Rueda-Chac´ on, M. J. Stevens, and V. K. Goyal, “Absorption-based, passive range imaging from hyperspectral thermal measurements,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 47, no. 5, pp. 4044–4060, 2025. [39] L. Cao, J. He, L. Gao, Y. Zhong, X. Hu, and Z. Li, “Lwir hyperspectral image classification based on a temperature-emissivity residual network and conditional random field model,” International Journal of Remote Sensing , vol. 43, no. 10, pp. 3744–3768, 2022. PREPRINT 2026 15 
+
+[40] M. A. Mousa, L. Bauer, Z. Yang, U. Singh, A. Deka, and Z. Jacob, “Physics-integrated inference for signal recovery in non-gaussian regimes,” Applied Physics Letters , vol. 128, no. 17, p. 171101, 2026. [Online]. Available: https://doi.org/10.1063/5.0324166 [41] F. Mao, J. Mei, S. Lu, F. Liu, L. Chen, F. Zhao, and Y. Hu, “Pid: Physics-informed diffusion model for infrared image generation,” Pat-tern Recognition , vol. 169, p. 111816, 2026. [42] Y. Zhao, H. Sun, C. Liu, and Z. Qi, “Thermal-physics-informed 3d gaussian splatting for infrared images rendering,” Infrared Physics & Technology , p. 106593, 2026. [43] G. Meng, Z. Cai, J. Tu, Y. Wang, C. Li, Y. Huang, and X. Ding, “Pcmamba: Physics-informed cross-modal state space model for dual-camera compressive hyperspectral imaging,” arXiv preprint arXiv:2505.16373 , 2025. [44] P. Tseng, “Convergence of a block coordinate descent method for nondifferentiable minimization,” Journal of Optimization Theory and Applications , vol. 109, no. 3, pp. 475–494, 2001. [45] J. M. Bioucas-Dias and J. M. P. Nascimento, “Hyperspectral subspace identification,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 46, no. 8, pp. 2435–2445, 2008. [46] L. Zhuang and J. M. Bioucas-Dias, “Fast hyperspectral image denoising and inpainting based on low-rank and sparse representations,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 11, no. 3, pp. 730–742, 2018. [47] C. Emde, R. Buras-Schnell, A. Kylling, B. Mayer, J. Gasteiger, U. Hamann, J. Kylling, B. Richter, C. Pause, T. Dowling et al. , “The libradtran software package for radiative transfer calculations (version 2.0.1),” Geoscientific Model Development , vol. 9, no. 5, pp. 1647–1672, 2016. [48] P. H. C. Eilers and H. F. M. Boelens, “Baseline correction with asymmetric least squares smoothing,” Leiden University Medical Centre Report , vol. 1, no. 1, p. 5, 2005.
