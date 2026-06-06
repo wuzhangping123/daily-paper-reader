@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-06",
+  "date": "2026-06-06",
+  "generated_at": "2026-06-06T20:57:59",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/06/2605.30915v2-ditto-scalable-order-aware-all-in-one-image-restoration-agent",
+      "section": "quick",
+      "title_en": "DiTTo: Scalable Order-aware All-in-One Image Restoration Agent",
+      "authors": "Seungho Choi, Jihyong Oh",
+      "date": "2026-05-29",
+      "pdf": "https://arxiv.org/pdf/2605.30915v2",
+      "score": "6.0",
+      "evidence": "顺序感知的多退化全能恢复方法",
+      "tldr": "现有图像修复智能体需要大量专家调用构建数据集，且无法扩展新专家。提出DiTTo框架，包含模拟器和智能体，通过单步模拟和顺序感知对齐降低复杂度，支持即插即用扩展。在MiO-100多退化图像上达到最先进质量。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Real-world images rarely suffer from a single degradation, and the order in which degradations are removed substantially affects the final restoration quality, motivating agent-based image restoration (IR), where a vision-language model schedules a pool of pre-built restoration-experts. However, existing training-based agents require $\\mathcal{O}((N^{\\mathbf{D}})^{2})$ restoration-expert calls per image to construct the Optimal Restoration-action Trajectory Dataset (ORTD), where $N^{\\mathbf{D}}$ denotes the number of degradation types in the universe $\\mathbf{D}$, and couple agent training to a fixed restoration-expert pool, preventing extension to newly introduced restoration-experts without full retraining. To overcome these efficiency and extensibility bottlenecks, we propose \\textbf{DiTTo}, a novel order-aware image restoration agent framework consisting of the DiTTo Simulator and the DiTTo Agent. The DiTTo Simulator combines $\\cup$S-IR for single-step restoration-action simulation and AiO-IQA for per-action quality prediction, reducing ORTD construction to $\\mathcal{O}(N^{\\mathbf{D}})$ simulator calls per image; the DiTTo Agent is trained by SFT on the simulator-generated ORTD, followed by \\textbf{Order-aware Restoration Alignment (ORA)} that aligns degradation identification, restoration-action-ordering, and output format along independent axes. This enables \\textbf{plug-and-play scalable extensibility}: adding a new restoration-expert requires updating only the lightweight ORA stage. On the MiO-100 evaluation set with up to five concurrent degradations, our DiTTo Agent achieves state-of-the-art multi-degradation restoration quality among previous agent-based IR methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/06/2606.03806v1-tex-1500-a-paired-real-world-lwir-hyperspectral-dataset-and-benchmark-for-temperature-emissivity-texture-decomposition",
+      "section": "quick",
+      "title_en": "TeX-1500: A Paired Real-World LWIR Hyperspectral Dataset and Benchmark for Temperature-Emissivity-Texture Decomposition",
+      "authors": "Cheng Dai, Jiale Lin, Hongyi Xu, Bingxuan Song, Ziyang Xie, Fanglin Bao",
+      "date": "2026-06-02",
+      "pdf": "https://arxiv.org/pdf/2606.03806v1",
+      "score": "6.0",
+      "evidence": "高光谱数据集与分解用于恢复",
+      "tldr": "长波红外高光谱成像的温度-发射率-纹理分解缺乏配对数据集，限制了数据驱动方法。本文构建TeX-1500大规模配对数据集，包含1522个真实场景的校准辐射立方体、波长位置及温度、发射率、纹理标签。提出TeX-UNet基线模型，在DARPA IH和FTIR场景上验证了配对监督的有效性。该工作为热物理属性分解提供了首个大规模基准。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Temperature-emissivity-texture (TeX) decomposition seeks to recover object heat state, material spectral response, and visible-like geometric texture from long-wave infrared hyperspectral imaging (LWIR HSI). Existing TeX pipelines are mainly scene-specific inverse solvers, and the lack of paired LWIR HSI-TeX supervision has limited learning-based decomposition. To address this gap, we introduce TeX-1500, a large-scale paired LWIR HSI-TeX dataset and benchmark for supervised HSI-to-TeX decomposition. TeX-1500 contains 1,522 calibrated real-scene pairs from DARPA Invisible Headlights (DARPA IH) pushbroom imagery and our FTIR acquisitions, covering five locations, four seasons, diverse acquisition times, heterogeneous wavelength layouts, and two sensor families. Each sample stores a calibrated valid-band radiance cube, calibrated wavelength positions, and aligned temperature, emissivity, and texture supervision constructed through a consistent restoration and TeX-construction protocol. We further provide TeX-UNet, a simple wavelength-aware baseline that maps calibrated HSI bands and wavelength positions to TeX fields. Experiments on the held-out DARPA IH pushbroom scenes and zero-/few-shot transfer to FTIR scenes show that TeX-1500 provides usable paired supervision and a measurable benchmark for data-driven physical-property-centered thermal perception.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/06/2606.06176v1-rqul-uie-revitalizing-quality-unstable-labels-for-underwater-image-enhancement-via-in-dataset-self-supervision",
+      "section": "quick",
+      "title_en": "RQUL-UIE: Revitalizing Quality-Unstable Labels for Underwater Image Enhancement via In-Dataset Self-Supervision",
+      "authors": "Haochen Hu, Yanrui Bin, Chih-yung Wen, Bing Wang",
+      "date": "2026-06-04",
+      "pdf": "https://arxiv.org/pdf/2606.06176v1",
+      "score": "6.0",
+      "evidence": "基于扩散的水下图像去噪，技术可迁移至高光谱图像",
+      "tldr": "水下图像增强受限于标注数据质量不稳定，现有方法难以有效利用低质量标签。本工作提出基于扩散模型的训练内自监督策略，无需额外标注即可评估标签质量，并量化为噪声级别指导多步去噪监督。同时引入傅里叶细化网络恢复高频信息，在多个基准上超越SOTA，实现标签质量鲁棒增强。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Underwater Image Enhancement (UIE) is essential for mitigating degradations caused by water medium. Although learning-based methods have advanced significantly, most rely on paired datasets with unstable label quality, which bottlenecks model performance. This paper proposes a diffusion-based, in-dataset self-supervised learning strategy designed to exploit the quality distribution of training labels. Specifically, we evaluate label quality via semantic perception embeddings from a pre-trained diffusion model in a training-free manner. These quality scores are subsequently quantized into noise-level indices, guiding a multi-step denoising process for level-wise supervision. This mechanism prevents low-quality labels from degrading the model while maximizing their utility during training. Furthermore, a Fourier-based refinement network is incorporated to explicitly reconstruct high-frequency components. Extensive evaluations demonstrate that our method consistently outperforms SOTA approaches in restoration quality. The code and pre-trained model will be available once accepted in link.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
