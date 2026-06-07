@@ -1,0 +1,2136 @@
+Title: Deep neural network yields regularization for ill-posed inverse problems
+
+URL Source: https://arxiv.org/pdf/2606.00517v1
+
+Published Time: Tue, 02 Jun 2026 00:33:36 GMT
+
+Number of Pages: 36
+
+Markdown Content:
+# Deep neural network yields regularization for ill-posed inverse problems 
+
+## Qiao Zhu 1, Lan Wang 1, Ye Zhang 1,2* 
+
+1School of Mathematics and Statistics, Beijing Institute of Technology, Beijing, 100081, China. 
+
+2MSU-BIT-SMBU Joint Research Center of Applied Mathematics, Shenzhen MSU-BIT University, Shenzhen, 518172, China. *Corresponding author(s). E-mail(s): ye.zhang@smbu.edu.cn; Contributing authors: qzhu@bit.edu.cn; wanglan@bit.edu.cn; 
+
+Abstract 
+
+This paper studies the regularization of ill-posed inverse problems by deep neu-ral networks (DNNs). We extend architecture-based regularization from shallow networks to deep models by developing a deterministic framework in which the admissible network class is enlarged adaptively and the resulting architecture complexity acts as the regularization mechanism. We propose two discrepancy-principle-driven expanding DNN algorithms to treat the cases where an explicit parameter-radius bound is available and unavailable, respectively. For both algo-rithms, we prove the finite termination of the adaptive expansion procedure and the convergence of the regularized solutions as the noise level vanishes. In addition, we derive explicit asymptotic bounds on the terminal network architec-ture, thereby quantifying how the required network complexity scales with the noise level. Numerical experiments on several representative linear and non-linear inverse problems support the theoretical findings and illustrate the practical usefulness of the proposed framework. 
+
+Keywords: Deep neural networks, universal approximation theorems, ill-posed problems, convergence analysis, iterative regularization 
+
+MSC Classification: 47A52 , 47J06 , 65J20 , 65J22 , 68T07 
+
+1
+
+> arXiv:2606.00517v1 [math.NA] 30 May 2026
+
+# 1 Introduction 
+
+Inverse problems arise in a wide range of scientific and engineering applications, including medical imaging, non-destructive testing, and the calibration of complex physical systems [ 1 –3 ]. The primary mathematical objective is to recover an unknown target quantity f † ∈ F ⊂ X A from indirect observations. The underlying physical process is typically modeled by a forward operator A : XA → Y between Banach spaces, leading to the operator equation 
+
+A(f ) = g, (1) where g = A(f †) denotes the ideal noise-free data. In practical applications, however, the exact data g is unavailable. Instead, one is given a noisy measurement gδ ∈ Y 
+
+satisfying the deterministic noise model ∥gδ − g∥Y ≤ δ, where δ > 0 is the noise level. A defining feature of inverse problems is their ill-posedness in the sense of Hadamard: the inverse mapping A−1 is typically discontinuous, so that small perturbations in the data may lead to large deviations in the reconstruction. Stable recovery therefore requires regularization. Classical frameworks restore well-posedness by incorporating prior knowledge via variational penalties [ 4 , 5], iterative procedures [ 6– 9], or finite-dimensional projection methods [10]. In recent years, deep learning has led to major advances in inverse problems; see, for example, the broad overviews in [ 11 –14 ]. A large part of this literature focuses on supervised and model-based deep reconstruction methods [ 15 ], including U-Net-type architectures [ 16 ], learned primal-dual schemes [ 17 ], variational networks [ 18 ], and generative-model-based approaches [ 19 , 20 ], all of which have demonstrated strong empirical performance in imaging applications. At the same time, the mathematical limitations of purely data-driven reconstruction pipelines have become increasingly apparent, especially with regard to instability and sensitivity to perturbations [ 21 ]. This has motivated another line of research that connects deep learning more directly to classical regularization theory. In this setting, neural networks define learned regularizers or data-adapted priors within variational formulations, as in the NETT framework [22 ], adversarial regularization [ 23 ], learned variational penalties [ 24 ], and total deep variation [ 25 ]. Related studies also investigate the regularizing properties of modern learning and optimization procedures for inverse problems [ 26 , 27 ]. In parallel, physics-informed neural networks (PINNs) provide a complementary paradigm by encoding governing equations directly into the training objective [ 28 , 29 ]. Particularly relevant to the present work is the recent interest in untrained neural priors and architecture-induced regularization, which highlights the possibility that network architecture itself may contribute to the regularization of inverse problems. Starting from the Deep Image Prior (DIP) paradigm [ 30 ], a growing literature has shown that a randomly initialized network, without being pretrained on external data, can be optimized directly against a single degraded observation and thereby act as an implicit architectural prior. Representative viewpoints include concise untrained decoders such as the Deep Decoder [31 ], regularization by architecture for inverse problems [ 32 ], deterministic recovery guarantees for unsupervised neural approaches [ 33 ], and principled stopping strategies for deep image priors [ 34 ]. See also the recent survey [ 35 ] for a broader overview of untrained neural priors in inverse imaging. These developments suggest that neural network architecture is not merely an implementation choice, but may itself act as a 2regularizing ingredient. This observation raises a natural question: rather than learning the regularization functional or relying on heuristically fixed network sizes, can one develop a deterministic regularization framework in which the admissible network architecture class is expanded adaptively and selected by a discrepancy principle? To utilize network architecture as a regularization parameter, one must first guaran-tee that neural networks possess the requisite approximation capacity to represent the unknown true solution f † as their structural complexity increases. This foundational assurance is provided by modern neural network approximation theory. Classical results established universal approximation for shallow networks with a single hidden layer [36 – 40 ], while quantitative rates were obtained for Barron-type function classes under spectral assumptions [ 41 –43 ]. In the deep setting, rigorous analyses have demonstrated genuine advantages of depth [ 44 – 48 ], and quantitative approximation results for ReLU networks are now available for H¨ older/continuous classes [ 49 – 53 ], smooth and Sobolev-type classes [ 54 – 57 ], and piecewise smooth functions [ 58 ]. In addition, some recent works provide explicit parameter-constrained approximation results for deep networks, including norm-constrained ReLU networks [ 59 ] and constructive Kolmogorov-type deep representations [ 60 ]. Altogether, these results confirm that width and depth directly govern the approximation capacity available for representing the unknown solution, making them natural candidates for structural regularization parameters. Despite this flourishing landscape of empirical success and approximation theory, an important theoretical gap remains in the context of inverse problems: how can the architectural complexity of a deep neural network be rigorously integrated into the mathematical framework of regularization theory? In our previous work [ 61 ], we addressed this question in the shallow-network setting and proved that the width of a single-hidden-layer network can serve as a standalone regularization parameter selected adaptively by a discrepancy principle. However, extending the architecture-based regularization philosophy from shallow to deep networks introduces substantial mathematical challenges. First, unlike the shallow case, the approximation capacity of deep architectures is governed jointly by width and depth, so that a stable regularization path must account for the coupled expansion of these two structural dimensions. Second, deterministic regularization theory relies on compactness to ensure existence and convergence of regularized solutions, which in turn requires optimization over hypothesis classes with explicitly bounded parameters. Although a few recent approximation results provide explicit parameter constraints, the vast majority of deep-network approximation theorems—particularly in general Sobolev-type settings—still provide error rates mainly in terms of width and depth, without yielding an explicit usable bound on the parameter radius. This disconnect prevents the direct construction of constrained network classes and poses a major theoretical obstacle to deep-network regularization. The central objective of this paper is to bridge this gap by establishing a regulariza-tion theory for expanding deep neural networks in an unsupervised, training-data-free setting, in the sense that the method uses only the given noisy observation gδ and does not require external training datasets or ground-truth solution labels. Rather than rely-ing on fixed architectures, we adaptively enlarge the admissible network class, allowing 3the structural complexity of the network to act as the regularization mechanism. The main contributions of this paper are summarized as follows: 
+
+• We formulate a novel regularization framework for general ill-posed inverse problems in which the unknown solution is represented by a deep neural network and its architectural complexity—primarily governed by the joint scaling of width and depth—serves as the central regularizing mechanism. 
+
+• We develop two discrepancy-driven expanding algorithms corresponding to the cases where an explicit parameter-radius bound is available and unavailable, respectively. 
+
+• We prove the existence of minimizers and the finite termination of the adaptive expansion procedure. Furthermore, we establish the convergence of the regularized solutions as the noise level vanishes and derive explicit asymptotic bounds on the terminal network architecture. In this way, the paper places the relationship between network complexity, approx-imation accuracy, and stability into a rigorous regularization framework, thereby extending the shallow-network theory in [61] to deep architectures. The remainder of this paper is organized as follows. Section 2 introduces the nota-tion, the class of deep neural networks with bounded parameters, and the abstract approximation properties. Section 3 presents the expanding deep neural network regu-larization algorithms and establishes their well-posedness, termination, and convergence properties. Section 4 reports numerical experiments on several representative inverse problems. Finally, Section 5 concludes the paper. 
+
+# 2 Preliminaries 
+
+We introduce the notation, the class of deep neural networks with bounded parameters, and the abstract approximation property used in the subsequent analysis. 
+
+## 2.1 Notation 
+
+Throughout this paper, N+ and N denote the sets of positive and non-negative integers, respectively. For two quantities X and Y , we write X ∨ Y := max {X, Y }. We use 
+
+X ≲ Y (equivalently, Y ≳ X) to indicate that there exists a generic constant C > 0, independent of the approximation parameters under consideration, such that X ≤ CY .We write X ≍ Y if both X ≲ Y and Y ≲ X hold. For any ζ ∈ R, we denote its floor and ceiling by ⌊ζ⌋ := max { i ∈ Z : i ≤ ζ } and ⌈ζ⌉ := min { i ∈ Z : i ≥ ζ }. Furthermore, for a bounded domain Ω ⊂ Rd, where d ∈ N+ is the spatial dimension, we employ standard notation for function spaces. We denote by C(Ω) the space of continuous functions on Ω. For s ∈ N+, Cs(Ω) denotes the space of functions whose partial derivatives up to order s are continuous on Ω. For α ∈ (0 , 1] and λ > 0, we define H¨ older(Ω , α, λ ) := f : Ω → R |f (x) − f (y)| ≤ λ|x − y|α 
+
+> ∞
+
+for all x, y ∈ Ω .
+
+Moreover, Lp(Ω) denotes the standard Lebesgue space. For s > 0 and 1 ≤ q ≤ ∞ ,
+
+W s,q (Ω) denotes the Sobolev space of smoothness s and integrability index q, equipped with its usual norm; fractional values of s are understood in the standard fractional 4Sobolev sense. We also use Bsq,ρ (Ω), with s > 0 and 1 ≤ q, ρ ≤ ∞ , to denote the Besov space with smoothness s, integrability index q, and fine index ρ.
+
+## 2.2 Deep neural networks with bounded parameters 
+
+We consider fully connected feedforward neural networks with scalar outputs defined on Ω. A specific network architecture is determined by its depth K ∈ N+ (i.e., the number of hidden layers), together with layer widths N0, N 1, . . . , N K+1 ∈ N+, where 
+
+N0 = d is the input dimension and NK+1 = 1 is the output dimension. The trainable parameter set is denoted by Θ = {(Wℓ, b ℓ)}K+1  
+
+> ℓ=1
+
+, with weight matrices Wℓ ∈ RNℓ×Nℓ−1
+
+and bias vectors bℓ ∈ RNℓ . We use a continuous activation function σ : R → R, applied componentwise in each hidden layer. Typical examples include the ReLU activation 
+
+σ(t) = max {0, t }, and the sigmoid activation. The corresponding network realization 
+
+ϕ(·; Θ) : Ω → R is defined recursively via 
+
+eϕ0(x) = x, ϕℓ(x) = Wℓ eϕℓ−1(x) + bℓ, eϕℓ(x) = σ(ϕℓ(x)) , ℓ = 1 , . . . , K, ϕ(x; Θ) = WK+1 eϕK (x) + bK+1 .
+
+(2) To obtain hypothesis classes with suitable compactness properties, we impose a finite norm constraint on the parameter set. More precisely, for each fixed network architecture, we regard the parameter collection Θ = {(Wℓ, b ℓ)}K+1  
+
+> ℓ=1
+
+as the vector consisting of all scalar weights and biases, and require 
+
+∥Θ∥ ≤ r, (3) where r > 0 is a prescribed finite radius. Here ∥ · ∥ denotes any fixed norm on the finite-dimensional parameter space associated with the chosen architecture, for instance the ℓ1, ℓ2, or ℓ∞ norm. Accordingly, for N, L ∈ N+ and r > 0, we define 
+
+N (N, L, r ) := 
+
+
+
+ϕ(·; Θ) ∈ C(Ω) K ≤ L, max  
+
+> 1≤ℓ≤K
+
+Nℓ ≤ N, ∥Θ∥ ≤ r
+
+
+
+. (4) By construction, these classes are nested: if N1 ≤ N2, L1 ≤ L2, and r1 ≤ r2, then 
+
+N (N1, L 1, r 1) ⊆ N (N2, L 2, r 2).
+
+## 2.3 Approximation theorems 
+
+Our theoretical framework relies on quantitative DNN approximation results. At its core, the essential issue is whether target functions can be efficiently approximated by networks belonging to norm-constrained classes of the form N (N, L, r ). The most con-venient situation is when the approximation theorem provides an explicit upper bound on the admissible parameter radius. Such a bound can be used directly to define the constrained hypothesis classes underlying the known-bound algorithm (Algorithm 1). 5However, this setting is rather restrictive. Many classical approximation results, espe-cially those in stronger topologies such as Sobolev spaces, provide approximation rates only in terms of network width and depth. The corresponding parameter radius is not given explicitly. In such cases, the known-bound algorithm is no longer directly applicable. This limitation motivates the introduction of a separate unknown-bound algorithm (Algorithm 2). We now recall one representative theorem of each type. We begin with an approx-imation result that yields an explicit admissible parameter radius. Since this radius depends on the target function f , it is not directly available in inverse problems where the target function is unknown, unless additional a priori information yields a usable bound independent of f .                                        
+
+> Theorem 1 (Explicitly bounded parameters, [ 60 , Theorem 3]) Let p∈(1 ,∞),d≥2, and
+> m∈N+. Assume that f∈H¨ older ([0 ,1] d, α, λ )for some α∈(0 ,1] and λ > 0. Then there exists a ReLU network ϕ∈ N
+> 
+> max {4d, 2md + 1 },2m+ 3 ,2 md ∨ ∥ f∥∞
+> 2m(d∨pα )
+> , such that
+> ∥f−ϕ∥Lp([0 ,1] d)≤2 λ+∥f∥∞
+> 2−αm .
+
+We next recall a Sobolev-norm approximation result. In this case, no explicit radius bound is available, although the existence of a finite admissible radius is still guaranteed by the existence of the approximating network itself.                                             
+
+> Theorem 2 (Sobolev approximation, [ 57 , Theorem 1.1]) Suppose that f∈Cs([0 ,1] d)with
+> s∈N,s > 1, satisfies ∥∂αf∥L∞([0 ,1] d)<1for all |α| ≤ s. Then, for any n, l ∈N+and any
+> p∈(1 ,∞), there exists a ReLU network ϕwith width at most 16 sd+1 d(n+ 2) log 2(8 n)and depth at most 27 s2(l+ 2) log 2(4 l)such that
+> ∥f−ϕ∥W1,p ([0 ,1] d)≤85( s+ 1) d8sn−2( s−1) /d l−2( s−1) /d .
+
+It is important to emphasize that Theorem 1 and Theorem 2 serve merely as concrete illustrations. They will be employed in our simulation study (Section 4). The framework developed herein is modular and can accommodate other DNN approximation results, provided the approximation error is measured in a reflexive Banach space, such as 
+
+Lp or W s,p with s > 0 and 1 < p < ∞. While other norm-constrained network approximation results exist, for example [ 59 ], they often rely on settings that are not directly compatible with the reflexive-space requirement of the present framework. More commonly, approximation rates are given in terms of network architecture, such as width and depth, without an explicit parameter-radius bound. Compatible results of this type are available for continuous and H¨ older functions in Lp norms [ 52 , 53 ], smooth functions measured in Sobolev norms [ 57 ], and Sobolev or Besov classes in Lp
+
+[62 ]. Table 1 summarizes these representative approximation rates over different target function classes. The preceding constructive approximation results motivate the following abstract assumption, cf. Assumption 1, formulated directly in terms of the network architecture parameters N and L.6Table 1 : Representative approximation results for ReLU neural networks over different target function classes.                                                  
+
+> Reference Function class Width Depth Approximation error Norm [53] H¨ older ([0 ,1] d, α, λ )O(N)O(L)O
+> 
+> (N2L2log N)−α/d 
+> Lp([0 ,1] d),
+> p∈(1 ,∞)[57] Cs([0 ,1] d)O(Nlog N)O(Llog L)O
+> 
+> N−2( s−s0)/d L−2( s−s0)/d 
+> Ws0,p ([0 ,1] d),
+> p∈(1 ,∞), s0< s
+> [62] Ws,q ([0 ,1] d) or
+> Bsq,ρ ([0 ,1] d)
+> O(N)O(L)O
+> 
+> (N L )−2s/d 
+> Lp([0 ,1] d),
+> p∈(1 ,∞)
+
+Assumption 1 (Generic DNN approximability condition) . Let X1 be a Banach space, and let F ⊂ X 1 be a target function class. Assume that there exist minimal architecture sizes Nmin , L min ∈ N+ and an error profile {E N,L }N ≥Nmin , L ≥Lmin ⊂ [0 , ∞),nonincreasing in each argument and satisfying lim N,L →∞ EN,L = 0 , such that for every 
+
+f ∈ F and every N ≥ Nmin , L ≥ Lmin , there exist a finite radius r > 0 and a network 
+
+ϕ ∈ N (N, L, r ) satisfying 
+
+∥f − ϕ∥X1 ≤ E N,L .
+
+Remark 1 Assumption 1 is an abstract approximability condition rather than a definition of a specific network architecture. It is understood in an existential sense with respect to the admissible radius: for each f ∈ F and each complexity level ( N, L ), there exists an approximating network in some class N (N, L, r ) with a finite radius r. No uniform upper bound on the admissible radius r is imposed; the radius may depend on f , N , and L.
+
+Remark 2 (Choice of the error profile EN,L ) The approximation theorems above determine admissible choices of EN,L by selecting the largest constructive parameters compatible with the prescribed width and depth budgets ( N, L ). In Theorem 1, the construction is indexed by m and requires max {4d, 2md + 1 } ≤ 
+
+N, 2m + 3 ≤ L. Choosing the largest such m = m(N, L ) gives 
+
+EN,L = 2( λ + ∥f ∥∞)2 −αm (N,L ) ≍ max {N −α/d , 2−αL/ 2},
+
+up to constants and integer rounding. In Theorem 2, the parameters n and l control the width and depth, respectively. Choosing the largest admissible n = n(N ) and l = l(L) yields 
+
+EN,L = 85( s + 1) d8s n(N )−2( s−1) /d l(L)−2( s−1) /d .
+
+Moreover, by the width and depth constraints, there exists a constant Cs,d > 0, depending only on s and d, such that 
+
+EN,L ≤ Cs,d (log N /N )2( s−1) /d (log L/L )2( s−1) /d .
+
+The resulting profile may be stepwise because the constructive parameters are integer-valued, but this is enough for the monotonicity and convergence requirements in Assumption 1. 
+
+73 A general framework of expanding neural network methods 
+
+In this section, we present a general framework for expanding neural-network regu-larization methods. We first state the assumptions, then introduce two algorithms corresponding to the cases with and without an a priori parameter-radius bound, and finally establish their convergence. 
+
+## 3.1 Assumptions 
+
+Throughout this subsection, the network class N (N, L, r ) is understood as the hypoth-esis class defined in (4) . We first record a basic compactness property of this class, which will be used to verify the abstract compactness assumption below in concrete settings. The proof of the following lemma is deferred to Appendix A. 
+
+Lemma 1 (Compactness of the hypothesis class) . Let N, L ∈ N+ be fixed, and let 
+
+0 ≤ r < ∞. Assume that the activation function σ : R → R is continuous. Then the network class N (N, L, r ) is compact in C(Ω) equipped with the uniform norm 
+
+∥f ∥C(Ω) := max x∈Ω |f (x)|. Consequently, for every p ∈ [1 , ∞), N (N, L, r ) is also compact in Lp(Ω) .
+
+The approximation framework is formulated in the Banach space X1. To establish the existence of minimizers for the network-constrained minimization problems considered below, we require a compactness mechanism for minimizing sequences that also preserves the admissibility of the limit. Although Lemma 1 provides compactness in C(Ω) and 
+
+Lp(Ω), the ambient space X1 used in the regularization analysis may be different. Therefore, we introduce an auxiliary Banach space X0, endowed with a weaker topology in the sense that X1 is continuously embedded into X0, in which the network class 
+
+N (N, L, r ) is strongly compact. This two-space approach makes it possible to extract strongly convergent subsequences in X0 while retaining weak compactness in X1. In practice, the compactness of N (N, L, r ) is often significantly easier to verify in a weaker topology than directly in X1, especially for nonsmooth activations (e.g., ReLU) and stronger norms. We therefore impose the following assumption. 
+
+Assumption 2 (Topological setting) . Let X1 be a reflexive Banach space of functions on Ω, and let X0 be an auxiliary Banach space of functions on Ω such that: (i) N (N, L, r ) ⊂ X 1 for all N, L ∈ N+ and r > 0;(ii) the embedding X1 ,→ X 0 is continuous; (iii) for every fixed (N, L, r ), the class N (N, L, r ) is compact in X0.                        
+
+> Remark 3 (a) If N(N, L, r ) is already compact in the chosen space X1, then no auxiliary space is needed. In this case, one may take X0=X1, so that Assumption 2(ii) is trivial and Assumption 2(iii) reduces to compactness in X1itself. (b) The inclusion N(N, L, r )⊂ X 1in Assumption 2(i) is mild in many standard settings. Typical reflexive choices for X1include Lp(Ω) and Ws,p (Ω) with 1 < p < ∞and s∈N+.
+
+8For instance, if the activation function is locally Lipschitz, such as ReLU, then, for fixed (N, L, r ), all network realizations are Lipschitz continuous on bounded domains. Hence, by Rademacher’s theorem, they belong to W 1,∞(Ω). For higher-order Sobolev spaces W s,p (Ω) with s ≥ 2, stronger smoothness assumptions on the activation function are generally needed. (c) Assumption 2(iii) can be verified in many common situations by Lemma 1. In particular, one may take X0 = Lq (Ω) whenever the embedding X1 ,→ Lq (Ω) is continuous. If a continuous embedding X1 ,→ C(Ω) is available, then X0 = C(Ω) is also admissible. The appropriate choice depends on the ambient space X1 and the specific application under consideration. 
+
+With this topological setting, we now introduce the assumptions on the forward operator A and the regularizer R that are required for the existence analysis of the network-constrained minimization problems. 
+
+Assumption 3 (Forward operator) . Let XA be a Banach space and let A : XA → Y 
+
+be the forward operator. Assume that: (i) (Well-definedness) The embedding X1 ,→ X A is continuous, so that A is well defined on the network class N (N, L, r ) ⊂ X 1.(ii) (Weak continuity) A is sequentially weak-to-weak continuous on bounded subsets of X1, i.e., fm ⇀ f in X1 with sup m ∥fm∥X1 < ∞ implies A(fm) ⇀ A (f ) in Y as 
+
+m → ∞ .(iii) (Injectivity) The equation A(f ) = g admits a unique solution f † in X1.(iv) (Local H¨ older continuity) There exist constants θ ∈ (0 , 1] , LA > 0, and η > 0
+
+such that ∥A(f )−A(f †)∥Y ≤ LA ∥f −f †∥θ 
+
+> X1
+
+for all f ∈ X 1 satisfying ∥f −f †∥X1 ≤ η.
+
+Assumption 4 (Regularizer) . Let R : X1 → [0 , ∞] be a proper functional. Assume that: (i) (Weak lower semicontinuity) R is sequentially weakly lower semicontinuous on 
+
+X1.(ii) (Coercivity) R(f ) → ∞ as ∥f ∥X1 → ∞ .(iii) (Finiteness on the network class) For every (N, L, r ), there exists at least one network ϕ ∈ N (N, L, r ) such that R(ϕ) < ∞.(iv) (Uniform regularizer bound on approximants) For the exact solution f † ∈ F ,there exists a constant Cf † > 0, independent of (N, L ), such that the approximants in Assumption 1 can be chosen to satisfy 
+
+R(ϕN,L ) ≤ Cf † , ∀ N ≥ Nmin , L ≥ Lmin .
+
+Remark 4 (A canonical choice of R) A natural and standard choice is R(f ) := ∥f ∥X1 . Then Assumption 4(iv) is satisfied. Indeed, by Assumption 1, for f † ∈ F and N ≥ Nmin , L ≥ Lmin ,there exists an approximant ϕ ∈ N (N, L, r ) for some r > 0 such that ∥f † − ϕ∥X1 ≤ E N,L ≤ENmin ,L min . Hence, by the triangle inequality, 
+
+R(ϕN,L ) = ∥ϕ∥X1 ≤ ∥ f †∥X1 + ∥f † − ϕ∥X1 ≤ ∥ f †∥X1 + ENmin ,L min ,
+
+where the last inequality follows from the monotonicity of EN,L . Therefore, one may take 
+
+Cf † := ∥f †∥X1 + ENmin ,L min , which is independent of ( N, L ). 
+
+93.2 Expanding neural network regularization algorithms 
+
+We now formulate the expanding deep neural network (DNN) regularization algorithms for the ill-posed operator equation (1) . The central idea is to use the network architecture itself as the regularization mechanism, so that the structural complexity of the network plays the role of a regularization parameter. Instead of fixing the architecture a priori ,we consider a nested sequence of neural network classes with gradually increasing width and depth, and at each stage solve a regularized minimization problem over the current admissible class. A discrepancy-type stopping rule selects the final architecture in a noise-dependent manner, thereby determining a stable regularized reconstruction. For a given architecture pair ( N, L ) and an admissible parameter radius r, we define the regularized objective functional 
+
+JδN,L,r (ϕ) := ∥A(ϕ) − gδ ∥Y + βN,L R(ϕ). (5) The first term measures consistency with the noisy data, while the regularization term 
+
+R(ϕ) stabilizes the reconstruction. The balance is controlled by the weight βN,L , which should be tied to the approximation level of the corresponding network class. Based on the error profile EN,L from Assumption 1, we first define the extended algorithmic approximation scale 
+
+EN,L := 
+
+(ENmin ,L min , if N < N min or L < L min ,
+
+EN,L , if N ≥ Nmin and L ≥ Lmin . (6) We then define 
+
+βN,L := c0 EθN,L , (7) where c0 > 0 is fixed and θ ∈ (0 , 1] is the exponent from Assumption 3(iv). This truncated definition ensures that βN,L is well defined even when the algorithm visits architectures below the minimal approximation threshold. For such smaller architec-tures, EN,L is used only as a regularization scale, not as an approximation guarantee for N (N, L, ·). To describe the architectural expansion, we prescribe two nondecreasing and unbounded sequences {Nk}k≥1, {Lk}k≥1 ⊂ N+ to dictate the network width and depth at iteration k. After solving the corresponding regularized minimization problem, the algorithm evaluates a stopping criterion to decide whether a further expansion is needed. To guarantee finite termination for this expansion mechanism, we introduce a noise-dependent target approximation level Eδ and a corresponding target architecture (Ntar (δ), L tar (δ)). The guiding principle is to ensure that for a sufficiently large radius 
+
+r and N ≥ Nmin , L ≥ Lmin , there exists an approximant ϕ ∈ N (N, L, r ) such that the objective JδN,L,r (ϕ) falls below the threshold τ δ . For approximants ϕ satisfying 
+
+∥ϕ−f †∥X1 ≤ η, the local H¨ older continuity of A (Assumption 3(iv)), the approximation property (Assumption 1), the uniform regularizer bound on admissible approximants 10 (Assumption 4(iv)), and the triangle inequality yield: 
+
+JδN,L,r (ϕ) ≤ ∥ A(f †) − gδ ∥Y + ∥A(ϕ) − A(f †)∥Y + βN,L R(ϕ)
+
+≤ δ + LA∥ϕ − f †∥θ 
+
+> X1
+
++ c0Cf † EθN,L . (8) By requiring each of the two architecture-dependent bias terms in (8) to not exceed   
+
+> τ−12
+
+δ, we naturally derive the target error level: 
+
+Eδ := min 
+
+( τ − 12LA
+
+δ
+
+1/θ 
+
+,
+
+ τ − 12c0Cf †
+
+δ
+
+1/θ 
+
+, η 
+
+)
+
+. (9) We then select target budgets ( Ntar (δ), L tar (δ)) with Ntar (δ) ≥ Nmin and Ltar (δ) ≥
+
+Lmin such that 
+
+q0Eδ ≤ E Ntar (δ),L tar (δ) ≤ E δ (10) for some q0 ∈ (0 , 1]. Since Eδ ≤ η, every architecture dominating ( Ntar (δ), L tar (δ)) lies in the admissible regime required by the stopping rule and the local stability estimate. The target architecture ( Ntar (δ), L tar (δ)) introduced above plays distinct roles in the two cases. In Case I, it serves purely as an analytical tool for the termination proof and does not enter the algorithm explicitly. More precisely, in this setting the target architecture is understood through the constructive parameterization of the underlying approximation theorem with explicit radius bounds. In Case II, by contrast, (Ntar , L tar ) is used both in the theoretical analysis and as the explicit reference scale for the transition from Phase I to Phase II. 
+
+Case I (Explicit radius bound available). We first consider the situation where the underlying approximation theory provides an explicit, nondecreasing upper bound for the admissible parameter radius. Although this bound generally depends on several fixed problem-specific constants, we write it as rmax (N, L ) in order to emphasize its functional dependence on the network architecture. At the k-th expansion stage, with the architecture pair ( Nk, L k), we define the stage-specific radius rk := rmax (Nk, L k). The admissible class is restricted to N (Nk, L k, r k). The resulting approximation f δk is defined as a minimizer of the regularized objective (5) over this constrained class, namely 
+
+f δk ∈ argmin     
+
+> ϕ∈N (Nk,L k, r k)
+
+JδNk ,L k , r k (ϕ). (11) Since the approximation profile is meaningful only above the minimal architecture threshold and the local stability estimate requires the approximating error to lie within the η-neighborhood of f †, we allow the algorithm to stop only after these admissibility conditions are met. We evaluate 
+
+S1,δ k := ∥A(f δk ) − gδ ∥Y ,
+
+11 and use the stopping criterion 
+
+Nk ≥ Nmin , Lk ≥ Lmin , ENk ,L k ≤ η, S1,δ k ≤ τ δ. (12) Here the Morozov discrepancy test is still imposed purely on the data residual; the first three conditions are admissibility requirements for the theoretical error analysis. We denote by k(δ) the first iteration at which (12) is satisfied. The resulting reconstruction is then given by f δ := f δk(δ), with the selected architecture given by (Nk(δ), L k(δ)). The corresponding procedure is summarized in Algorithm 1. 
+
+Algorithm 1 Expanding DNN regularization under an explicit radius bound  
+
+> 1:
+
+Input: Expansion sequences {Nk}, {Lk}; explicit radius bound function rmax (N, L ); discrepancy parameter τ > 1; exponent θ ∈ (0 , 1]; local radius η > 0; constant 
+
+c0 > 0; noise level δ; noisy data gδ ; regularizer R; error profile EN,L . 
+
+> 2:
+
+Output: Reconstructed solution f δ , final architecture dimensions Nk(δ), Lk(δ),and stopping index k(δ).  
+
+> 3:
+
+k ← 0 
+
+> 4:
+
+repeat  
+
+> 5:
+
+k ← k + 1  
+
+> 6:
+
+rk ← rmax (Nk, L k) 
+
+> 7:
+
+βNk ,L k ← c0 EθNk ,L k 
+
+> 8:
+
+Compute a minimizer f δk via (11)  
+
+> 9:
+
+Evaluate the residual: S1,δ k ← ∥ A(f δk ) − gδ ∥Y 
+
+> 10:
+
+until Nk ≥ Nmin , Lk ≥ Lmin , ENk ,L k ≤ η, and S1,δ k ≤ τ δ  
+
+> 11:
+
+k(δ) ← k 
+
+> 12:
+
+f δ ← f δk(δ) 
+
+> 13:
+
+return f δ , N k(δ), L k(δ), k (δ)
+
+Case II (Explicit radius bound unavailable). We now turn to the more general scenario where no explicit upper bound for the admissible parameter radius is available 
+
+a priori . In this setting, expanding the network architecture alone is insufficient, since a restricted parameter radius may prevent the objective functional from reaching the stopping threshold τ δ , even if the structural capacity ( Nk, L k) is immense. To address this, we employ a two-phase strategy. Phase I simultaneously enlarges the architecture and an exploratory radius. If the stopping criterion is not met once the architecture reaches the theoretically sufficient scale ( Ntar (δ), L tar (δ)) defined above, Phase II freezes the architecture at this target scale and solely increases the radius to ensure termination. Because reaching ( Ntar (δ), L tar (δ)) already guarantees that the approximation error is well within the required theoretical bounds, any remaining obstruction to satisfying the stopping criterion at that stage is strictly attributed to an insufficient radius rather than to inadequate architectural capacity. 12 Phase I jointly expands the architecture and a prescribed exploratory radius sequence {rI
+
+> k
+
+}. At the k-th iteration, we introduce a secondary sub-iteration index 
+
+j = 0 to denote this base radius state, and compute the minimizer 
+
+f δk, 0 ∈ argmin     
+
+> ϕ∈N (Nk,L k, r I
+> k)
+
+JδNk ,L k , r I
+
+> k
+
+(ϕ). (13) We stop Phase I as soon as the objective S2,δ k, 0 := JδNk ,L k , r I
+
+> k
+
+(f δk, 0) satisfies S2,δ k, 0 ≤ τ δ . If this occurs, we set the stopping index j(δ) = 0. Otherwise, once Nk ≥ Ntar (δ) and 
+
+Lk ≥ Ltar (δ), we retain the current iteration index k and enter Phase II. In Phase II , the architecture is frozen at the target scale ( Ntar (δ), L tar (δ)), and the admissible radius is enlarged along an unbounded secondary sequence {rII  
+
+> j
+
+}j≥1
+
+with rII  
+
+> j
+
+↑ ∞ . At the j-th sub-iteration, we compute the minimizer 
+
+f δk,j ∈ argmin   
+
+> ϕ∈N (Ntar (δ),L tar (δ), r II
+> j)
+
+JδNtar ,L tar , r II 
+
+> j
+
+(ϕ). (14) We then evaluate the corresponding stopping quantity: S2,δ k,j := JδNtar (δ),L tar (δ), r II 
+
+> j
+
+ f δk,j 
+
+,and terminate Phase II at the first index j for which S2,δ k,j ≤ τ δ . This stopping index is denoted by j(δ), while k(δ) is inherited as the iteration index at which Phase I concluded. Since the architecture remains fixed throughout this phase, the final selected structural parameters are Nk(δ) = Ntar (δ) and Lk(δ) = Ltar (δ), and the final stable reconstruction is given by f δ := f δk(δ),j (δ).The complete procedure is summarized in Algorithm 2. 
+
+Remark 5 The target architecture ( Ntar (δ), L tar (δ)) is introduced as a theoretical device to rigorously guarantee finite termination. However, the resulting bounds for Ntar (δ) and 
+
+Ltar (δ) are typically extremely large and conservative due to the worst-case nature of the underlying approximation theory. In practice, the algorithm usually terminates in Phase I long before the network budgets approach this theoretical scale. For instance, in Example 1 with δ = 10 −4 and τ = 1 .6, the theoretical target architecture is already of extremely large magnitude. Depending on the concrete constants used in the estimate, one obtains values on the order of Ntar ∼ 10 8 and Ltar ∼ 10 7, which are far beyond practical computational limits. 
+
+Remark 6 (Computational efficiency via warm start) In the implementation of Algorithm 1 and Algorithm 2, we use a warm-start strategy between consecutive architecture levels. When passing from stage k to stage k + 1, the weights learned at stage k are embedded into the enlarged network and used to initialize the new optimization. This reduces the computational cost and improves the stability of the non-convex training process. 
+
+Remark 7 (Computational transition to Phase II) Although any unbounded sequence {rII  
+
+> j
+
+}
+
+guarantees eventual termination at the theoretical level, for computational efficiency it is natural to choose rII 1 ≥ rI 
+
+> ktr
+
+, where ktr denotes the iteration index at which Phase I terminates and Phase II is activated. This preserves a monotonically nested parameter domain, so that the network parameters obtained at the end of Phase I remain admissible in Phase II. Consequently, 
+
+13 Algorithm 2 Two-stage expanding DNN regularization without explicit radius bound  
+
+> 1:
+
+Input: Expansion sequences {Nk}, {Lk}; target architecture ( Ntar (δ), L tar (δ)); Phase I radii {rI
+
+> k
+
+}k≥1; Phase II radii {rII  
+
+> j
+
+}j≥1 with rII  
+
+> j
+
+↑ ∞ ; discrepancy parameter 
+
+τ > 1; exponent θ ∈ (0 , 1]; constant c0 > 0; noise level δ; noisy data gδ ; regularizer 
+
+R; error profile EN,L . 
+
+> 2:
+
+Phase I: joint expansion of architecture and parameter radius  
+
+> 3:
+
+k ← 0, j ← 0 
+
+> 4:
+
+repeat  
+
+> 5:
+
+k ← k + 1  
+
+> 6:
+
+βNk ,L k ← c0 EθNk ,L k 
+
+> 7:
+
+Compute the minimizer f δk, 0 via (13)  
+
+> 8:
+
+Evaluate the full objective: S2,δ k, 0 ← JδNk ,L k , r I
+
+> k
+
+(f δk, 0) 
+
+> 9:
+
+until S2,δ k, 0 ≤ τ δ or (Nk ≥ Ntar (δ) and Lk ≥ Ltar (δ))  
+
+> 10:
+
+if S2,δ k, 0 ≤ τ δ then  
+
+> 11:
+
+k(δ) ← k, j(δ) ← 0 
+
+> 12:
+
+f δ ← f δk(δ),0 
+
+> 13:
+
+else  
+
+> 14:
+
+Phase II: freeze architecture at (Ntar (δ), L tar (δ)) and enlarge radius  
+
+> 15:
+
+repeat  
+
+> 16:
+
+j ← j + 1  
+
+> 17:
+
+Compute the minimizer f δk,j via (14)  
+
+> 18:
+
+Evaluate the full objective: S2,δ k,j ← JδNtar (δ),L tar (δ), r II 
+
+> j
+
+(f δk,j ) 
+
+> 19:
+
+until S2,δ k,j ≤ τ δ  
+
+> 20:
+
+k(δ) ← k, j(δ) ← j 
+
+> 21:
+
+Nk(δ) ← Ntar (δ), L k(δ) ← Ltar (δ) 
+
+> 22:
+
+f δ ← f δk(δ),j (δ) 
+
+> 23:
+
+end if  
+
+> 24:
+
+return f δ , N k(δ), L k(δ), k (δ), j (δ)
+
+they can be used as a warm-start initialization for the subsequent non-convex optimization, which avoids restarting from an unrelated initialization and may improve computational efficiency in practice. 
+
+To establish finite termination and quantify the final architectural complexity across both algorithmic cases, we impose the following unifying structural conditions on the expansion schedules. 
+
+Assumption 5. (Expansion schedules) Let {Nk}k≥1 and {Lk}k≥1 be nondecreasing and unbounded sequences in N+. Assume that: (i) There exist constants CN , C L ≥ 1 such that Nk+1 ≤ CN Nk and Lk+1 ≤ CLLk for all k ≥ 1.
+
+14 (ii) Let k∗ 
+
+> N
+
+(δ) := min {k ∈ N+ : Nk ≥ Ntar (δ)} and k∗
+
+> L
+
+(δ) := min {k ∈ N+ : Lk ≥
+
+Ltar (δ)}, and define k∗(δ) := max {k∗ 
+
+> N
+
+(δ), k ∗
+
+> L
+
+(δ)}. Once one architectural component reaches its target level, it is kept fixed until the other component also reaches its target; that is, Nk = Nk∗  
+
+> N(δ)
+
+for all k ∈ [k∗ 
+
+> N
+
+(δ), k ∗(δ)] , and Lk = Lk∗ 
+
+> L(δ)
+
+for all 
+
+k ∈ [k∗
+
+> L
+
+(δ), k ∗(δ)] .(iii) There exists a constant qsc ∈ (0 , 1] such that ECN N, C LL ≥ qsc EN,L for all N, L ∈ N+.
+
+## 3.3 Convergence analysis of Algorithms 
+
+We now state the main theorem. 
+
+Theorem 3 Let f δ denote the approximate solution to the operator equation A(f ) = g
+
+generated by either Algorithm 1 or Algorithm 2. Under Assumptions 1-5, the following assertions hold: 
+
+(a) Existence. For every δ > 0, N, L ∈ N+, and every admissible radius r > 0, the regularized minimization problem 
+
+f δN,L,r ∈ argmin  
+
+> ϕ∈N (N,L,r )
+
+
+
+∥A(ϕ) − gδ ∥Y + βN,L R(ϕ)
+
+
+
+admits at least one minimizer. (b) Finite termination and architecture control. For every δ > 0, both Algorithm 1 and Algorithm 2 terminate after finitely many steps. In particular, the stopping index k(δ) of Algorithm 1 and the Phase I stopping index k(δ) of Algorithm 2 satisfy 
+
+k(δ) ≤ max k∗ 
+
+> N
+
+(δ), k ∗
+
+> L
+
+(δ) , where k∗ 
+
+> N
+
+(δ), k∗
+
+> L
+
+(δ) are the target reaching indices defined in Assumption 5(ii). Moreover, if Algorithm 2 enters Phase II, then the corresponding inflation index j(δ) is finite. The selected width and depth of both algorithms satisfy 
+
+N (δ) ≤ max N1, C N Ntar (δ) , L(δ) ≤ max L1, C LLtar (δ) , (15) 
+
+where N1 and L1 are fixed initial constants, and Ntar (δ), L tar (δ) are selected according to (10) .(c) Convergence. For every sequence δn ↓ 0, we have 
+
+f δn ⇀ f † in X1, A(f δn ) → g in Y as n → ∞ .
+
+If, in addition, there exists a Banach space X2 such that X1 is compactly embedded into X2, then 
+
+f δn → f † in X2 as n → ∞ .
+
+To make the architecture control in Theorem 3(b) explicit, we insert the target error level Eδ = O(δ1/θ ) into the approximation rates of Theorems 2 and 1. This yields the following asymptotic growth laws for the stopping architecture as δ → 0: 15 • H¨ older setting (Algorithm 1). Suppose that f † satisfies the assumptions of Theorem 1. The stopping depth and width satisfy 
+
+L(δ) = O (log(1 /δ )) , N (δ) = O
+
+
+
+δ− dαθ 
+
+
+
+δ → 0. (16) Taking X1 = Lp([0 , 1] d), we have f δ ⇀ f † in Lp([0 , 1] d) as δ → 0. 
+
+• Sobolev setting (Algorithm 2). Suppose that f † satisfies the assumptions of Theorem 2 for some integer s > 1. The stopping architecture satisfies 
+
+N (δ)L(δ) = O
+
+
+
+δ− d 
+
+> 2( s−1) θ
+
+| log δ|2
+
+δ → 0. (17) Taking X1 = W 1,p ([0 , 1] d), we obtain f δ ⇀ f † in W 1,p ([0 , 1] d) as δ → 0. In particular, by the compact embedding W 1,p ([0 , 1] d) ,→,→ Lp([0 , 1] d), it follows that f δ → f † in 
+
+Lp([0 , 1] d) as δ → 0. 
+
+Remark 8 These asymptotic bounds show that, as the noise level δ decreases, the stopping architecture must become richer. In the H¨ older setting, the dominant growth appears in the width, while the depth increases only logarithmically. In the Sobolev setting, the width-depth product exhibits polynomial growth in δ−1, up to logarithmic corrections. 
+
+We end this section by the proof of Theorem 3. 
+
+Proof (a) Existence. Fix δ > 0, architecture dimensions N, L ∈ N+, and an admissible search radius r > 0. Define 
+
+JδN,L,r (f ) := ∥A(f ) − gδ ∥Y + βN,L R(f ), f ∈ N (N, L, r ).
+
+Let v := inf f ∈N (N,L,r ) JδN,L,r (f ), and choose a minimizing sequence {fn} ⊂ N (N, L, r ) such that JδN,L,r (fn) → v as n → ∞ . By Assumption 4(iii), there exists f0 ∈ N (N, L, r ) such that R(f0) < ∞. Since A is well defined on N (N, L, r ) by Assumption 3(i), it follows that 
+
+JδN,L,r (f0) < ∞. Passing to a tail if necessary, we may assume JδN,L,r (fn) ≤ JδN,L,r (f0) + 1 for all n ∈ N. As the data fidelity term is nonnegative, this gives βN,L R(fn) ≤ JδN,L,r (fn) ≤
+
+JδN,L,r (f0) + 1, hence R(fn) ≤ β−1
+
+> N,L
+
+(JδN,L,r (f0) + 1) for all n ∈ N. By the coercivity of R,the sequence {fn} is bounded in X1.Since X1 is reflexive, there exist a subsequence, not relabeled, and an element f ∗ ∈ X 1
+
+such that fn ⇀ f ∗ in X1. Since {fn} ⊂ N (N, L, r ) and N (N, L, r ) is compact in X0 by Assumption 2(iii), there exist a further subsequence, again not relabeled, and some ˜f ∈ X 0
+
+such that fn → ˜f strongly in X0. The continuous embedding X1 ,→ X 0 implies that fn ⇀ f ∗
+
+also in X0. Since strong convergence in X0 implies weak convergence in X0, the uniqueness of weak limits gives ˜f = f ∗ in X0. Since N (N, L, r ) is compact, hence closed, in X0, we conclude that f ∗ ∈ N (N, L, r ). By Assumption 3(ii), since {fn} is bounded in X1 and fn ⇀ f ∗ in X1, we have A(fn) ⇀A(f ∗) in Y, and therefore A(fn) − gδ ⇀ A (f ∗) − gδ in Y. Since the norm is weakly lower semicontinuous, ∥A(f ∗) − gδ ∥Y ≤ lim inf n→∞ ∥A(fn) − gδ ∥Y . Moreover, by the weak lower semicontinuity of R, we have R(f ∗) ≤ lim inf n→∞ R(fn). Consequently, 
+
+JδN,L,r (f ∗) ≤ lim inf  
+
+> n→∞
+
+JδN,L,r (fn) = v. 
+
+16 Since f ∗ ∈ N (N, L, r ) and v is the infimum over N (N, L, r ), we also have v ≤ JδN,L,r (f ∗). Hence JδN,L,r (f ∗) = v, so f ∗ is a minimizer. This proves (a) .
+
+(b) Finite termination. Fix any δ > 0, and choose target budgets Ntar (δ) ≥
+
+Nmin , L tar (δ) ≥ Lmin such that q0 Eδ ≤ E Ntar (δ),L tar (δ) ≤ E δ . Since the sequences {Nk}k≥1
+
+and {Lk}k≥1 are nondecreasing and unbounded, the indices 
+
+k∗ 
+
+> N
+
+(δ) := min {k ∈ N+ : Nk ≥ Ntar (δ)}, k∗
+
+> L
+
+(δ) := min {k ∈ N+ : Lk ≥ Ltar (δ)}
+
+are well defined. Let k∗(δ) := max {k∗ 
+
+> N
+
+(δ), k ∗
+
+> L
+
+(δ)} and ( N , L ) := ( Nk∗(δ), L k∗(δ)). We first consider Algorithm 1. By the explicit-bounded approximation theorem underlying Case I, there exists ϕI ∈ N  Ntar (δ), L tar (δ), r max (Ntar (δ), L tar (δ))  such that ∥f † − ϕI∥X1 ≤ENtar (δ),L tar (δ) ≤ E δ and R(ϕI) ≤ Cf † . Since Eδ ≤ η, Assumption 3(iv) applies to ϕI.Moreover, by the monotonicity of rmax and the nestedness of the network classes, ϕI ∈N  N , L, r max (N , L ). Since N ≥ Nmin and L ≥ Lmin , the definition (7) gives βN ,L =
+
+c0EθN ,L = c0EθN ,L . Hence 
+
+JδN ,L,r max (N ,L )(ϕI) = ∥A(ϕI) − gδ ∥Y + βN ,L R(ϕI)
+
+≤ ∥ A(ϕI) − A(f †)∥Y + ∥g − gδ ∥Y + βN ,L R(ϕI)
+
+≤ LA∥ϕI − f †∥θ 
+
+> X1
+
++ δ + c0EθN ,L Cf †
+
+≤ LAEθδ + δ + c0Eθδ Cf † .
+
+By the definition of Eδ , we have LAEθδ ≤ τ −12 δ and c0Cf † Eθδ ≤ τ −12 δ, and therefore 
+
+JδN ,L,r max (N ,L )(ϕI) ≤ τ − 12 δ + δ + τ − 12 δ = τ δ. 
+
+Let f δ denote the minimizer computed by Algorithm 1 at iteration k∗(δ). Since the admissible class contains ϕI, the minimality of f δ implies 
+
+JδN ,L,r max (N ,L )(f δ ) ≤ JδN ,L,r max (N ,L )(ϕI) < τ δ. 
+
+Hence S1,δ k∗(δ) = ∥A(f δ ) − gδ ∥Y ≤ JδN ,L,r max (N ,L )(f δ ) < τ δ . Since Nk∗(δ) ≥ Ntar (δ) ≥ Nmin 
+
+and Lk∗(δ) ≥ Ltar (δ) ≥ Lmin , and ENk∗(δ),L k∗(δ) ≤ E Ntar (δ),L tar (δ) ≤ E δ ≤ η, all admissibility conditions in (12) are satisfied at iteration k∗(δ). Therefore Algorithm 1 terminates no later than iteration k∗(δ). We next consider Algorithm 2. By Assumption 1 and Assumption 4(iv), there exist a finite radius r∗ 
+
+> δ
+
+> 0 and an approximant ϕII ∈ N (Ntar (δ), L tar (δ), r ∗ 
+
+> δ
+
+) such that ∥f † − ϕII ∥X1 ≤ENtar (δ),L tar (δ) ≤ E δ and R(ϕII ) ≤ Cf † . Again, since Eδ ≤ η, Assumption 3(iv) applies to 
+
+ϕII . Because rII  
+
+> j
+
+↑ ∞ , there exists a finite index j∗ := min {j ∈ N+ : rII  
+
+> j
+
+≥ r∗ 
+
+> δ
+
+} such that 
+
+ϕII ∈ N (Ntar (δ), L tar (δ), r II  
+
+> j∗
+
+). Moreover, 
+
+JδNtar (δ),L tar (δ),r II  
+
+> j∗
+
+(ϕII ) = ∥A(ϕII ) − gδ ∥Y + βNtar (δ),L tar (δ)R(ϕII )
+
+≤ ∥ A(ϕII ) − A(f †)∥Y + ∥g − gδ ∥Y + βNtar (δ),L tar (δ)R(ϕII )
+
+≤ LA∥ϕII − f †∥θ 
+
+> X1
+
++ δ + c0EθNtar (δ),L tar (δ)Cf †
+
+≤ LAEθδ + δ + c0Eθδ Cf † < τ δ. 
+
+If Phase I already stops before or at iteration k∗(δ), then there is nothing to prove. Otherwise, by the definition of k∗(δ), Phase I reaches the target budget by iteration k∗(δ) and enters 
+
+17 Phase II. At the inflation index j∗, the approximant ϕII is admissible for the Phase II minimization problem, so the minimizer f δ computed at ( k∗(δ), j ∗) satisfies 
+
+S2,δ k∗(δ),j ∗ = JδNtar (δ),L tar (δ),r II  
+
+> j∗
+
+(f δ ) ≤ JδNtar ,L tar ,r II  
+
+> j∗
+
+(ϕII ) < τ δ. 
+
+Hence Phase II terminates after finitely many inflation steps. In particular, k(δ) ≤ k∗(δ) = max {k∗ 
+
+> N
+
+(δ), k ∗
+
+> L
+
+(δ)}.It remains to prove the complexity bounds. For the width sequence, if k∗ 
+
+> N
+
+(δ) = 1, then Nk∗  
+
+> N(δ)
+
+= N1; if k∗ 
+
+> N
+
+(δ) > 1, then the minimality of k∗ 
+
+> N
+
+(δ) implies Nk∗  
+
+> N(δ)−1
+
+<Ntar (δ), and Assumption 5(i) yields Nk∗  
+
+> N(δ)
+
+≤ CN Nk∗  
+
+> N(δ)−1
+
+< CN Ntar (δ). Hence 
+
+Nk∗  
+
+> N(δ)
+
+≤ max {N1, C N Ntar (δ)}. Similarly, Lk∗ 
+
+> L(δ)
+
+≤ max {L1, C LLtar (δ)}. For Algorithm 1, Assumption 5(ii) yields Nk∗(δ) = Nk∗  
+
+> N(δ)
+
+and Lk∗(δ) = Lk∗
+
+> L(δ)
+
+. Thus, 
+
+N (δ) ≤ Nk∗(δ) = Nk∗  
+
+> N(δ)
+
+≤ max {N1, C N Ntar (δ)},
+
+and 
+
+L(δ) ≤ Lk∗(δ) = Lk∗ 
+
+> L(δ)
+
+≤ max {L1, C LLtar (δ)}.
+
+For Algorithm 2, if Phase I terminates, then k(δ) ≤ k∗(δ) and the monotonicity of the sequences gives N (δ) = Nk(δ) ≤ Nk∗(δ) and L(δ) = Lk(δ) ≤ Lk∗(δ), so the same bounds follow. If Phase II is activated, then by construction the architecture is frozen at ( Ntar , L tar ), hence the above bounds also hold. This completes the proof of (b) .
+
+(c) Convergence. Let δ ↓ 0, and let f δ be the corresponding outputs of either algorithm with final indices ( Nδ , L δ ). We first derive a uniform bound for R(f δ ). For Algorithm 1, by the stopping criterion (12) , the final architecture satisfies Nδ ≥
+
+Nmin , L δ ≥ Lmin and ENδ ,L δ ≤ η. Hence the approximation property in Assumption 1 is applicable at the final architecture. Together with Assumption 4(iv), this yields an approximant 
+
+ϕδ ∈ N  Nδ , L δ , r max (Nδ , L δ ) such that ∥f † −ϕδ ∥X1 ≤ E Nδ ,L δ ≤ η, and R(ϕδ ) ≤ Cf † . Hence Assumption 3(iv) applies to ϕδ . Denote βδ = c0 EθNδ ,L δ . Since Nδ ≥ Nmin and Lδ ≥ Lmin ,the definition (6) gives that βδ = c0EθNδ ,L δ . By the optimality of f δ , we obtain 
+
+∥A(f δ ) − gδ ∥Y + βδ R(f δ ) ≤ ∥ A(ϕδ ) − gδ ∥Y + βδ R(ϕδ ).
+
+Discarding the nonnegative residual term on the left-hand side and using the local H¨ older continuity of A, we obtain 
+
+R(f δ ) ≤ ∥A(ϕδ ) − gδ ∥Y
+
+βδ
+
++ R(ϕδ ) ≤ ∥A(ϕδ ) − A(f †)∥Y + ∥g − gδ ∥Y
+
+c0EθNδ ,L δ
+
++ Cf †
+
+≤ LA∥f † − ϕδ ∥θ 
+
+> X1
+
++ δc0EθNδ ,L δ
+
++ Cf † ≤ LA
+
+c0
+
++ δc0EθNδ ,L δ
+
++ Cf † .
+
+By the complexity bounds established in (b) , for sufficiently small δ, we have Nδ ≤ CN Ntar (δ)and Lδ ≤ CLLtar (δ). Since EN,L is nonincreasing in each argument, Assumption 5(iii) and the target choice q0Eδ ≤ E Ntar (δ),L tar (δ) ≤ E δ give 
+
+ENδ ,L δ ≥ E CN Ntar (δ), C LLtar (δ) ≥ qsc ENtar (δ),L tar (δ) ≥ qsc q0Eδ .
+
+Therefore δ
+
+> EθNδ ,L δ
+
+≤ δ 
+
+> (qsc q0)θEθδ
+
+, which is uniformly bounded by the definition of Eδ . Thus 
+
+R(f δ ) is uniformly bounded for Algorithm 1. For Algorithm 2, the stopping rule gives Jδ (f δ ) ≤ τ δ , hence βδ R(f δ ) ≤ τ δ . Since 
+
+βδ = c0EθNδ ,L δ , and using the same lower bound derived above, we have 
+
+R(f δ ) ≤ τ δ c0EθNδ ,L δ
+
+≤ τ δ c0(qsc q0)θ Eθδ
+
+.
+
+18 Since δ/ Eθδ is uniformly bounded, R(f δ ) is uniformly bounded in both cases. Now let δn ↓ 0. Since R(f δn ) is uniformly bounded and R is coercive, the sequence {f δn }
+
+is bounded in X1. By reflexivity, there exist a subsequence, not relabeled, and an element 
+
+f ∗ ∈ X 1 such that f δn ⇀ f ∗ in X1. By Assumption 3(ii), we have A(f δn ) ⇀ A (f ∗) in Y.For Algorithm 1, the stopping rule yields ∥A(f δn ) − gδn ∥Y ≤ τ δ n. For Algorithm 2, since 
+
+∥A(f δn ) − gδn ∥Y ≤ Jδn (f δn ) ≤ τ δ n, the same estimate holds. Therefore, in either case, 
+
+∥A(f δn ) − g∥Y ≤ ∥ A(f δn ) − gδn ∥Y + ∥gδn − g∥Y ≤ (τ + 1) δn → 0.
+
+Hence A(f δn ) → g strongly in Y. Since strong convergence implies weak convergence, the uniqueness of weak limits yields A(f ∗) = g = A(f †). By Assumption 3(iii), the equation 
+
+A(f ) = g admits the unique solution f † in X1. Hence f ∗ = f †. Since the above argument applies to every subsequence of {f δn }, every subsequence admits a further subsequence converging weakly to f † in X1. By the standard subsequence criterion, the whole sequence 
+
+{f δn } converges weakly to f † in X1.Finally, suppose that X1 is compactly embedded into a Banach space X2. Then the bounded sequence {f δn } admits a further subsequence, again not relabeled, such that f δn → ˜f
+
+in X2 for some ˜f ∈ X 2. Since the embedding X1 ,→ X 2 is continuous, the weak convergence in X1 implies weak convergence in X2, so f δn ⇀ f † in X2. Since strong convergence implies weak convergence and weak limits are unique in X2, we obtain ˜f = f †. Therefore, every subsequence of {f δn } has a further subsequence converging strongly to f † in X2. This implies the strong convergence of the whole sequence. Indeed, otherwise there would exist ε > 0 and a subsequence such that 
+
+∥f δn − f †∥X2 ≥ ε for all n, 
+
+which contradicts the existence of a further subsequence converging strongly to f † in X2.Hence f δn → f † strongly in X2.
+
+□
+
+# 4 Experimental results 
+
+In this section, we present numerical experiments on three classical ill-posed inverse problems to empirically validate the proposed expanding deep neural network schemes (Algorithms 1 and 2). Specifically, these experiments are designed to illustrate the regularization properties and convergence results established in Theorem 3, and to demonstrate that the discrepancy principle serves as an effective stopping criterion for yielding accurate, noise-robust reconstructions. In all examples, the noisy data gδ are generated by adding random noise to the exact data g such that ∥gδ − g∥Y ≤ δ. To instantiate the theoretical framework, we adopt the canonical regularizer R(f ) := ∥f ∥X1
+
+as discussed in Remark 4. A crucial practical observation regarding Algorithm 2 is that, although it incorpo-rates a two-stage mechanism to ensure finite termination theoretically, the discrepancy criterion S2,δ k, 0 ≤ τ δ is consistently met during Phase I in our experiments. This occurs because the practical expressivity of deep neural networks significantly surpasses the worst-case approximation bounds ( Ntar , L tar ) derived in Theorem 2. Consequently, the expanding architecture combined with a heuristically increasing radius rI 
+
+> k
+
+provides sufficient capacity to capture the regularized solution within the noise tolerance. Since Phase II is never triggered in practice, we exclusively report the architectural evolution and results from Phase I. 19 All numerical experiments are implemented in Python using the PyTorch frame-work and executed on a workstation with two NVIDIA L40 GPUs. The source code is publicly available at https://github.com/z1998w/DNNip2. To ensure an unbiased algorithmic comparison, we employ a unified ReLU network expansion schedule: width 
+
+Nk = max {4d, 2kd + 1 } and depth Lk = 2 k + 3. This schedule is directly motivated by the H¨ older approximation in Theorem 1, and is therefore particularly natural for Algorithm 1. For Algorithm 2, although this choice is not tied to its underlying approximation theorem, it still provides a valid monotone and unbounded architec-ture expansion path. We adopt this same schedule in the experiments to place both algorithms on an identical architectural scale and thereby enable a fair comparison of their stopping behavior and reconstruction performance. While the architecture sched-ule is unified, the parameter restrictions are matched to their respective theoretical frameworks. Specifically, Algorithm 1 enforces the theoretical explicit radius bound 
+
+rk = 2( kd ∨ ∥ f †∥∞)2 k(d∨(pα )) . In contrast, Phase I of Algorithm 2 utilizes a heuristic linearly growing exploratory radius rI 
+
+> k
+
+= 1000 k. Finally, to prevent severe gradient instability and prohibitive computational costs, we restrict the maximum expansion index to k = 5. 
+
+Table 2 : Problem-specific hyperparameters and discretization sizes. Hyphens (-) indicate that the corresponding parameter is not applicable because Algorithm 1 lacks an explicit radius bound for Example 3.                                       
+
+> Settings Example 1 Example 2 Example 3 Algorithm 1 c00.02 0.024 -
+> τ1.61.02 -Algorithm 2 c010 −810 −88×10 −7
+> τ1.05 1.21.2Grid Mtrain 100 ×100 100 ×100 50 ×50
+> Mtest 200 ×200 200 ×200 100 ×100
+
+During the optimization process, networks are trained using full-batch gradient descent with a maximum of 50,000 epochs per expansion stage. We utilize the Adam optimizer (seed 2026) with an initial learning rate of 10 −3, paired with a ReduceLROn-Plateau scheduler that halves the learning rate upon 2000 epochs of stagnation (down to a minimum of 10 −6). For evaluation, the domain Ω is discretized into a uniform training grid Xtrain =
+
+{xj }Mtrain  
+
+> j=1
+
+for network fitting, and an independent test grid Xtest = {zi}Mtest  
+
+> i=1
+
+for error assessment. The reconstruction accuracy is measured via the relative discrete L2 error: 
+
+ef := ∥f δ − f †∥L2(Xtest )
+
+∥f †∥L2(Xtest )
+
+=
+
+PMtest  
+
+> i=1
+
+f δ (zi) − f †(zi) 2
+
+PMtest  
+
+> i=1
+
+f †(zi) 2
+
+!1/2
+
+.
+
+20 The problem-specific hyperparameters and grid configurations for the three examples are summarized in Table 2. 1 2 3 4 5                         
+
+> Iteration Stage ( k)
+> 0.02
+> 0.05
+> 0.1
+> 0.2
+> 0.5
+> 1
+> Error  ef
+> 12345
+> Iteration Stage ( k)
+> 10 4
+> 10 3
+> 10 2
+> 3 × 10 2
+> Data residual  S1,
+> k
+> 12345
+> Iteration Stage ( k)
+> 0.02
+> 0.05
+> 0.1
+> 0.2
+> 0.5
+> 1
+> 2
+> 5
+> Error  ef
+> 12345
+> Iteration Stage ( k)
+> 10 4
+> 10 3
+> 10 2
+> 3 × 10 2
+> Total objective  S2,
+> k, 0
+> = 10 4
+> = 10 3
+> = 5 × 10 3
+> = 1.5 × 10 2
+> = 3 × 10 2
+> Stopping point
+
+Fig. 1 : Example 1: Evolution of the relative test error ef (left) and the stopping criterion value (right) for Algorithm 1 ( S1,δ k ) and Algorithm 2 ( S2,δ k, 0) under different noise levels δ. Stars indicate the first iteration at which the stopping criterion is satisfied. 
+
+Example 1 (Fredholm Integral Equation / Deconvolution) We consider a two-dimensional Fredholm integral equation of the first kind on the unit square Ω = [0 , 1] 2, corresponding to a Gaussian deconvolution problem. The forward operator is given by 
+
+A(f )( x) = 
+
+Z
+
+> Ω
+
+κ(x, y)f (y) dy = g(x),
+
+where κ(x, y) = 12πℓ 21
+
+exp 
+
+
+
+− |x−y|2
+
+> 2ℓ21
+
+
+
+with ℓ1 = 0.1. The exact solution is chosen as 
+
+f †(x1, x 2) = 0 .1 sin( πx 1) sin( πx 2). 
+
+Verification for Algorithm 1 
+
+We set X1 = XA = Y = L2(Ω). Since f † is smooth, it satisfies the Lipschitz condition required by Theorem 1 with α = 1, and hence Assumption 1 holds. Assumption 2 is satisfied by setting X0 = H−1(Ω). For Assumption 3, condition (i) follows immediately from X1 = XA = L2(Ω). Moreover, A is a bounded linear operator on L2(Ω) by Young’s 21 inequality. Therefore, condition (ii) holds by sequential weak-to-weak continuity of bounded linear operators, and condition (iv) holds with θ = 1. Finally, condition (iii) follows from the injectivity induced by the strict positive definiteness of the Gaussian kernel. 0.0 0.5 1.0 
+
+> x1
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> x2
+
+f  
+
+> 0.0 0.5 1.0
+> x1
+
+f δ  
+
+> 0.0 0.5 1.0
+> x1
+
+f δ  
+
+> final
+> 0.0 0.5 1.0
+> x1
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> x2
+
+f δ  
+
+> 0.0 0.5 1.0
+> x1
+
+f δ
+
+> final
+> -0.07
+> -0.02
+> 0.03
+> 0.08
+> 0.13
+
+Fig. 2 : Example 1: True solution f † and the corresponding reconstructions f δ and 
+
+f δ 
+
+> final
+
+obtained by Algorithm 1 (first row) and Algorithm 2 (second row) for δ = 0 .0001. Here, f δ 
+
+> final
+
+denotes the reconstruction at the final expansion stage ( k = 5). 
+
+Verification for Algorithm 2 
+
+We set X1 = H1(Ω), and XA = Y = L2(Ω). By Theorem 2 with s = 2 and p = 2, Assumption 1 holds for the present example. Assumption 2 is satisfied by setting 
+
+X0 = L2(Ω). For Assumption 3, well-definedness follows from the continuous embedding 
+
+H1(Ω) ,→ L2(Ω), and injectivity is inherited from the L2-setting. Furthermore, the compact embedding H1(Ω) ,→,→ L2(Ω) implies that weak convergence in H1(Ω) yields strong convergence in L2(Ω), and hence the required weak-to-weak continuity. Finally, let ∥A∥op denote the operator norm of A on L2(Ω) and Cemb denote the embedding constant of H1(Ω) ,→ L2(Ω). Using the boundedness of A together with this continuous embedding, we obtain 
+
+∥A(f ) − A(f †)∥L2(Ω) ≤ ∥ A∥op ∥f − f †∥L2(Ω) ≤ ∥ A∥op Cemb ∥f − f †∥H1(Ω) .
+
+This verifies Assumption 3(iv) with θ = 1 and the corresponding constant LA =
+
+∥A∥op Cemb .22 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.138 
+
+0.109 
+
+0.031 
+
+0.032 
+
+0.046 
+
+0.03 
+
+0.07 
+
+0.10 
+
+0.14 
+
+> Error
+
+(a) δ = 0 .0001 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.071 
+
+0.054 
+
+0.043 
+
+0.039 
+
+0.046 
+
+0.04 
+
+0.05 
+
+0.06 
+
+0.07  
+
+> Error
+
+(b) δ = 0 .001 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.279 
+
+0.198 
+
+0.061 
+
+0.043 
+
+0.053 
+
+0.04 
+
+0.12 
+
+0.20 
+
+0.28 
+
+> Error
+
+(c) δ = 0 .005 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.746 
+
+0.454 
+
+0.282 
+
+0.140 
+
+0.077 
+
+0.08 
+
+0.30 
+
+0.52 
+
+0.75  
+
+> Error
+
+(d) δ = 0 .03 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.150 
+
+0.116 
+
+0.027 
+
+0.037 
+
+0.045 
+
+0.03 
+
+0.07 
+
+0.11 
+
+0.15 
+
+> Error
+
+(e) δ = 0 .0001 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.167 
+
+0.040 
+
+0.027 
+
+0.038 
+
+0.045 
+
+0.03 
+
+0.07 
+
+0.12 
+
+0.17  
+
+> Error
+
+(f) δ = 0 .001 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.618 
+
+0.336 
+
+0.051 
+
+0.039 
+
+0.053 
+
+0.04 
+
+0.23 
+
+0.42 
+
+0.62 
+
+> Error
+
+(g) δ = 0 .005 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+4.062 
+
+2.186 
+
+0.395 
+
+0.132 
+
+0.080 
+
+0.08 
+
+1.41 
+
+2.73 
+
+4.06  
+
+> Error
+
+(h) δ = 0 .03 
+
+Fig. 3 : Example 1: Relative L2 error ef of the predicted f obtained by Algorithm 1 (first row) and Algorithm 2 (second row) for different network architectures ( L layers, 
+
+N neurons). Each column corresponds to a different noise level δ in the data g. The red box marks the first architecture for which the stopping criterion is satisfied. 23 Example 2 (Backward Heat Conduction) We consider the backward heat conduction problem on the unit square Ω = [0 , 1] 2 governed by 
+
+
+
+∂tu − ∆u = 0 , (x, t ) ∈ Ω × (0 , T ],u = 0 , (x, t ) ∈ ∂Ω × [0 , T ],u(x, 0) = f (x), x ∈ Ω.
+
+(18) The forward operator is the solution map at final time T = 0 .01, given by A(f ) := u(·, T ) = 
+
+g, where g denotes the final temperature distribution. We choose the exact solution as 
+
+f †(x1, x 2) = 0 .4 x1(1 − x1)x2(1 − x2). 
+
+Verification for Algorithm 1 
+
+As in Example 1, we set X1 = XA = Y = L2(Ω) and X0 = H−1(Ω). Assumptions 1 and 2 are verified exactly as in Example 1. For Assumption 3, condition (i) follows immediately from X1 = XA = L2(Ω). Moreover, the heat solution operator is bounded and linear on L2(Ω) by the standard energy estimate; therefore, condition (ii) holds by sequential weak-to-weak continuity of bounded linear operators, and condition (iv) holds with θ = 1. Finally, condition (iii) follows from the classical backward uniqueness of the heat equation. 1 2 3 4 5                           
+
+> Iteration Stage ( k)
+> 0.05
+> 0.1
+> 0.2
+> 0.5
+> 1
+> Error  ef
+> 12345
+> Iteration Stage ( k)
+> 10 5
+> 10 4
+> 5 × 10 4
+> 10 3
+> 5 × 10 3
+> Data residual  S1,
+> k
+> 12345
+> Iteration Stage ( k)
+> 0.05
+> 0.1
+> 0.2
+> 0.5
+> 1
+> 2
+> Error  ef
+> 12345
+> Iteration Stage ( k)
+> 10 5
+> 10 4
+> 5 × 10 4
+> 10 3
+> 5 × 10 3
+> Total objective  S2,
+> k, 0
+> = 2 × 10 5
+> = 5 × 10 4
+> = 2 × 10 3
+> = 3 × 10 3
+> = 6 × 10 3
+> Stopping point
+
+Fig. 4 : Example 2: Evolution of the relative test error ef (left) and the stopping criterion value (right) for Algorithm 1 ( S1,δ k ) and Algorithm 2 ( S2,δ k, 0) under different noise levels δ. Stars indicate the first iteration at which the stopping criterion is satisfied. 24 0.00 0.25 0.50 0.75 1.00 
+
+x1
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> x2
+
+f    
+
+> 0.00 0.25 0.50 0.75 1.00
+
+x1
+
+f δ    
+
+> 0.00 0.25 0.50 0.75 1.00
+
+x1
+
+f δ    
+
+> final
+> 0.00 0.25 0.50 0.75 1.00
+
+x1
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> x2
+
+f δ    
+
+> 0.00 0.25 0.50 0.75 1.00
+
+x1
+
+f δ
+
+> final
+> -0.02
+> -0.00
+> 0.01
+> 0.02
+
+Fig. 5 : Example 2: True solution f † and the corresponding reconstructions f δ and 
+
+f δ 
+
+> final
+
+obtained by Algorithm 1 (first row) and Algorithm 2 (second row) for δ = 0 .00002. Here, f δ 
+
+> final
+
+denotes the reconstruction at the final expansion stage ( k = 5). 
+
+Verification for Algorithm 2 
+
+Similarly, by setting X1 = H1(Ω), X0 = L2(Ω), and XA = Y = L2(Ω), Assumptions 1, 2, and 3 are verified exactly as in Example 1. 
+
+Example 3 (Electrical Impedance Tomography) We consider the non-linear parameter identi-fication problem for electrical impedance tomography (EIT) on the unit square Ω = [0 , 1] 2.The governing conductivity equation is 
+
+∇ ·  f (x)∇u(x) = 0 , x ∈ Ω, (19) where f (x) denotes the electrical conductivity and u(x) the electrical potential. For a prescribed boundary voltage h, the potential satisfies the Dirichlet condition u|∂Ω = h, and the induced boundary current is given by f ∂ ν u|∂Ω, where ν is the unit outward normal vector. The corresponding forward operator is the Dirichlet-to-Neumann (DN) map Λ f : h 7 → f ∂ ν u|∂Ω.Accordingly, the classical Calder´ on problem of recovering the conductivity from boundary measurements can be formulated as the non-linear operator equation A(f ) = g, where 
+
+A(f ) := Λ f and g denotes the measured DN data. To ensure uniform ellipticity of (19) ,the conductivity is required to satisfy f (x) ≥ c > 0. We choose the exact conductivity 
+
+f †(x1, x 2) = 0 .1 + 0 .1 sin( πx 1) sin( πx 2), which satisfies f † ≥ 0.1 on Ω. 
+
+25 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.360 
+
+0.215 
+
+0.083 
+
+0.075 
+
+0.132 
+
+0.07 
+
+0.17 
+
+0.26 
+
+0.36 
+
+> Error
+
+(a) δ = 0 .00002 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.151 
+
+0.108 
+
+0.072 
+
+0.088 
+
+0.111 
+
+0.07 
+
+0.10 
+
+0.12 
+
+0.15  
+
+> Error
+
+(b) δ = 0 .0005 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.223 
+
+0.171 
+
+0.083 
+
+0.072 
+
+0.107 
+
+0.07 
+
+0.12 
+
+0.17 
+
+0.22 
+
+> Error
+
+(c) δ = 0 .002 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.366 
+
+0.274 
+
+0.157 
+
+0.111 
+
+0.122 
+
+0.11 
+
+0.20 
+
+0.28 
+
+0.37  
+
+> Error
+
+(d) δ = 0 .003 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.141 
+
+0.102 
+
+0.083 
+
+0.077 
+
+0.103 
+
+0.08 
+
+0.10 
+
+0.12 
+
+0.14 
+
+> Error
+
+(e) δ = 0 .00002 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.221 
+
+0.165 
+
+0.086 
+
+0.072 
+
+0.096 
+
+0.07 
+
+0.12 
+
+0.17 
+
+0.22  
+
+> Error
+
+(f) δ = 0 .0005 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.271 
+
+0.221 
+
+0.092 
+
+0.088 
+
+0.103 
+
+0.09 
+
+0.15 
+
+0.21 
+
+0.27 
+
+> Error
+
+(g) δ = 0 .002 8 17 65 257 1025 
+
+Width ( N)
+
+13 
+
+11 
+
+9
+
+7
+
+5
+
+> Depth ( L)
+
+0.287 
+
+0.175 
+
+0.125 
+
+0.156 
+
+0.167 
+
+0.12 
+
+0.18 
+
+0.23 
+
+0.29  
+
+> Error
+
+(h) δ = 0 .003 
+
+Fig. 6 : Example 2: Relative L2 error ef of the predicted f obtained by Algorithm 1 (first row) and Algorithm 2 (second row) for different network architectures ( L layers, 
+
+N neurons). Each column corresponds to a different noise level δ in the data g. The red box marks the first architecture for which the stopping criterion is satisfied. 26 In the numerical implementation, the full DN map is approximated by finitely many boundary excitations and the corresponding Neumann measurements. We apply voltage patterns to one side of ∂Ω at a time and ground the remaining three sides. Writing Γ bottom =
+
+{x2 = 0 }, Γ top = {x2 = 1 }, Γ left = {x1 = 0 }, and Γ right = {x1 = 1 }, for each side 
+
+γ ∈ { Γbottom , Γtop , Γleft , Γright } and each frequency index ω ∈ { 1, 2}, we define 
+
+h(ω,γ )(x) = 
+
+
+
+sin( ωπx 1), if x ∈ γ and γ ∈ { Γbottom , Γtop },
+
+sin( ωπx 2), if x ∈ γ and γ ∈ { Γleft , Γright },
+
+0, otherwise on ∂Ω \ γ. 
+
+(20) This choice preserves continuity at the corner points and yields 4 × 2 = 8 boundary measurements. 1 2 3 4 5
+
+Iteration Stage ( k)    
+
+> 0.01
+> 0.05
+> 0.1
+> 0.5
+> 1
+> 2
+> Error  ef
+> 12345
+
+Iteration Stage ( k)        
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> Total objective  S2,
+> k, 0
+> = 10 3
+> = 2 × 10 2
+> = 10 1
+> = 2 × 10 1
+> = 3.5 × 10 1
+> Stopping point
+
+Fig. 7 : Example 3: Evolution of the relative test error ef (left) and the stopping criterion value (right) for Algorithm 2 ( S2,δ k, 0) under different noise levels δ. Stars indicate the first iteration at which the stopping criterion is satisfied. Algorithm 1 is not considered in this example, since the Lp-based approximation framework in Theorem 1 does not provide a natural regularization space continuously embedded into L∞(Ω), which is needed to preserve the positivity condition f ≥ c > 0. 
+
+Verification for Algorithm 2 (unknown bound) 
+
+We set X1 = W 1,3(Ω), X0 = L3(Ω), XA = L∞(Ω), and Y = L(H1/2(∂Ω) , H −1/2(∂Ω)). By Theorem 2 with s = 2 and p = 3, Assumption 1 holds for the present example. Assumption 2 is satisfied by choosing X0 = L3(Ω). Since W 1,3(Ω) ,→ L∞(Ω) contin-uously, conductivities sufficiently close to f † in W 1,3(Ω) remain uniformly positive, because f † ≥ 0.1 on Ω. Thus the DN map is well defined on a sufficiently small admissible neighborhood of f †, which verifies Assumption 3(i). Moreover, the compact embedding W 1,3(Ω) ,→,→ L∞(Ω) implies that weak convergence in W 1,3(Ω) yields 27 strong convergence in L∞(Ω). Together with the local Lipschitz continuity of the DN map with respect to the L∞-norm on uniformly elliptic conductivities, this gives Assumption 3(ii). Finally, let CA > 0 denote the local Lipschitz constant of the forward map in L∞(Ω), and let Cemb denote the embedding constant of W 1,3(Ω) ,→ L∞(Ω). Then, for f sufficiently close to f †, we have 
+
+∥A(f ) − A(f †)∥Y ≤ CA∥f − f †∥L∞(Ω) ≤ CACemb ∥f − f †∥W 1,3(Ω) .
+
+Hence Assumption 3(iv) holds with θ = 1 and LA = CACemb . The uniqueness condition in Assumption 3(iii) follows from the classical uniqueness result for the Calder´ on problem in two dimensions. 0.00 0.25 0.50 0.75 1.00 
+
+x1
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> x2
+
+f    
+
+> 0.00 0.25 0.50 0.75 1.00
+
+x1
+
+f δ    
+
+> 0.00 0.25 0.50 0.75 1.00
+
+x1
+
+f δ
+
+> final
+> 0.10
+> 0.13
+> 0.17
+> 0.20
+
+Fig. 8 : Example 3: True solution f † and the corresponding reconstructions f δ and 
+
+f δ 
+
+> final
+
+obtained by Algorithm 1 (first row) and Algorithm 2 (second row) for δ = 0 .001. Here, f δ 
+
+> final
+
+denotes the reconstruction at the final expansion stage ( k = 5). We evaluate Algorithm 1 and Algorithm 2 under various noise levels δ. Although the absolute noise bounds δ may appear small, the corresponding relative noise levels 
+
+∥gδ − g∥Y /∥g∥Y can still be substantial relative to the norm of the exact data g.The chosen δ-values therefore span a broad range of noise regimes. In Example 1, 
+
+δ ∈ [10 −4, 3 × 10 −2] gives relative noise levels from 0 .22% to 50%. The corresponding ranges are 0 .14% to 50% in Example 2, with δ ∈ [2 × 10 −5, 6 × 10 −3], and 0 .14% to 50% in Example 3, with δ ∈ [10 −3, 0.35]. To validate the theoretical guarantees in Theorem 3, we examine the algorithms from four perspectives. Although the stopping criterion may already be satisfied at an earlier stage, in all experiments we still run the full five-stage expansion process so as to show the complete evolution of the algorithms and to provide a more comprehensive demonstration of their effectiveness. Specifically, we report: (i) the trajectories of errors and stopping quantities to verify finite termination; (ii) architecture heatmaps to reveal noise-dependent structural adaptation; (iii) visual reconstructions to demonstrate effective noise suppression; and (iv) empirical convergence rates as δ → 0. 28 8 17 65 257 1025 
+
+> Width ( N)
+> 13
+> 11
+> 9
+> 7
+> 5
+> Depth ( L)
+> 0.061
+> 0.026
+> 0.017
+> 0.020
+> 0.032
+> 0.02
+> 0.03
+> 0.05
+> 0.06
+> Error
+
+(a) δ = 0 .001 8 17 65 257 1025  
+
+> Width ( N)
+> 13
+> 11
+> 9
+> 7
+> 5
+> Depth ( L)
+> 0.585
+> 0.379
+> 0.079
+> 0.025
+> 0.092
+> 0.02
+> 0.21
+> 0.40
+> 0.59
+> Error
+
+(b) δ = 0 .02 8 17 65 257 1025 
+
+> Width ( N)
+> 13
+> 11
+> 9
+> 7
+> 5
+> Depth ( L)
+> 1.786
+> 0.548
+> 0.172
+> 0.145
+> 0.138
+> 0.14
+> 0.69
+> 1.24
+> 1.79
+> Error
+
+(c) δ = 0 .28 17 65 257 1025  
+
+> Width ( N)
+> 13
+> 11
+> 9
+> 7
+> 5
+> Depth ( L)
+> 0.490
+> 0.483
+> 0.163
+> 0.119
+> 0.142
+> 0.12
+> 0.24
+> 0.37
+> 0.49
+> Error
+
+(d) δ = 0 .35 
+
+Fig. 9 : Example 3: Relative L2 error ef of the predicted f obtained by Algorithm 2 for different network architectures ( L layers, N neurons). Each column corresponds to a different noise level δ in the data g. The red box marks the first architecture for which the stopping criterion is satisfied. We first examine the finite termination property and the noise-dependent archi-tecture complexity predicted by Theorem 3(b). The trajectory plots (Figs. 1, 4, 7) display the relative test error ef together with the discrepancy-based stopping quanti-ties S1,δ k and S2,δ k, 0. In all three examples, these quantities decrease overall and cross the discrepancy threshold after finitely many steps, confirming the stopping behav-ior of the proposed schemes. At the same time, the error curves exhibit the classical semi-convergence phenomenon of ill-posed inverse problems: for low to moderate noise levels, the error typically decreases at first and then increases once the architecture becomes overly rich, while for heavily contaminated data it may increase from the first iteration stage. This behavior highlights the necessity of early stopping. The same overfitting phenomenon is visible in both the reconstructions (Figs. 2, 5, 8) and the architecture heatmaps (Figs. 3, 6, 9). Reconstructions selected by the discrepancy principle preserve the main structural features, whereas over-expanded models develop pronounced spurious oscillations. In the heatmaps, the upper-right region is dominated by yellow, indicating relatively large reconstruction errors associated with excessively wide and deep architectures. By contrast, the blue regions correspond to more stable and accurate reconstructions. 29 10 4              
+
+> 10 3
+> 5 × 10 3
+> 1.5 × 10 2
+> 3 × 10 2
+> 0.02
+> 0.04
+> 0.08
+> Error  ef
+> Algorithm 3.2
+> Algorithm 3.1
+> 2 × 10 5
+> 5 × 10 4
+> 2 × 10 3
+> 3 × 10 3
+> 6 × 10 3
+> 0.07
+> 0.10
+> 0.20
+> Error  ef
+> Algorithm 3.2
+> Algorithm 3.1
+> 10 30.02 0.1 0.2 0.35
+
+Noise Level ( )
+
+> 0.02
+> 0.08
+> 0.15
+> Error  ef
+> Algorithm 3.2
+
+Fig. 10 : Relative L2 error ef versus the noise level δ for Examples 1 (top), 2 (middle), and 3 (bottom). The error ef is evaluated at the first iteration satisfying the stopping criterion. The selected architecture depends clearly on the noise level: smaller noise permits richer network architectures, while larger noise leads to earlier stopping at smaller widths and depths. This pattern is visible in all three heatmaps, namely Figs. 3, 6, and 9, where the red boxes marking the stopping configurations selected by the discrepancy principle shift systematically toward deeper and wider networks as δ decreases. As a concrete illustration, consider Example 1; see Fig. 3. For the relatively large noise level 
+
+δ = 0 .005, both Algorithm 1 and Algorithm 2 stop already at k = 1 with ( N, L ) = (8 , 5). For the much smaller noise level δ = 0 .0001, Algorithm 1 expands to k = 2 with (N, L ) = (17 , 7), whereas Algorithm 2 expands to k = 3 with ( N, L ) = (65 , 9). This empirical trend is consistent with the asymptotic complexity laws in (17) and (16) . Since all examples are posed in spatial dimension d = 2 with θ = 1, and the exact solutions 30 satisfy the assumed regularity ( α = 1 in the H¨ older setting and s = 2 in the Sobolev setting), the theoretical bounds reduce to L(δ) = O(log (1 /δ )) and N (δ) = O(δ−2) for Algorithm 1, and to N (δ)L(δ) = O(δ−1| log δ|2) for Algorithm 2. These bounds mean that, as the noise level decreases, the admissible stopping architecture may grow at the corresponding rates. The experiments support this prediction: larger noise levels confine the admissible capacity to relatively small architectures, whereas smaller noise levels allow richer models before overfitting emerges. Finally, we examine the asymptotic convergence behavior as the noise level tends to zero, in accordance with Theorem 3(c). As shown in Fig. 10, the relative L2 error ef ,evaluated at the first iteration satisfying the stopping criterion, is plotted against δ on a log-log scale. In all three examples, the plotted relative L2 error decreases clearly as the noise level δ tends to zero, indicating an empirical convergence trend with respect to δ. These quantitative results support the theoretical conclusion that the regularized reconstructions converge to the exact solution as δ → 0, while also demonstrating that the proposed expanding framework performs consistently across diverse inverse problems. 
+
+# 5 Conclusions 
+
+In this paper, we extended architecture-based regularization from shallow to deep neural networks for ill-posed inverse problems. Previous studies typically used the width of a single hidden layer as the sole regularization parameter. Here, we advanced this idea by developing an expanding framework in which both network width and depth increase adaptively. Under the approximation property for deep neural networks, we proposed two discrepancy-principle-based regularization algorithms corresponding to the cases where an explicit a priori bound on the parameter radius is available or unavailable. For both methods, we established the existence of regularized minimizers, finite termination of the expansion procedure, asymptotic convergence of the reconstructed solutions as the noise level vanishes, and explicit asymptotic bounds on the terminal network architecture. By combining these general bounds with concrete approximation results, we further derived explicit scaling laws for the stopping architecture in the H¨ older and Sobolev settings. Numerical experiments on several representative inverse problems supported the theoretical analysis from multiple perspectives, including finite termination in practice, noise-dependent structural adaptation, effective noise suppression, and empir-ical algebraic convergence as the noise level decreases. Overall, these results show that architecture expansion provides a mathematically justified and practically effec-tive regularization strategy for deep neural networks in linear and non-linear inverse problems. Future work includes deriving sharper approximation and parameter-radius estimates for concrete network classes, as well as extending the present framework to more structured architectures, such as convolutional neural networks and transformers. 
+
+# Appendix A Proof of Lemma 1            
+
+> Proof Fix an admissible network architecture, namely a depth K≤Land widths N1, . . . , N K
+> satisfying max 1≤ℓ≤KNℓ≤N. For this fixed architecture, the parameter collection Θ consists
+
+31 of finitely many scalar weights and biases. The constraint ∥Θ∥ ≤ r therefore defines a closed and bounded subset of a finite-dimensional parameter space. Since all norms on finite-dimensional spaces are equivalent, this set is compact by the Heine–Borel theorem. For this fixed architecture, consider the realization map T (Θ) = ϕ(·; Θ). Because σ is continuous and the network is obtained by finitely many compositions of affine maps and σ,the map ( x, Θ) 7 → ϕ(x; Θ) is continuous on the compact set Ω × { Θ : ∥Θ∥ ≤ r}. Hence it is uniformly continuous. Therefore, if Θ n → Θ, then 
+
+∥ϕ(·; Θ n) − ϕ(·; Θ) ∥C(Ω) → 0.
+
+Thus the realization map is continuous from the compact parameter set into C(Ω). Its image is therefore compact in C(Ω). Since K ≤ L and 1 ≤ Nℓ ≤ N , there are only finitely many admissible architectures. Hence N (N, L, r ) is a finite union of compact subsets of C(Ω), and is therefore compact in C(Ω). Finally, the embedding C(Ω) ,→ Lp(Ω) is continuous for every p ∈ [1 , ∞), since ∥f ∥Lp(Ω) ≤|Ω|1/p ∥f ∥C(Ω) . Therefore N (N, L, r ) is also compact in Lp(Ω). This completes the proof. □
+
+# Acknowledgments 
+
+This work was funded by the Shenzhen Sci-Tech Fund (No. RCJC20231211090030059), National Key Research and Development Program of China (No. 2025YFE0113400) and National Natural Science Foundation of China (No. W2421102). 
+
+# References 
+
+[1] Engl, H.W., Hanke, M., Neubauer, A.: Regularization of Inverse Problems. Springer, New York (1996) [2] Isakov, V.: Inverse Problems for Partial Differential Equations. Springer, New York (2006) [3] Schuster, T., Kaltenbacher, B., Hofmann, B., Kazimierski, K.S.: Regularization Methods in Banach Spaces. Walter de Gruyter, Berlin (2012) [4] Tikhonov, A.N., Arsenin, V.Y.: Solutions of Ill-Posed Problems. Winston Wiley, Washington, DC New York (1977) [5] Ito, K., Jin, B.: Inverse Problems: Tikhonov Theory and Algorithms. World Scientific, Singapore (2014) [6] Gong, R., Hofmann, B., Zhang, Y.: A new class of accelerated regularization methods, with application to bioluminescence tomography. Inverse Probl. 36 (5), 055013 (2020) [7] Jin, B., Kereta, ˇZ.: On the convergence of stochastic gradient descent for linear inverse problems in banach spaces. SIAM J. Imaging Sci. 16 (2), 671–705 (2023) [8] Zhang, Y., Chen, C.: Stochastic asymptotical regularization for linear inverse problems. Inverse Probl. 39 (1), 015007 (2023) 32 [9] Jin, B., Xia, Y., Zhou, Z.: On the regularizing property of stochastic iterative methods for solving inverse problems. In: Handbook of Numerical Analysis vol. 26, pp. 211–272. Elsevier, Amsterdam (2025) [10] Natterer, F.: The Mathematics of Computerized Tomography. SIAM, Philadelphia (2001) [11] McCann, M.T., Jin, K.H., Unser, M.: Convolutional neural networks for inverse problems in imaging: A review. IEEE Signal Process. Mag. 34 (6), 85–95 (2017) [12] Arridge, S., Maass, P., ¨Oktem, O., Sch¨ onlieb, C.-B.: Solving inverse problems using data-driven models. Acta Numer. 28 , 1–174 (2019) [13] Ongie, G., Jalal, A., Metzler, C.A., Baraniuk, R.G., Dimakis, A.G., Willett, R.: Deep learning techniques for inverse problems in imaging. IEEE J. Sel. Areas Inf. Theory 1(1), 39–56 (2020) [14] Scarlett, J., Heckel, R., Rodrigues, M.R., Hand, P., Eldar, Y.C.: Theoretical perspectives on deep learning methods in inverse problems. IEEE J. Sel. Areas Inf. Theory 3(3), 433–453 (2023) [15] Jin, K.H., McCann, M.T., Froustey, E., Unser, M.: Deep convolutional neural network for inverse problems in imaging. IEEE Trans. Image Process. 26 (9), 4509–4522 (2017) [16] Ronneberger, O., Fischer, P., Brox, T.: U-Net: Convolutional Networks for Biomedi-cal Image Segmentation. In: International Conference on Medical Image Computing and Computer-assisted Intervention, pp. 234–241 (2015). Springer [17] Adler, J., ¨Oktem, O.: Learned primal-dual reconstruction. IEEE Trans. Med. Imaging 37 (6), 1322–1332 (2018) [18] Hammernik, K., Klatzer, T., Kobler, E., Recht, M.P., Sodickson, D.K., Pock, T., Knoll, F.: Learning a variational network for reconstruction of accelerated MRI data. Magn. Reson. Med. 79 (6), 3055–3071 (2018) [19] Bora, A., Jalal, A., Price, E., Dimakis, A.G.: Compressed sensing using generative models. In: International Conference on Machine Learning, pp. 537–546 (2017). PMLR [20] Mardani, M., Gong, E., Cheng, J.Y., Vasanawala, S.S., Zaharchuk, G., Xing, L., Pauly, J.M.: Deep generative adversarial neural networks for compressive sensing MRI. IEEE Trans. Med. Imaging 38 (1), 167–179 (2018) [21] Antun, V., Renna, F., Poon, C., Adcock, B., Hansen, A.C.: On instabilities of deep learning in image reconstruction and the potential costs of AI. Proc. Natl. Acad. Sci. U. S. A. 117 (48), 30088–30095 (2020) 33 [22] Li, H., Schwab, J., Antholzer, S., Haltmeier, M.: NETT: solving inverse problems with deep neural networks. Inverse Probl. 36 (6), 065005 (2020) [23] Lunz, S., ¨Oktem, O., Sch¨ onlieb, C.-B.: Adversarial regularizers in inverse problems. Adv. Neural Inf. Process. Syst. 31 (2018) [24] Lunz, S.: Learned regularizers for inverse problems. In: Handbook of Mathematical Models and Algorithms in Computer Vision and Imaging: Mathematical Imaging and Vision, pp. 1–21. Springer, New York (2022) [25] Kobler, E., Effland, A., Kunisch, K., Pock, T.: Total deep variation for linear inverse problems. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 7549–7558 (2020) [26] Jin, B., Zhou, Z., Zou, J.: On the convergence of stochastic gradient descent for nonlinear ill-posed problems. SIAM J. Optim. 30 (2), 1421–1450 (2020) [27] Long, H., Zhang, Y., Gao, G.: An accelerated inexact newton regularization scheme with a learned feature-selection rule for non-linear inverse problems. Inverse Probl. 
+
+40 (8), 085011 (2024) [28] Raissi, M., Perdikaris, P., Karniadakis, G.E.: Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. J. Comput. Phys. 378 , 686–707 (2019) [29] Karniadakis, G.E., Kevrekidis, I.G., Lu, L., Perdikaris, P., Wang, S., Yang, L.: Physics-informed machine learning. Nat. Rev. Phys. 3(6), 422–440 (2021) [30] Ulyanov, D., Vedaldi, A., Lempitsky, V.: Deep image prior. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp. 9446–9454 (2018) [31] Heckel, R., et al. : Deep Decoder: Concise Image Representations from Untrained Non-convolutional Networks. In: International Conference on Learning Represen-tations (2019) [32] Dittmer, S., Kluth, T., Maass, P., Otero Baguer, D.: Regularization by architecture: A deep prior approach for inverse problems. J. Math. Imaging Vis. 62 (3), 456–470 (2020) [33] Buskulic, N., Fadili, J., Qu´ eau, Y.: Convergence and recovery guarantees of unsupervised neural networks for inverse problems. J. Math. Imaging Vis. 66 (4), 584–605 (2024) [34] Wang, H., Li, T., Zhuang, Z., Chen, T., Liang, H., Sun, J.: Early stopping for deep image prior. Transact. Mach. Learn. Res. 2023 (2023) [35] Qayyum, A., Ilahi, I., Shamshad, F., Boussaid, F., Bennamoun, M., Qadir, J.: 34 Untrained neural network priors for inverse imaging problems: A survey. IEEE Trans. Pattern Anal. Mach. Intell. 45 (5), 6511–6536 (2022) [36] Cybenko, G.: Approximation by superpositions of a sigmoidal function. Math. Control Signals Syst. 2(4), 303–314 (1989) [37] Hornik, K., Stinchcombe, M., White, H.: Multilayer feedforward networks are universal approximators. Neural Netw. 2(5), 359–366 (1989) [38] Hornik, K.: Approximation capabilities of multilayer feedforward networks. Neural Netw. 4(2), 251–257 (1991) [39] Stinchcombe: Universal approximation using feedforward networks with non-sigmoid hidden layer activation functions. In: International 1989 Joint Conference on Neural Networks, pp. 613–617 (1989). IEEE [40] Pinkus, A.: Approximation theory of the MLP model in neural networks. Acta Numer. 8, 143–195 (1999) [41] Barron, A.R.: Universal approximation bounds for superpositions of a sigmoidal function. IEEE Trans. Inf. Theory 39 (3), 930–945 (2002) [42] Bach, F.: Breaking the curse of dimensionality with convex neural networks. J. Mach. Learn. Res. 18 (19), 1–53 (2017) [43] Li, Y., Lu, S., Math´ e, P., Pereverzev, S.V.: Two-layer networks with the ReLU k
+
+activation function: Barron spaces and derivative approximation. Numer. Math. 
+
+156 (1), 319–344 (2024) [44] Eldan, R., Shamir, O.: The power of depth for feedforward neural networks. In: Conference on Learning Theory, pp. 907–940 (2016). PMLR [45] Telgarsky, M.: Benefits of depth in neural networks. In: Conference on Learning Theory, pp. 1517–1539 (2016). PMLR [46] Mhaskar, H.N., Poggio, T.: Deep vs. shallow networks: An approximation theory perspective. Anal. Appl. 14 (06), 829–848 (2016) [47] Poggio, T., Mhaskar, H., Rosasco, L., Miranda, B., Liao, Q.: Why and when can deep-but not shallow-networks avoid the curse of dimensionality: a review. Int. J. Autom. Comput. 14 (5), 503–519 (2017) [48] Lu, Z., Pu, H., Wang, F., Hu, Z., Wang, L.: The expressive power of neural networks: A view from the width. Adv. Neural Inf. Process. Syst. 30 (2017) [49] Yarotsky, D.: Error bounds for approximations with deep ReLU networks. Neural Netw. 94 , 103–114 (2017) 35 [50] Yarotsky, D.: Optimal approximation of continuous functions by very deep ReLU networks. In: Conference on Learning Theory, pp. 639–649 (2018). PMLR [51] Shen, Z., Yang, H., Zhang, S.: Nonlinear approximation via compositions. Neural Netw. 119 , 74–84 (2019) [52] Shen, Z., Yang, H., Zhang, S.: Deep network approximation characterized by number of neurons. Commun. Comput. Phys. 28 (5), 1768–1811 (2020) [53] Shen, Z., Yang, H., Zhang, S.: Optimal approximation rate of ReLU networks in terms of width and depth. J. Math. Pures Appl. 157 , 101–135 (2022) [54] Yarotsky, D., Zhevnerchuk, A.: The phase diagram of approximation rates for deep neural networks. Adv. Neural Inf. Process. Syst. 33 , 13005–13015 (2020) [55] G¨ uhring, I., Kutyniok, G., Petersen, P.: Error bounds for approximations with deep ReLU neural networks in W s,p norms. Anal. Appl. 18 (05), 803–859 (2020) [56] Lu, J., Shen, Z., Yang, H., Zhang, S.: Deep network approximation for smooth functions. SIAM J. Math. Anal. 53 (5), 5465–5506 (2021) [57] Hon, S., Yang, H.: Simultaneous neural network approximation for smooth functions. Neural Netw. 154 , 152–164 (2022) [58] Petersen, P., Voigtlaender, F.: Optimal approximation of piecewise smooth functions using deep ReLU neural networks. Neural Netw. 108 , 296–330 (2018) [59] Jiao, Y., Wang, Y., Yang, Y.: Approximation bounds for norm constrained neural networks with applications to regression and GANs. Appl. Comput. Harmon. Anal. 
+
+65 , 249–278 (2023) [60] Schmidt-Hieber, J.: The Kolmogorov–Arnold representation theorem revisited. Neural Netw. 137 , 119–126 (2021) [61] Wang, L., Zhu, Q., Jin, B., Zhang, Y.: Shallow neural network yields regularization for ill-posed inverse problems. arXiv preprint arXiv:2511.16171 (2025) [62] Yang, Y.: On the optimal approximation of Sobolev and Besov functions using deep ReLU neural networks. Appl. Comput. Harmon. Anal., 101797 (2025) 36

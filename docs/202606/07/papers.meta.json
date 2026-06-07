@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-07",
+  "date": "2026-06-07",
+  "generated_at": "2026-06-07T21:10:14",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/07/2606.06483v1-statistically-and-computationally-optimal-estimation-and-inference-of-common-subspaces",
+      "section": "quick",
+      "title_en": "Statistically and Computationally Optimal Estimation and Inference of Common Subspaces",
+      "authors": "Joshua Agterberg",
+      "date": "2026-06-04",
+      "pdf": "https://arxiv.org/pdf/2606.06483v1",
+      "score": "7.0",
+      "evidence": "公共子空间估计用于低秩矩阵，可用于低秩表示去噪",
+      "tldr": "针对多个噪声扰动对称低秩矩阵共享公共子空间的估计与推断问题，本文研究不同信噪比下的统计和计算极限。提出基于谱和平方初始化的投影梯度下降估计器，在强估计信噪比下达到最优sinΘ误差率。进一步，在强推断信噪比下估计量渐近正态，并构建自适应最优置信区间。揭示一个新颖现象：即使信噪比高于估计的计算极限，自适应统计推断仍可能信息论上不可能。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Given multiple data matrices, many problems in statistics and data science rely on estimating a common subspace that captures certain structure shared by all the data matrices. In this paper we investigate the statistical and computational limits for the common subspace model in which one observes a collection of symmetric low-rank matrices perturbed by noise, where each low-rank matrix shares the same common subspace. Our main results identify several regimes of the signal-to-noise ratio (SNR) such that estimation and inference are statistically or computationally optimal, and we refer to these regimes as weak SNR, moderate SNR, strong estimation SNR, and strong inference SNR. First, we propose an estimator based on projected gradient descent initialized via spectral sum of squares and show that it achieves the optimal $\\sinΘ$ error rate under strong estimation SNR. These results are complemented by both statistical and computational lower bounds identifying the weak and moderate estimation SNR regimes. Next, we turn to statistical inference for the $\\sinΘ$ distance itself, and we show that our estimator has an asymptotically Gaussian distribution in the strong inference SNR regime. Based on this limiting result we propose confidence intervals and show that they are adaptively minimax optimal in the strong inference SNR regime, where adaptivity is measured in terms of the SNR. Finally, we show that adaptive confidence intervals are information-theoretically impossible below the strong inference SNR regime. Consequently, our results unveil a novel phenomenon: despite the SNR being ``above'' the computational limit for estimation, adaptive statistical inference may still be information-theoretically impossible.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/07/2606.00517v1-deep-neural-network-yields-regularization-for-ill-posed-inverse-problems",
+      "section": "quick",
+      "title_en": "Deep neural network yields regularization for ill-posed inverse problems",
+      "authors": "Qiao Zhu, Lan Wang, Ye Zhang",
+      "date": "2026-05-30",
+      "pdf": "https://arxiv.org/pdf/2606.00517v1",
+      "score": "6.0",
+      "evidence": "深度神经网络正则化反问题的方法可应用于图像去噪",
+      "tldr": "针对不适定逆问题，本文通过深度神经网络架构自适应扩展实现正则化。提出两种基于差异原则的算法，分别处理有无参数半径界的情形，证明算法有限终止及解随噪声消失的收敛性，并导出网络复杂度随噪声水平的渐近标度。数值实验验证了方法在线性与非线性逆问题中的有效性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "This paper studies the regularization of ill-posed inverse problems by deep neural networks (DNNs). We extend architecture-based regularization from shallow networks to deep models by developing a deterministic framework in which the admissible network class is enlarged adaptively and the resulting architecture complexity acts as the regularization mechanism. We propose two discrepancy-principle-driven expanding DNN algorithms to treat the cases where an explicit parameter-radius bound is available and unavailable, respectively. For both algorithms, we prove the finite termination of the adaptive expansion procedure and the convergence of the regularized solutions as the noise level vanishes. In addition, we derive explicit asymptotic bounds on the terminal network architecture, thereby quantifying how the required network complexity scales with the noise level. Numerical experiments on several representative linear and non-linear inverse problems support the theoretical findings and illustrate the practical usefulness of the proposed framework.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/07/2606.03393v2-flicker-ddpm-accelerating-denoising-diffusion-via-1f-colored-noise-injection",
+      "section": "quick",
+      "title_en": "Flicker-DDPM: Accelerating Denoising Diffusion via 1/f Colored Noise Injection",
+      "authors": "KeXiang Mao, FanCheng Li",
+      "date": "2026-06-02",
+      "pdf": "https://arxiv.org/pdf/2606.03393v2",
+      "score": "6.0",
+      "evidence": "去噪扩散模型采用有色噪声，可用于图像去噪",
+      "tldr": "标准去噪扩散概率模型（DDPM）使用各向同性白噪声，与自然图像功率谱特性不匹配，导致需要大量采样步数。本文提出Flicker-DDPM，引入自组织临界性启发的1/f彩色噪声，通过可调参数的空间相关核生成匹配图像谱的噪声。在CIFAR-10上，Flicker-DDPM仅用标准DDPM约三分之一的采样步数就能达到或超越其生成质量，且每步额外计算成本极低。进一步建立频域线性理论，揭示谱匹配彩色噪声能使反向过程线性化，为加速扩散模型提供了理论解释。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We propose a novel diffusion model, Flicker-DDPM, which incorporates flicker (1/f) noise inspired by self-organized criticality (SOC), a widely observed phenomenon in natural systems. Unlike denoising diffusion probabilistic models (DDPMs), which employ isotropic white noise in the forward process, Flicker-DDPM adopts colored noise with power-law spectra to better match the spectral statistics of natural images, whose power spectra typically follow P(k) proportional to 1/k^α. To this end, we develop a colored-noise module based on a spatial correlation kernel, σ(d) = (d + 1)^{-η}, and theoretically establish that adjusting η controls the spectral exponent α of the generated 1/fα noise, enabling adaptation to datasets with diverse spectral characteristics. On CIFAR-10, Flicker DDPM matches or surpasses the generation quality of a standard DDPM baseline using 3.33 times fewer sampling steps, with negligible additional computational cost per step. We further develop a frequency-domain linear theory demonstrating that spectrally matched colored noise linearizes the reverse trajectory, theoretically explaining the observed sampling acceleration.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

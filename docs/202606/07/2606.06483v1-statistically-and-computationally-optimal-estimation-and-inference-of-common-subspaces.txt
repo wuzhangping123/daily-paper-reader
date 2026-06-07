@@ -1,0 +1,13670 @@
+Title: Statistically and Computationally Optimal Estimation and Inference of Common Subspaces
+
+URL Source: https://arxiv.org/pdf/2606.06483v1
+
+Published Time: Fri, 05 Jun 2026 01:32:25 GMT
+
+Number of Pages: 79
+
+Markdown Content:
+# Statistically and Computationally Optimal Estimation and Inference of Common Subspaces 
+
+## Joshua Agterberg June 5, 2026 
+
+Abstract 
+
+Given multiple data matrices, many problems in statistics and data science rely on estimating a common subspace that captures certain structure shared by all the data matrices. In this paper we investigate the statistical and computational limits for the common subspace model in which one observes a collection of symmetric low-rank matrices perturbed by noise, where each low-rank matrix shares the same common subspace. Our main results identify several regimes of the signal-to-noise ratio (SNR) such that estimation and inference are statistically or computationally optimal, and we refer to these regimes as weak SNR, moderate SNR, strong estimation SNR, and strong inference SNR. First, we propose an estimator based on projected gradient descent initialized via spectral sum of squares and show that it achieves the optimal sin Θ error rate under strong estimation SNR. These results are complemented by both statistical and computational lower bounds identifying the weak and moderate estimation SNR regimes. Next, we turn to statistical inference for the sin Θ distance itself, and we show that our estimator has an asymptotically Gaussian distribution in the strong inference SNR regime. Based on this limiting result we propose confidence intervals and show that they are adaptively minimax optimal in the strong inference SNR regime, where adaptivity is measured in terms of the SNR. Finally, we show that adaptive confidence intervals are information-theoretically impossible below the strong inference SNR regime. Consequently, our results unveil a novel phenomenon: despite the SNR being “above” the computational limit for estimation, adaptive statistical inference may still be information-theoretically impossible. 
+
+## Contents 
+
+1 Introduction 2
+
+1.1 Main Contributions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31.2 Paper Organization . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41.3 Notation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+
+2 Projected Gradient Descent with Spectral Initialization 5
+
+2.1 Warm Initialization via Spectral Sum of Squares . . . . . . . . . . . . . . . . . . . . . . . . . 6
+
+3 Estimation Upper and Lower Bounds 6
+
+3.1 Statistical and Computational Lower Bounds . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+
+4 Minimax-Optimal and Adaptive Inference 9
+
+4.1 Rate Optimal Adaptive Confidence Intervals . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10 4.2 Adaptivity Lower Bounds . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11 
+
+5 Related Work 12 
+
+1
+
+> arXiv:2606.06483v1 [math.ST] 4 Jun 2026
+
+6 Numerical Applications 13 
+
+6.1 Simulations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 6.2 Application to Trade Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14 
+
+7 Discussion 15 A Proof of Theorem 2 16 
+
+A.1 Proof of Lemma 1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21 A.2 Proof of Lemma 2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24 A.3 Proof of Lemma 3 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27 A.4 Proof of Lemma 4 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29 A.5 Proof of Lemma 5 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31 
+
+B Proofs for Asymptotic Normality and Inference 32 
+
+B.1 Proof of Theorem 9 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 B.1.1 Proof of Lemma 6 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 39 B.1.2 Proof of Lemma 7 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43 B.1.3 Proof of Lemma 8 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47 B.1.4 Proof of Lemma 9 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51 B.1.5 Proof of Lemma 10 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53 B.2 Proof of Theorem 5 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 57 B.2.1 Proof of Lemma 11 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67 B.3 Proof of Theorem 7 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67 B.3.1 Proof of Lemma 12 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 68 
+
+C Proofs of Lower Bounds 69 
+
+C.1 Proof of Theorem 3 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69 C.2 Proof of Theorem 4 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 70 C.3 Proof of Theorems 6 and 8 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 71 
+
+## 1 Introduction 
+
+In many statistical problems of interest, one is provided with multiple datasets that are posited to share some common underlying structure, and the goal is to perform estimation and inference on this shared structure. Examples include neuroscience (Semedo et al., 2019), single-cell RNA sequencing (Ma and Ma, 2026), and multilayer network analysis (Paul and Chen, 2020; MacDonald et al., 2022; Loyal and Chen, 2023; Lyu et al., 2023b). In many such settings, this shared structure manifests through linear-algebraic relationships between datasets, often in the form of subspaces or matrix factorizations. For instance, in statistical network analysis, it is natural to posit shared latent structure, such as common community memberships associated with the same set of vertices, across multiple observed networks (Paul and Chen, 2020; Lei et al., 2023). Motivated by these considerations, in this paper we study how to optimally extract such common structure from multiple symmetric matrices. To be more precise, in this paper we consider the common subspace model , first introduced in Arroyo et al. (2021) for network data as the Common Subspace Independent Edge (COSIE) model. Suppose one observes L matrices {A(l)}Ll=1 with each A(l) ∈ Rn×n such that 
+
+A(l) = S(l) + N (l), (1) where S(l) (the signal matrix) is a symmetric rank r matrix, and N (l) is a symmetric noise matrix. We assume that N (l) has independent subgaussian entries, with variance σ2 on the diagonal and σ2/2 on the off-diagonal; that is, each N (l) is a Wigner matrix. In the case that each entry is Gaussian, we say it is a 2GOE matrix (i.e., a member of the Gaussian orthogonal ensemble ) with variance σ2, otherwise we say it is a Wigner matrix with variance σ2.We further assume that each S(l) can be factorized via 
+
+S(l) = U R (l)U ⊤,
+
+where U ∈ Rn×r is an orthonormal matrix common to all signal matrices (the common subspace ), and 
+
+R(l) ∈ Rr×r is a symmetric full-rank matrix associated to each S(l). The matrices R(l) need not be diagonal. In general, U and R(l) are identifiable only up to a simultaneous r × r orthogonal transformation. For simplicity, we assume throughout that the rank r is known. The matrix U ∈ Rn×r can be viewed as a matrix whose rows are r-dimensional latent Euclidean vectors associated to all the matrices simultaneously ,and thus is an object of central importance when seeking to aggregate information from multiple datasets. The common subspace model encompasses several widely studied network models as special cases, includ-ing the multilayer stochastic blockmodel, the multilayer mixed-membership blockmodel, and the multilayer degree-corrected mixed-membership blockmodel with common degree corrections. We refer the reader to Arroyo et al. (2021) for more details on this model and its relation to other network models. However, the common subspace model need not be restricted to network data. Indeed, our formulation differs slightly from that work in that we assume independent subgaussian Wigner noise with common variance σ2, which implicitly allows the signal matrices S(l) to be arbitrary symmetric low-rank matrices. By contrast, when 
+
+N (l) consists of mean-zero Bernoulli noise, as is standard in network data applications, the entries of S(l)
+
+must lie in [0 , 1] , and hence the signal matrices are necessarily constrained. The subgaussian noise assumption serves as a stylized statistical model for studying common subspace estimation in many settings. In the special case L = 1 , the model reduces to the classical matrix denoising problem. It is well known that the information-theoretical limits of estimation in such problems are governed by the signal strength of the underlying low-rank matrix, typically characterized by the magnitude of its smallest nonzero eigenvalue. In this paper, we investigate the information-theoretical limits of estimation and inference in the common subspace model in the regime where L ≫ 1.
+
+1.1 Main Contributions 
+
+Our main contributions in this paper are multifold. From a pragmatic perspective, one primary contribution of this paper is to develop and analyze an end-to-end procedure, projected gradient descent with spectral initialization, that aims to recover the shared subspace U . While variants of our algorithm have been analyzed previously in the literature (Paul and Chen, 2020), a more comprehensive statistical analysis under the common subspace model is still lacking. Furthermore, existing results often require additional assumptions on either the initialization or the structure of the signal matrices S(l). In this work we only impose minimal signal-strength assumptions, and our results are complemented by the requisite lower bounds. In this work we study the error ∥ sin Θ( bUt, U )∥F , where bUt is the output of projected gradient descent after t iterations; this error is defined in Section 1.3. This loss function computes errors modulo orthogonal transformation, thus eliminating the intrinsic nonidentifiability inherent in the model. First, we show that 
+
+∥ sin Θ( bUt, U )∥F converges to the optimal statistical error after logarithmically many iterations under a certain signal-to-noise (SNR) condition. Next, turning to statistical inference, we provide a novel limit theorem and propose confidence intervals for the error ∥ sin Θ( bUt, U )∥2 
+
+> F
+
+under a slightly stronger SNR condition. Remarkably, we demonstrate that we are able to provide confidence intervals for the loss without knowledge of U , akin to the out-of-sample error in linear regression. The other main contribution of this paper is to provide a comprehensive picture of the statistical and computational limits of estimation and inference. To the best of our knowledge, a minimax study for statistical inference of subspaces has not been studied previously. Our analysis reveals a novel phenomenon, which we can summarize in the following theorem. For simplicity of presentation we assume that L ≲ n,that r = O(1) , and that each N (l) is Gaussian noise. In order to state our result, we define the following 3signal-strength parameter λ defined through the equation 
+
+λ2 = 1
+
+L λmin 
+
+ LX
+
+> l=1
+
+(R(l))2
+
+
+
+.
+
+Evidently, when L = 1 , the parameter λ is the magnitude of the smallest nonzero eigenvalue of the low-rank matrix. We also define the generalized condition number via κ := max l ∥R(l)∥ 
+
+> λ
+
+. We are now prepared to state our main informal result. 
+
+Theorem 1 (Informal Statement of Main Results) . Suppose we observe {A(l)}Ll=1 as in (1) , and assume that κ and r are bounded, and each N (l) is a GOE matrix with variance σ2. Then we have the following: 
+
+• (Weak Estimation SNR) When λ/σ ≪ p nL , estimation of U is information-theoretically impossible. 
+
+• (Moderate Estimation SNR) When √nL1/4 ≫ λ/σ ≳ p nL , no polynomial-time estimator of U exists based on predictions from the low-degree likelihood ratio. 
+
+• (Strong Estimation SNR) When λ/σ ≳ √nL1/4 , projected gradient descent with spectral initialization achieves the optimal error rate after logarithmically many iterations. 
+
+• (Weak Inference SNR) When n√L ≫ λ/σ ≫ p nL , minimax-optimal adaptive inference is information-theoretically impossible. 
+
+• (Strong Inference SNR) When λ/σ ≫ n√L , adaptive statistical inference is information-theoretically possible, and our proposed confidence intervals adaptively achieve the optimal rate. 
+
+One immediate takeaway from this result is that the computational barrier to estimation occurs at a smaller SNR value than the information-theoretical barrier to adaptive statistical inference. Consequently, even if optimal estimation is feasible in polynomial time, adaptive inference may not be possible. However, whenever estimation or adaptive inference is both statistically and computationally feasible, our estimators achieve the optimal rates. These phase transition phenomena can be displayed concisely in the following diagram. SNR = λ/σ 
+
+0 √n√L   
+
+> √nL1/4
+> n√L
+> Weak Estimation SNR Moderate Estimation SNR Strong Estimation SNR
+> Weak Inference SNR Strong Inference SNR
+
+To the best of our knowledge, this is the first time that a problem of this form has exhibited both a “statistical-computational” estimation gap as well as a “computational-statistical” inferential gap (i.e., where the computational threshold for estimation lies below the statistical threshold for adaptive inference). In contrast, many existing models often have the property that being “above” the computational threshold for estimation results in statistical inference “for free,” in the sense that optimal inference comes with no additional SNR requirements, such as in tensor data analysis (Xia et al., 2022). 
+
+1.2 Paper Organization 
+
+The rest of this paper is organized as follows. In the subsequent section we introduce our main methodology. In Section 3 we study the estimation error of our procedure, including an upper bound for each iteration and minimax and computational lower bounds. In Section 4 we study the information-theoretical limits for (adaptive) statistical inference, and we provide minimax-optimal confidence intervals as well as information-theoretical lower bounds. In Section 5 we discuss related work, and in Section 6 we consider applications to real and simulated data. We finish with a discussion. Proofs of main results can be found in the appendices. 41.3 Notation 
+
+For two sequences an and bn, we write an ≪ bn if an/b n → 0 as n → ∞ , and we write an ≲ bn if there is a constant C > 0 such that an ≤ Cb n. We will also write an = o(bn) if an ≪ bn and an = O(bn) if an ≲ bn.We write an ≍ bn if both an ≲ bn and bn ≲ an. For a function f : Rn×r → R, we let ∇f denote its gradient viewed as an n × r matrix, and we let ∇2f denote its Hessian, viewed as either an operator on n × r matrices or a nr × nr matrix, where the distinction is clear from context. For a general matrix M we let ∥M ∥ and ∥M ∥F denote its spectral and Frobenius norms respectively, and we let Tr (M ) denote its trace. We let SVD r (M ) denote the leading r left singular vectors of the matrix 
+
+M . For two orthonormal matrices U1 and U2 of dimension n × r with r ≤ n, we let sin Θ( U1, U2) denote the matrix of singular values of (U1)⊤⊥U2, where (U1)⊥ denotes any matrix with orthonormal columns such that (U1)⊤⊥U1 = 0 . In particular, we have that 
+
+∥ sin Θ( U1, U2)∥F = ∥(U1)⊤⊥U2∥F . (2) We let OU1,U2 denote the Frobenius-optimal orthogonal matrix aligning U1 and U2; that is, 
+
+OU1,U2 := arg min 
+
+> O:OO ⊤=Ir
+
+∥U1O − U2∥F .
+
+For orthonormal U1 and U2, it is well-known that OU1,U2 can be computed from the product of the left and right singular vectors of U ⊤ 
+
+> 1
+
+U2.For a random variable X, we let ∥X∥ψα denote its Orlicz ψα norm. See Vershynin (2018) for more details. For a sequence of random variables {Xn}∞
+
+> n=1
+
+, we say Xnd
+
+−→ X if Xn converges to X in distribution. Similarly, we write Xnp
+
+−→ X if Xn converges in probability to X. For two random variables X and Y , we write EX as the expected value of X and EX|Y as the conditional expectation of X given Y .
+
+## 2 Projected Gradient Descent with Spectral Initialization 
+
+In this section we introduce our main algorithm to estimate the matrix U . Define the loss function 
+
+h  bU ; { bR(l)}Ll=1 
+
+ := 14L
+
+> L
+
+X
+
+> l=1
+
+∥A(l) − bU bR(l) bU ⊤∥2 
+
+> F
+
+.
+
+Up to possible rescaling, h can be viewed as the objective function whose minimizer is the maximum likelihood estimator under Gaussian noise. However, due to the constraint that U ⊤U = Ir , globally optimizing this function can be NP-hard in general. We therefore propose to optimize the loss function h by projected gradient descent which constrains the current iterate bUt to be orthonormal at every iteration. Given an initialization bU0 and stepsize η, we update 
+
+bUt and bRt via 
+
+bR(l) 
+
+> t
+
+:= bU ⊤ 
+
+> t
+
+A(l) bUt; l = 1 , . . . , L ;
+
+bUt+.5 = bUt − η∇ bUt h  bUt, { bR(l) 
+
+> t
+
+}Ll=1 
+
+;
+
+bUt+1 = SVD r ( bUt+.5).
+
+The gradient of h keeping bR(l) 
+
+> t
+
+fixed is given by 
+
+∇ bUt h( bUt, { bR(l) 
+
+> t
+
+}) = 1
+
+L
+
+> L
+
+X
+
+> l=1
+
+  bUt bR(l) 
+
+> t
+
+bU ⊤ 
+
+> t
+
+− A(l) bUt bR(l) 
+
+> t
+
+. (3) For a given orthonormal bUt, the update bR(l) 
+
+> t
+
+is the closed-form minimizer of the objective function. Thus, the algorithm can be viewed as updating bUt via projected gradient descent, and then directly minimizing the error for each bR(l) 
+
+> t
+
+. Alternatively, this algorithm can be viewed as a Riemannian gradient descent algorithm on bU directly, where the SVD step acts as the retraction. 52.1 Warm Initialization via Spectral Sum of Squares 
+
+In order to initialize the algorithm, we propose using the sum of squares. Define 
+
+bU0 := SVD r
+
+  LX
+
+> l=1
+
+(A(l))2.
+
+To understand this initialization, we note that squaring is in general necessary when the matrices R(l) are permitted to have negative eigenvalues. For example, in the simple case that 
+
+R(1) =
+
+λ 00 λ
+
+
+
+; R(2) =
+
+−λ 00 −λ
+
+
+
+,
+
+it is straightforward to observe that simply averaging A(l) will result in a “canceling out” effect, resulting in pure noise, which is uninformative. More generally, if one has 
+
+R(l) =
+
+
+
+a(l) b(l) b(l)
+
+b(l) a(l) b(l)
+
+b(l) b(l) a(l)
+
+
+
+with some a(l) > b (l) and some a(l) < b (l), then the average will exhibit a similar “canceling out” effect. Similar examples have appeared in previous works; notably Lei et al. (2023) explicitly consider such settings in the context of multilayer stochastic blockmodels, which is a special case of the common subspace model. When using the sum of squares, we have 
+
+E
+
+ X
+
+> l
+
+ A(l)2
+
+
+
+= X
+
+> l
+
+ S(l)2 + σ2L n + 1 2 In,
+
+which has the property that its leading eigenspace is equal to U (up to orthogonal transformation), since the addition of σ2L n+1 2 In does not affect the eigenspace. The full algorithm is summarized in Algorithm 1. 
+
+## 3 Estimation Upper and Lower Bounds 
+
+In this section we consider the statistical and computational limits for estimation. We first have the following result. 
+
+Theorem 2 (Upper Bounds for Iterates) . Suppose that there exists some sufficiently large constant C0 such that 
+
+λ/σ ≥ C0 max 
+
+
+
+κ√r
+
+r nr L , κ 3
+
+r nr L , κr 1/4
+
+√nL1/4 , r 
+
+√nL1/4
+
+
+
+. (7) 
+
+Suppose each matrix N (l) is a subgaussian Wigner matrix with variance σ2, and suppose also that max i,j,l ∥N (l) 
+
+> ij
+
+∥ψ2 ≲
+
+σ and that r ≤ min {L, n } with log( L) ≤ cnr for some sufficiently small constant c, and suppose that L ≤ n2.Let bUt denote the output of Algorithm 1 after t iterations, and suppose the stepsize η satisfies η ∈ ( c′
+
+> η
+> λ2max
+
+, cη
+
+> λ2max
+
+)
+
+where c′ 
+
+> η
+
+< c η < 1 are any fixed constants. Then with probability at least 1 − exp( −cn ), for all iterations t
+
+it holds that 
+
+∥ sin Θ( bUt, U )∥F ≤ C1
+
+σκ √nr λ√L +
+
+
+
+1 − c′
+
+> η
+
+8κ2
+
+t
+
+C2
+
+σ2n√r
+
+√Lλ 2 .
+
+Consequently, after O
+
+
+
+log( λ/σ √LC1κ√nr )
+
+
+
+iterations, it holds that 
+
+∥ sin Θ( bUt, U )∥F ≤ 2C1σκ √nr λ√L .
+
+6Algorithm 1 Projected Gradient Descent Initialized via Spectral Sum of Squares 
+
+Input: Collection of matrices {A(l)}Ll=1 ; rank r, stepsize η, number of iterations T .1. Define 
+
+bU0 := SVD r
+
+ LX
+
+> l=1
+
+(A(l))2
+
+
+
+. (4) 2. While t < T :(a) Set bR(l) 
+
+> t
+
+:= bU ⊤ 
+
+> t
+
+A(l) bUt.(b) Gradient step: 
+
+bUt+.5 := bUt − ηL
+
+> L
+
+X
+
+> l=1
+
+  bUt bR(l) 
+
+> t
+
+bU ⊤ 
+
+> t
+
+− A(l) bUt bR(l) 
+
+> t
+
+. (5) (c) Projection step: 
+
+bUt+1 := SVD r ( bUt+.5). (6) 
+
+Output: bUT .
+
+Proof. See Section A. The key assumption in Theorem 2 is (7). When κ, r ≍ 1, its dominant requirement is that λ/σ ≳ √n/L 1/4.In Section 3.1, we argue that this condition is unavoidable for all polynomial-time estimators of U . Aparticularly interesting regime is when λ/σ ≪ √n but λ/σ ≳ √n/L 1/4, since λ/σ ≪ √n implies that individual subspace estimation cannot be consistent (Cai and Zhang, 2018). In this setting, the sum of squares spectral initialization (i.e., t = 0 ) incurs a “quadratic” error of order σ2nλ2√L . This behavior mirrors subspace perturbation bounds for low-rank rectangular matrices of dimension p1 × p2 with p2 ≫ p1, where a quadratic term dominates in the high-noise regime (Cai and Zhang, 2018; Cai et al., 2021a). This analogy is reinforced by the observation that bU0 can be viewed as the matrix of left singular vectors of [A(1) , . . . , A(L)],a rectangular matrix with p1 = n and p2 = Ln . However, unlike these other settings, the additional structure of the common subspace model allows projected gradient descent to reduce the effect of this quadratic error. Several recent works have studied variants of the sum of squares spectral approach (Lei et al., 2023; Xie, 2024a; Zhou and Chen, 2025; Zhang et al., 2022; Agterberg et al., 2022). These papers focus on the heteroskedastic setting, where debiasing is necessary for improved estimation. In contrast, our model assumes homoskedastic noise, so no additional debiasing is required. Extending our analysis to heteroskedastic noise would be of both practical and theoretical interest, and we leave this direction for future work. 
+
+3.1 Statistical and Computational Lower Bounds 
+
+The purpose of this section is to demonstrate that the error and assumptions in Theorem 2 are optimal. First, we provide a minimax lower bound for estimation with respect to the sin Θ loss. Define the parameter space 
+
+P(λ, n, L, σ ) := 
+
+
+
+{S(l)}Ll=1 : S(l) = U R (l)U ⊤; U ∈ Rn×r , U ⊤U = Ir , λ 2 ≤ λmin 
+
+ 1
+
+L
+
+X
+
+> l
+
+(R(l))2
+
+ 
+
+. (8) We have the following minimax lower bound. 7Theorem 3 (Minimax Lower Bound) . Assume that r ≤ c0
+
+√n for some sufficiently small constant c0. Then it holds that 
+
+inf 
+
+> bU
+
+sup 
+
+> P(λ,n,L,σ )
+
+E∥ sin Θ( bU , U )∥2 
+
+> F
+
+≳ σ2nr λ2L ∧ r, 
+
+where the infimum is taken over all estimators bU on the basis of the observation {A(l)}Ll=1 under GOE noise. Proof. See Section C.1. Theorem 3 shows that the error bound attained by Algorithm 1 in Theorem 2 is minimax rate-optimal after logarithmically many iterations. However, Theorem 3 only proves that a necessary condition for consistency is that λ/σ ≫ p nr L . In contrast, Theorem 2 requires an additional condition, which, when 
+
+r, κ ≍ 1 is that λ/σ ≳ √n/L 1/4. We will provide evidence that this assumption is necessary for a polynomial-time estimator to exist using the low-degree likelihood ratio approach, which has provided evidence for a number of problems related to low-rank matrix estimation (Lyu and Xia, 2023; Lei et al., 2024; Luo and Gao, 2024). See Kunisky et al. (2022) for a survey. Explicitly, suppose one is given L i.i.d. observations X1, . . . , X L, and consider testing the null hypothesis 
+
+H0 : Xi ∼ Qn versus the alternative Xi ∼ Pn. As is well-known, the likelihood ratio Ln(X) = dPn(X)
+
+> dQn(X)
+
+is uniformly most powerful, and, furthermore, when Pn and Qn are statistically indistinguishable (in the sense that the sum of Type I and Type II errors do not tend to zero) it holds that ∥Ln(X)∥2 = O(1) as 
+
+n → ∞ , where ∥ · ∥ 2 = EQn (·)2. Building on this idea, in Kunisky et al. (2022) the authors propose studying computational distinguishability by projecting Ln(X) onto polynomials of degree at most D. Define L≤Dn (X)
+
+as the orthogonal projection of Ln(X) onto polynomials of degree at most D. Kunisky et al. (2022) conjecture that when ∥L≤Dn (X)∥2 = O(1) , then the hypothesis test is computationally hard. To apply the conjecture we consider the following two hypotheses: 
+
+H0 : A(l) ∼ N (l) for all l; (9) 
+
+Ha : A(l) ∼ S(l) + N (l) for all l, where 
+
+S(l) = εlλuu ⊤;
+
+εl ∼ IID Rademacher .
+
+(10) For simplicity we assume that u has entries in ±n−1/2 uniformly at random. This simple model is a rank-one version of the model we consider herein, where u represents the shared subspace. The hypothesis test above tests pure noise against the alternative that there is a shared subspace u. Our conjecture for this test is based on a variant from Lyu and Xia (2023). 
+
+Conjecture 1 (Conjecture 1 of Lyu and Xia (2023)) . Let Qn denote the null hypothesis (9) and Pn denote the alternative (10) . Denote X = {A(l)}Ll=1 . If there exists ε ≥ 0 and D ≥ log( nL )1+ ε such that ∥L≤Dn (X)∥2 =1 + o(1) then there is no polynomial-time test ϕn : RL×n×n 7 → { 0, 1} such that the sum of Type I error and Type II error probabilities satisfy 
+
+EQn [ϕn(X)] + EPn [1 − ϕn(X)] → 0
+
+as n → ∞ .
+
+Therefore, if ∥L≤Dn ∥2 = 1 + o(1) for this model, Conjecture 1 suggests that there is no polynomial-time algorithm that can detect the existence of a rank one shared subspace. We have the following result. 
+
+Theorem 4 (Computational Lower Bound) . When λ/σ = o  √nL1/4
+
+ it holds that ∥L≤Dn ∥2 = 1 + o(1) as 
+
+n → ∞ .Proof. See Section C.2. 8Combining Theorem 3 and Theorem 4, when r, κ ≍ 1, our proposed estimator attains minimax-optimal estimation error after logarithmically many iterations in the minimal regime such that a polynomial-time estimator exists. In particular, these results complete the statement of Theorem 1 for the different Estimation SNR regimes. 
+
+## 4 Minimax-Optimal and Adaptive Inference 
+
+In this section we investigate the information-theoretical limits for statistical inference for the error ∥ sin Θ( bU , U )∥2 
+
+> F
+
+,where we denote bU = bUt for t iterations. Define the matrix R via 
+
+R := R(1) , · · · , R(L) ∈ Rr×Lr .
+
+Our first result in this direction is a novel limit theorem in the Strong Inference SNR Regime. 
+
+Theorem 5 (Asymptotic Normality) . Suppose that the conditions of Theorem 2 hold, and suppose t ≥
+
+Cη log   κ2λ2Lσ2nr 
+
+, where Cη depends on the step size η. Suppose further that λ/σ ≫ nr 2κ4 
+
+> √L
+
+and L ≲ n with 
+
+L → ∞ . Suppose also that log( r) ≲ √L. Assume that 
+
+max 
+
+ κ4
+
+L , κ 4∥U ∥22,∞, κ 2√nr ∥U ∥22,∞, κ2r3/2 log( n)
+
+√n
+
+
+
+≪ 1. (11) 
+
+Then it holds that 
+
+∥ sin Θ( bU , U )∥2 
+
+> F
+
+− σ2n 
+
+> 2
+
+Tr (( RR ⊤)−1)
+
+σ2pn/ 2∥(RR ⊤)−1∥Fd
+
+−→ N (0 , 1) .
+
+Proof. See Section B. We focus on the asymptotic regime where L grows with n, but still satisfies L ≲ n. When κ, r ≍ 1, the condition ∥U ∥22,∞ ≪ 1/√nr is quite mild, since ∥U ∥22,∞ can be as small as rn . Therefore, the main restriction in Theorem 5 is the SNR condition λ/σ ≫ nr 2κ4 
+
+> √L
+
+, which is much stronger than the condition λ/σ ≳ √n/L 1/4
+
+from Theorem 2 when κ, r ≍ 1 and L ≲ n. Though this assumption may seem conservative, we will show in Section 4.2 that it is actually unavoidable for adaptive inference. Theorem 5 is closely related to several asymptotic normality results in the literature (Xia et al., 2022; Xia, 2021; Bao et al., 2021). In particular, Xia (2021) proves asymptotic normality for the sin Θ distance in the matrix denoising model under Gaussian noise. Their theorem has a similar structure, except that the centering term depends not only on the singular values of the signal matrix, but also on the matrix dimensions d1 and d2. This additional dependence comes from the dimension mismatch between d1 and d2:when d1 = d2, the centering term depends only on the singular values. In our setting, the singular values of 
+
+RR ⊤ play an analogous role. A related result can also be found in Bao et al. (2021) in the regime where the singular values are of order √n (after appropriate rescaling). Unlike Xia (2021) and Bao et al. (2021), we additionally provide estimators for the centering and scaling terms. Finally, Xia et al. (2022) establishes a qualitatively similar result for tensor data, though our setting and proofs are different. 
+
+Remark 1 (Highlights of the Proof) . The proof of this result follows from Theorem 9, which establishes the first-order asymptotic expansion for ∥U ⊤⊥ bUt∥2 
+
+> F
+
+. The major first step of the proof is to show that 
+
+U ⊤⊥ bUt ≈ X
+
+> l
+
+U ⊤⊥ N (l)U R (l)(RR ⊤)−1, (12) where the approximation holds up to small-order terms at least quadratic in the noise N (l), together with a deterministic optimization error. To prove this approximation, we rely on decoupling arguments to control the quadratic error terms, as well as a novel argument showing that the loss function is geodesically convex (with 9respect to the Grassmannian manifold geometry) once all iterates are within the statistical neighborhood guaranteed by Theorem 2. After establishing this result, we then expand out the leading-order term to yield 
+
+∥U ⊤⊥ bUt∥2 
+
+> F
+
+= Tr 
+
+
+
+U⊥U ⊤⊥
+
+ X
+
+> l
+
+N (l)U R (l)(RR ⊤)−1
+
+ X
+
+> l
+
+(RR ⊤)−1R(l)U N (l)
+
+ 
+
++ Res ,
+
+where Res contains all the smaller-order terms and their interactions with the leading-order term. To handle this final residual term we separate it into terms of order three in N (l) and terms of order four and higher together with the deterministic optimization error. To handle the third-order terms, we appeal to decoupling concentration arguments for third-order polynomials of random variables together with ε-net arguments to handle the dependence. With this residual term controlled, our final result follows by showing that this leading-order term can be written as a martingale with respect to an appropriate filtration and applying a version of the Martingale Central Limit Theorem. 
+
+4.1 Rate Optimal Adaptive Confidence Intervals 
+
+Theorem 5 suggests that it is possible to derive confidence intervals via plug-in estimation. To determine whether these confidence intervals are minimax rate optimal, we first provide a minimax lower bound for the expected length of all 1−α honest confidence intervals. We will follow a similar framework as in Cai and Guo (2017). To lay the groundwork, we will consider the parameter space P(λ, n, L, σ ) defined in (8). Since we are interested in the dependence on the SNR, we will use the shorthand P(λ) = P(λ, n, L, σ ), since changing 
+
+σ is equivalent to changing λ by a rescaling argument. Observe that P(λ1) ⊂ P (λ2) for any λ1 ≥ λ2. Thus, 
+
+P(λ) forms a nested set of parameter spaces. Given a parameter 0 < α < 1, and an estimate bU of U and a parameter space P, let Iα(P) denote the set of all honest 1 − α level confidence intervals for ∥ sin Θ( bU , U )∥2 
+
+> F
+
+over P; that is, 
+
+Iα(P) : = 
+
+(
+
+CI α
+
+ {A(l)}Ll=1 
+
+ = [ l, u ] : inf  
+
+> θ∈P
+
+Pθ
+
+
+
+∥ sin Θ( bU , U )∥2 
+
+> F
+
+∈ CI α
+
+ {A(l)}Ll=1 
+
+
+
+≥ 1 − α
+
+)
+
+.
+
+For simplicity we suppress the dependence of CI α on the observations {A(l)}Ll=1 . The length of the confidence interval L(CI α) is defined as the difference u − l. The maximum expected length over the parameter space P
+
+is denoted as 
+
+LCI α (P) := sup 
+
+> θ∈P
+
+Eθ L CI α
+
+.
+
+Our first result gives a lower bound on the minimax expected length over P(λ).
+
+Theorem 6. Suppose that λ/σ ≥ C0 nr √L for some sufficiently large constant C0 > 0, and that r ≥ 2. Then there exists a constant c′ > 0 such that for all n sufficiently large, 
+
+inf  
+
+> CI α∈I α(P(λ))
+
+LCI α
+
+ P(λ) ≥ c′ σ2nr λ2L
+
+1
+
+√nr . (13) 
+
+Proof. See Section C.3. When λ/σ ≥ C0 nr √L , we are in the regime where Theorem 5 applies up to factors of r and κ. It is also straightforward to show that if (RR ⊤)−1 is known, then the resulting confidence intervals will have the width given above. Thus, if it is possible to estimate the centering and scaling terms to appropriate fidelity, the resulting confidence intervals will have minimax optimal length. We now discuss the construction of the optimal confidence interval that achieves the rate in Theorem 6. Define 
+
+bR := 
+
+ bU ⊤A(1) bU , · · · , bU ⊤A(L) bU
+
+
+
+∈ Rr×rL .
+
+10 Let zα/ 2 denote the 1 − α/ 2 quantile of the standard Gaussian distribution. We define 
+
+dCI α := σ2n
+
+2 Tr   bR bR⊤−1 ± zα/ 2σ2pn/ 2∥  bR bR⊤−1∥F .
+
+This quantity can be understood as simple plug-in estimation of the centering and scaling terms in Theorem 5. Nonetheless, the following result shows that this confidence interval is optimal when bU is computed via Algorithm 1. 
+
+Theorem 7 (Confidence Interval Upper Bound) . Suppose the conditions of Theorem 5 hold. Then it holds that 
+
+lim inf  
+
+> n→∞
+
+inf  
+
+> θ∈P (λ)
+
+P
+
+
+
+∥ sin Θ( bU , U )∥2 
+
+> F
+
+∈ dCI α
+
+
+
+≥ 1 − α, 
+
+and for all n sufficiently large, with probability at least 1 − exp( −cn ),
+
+L(dCI α) ≲ σ2nr λ2L
+
+1
+
+√nr .
+
+Proof. See Section B.3. Note that Theorem 7 does not require sample splitting to achieve optimal inference, unlike other similar results in the literature on linear regression (Cai and Guo, 2018, 2017) and matrix completion (Carpentier et al., 2018). Furthermore, Theorem 7 demonstrates that when λ/σ ≫ n√L and r, κ = O(1) , our proposed confidence intervals are minimax-optimal. Since the construction of dCI α does not rely on knowledge of λ apriori , the resulting confidence intervals are adaptive to signal strength. 
+
+4.2 Adaptivity Lower Bounds 
+
+In this section we determine whether adaptive confidence intervals can be constructed in the regime λ/σ ≲ 
+
+> n√L
+
+. To study adaptivity, we consider a similar framework as in Cai and Guo (2017). Given two nested parameter spaces P1 ⊂ P 2, we define the adaptation benchmark 
+
+L∗
+
+> α
+
+(P1, P2) := inf  
+
+> CI α∈I α(P2)
+
+LCI α (P1),
+
+which is the infimum of the maximum expected length over P1 among all 1 − α confidence intervals over 
+
+P2. Note that Theorem 6 gives a lower bound on L∗
+
+> α
+
+(P(λ), P(λ)) , and, moreover, the confidence intervals in Theorem 7 attain this rate. If a confidence interval is rate optimally adaptive over P1 and P2, it should have optimal expected length simultaneously over both parameter spaces while still maintaining coverage over P2. Then this confidence interval must satisfy LCI α (P1) ≥ L ∗
+
+> α
+
+(P1, P2). Hence, if L∗
+
+> α
+
+(P1, P2) is significantly larger than the minimax rate over P1, then rate-optimal adaptation is impossible. For technical reasons in the proof, we use the following slightly modified parameter space eP(λ) defined via 
+
+eP(λ) := 
+
+
+
+{S(l)}Ll=1 : S(l) = U R (l)U ⊤; U ∈ Rn×r , U ⊤U = Ir , rλ 2 ≤ 1
+
+L
+
+> L
+
+X
+
+> l=1
+
+∥R(l)∥2
+
+> F
+
+
+
+.
+
+If each R(l) is well-conditioned with condition number O(1) , then eP(λ) coincides with P(λ) up to constants. The following result shows the (lack of) adaptivity of confidence intervals over the two parameter spaces 
+
+eP(λ1), eP(λ2).11 Theorem 8. Take λ1 ≥ λ2, where λ1/σ ≥ nr √L . Suppose that r ≥ 2. Then there exists some constant c′ > 0
+
+such that for all n sufficiently large it holds that 
+
+L∗
+
+> α
+
+  eP(λ1), eP(λ2) ≥ c′ σ2nr λ21L
+
+ σ√nr λ2
+
+√L + 1
+
+√nr 
+
+
+
+.
+
+Proof. See Section C.3. Observe that when r, κ ≍ 1, and λ1 ≫ λ2, with λ2/σ ≪ nr √L , then rate-optimal adaptation is impossible. However, if λ1, λ 2 ≫ σ nr √L , rate-optimal adaptation is possible, and this threshold matches the assumption in Theorem 7 up to the factor of r. Thus, considering Theorems 6 to 8, we have now established the existence of the Weak and Strong Inference SNR Regimes, which completes the proof of Theorem 1. 
+
+## 5 Related Work 
+
+Our work is closely connected to the literature on multilayer network analysis. A number of authors have considered estimation in the multilayer stochastic blockmodel with arbitrary connection probabilities, which can be viewed as a special case of the common subspace model (Lei et al., 2023, 2020; Paul and Chen, 2020; Jing et al., 2021; Agterberg et al., 2025; Chen et al., 2022; Huang et al., 2023). Our proposed estimation pro-cedure has previously been considered in Paul and Chen (2020) as “orthogonal-linked matrix factorization,” though statistical guarantees are only provided for global minima under a multilayer stochastic blockmodel. Our procedure does not actually require us to find a global minimum, and we show that our algorithm (with our initialization) is both statistically and computationally optimal. The work Lei et al. (2024) gives a computational lower bound for estimation in the multilayer stochastic blockmodel, but their results are sharp only up to logarithmic factors. In contrast, in this work we are able to explicitly characterize the computational limits in terms of the SNR. The works Lyu and Xia (2023); Lyu et al. (2023a) are also closely related to this work, where they study the statistical and computational limits for a closely related model for mixtures of low-rank matrices. Our model is significantly more general than theirs, though their model can be viewed as a special case of the model we consider herein. In addition, none of the aforementioned works consider inference. Our work is also related to the work Arroyo et al. (2021) which proposes the common subspace model. They consider estimating U by first setting bU (l) := SVD r (A(l)) and bU = SVD r ([ bU (1) , bU (2) , · · · , bU (L)]) . This procedure has been further studied and extended in several follow-on works (Agterberg et al., 2025; Zheng and Tang, 2024; Paul and Chen, 2020). However, a major deficiency of this procedure and its variants is that the first step requires each matrix A(l) to have sufficient signal strength. Under our statistical model, this is equivalent to requiring that λ/σ ≫ √n, which does not benefit from the “aggregation effect” of having larger L.In order to leverage the “aggregation” from multiple networks, the work Lei et al. (2023) proposed to estimate U (under a multilayer stochastic blockmodel) via a bias-adjusted sum of squares. Their procedure can essentially be viewed as a modified version of our initialization bU0, where the modification consists of diagonal deletion due to the heteroskedasticity. They prove an upper bound under a certain signal-strength condition (for Bernoulli noise), and this signal-strength condition was later shown to be computationally optimal in Lei et al. (2024). Subsequently, Xie (2024a) proposed to further modify the procedure of Lei et al. (2023) to “impute” the diagonal. The algorithm considered therein can be viewed as a Bernoulli-noise specific extension of the HeteroPCA algorithm proposed in Zhang et al. (2022) and further studied in both Agterberg et al. (2022); Yan et al. (2024). However, in our work the focus is on optimal error rates and statistical inference under homoskedastic noise where bias adjustment is not necessary, and therefore the focus is significantly different. Our work is also related to the literature on tensor data analysis, which exhibits similar statistical-computational gaps (Zhang and Xia, 2018; Luo and Zhang, 2022; Auddy et al., 2025; Luo and Zhang, 2024; Arous et al., 2019), though our model is significantly different. Our model is also related to several models considered in the data integration literature (e.g., Lock et al. (2013)). The works Ma and Ma (2026); Yang 12 and Ma (2025); Li and Lyu (2025) are perhaps most similar, though only Ma and Ma (2026) consider the “weak-signal” regime we consider herein, though their focus is difrerent. Turning to statistical inference, there have been a number of works on distributional theory and statistical inference for single networks or matrices (Agterberg, 2023; Chen et al., 2021a,b; Yan et al., 2024; Fan et al., 2022; Xie, 2024b; Xie and Zhang, 2025; Cheng et al., 2021; Pu et al., 2026; Liu et al., 2025; Bao et al., 2021; Ding, 2020); see Agterberg and Cape (2026) for a survey in the stochastic blockmodel setting. However, inferential techniques for multilayer networks or collections of matrices are comparatively lacking, though there have been some efforts. Our work is most closely related to the works Zheng and Tang (2024); Xie (2024a); Agterberg and Zhang; Xia et al. (2022). The work Zheng and Tang (2024) considers the model herein and derives CLTs for the rows of the estimated subspace as well as the estimated score matrices. Similarly, in the work Xie (2024a) the author develops entrywise limit theorems for the rows of the matrix 
+
+bU obtained via bias-adjusted spectral sum of squares. Finally, the works Agterberg and Zhang; Xia et al. (2022) consider statistical inference for tensors. Our analyses are different from these prior works, and we primarily focus on the sin Θ distance. Of these, only Xia et al. (2022); Xia (2021) consider this distance, but neither of these papers consider the model herein, nor do they undertake a minimax analysis. Our study on adaptive inference is inspired by a rich literature on adaptation theory in various settings. For example, our minimax result in Theorem 8 is reminiscent of several results in high-dimensional sparse linear regression (Cai and Guo, 2018, 2017; Cai et al., 2021b, 2023; Guo et al., 2019; Nickl and van de Geer, 2013) and functional data analysis (Cai and Low, 2004; Cai et al., 2013; Cai and Low, 2005; Robins and Vaart, 2006; Hoffmann and Nickl, 2011; Cai and Low, 2006; Lepskii, 1992, 1993; Cai et al., 2014). In these prior works the authors also consider adaptive confidence sets or confidence intervals, and they consider adaptation to an unknown parameter. However, the only result we know of considering adaptive inference in a matrix context is Carpentier et al. (2018), but the focus of that work is in adaptation with respect to the rank r, and they do not consider estimating subspaces. To the best of our knowledge, our study is the first to consider adaptive inference, where adaptation is considered with respect to the SNR. 
+
+## 6 Numerical Applications 
+
+In this section we apply Algorithm 1 to both real and simulated data. In the subsequent section we consider simulated data, and in Section 6.2 we consider an application to global trade data. 
+
+6.1 Simulations 
+
+We first consider the following setup. For each figure, we consider n ∈ { 200 , 400 }. For a given L, λ , and n,we first generate a subspace U randomly by drawing a Gaussian random matrix of dimension n × r, and then computing its left singular vectors. We then generate R(l) by drawing a random symmetric matrix of dimension r × r with standard Gaussian entries, and then normalizing it so its smallest singular value is λ. Each A(l) is then drawn with σ = 1 according to the model (1). In Fig. 1 we plot the errors for 
+
+L ∈ { n/ 4, n/ 2, 3n/ 4, n } and λ = nc/ 16 for c ∈ { 6, 7, 8, 9}. Each different color is associated to a different value of λ. The dotted line corresponds to the spectral initialization (akin to the algorithm proposed in prior works), and the solid line denotes the error after 100 iterations of projected gradient descent. Notably, the error for a given value of λ is always smaller for projected gradient descent than the spectral initialization, but for sufficiently large λ, the two errors are much closer, and get smaller for larger L, which mirrors our theory directly. Next, we consider confidence intervals for the error ∥ sin Θ( bUt, U )∥2 
+
+> F
+
+. We consider a similar setup as before, only now we consider λ = nc/ 16 with c ∈ { 8, 9, 10 , 11 }, since Theorem 7 requires stronger signal strength. Table 1 shows the empirical probability that the true ∥ sin Θ( bU , U )∥2 
+
+> F
+
+lies in the computed confi-dence interval with α = .05 , averaged over 100 samples for each L, with the left table associated to n = 200 
+
+and the right for n = 400 . According to our theory, as we increase λ and increase L, we expect the confidence intervals to be valid. Indeed, at λ = n8/16 we do not see validity for either n value, but for λ = n9/16 we see that the empirical probability is closer to .95 for larger L. For the row associated to λ = n10 /16 , we again 13 n = 200 n = 400 
+
+Figure 1: Simulation of proposed projected gradient descent algorithm (solid lines) versus the spectral initialization (dotted lines) with σ = 1 . Each color is a different value of λ = nc/ 16 with c ∈ { 6, 7, 8, 9}.The x-axis denotes the number of layers, and the y-axis denotes the error averaged over 10 Monte Carlo repetitions. 
+
+Lλ 50 100 150 200 
+
+n8/16 0.44 0.68 0.71 0.71 
+
+n9/16 0.75 0.85 0.95 0.92 
+
+n10 /16 0.95 0.94 0.97 0.99 
+
+n11 /16 0.93 0.90 0.93 0.97  
+
+> n= 200
+
+Lλ 100 200 300 400 
+
+n8/16 0.68 0.80 0.83 0.82 
+
+n9/16 0.89 0.90 0.93 0.94 
+
+n10 /16 0.92 0.94 0.96 0.95 
+
+n11 /16 0.94 0.96 0.96 0.96  
+
+> n= 400
+
+Table 1: Empirical probability of ∥ sin Θ( bU , U )∥2 
+
+> F
+
+∈ dCI α (α = .05) averaged over 100 Monte Carlo repetitions. see that our resulting confidence intervals are approximately valid for all L. This phenomenon is reflected by both n = 200 and n = 400 .
+
+6.2 Application to Trade Data 
+
+In this section we apply projected gradient descent with the spectral initialization to the trade data analyzed in several previous works (Jing et al., 2021; Lyu and Xia, 2023; Agterberg and Zhang, 2025) and collected by De Domenico et al. (2015). We preprocess the data as in Agterberg and Zhang (2025), resulting in L = 59 
+
+matrices of dimension 214 × 214 , where each matrix A(l) is a measure of the trading volume of commodity 
+
+l between different countries. We run projected gradient descent with r = 5 as in Agterberg and Zhang (2025). In Fig. 2 we plot dimensions 1 and 2 (left) and dimensions 3 and 4 (right) of bUt. Observe that dimensions 1 and 2 have a clear distinction between Europe and Asia, and dimensions 3 and 4 have a clear separation of the USA from other countries. To further study the resulting embeddings, in Fig. 3 we plot the percentile of each dimension, with largest values in red and smallest values in blue. In dimension 2 we see that most of Eastern Europe, Asia, and Africa are warmer colors, whereas Western Europe and North and South America are largely cooler colors. Dimension 4 contains similar behavior, except with the roles of Europe and the Americas reversed. This figure suggests that Algorithm 1 is uncovering underlying shared structure. 14 Dimensions 1 and 2. Dimensions 3 and 4. Figure 2: Resulting embedding of trade data    
+
+> Dimension 1 Dimension 2 Dimension 3
+> Dimension 4 Dimension 5
+
+Figure 3: Percentile of each column of bUt for each country, with warmer colors associated to larger values and cooler colors associated to smaller values. 
+
+## 7 Discussion 
+
+We have considered the statistical and computational limits for estimation of U with respect to the Frobenius 
+
+sin Θ distance, and the statistical limits for adaptive inference for the error ∥ sin Θ( bU , U )∥2 
+
+> F
+
+. In practice, these results imply that statistical inference may be difficult without a priori knowledge of the signal strength, even when optimal estimation is feasible. There are several possible extensions, which we detail below. 
+
+• Optimal dependence on r and κ. In this work we have focused on the statistical and computational limits without optimizing for r and κ, and our results are somewhat loose with regard to these quantities. 15 It would be of interest to determine the precise dependence on these quantities, and whether there are algorithms that are robust to overspecifying r, or that perform well with large values of κ.
+
+• Extension to heteroskedastic noise . Our main results require, at the very least, that each N (l) is a Wigner matrix. However, in practice, the noise matrices may have heteroskedasticity, as is the case for binary network data. Extending our analysis to this setting may require additional modifications that explicitly account for heteroskedasticity. 
+
+• Sharp phase transitions. Our results demonstrate different phase transitions based on the order-wise behavior of λ/σ . It is of interest to determine the sharp constants for the error in all possible regimes of interest. 
+
+## Acknowledgments 
+
+Part of this research was performed while the author was visiting the Institute for Mathematical and Statis-tical Innovation (IMSI), which is supported by the National Science Foundation (Grant No. DMS-1929348). 
+
+## A Proof of Theorem 2 
+
+In this section we prove Theorem 2. Throughout our proofs we note that if an event holds with probability at least 1 − C exp( −cn ) then it holds with probability 1 − exp( −cn ) for some other constant c, and we do this replacement subsequently without further justification. We will prove by induction. Our first result controls the spectral norm of the initialization error. Through-out our proofs, we let λmax := max l ∥R(l)∥.
+
+Lemma 1. Under the conditions of Theorem 2, with probability at least 1 − exp( −cn ) it holds that 
+
+X
+
+> l
+
+
+
+(A(l))2 − (S(l))2 − σ2
+
+2 (n + 1) In
+
+
+
+≲ λmax σ√nL + σ2n√L. 
+
+Proof. See Section A.1. 
+
+Proof of Theorem 2: Initialization. We now provide a bound for the spectral initialization. We will simply apply the Davis-Kahan Theorem. Observe that 
+
+> L
+
+X
+
+> l=1
+
+E(A(l))2 = X
+
+> l
+
+(S(l))2 + σ2
+
+2 L(n + 1) I.
+
+This shows that 
+
+λr
+
+ X
+
+> l
+
+(S(l))2 + σ2
+
+2 (n + 1) LI
+
+
+
+≥ Lλ 2 + σ2
+
+2 nL. 
+
+Observe that by Lemma 1, with probability at least 1 − exp( −cn ),
+
+X
+
+> l
+
+ A(l)2 −  S(l)2 − σ2
+
+2 (n + 1) In
+
+
+
+≲ λmax σ√nL + σ2n√L
+
+≤ Lλ 2
+
+4
+
+where the final inequality holds whenever λ/σ ≥ C max κp nL , √nL1/4 which holds when (7) is satisfied. Therefore, by the Davis-Kahan Theorem, we have that with this same probability, 
+
+∥ sin Θ( bU0, U )∥ ≲ λmax σ√nL + σ2n√LLλ 2
+
+≲ κσ √n
+
+√Lλ + σ2nλ2√L .
+
+16 Using the deterministic inequality ∥A∥F ≤ √r∥A∥ for any matrix A of rank at most r, we obtain that 
+
+∥ sin Θ( bU0, U )∥F ≤ Cκσ √nr 
+
+√Lλ + Cσ 2n√rλ2√L
+
+whenever the event in Lemma 1 holds. We prove Theorem 2 by induction. For simplicity we only consider the regime where √n ≳ λ/σ ≳√n/L 1/4 since otherwise no additional iterations are required and the result holds for t = 0 . We also do not consider the updates for bR(l) 
+
+> t
+
+since we can encode these updates directly into the algorithm, since 
+
+bR(l) 
+
+> t
+
+= bU ⊤ 
+
+> t
+
+A(l) bUt. Therefore, the gradient updates are equivalently given by 
+
+bUt+1 /2 = bUt − ηL
+
+> L
+
+X
+
+> l=1
+
+  bUt bR(l) 
+
+> t
+
+bU ⊤ 
+
+> t
+
+− A(l) bUt bR(l)
+
+> t
+
+= bUt − ηL
+
+> L
+
+X
+
+> l=1
+
+  bUt bU ⊤ 
+
+> t
+
+A(l) bUt bU ⊤ 
+
+> t
+
+− A(l) bUt bU ⊤ 
+
+> t
+
+A(l) bUt;
+
+bUt+1 = SVD r ( bUt+1 /2).
+
+This algorithm does not include any updates for bR(l) 
+
+> t
+
+, and it is equivalent to Algorithm 1. Define the event 
+
+Egood := 
+
+ X
+
+> l
+
+N (l)QS (l) ≤ Cσ √rnLλ max ∥Q∥F for all matrices Q of rank at most 2r
+
+
+
+(14a) 
+
+\  X
+
+> l
+
+N (l)QN (l) − σ2
+
+2 L Q⊤ + Tr (Q)I ≤ Cσ 2nr √L∥Q∥F
+
+for all matrices Q of rank at most 2r
+
+ (14b) 
+
+\  X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U ≤ Cσ 2r max {√nL, n }
+
+
+
+(14c) 
+
+\  X
+
+> l
+
+N (l)S(l) ≤ Cσ √nLλ max 
+
+
+
+(14d) We will prove the result by induction on t on the event Egood . The following lemma shows that Egood holds with high probability. 
+
+Lemma 2. Suppose that each N (l) is a subgaussian Wigner matrix with variance σ2 and ψ2 norm bounded by σ. Suppose that max l ∥S(l)∥ ≤ λmax and log( L) ≤ cnr for some sufficiently small constant c. Then the event Egood holds with probability at least 1 − exp( −cn ).Proof. See Section A.2. To give the proof we will require some additional bounds on the event Egood . Define 
+
+Lt := − 1
+
+L
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤ X 
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt + 1
+
+L U⊥U ⊤⊥
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+− bUt bU ⊤
+
+> t
+
+1
+
+L
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt + 1
+
+L
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt
+
+(15) 
+
+Qt := − 1
+
+L bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt + 1
+
+L
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt, (16) 17 which are the terms linear and quadratic in N (l) respectively. The following lemma controls the linear error. 
+
+Lemma 3. Suppose the conditions of Theorem 2 hold. Suppose that 
+
+∥U ⊤⊥ bUt∥F ≤ 12 .
+
+Then on the event Egood it holds that 
+
+∥U⊥U ⊤⊥ Lt∥F ≤ C∥U ⊤⊥ bUt∥F
+
+σλ max 
+
+√nr 
+
+√L + C σλ max 
+
+√nr 
+
+√L ;
+
+∥Lt∥F ≤ C√r∥U ⊤⊥ bUt∥F
+
+σλ max 
+
+√nr 
+
+√L + C σλ max 
+
+√nr 
+
+√L .
+
+Proof. See Section A.3. The following lemma bounds the term Qt.
+
+Lemma 4. Suppose the conditions of Theorem 2 hold. Suppose that 
+
+∥U ⊤⊥ bUt∥F ≤ 12 .
+
+Then on the event Egood it holds that 
+
+∥U⊥U ⊤⊥ Qt∥F ≤ ∥ U ⊤⊥ bUt∥F
+
+Cσ 2nr 3/2
+
+√L + Cσ 2r3/2 max {√nL, n }
+
+L
+
+∥Qt∥F ≤ Cσ 2nr 2
+
+√L
+
+Proof. See Section A.4. Finally, the following technical lemma is needed to ensure that the iterates contract. 
+
+Lemma 5. Suppose the conditions of Theorem 2 hold. Suppose that 
+
+∥U ⊤⊥ bUt∥F ≤ 12 .
+
+Then on the event Egood it holds that 
+
+λr
+
+ X
+
+> l
+
+bU ⊤ 
+
+> t
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+
+
+≥ Lλ 2
+
+4 ;
+
+∥ X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt∥ ≤ Lλ 2max .
+
+Proof. See Section A.5. With these lemmas in place we now have the proof of Theorem 2 for t ≥ 1.
+
+Proof of Theorem 2: Induction Step. Define the event ELemma 1 as the event that 
+
+∥ sin Θ( bU (0) , U )∥F ≤ C1
+
+σκ √nr λ√L
+
+| {z }
+
+> =: A
+
++ C2
+
+σ2n√r
+
+√Lλ 2
+
+| {z }
+
+> =: B
+
+.
+
+18 Throughout we condition on the event Egood ∩ E Lemma 1 . By Lemma 1, ELemma 1 holds with probability at least 1 − exp( −cn ), and by Lemma 2, Egood holds with this same probability. Under (7) and the event 
+
+Egood ∩ E Lemma 1 , it holds that ∥U ⊤⊥ bUt∥F ≤ 12 provided C0 is sufficiently large. Therefore, suppose that at time t it holds that 
+
+∥ sin Θ( bUt, U )∥F ≤ A +  1 − ηλ 2
+
+8
+
+tB. 
+
+Clearly this holds at time t = 0 . The gradient update gives 
+
+bUt+1 /2 = bUt − ηL
+
+> L
+
+X
+
+> l=1
+
+bUt bU ⊤ 
+
+> t
+
+A(l) bUt bU ⊤ 
+
+> t
+
+− A(l)
+
+bUt bU ⊤ 
+
+> t
+
+A(l) bUt
+
+= bUt − ηL
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤ LX
+
+> l=1
+
+S(l) bUt bU ⊤
+
+> t
+
+ S(l) bUt
+
+− ηL
+
+> L
+
+X
+
+> l=1
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤N (l) − U⊥U ⊤⊥ N (l)
+
+bUt bU ⊤
+
+> t
+
+ S(l) bUt
+
+− ηL
+
+> L
+
+X
+
+> l=1
+
+bUt bU ⊤
+
+> t
+
+ S(l) + N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt
+
++ ηL
+
+> L
+
+X
+
+> l=1
+
+ S(l) + N (l) bUt bU ⊤
+
+> t
+
+ N (l) bUt.
+
+From the definitions of Lt and Qt in Eq. (15) and Eq. (16) it holds that 
+
+U⊥U ⊤⊥ bUt+1 /2 = U⊥U ⊤⊥ bUt − ηL U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt + ηU⊥U ⊤⊥
+
+
+
+Lt + Qt
+
+
+
+.
+
+From Lemma 3 and Lemma 4 we have that 
+
+∥U⊥U ⊤⊥ Lt∥F ≤ C∥U ⊤⊥ bUt∥F
+
+σ√nrλ max 
+
+√L + C σλ max 
+
+√nr 
+
+√L ;
+
+∥U⊥U ⊤⊥ Qt∥F ≤ ∥ U ⊤⊥ bUt∥F
+
+Cσ 2nr 3/2
+
+√L + Cσ 2r3/2 max {√nL, n }
+
+L .
+
+By Lemma 5, 
+
+λr
+
+ηL
+
+X
+
+> l
+
+bU ⊤ 
+
+> t
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+!
+
+≥ ηλ 2
+
+4 .
+
+Since ηλ 2 ≤ 1, this yields 
+
+∥U ⊤⊥ bUt+1 /2∥F ≤ ∥ U ⊤⊥ bUt∥F
+
+
+
+1 − ηλ 2
+
+4 + η Cσ √nrλ max 
+
+√L + η Cσ 2nr 3/2
+
+√L
+
+
+
++ η Cσλ max 
+
+√nr 
+
+√L + η Cσ 2r3/2 max {√nL, n }
+
+L .
+
+Under (7), since C1 is fixed, it holds that 
+
+Cσλ max 
+
+√nr 
+
+√L + Cσ 2r3/2 max {√nL, n }
+
+L ≤ λ2
+
+64 A. 
+
+19 Therefore, from the induction hypothesis, 
+
+∥U ⊤⊥ bUt+1 /2∥F ≤
+
+
+
+1 − 7ηλ 2
+
+32 
+
+
+
+∥U ⊤⊥ bUt∥F + ηλ 2
+
+64 A
+
+≤
+
+
+
+1 − 7ηλ 2
+
+32 
+
+ 
+
+A +  1 − ηλ 2
+
+8
+
+tB
+
+
+
++ ηλ 2
+
+64 A
+
+= A
+
+
+
+1 − 13 ηλ 2
+
+64 
+
+
+
++
+
+
+
+1 − ηλ 2
+
+8
+
+t
+
+B
+
+
+
+1 − 7ηλ 2
+
+32 
+
+
+
+.
+
+We next bound the projection step. Write 
+
+bUt+1 /2 = bUt+1 bΣt bV ⊤ 
+
+> t
+
+.
+
+Then 
+
+∥ sin Θ( bUt+1 , U )∥F ≤ ∥ bΣ−1 
+
+> t
+
+∥ ∥ U ⊤⊥ bUt+1 /2∥F .
+
+We claim that 
+
+∥ bΣ−1 
+
+> t
+
+∥ ≤ 1 + ηλ 2
+
+32 .
+
+Indeed, write 
+
+bUt+1 /2 = bUt + It,
+
+where 
+
+It := − ηL
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤ X 
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt + ηLt + ηQt.
+
+Using ηλ 2max ≤ cη and the induction hypothesis, 
+
+ηL
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤ X 
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt ≤ 2ηλ 2max ∥U ⊤⊥ bUt∥F
+
+≤ 2cη
+
+"
+
+A +
+
+
+
+1 − ηλ 2
+
+8
+
+t
+
+B
+
+#
+
+.
+
+Since ηλ 2 ≥ c′ 
+
+> η
+> κ2
+
+, (7) implies that A + B ≤ c′ 
+
+> η
+> 1024 cη
+> 1
+> κ2
+
+and hence 
+
+ηL
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤ X 
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt ≤ 2cη (A + B)
+
+≤ 2cη
+
+c′
+
+> η
+
+1024 cη
+
+1
+
+κ2
+
+≤ ηλ 2
+
+512 .
+
+Similarly, by Lemmas 3 and 4 and (7), 
+
+∥ηLt∥F + ∥ηQt∥F ≤ η∥U ⊤⊥ bUt∥F
+
+Cσ √nrλ max 
+
+√L + η Cσλ max 
+
+√nr 
+
+√L + η Cσ 2nr 2
+
+√L
+
+≤ ηλ 2
+
+512 .
+
+20 Hence, it holds that ∥I t∥ ≤ ηλ 2 
+
+> 256
+
+. Therefore, 
+
+bU ⊤ 
+
+> t+1 /2
+
+bUt+1 /2 − Ir ≤ 2∥I t∥ + ∥I t∥2 ≤ ηλ 2
+
+128 + η2λ4
+
+256 2 ≤ ηλ 2
+
+64 .
+
+By Weyl’s inequality, λ2 
+
+> r
+
+( bΣt) ≥ 1 − ηλ 2 
+
+> 64
+
+. Thus, since ηλ 2 ≤ 1,
+
+∥ bΣ−1 
+
+> t
+
+∥ ≤ 1
+
+p1 − ηλ 2/64 ≤ 1 + ηλ 2
+
+32 .
+
+Therefore, we have shown that 
+
+∥ sin Θ( bUt+1 , U )∥F ≤
+
+
+
+1 + ηλ 2
+
+32 
+
+ "
+
+A
+
+
+
+1 − 13 ηλ 2
+
+64 
+
+
+
++
+
+
+
+1 − ηλ 2
+
+8
+
+t
+
+B
+
+
+
+1 − 7ηλ 2
+
+32 
+
+#
+
+≤ A +
+
+
+
+1 − ηλ 2
+
+8
+
+t+1 
+
+B. 
+
+Hence, for every t ≥ 0, on the event Egood ,
+
+∥ sin Θ( bUt, U )∥F ≤ C1
+
+σκ √nr λ√L +
+
+
+
+1 − ηλ 2
+
+8
+
+t
+
+C2
+
+σ2n√r
+
+√Lλ 2 .
+
+Since ηλ 2 > c ′ 
+
+> η
+
+/κ 2, we also have 
+
+∥ sin Θ( bUt, U )∥F ≤ C1
+
+σκ √nr λ√L +
+
+
+
+1 − c′
+
+> η
+
+8κ2
+
+t
+
+C2
+
+σ2n√r
+
+√Lλ 2 .
+
+This completes the proof. 
+
+A.1 Proof of Lemma 1 
+
+Proof. Without loss of generality we let σ2 = 1 . We define 
+
+S := X
+
+> l
+
+
+
+(A(l))2 − (S(l))2 − 12 (n + 1) In
+
+
+
+.
+
+It holds that S ≤ SL + SQ where SL and SQ are defined via 
+
+SL : = X
+
+> l
+
+
+
+N (l)S(l) + S(l)N (l)
+
+
+
+;
+
+SQ : = X
+
+> l
+
+
+
+(N (l))2 − E N (l)2
+
+
+
+.
+
+We will bound each term separately. 
+
+Bounding SL: First, we note that 
+
+X
+
+> l
+
+N (l)S(l) = X
+
+> l
+
+Pupper −diag (N (l))S(l) + X
+
+> l
+
+Pc
+
+> upper −diag
+
+(N (l))S(l),
+
+where Pupper −diag is the operator that sets its lower off-diagonal elements to zero. Without loss of generality we bound the first term; the second is similar. 21 Let x be any deterministic unit vector in the span of U U ⊤, and let y be any deterministic n-dimensional unit vector. Then we can write 
+
+y⊤ X
+
+> l
+
+Pupper −diag (N (l))S(l)x = X
+
+> 1≤i≤n, 1≤j≤nn
+
+X
+
+> k=1
+
+X
+
+> l
+
+yiPupper −diag (N (l))ij S(l) 
+
+> jk
+
+xk.
+
+Note that for fixed x and y this is a sum of independent subgaussian random variables. We will note that its ψ2 norm can be bounded by 
+
+X
+
+> 1≤i≤n, 1≤j≤n
+
+X
+
+> l
+
+y2
+
+> i
+
+ X
+
+> k
+
+S(l) 
+
+> jk
+
+xk
+
+2
+
+= X
+
+> l
+
+X
+
+> j
+
+∥e⊤ 
+
+> j
+
+S(l)x∥2 = X
+
+> l
+
+∥S(l)x∥2 ≤ Lλ 2max ,
+
+since sup ∥x∥=1 ∥S(l)x∥2 ≤ λ2max . By taking a union bound via ε-net, it holds that 
+
+∥ X
+
+> l
+
+N (l)S(l)∥ ≤ Ct 
+
+with probability at least 1 − exp 
+
+
+
+cn − t2
+
+> Lλ 2max
+
+
+
+. Consequently, letting t2
+
+> Lλ 2max
+
+= s2, we obtain that 
+
+∥ X
+
+> l
+
+N (l)S(l)∥ ≤ Cs √Lλ max 
+
+with probability at least 1 − exp 
+
+
+
+cn − s2
+
+
+
+. Therefore, we may let s = C√n to obtain that 
+
+∥ X
+
+> l
+
+N (l)S(l)∥ ≤ C√nLλ max 
+
+with probability at least 1 − exp( −cn ).
+
+Bounding SQ: First, we have 
+
+SQ = X
+
+> l
+
+(N (l))2 − E(N (l))2 ≤ X
+
+> l
+
+H(N (l))2 + X
+
+> l
+
+D(N (l))2 − E(N (l))2 ,
+
+where H(·) is the hollowing operator that sets the diagonal to zero, and D is the diagonal operator that sets the off-diagonal to zero. We bound each term in turn. 
+
+• The off-diagonal term. Observe that the first term can be written as a U-statistic in the entries of N (l),and we may apply Theorem 1 of Pena and Montgomery-Smith (1995) to obtain that 
+
+P
+
+ X
+
+> l
+
+H(N (l))2 > t 
+
+
+
+≤ CP
+
+ X
+
+> l
+
+H
+
+
+
+N (l) fN (l)
+
+
+
+> Ct 
+
+
+
+,
+
+where fN (l) is an independent copy. We then have that 
+
+X
+
+> l
+
+H
+
+
+
+N (l) fN (l)
+
+
+
+≤ X
+
+> l
+
+N (l) fN (l)
+
+| {z }
+
+> =: T1
+
++ X
+
+> l
+
+D
+
+
+
+N (l) fN (l)
+
+| {z }
+
+> =: T2
+
+.
+
+We now bound each term T1 and T2 as follows. 22 – The term T2. For the diagonal term above, we note that the i’th diagonal entry can be written as 
+
+X
+
+> l
+
+X
+
+> j
+
+N (l) 
+
+> ij
+
+fN (l) 
+
+> ij
+
+.
+
+Conditional on fN (l), the above is a subgaussian random variable with variance proxy P
+
+> l
+
+P
+
+> j
+
+  fN (l)
+
+> ij
+
+2.Therefore, it can be bounded via 
+
+X
+
+> l
+
+X
+
+> j
+
+N (l) 
+
+> ij
+
+fN (l) 
+
+> ij
+
+≤ Ct 
+
+sX
+
+> l
+
+X
+
+> j
+
+  fN (l)
+
+> ij
+
+2
+
+with probability at least 1 − 2 exp( −ct 2), conditional on fN (l). Using concentration of the norm for subgaussian random variables, uniformly over i it holds that 
+
+sX
+
+> l
+
+X
+
+> j
+
+  fN (l)
+
+> ij
+
+2 ≤ C√nL (17) with probability at least 1 − 2n exp( −cnL ). Therefore, on this event, for all i, with probability at least 
+
+1 − 2n exp( −ct 2) it holds that 
+
+X
+
+> l
+
+X
+
+> j
+
+N (l) 
+
+> ij
+
+fN (l) 
+
+> ij
+
+≤ Ct √nL, 
+
+whenever the event (17) holds. Combining it all we have that this quantity is bounded by Cn √L with probability at least 1 − 2n exp( −cn ) − 2n exp( −cnL ).
+
+– The term T1. We replicate our proof for ∥ P 
+
+> l
+
+N (l)S(l)∥ only replacing S(l) with fN (l). Conditional on the event 
+
+sup 
+
+> ∥x∥=1
+
+X
+
+> l
+
+∥N (l)x∥2 ≤ CLn, 
+
+it holds that 
+
+X
+
+> l
+
+N (l) fN (l) ≤ Cs √Ln 
+
+with probability at least 1 − 2 exp( cn − s2). Taking s ≍ √n yields the same bound, which holds with probability at least 1 − 2 exp( −cn ) − 2 exp( −cLn ).We have thus shown that 
+
+X
+
+> l
+
+H
+
+
+
+(N (l))2
+
+
+
+≤ Cn √L
+
+with probability at least 1 − 8n exp( −cn ).
+
+• The Diagonal Term . We observe that 
+
+D
+
+ X
+
+> l
+
+(N (l))2 − E(N (l))2
+
+
+
+= max 
+
+> i
+
+X
+
+> l,j
+
+(N (l) 
+
+> ij
+
+)2 − E(N (l) 
+
+> ij
+
+)2 .
+
+For fixed i, this is a subexponential random variable. Bernstein’s inequality implies that 
+
+X
+
+> l,j
+
+(N (l) 
+
+> ij
+
+)2 − E(N (l) 
+
+> ij
+
+)2 ≤ t
+
+23 with probability at least 1 − 2 exp( −c min { t2 
+
+> Ln
+
+, t }). Take t = Cn √L and a union bound to show that 
+
+D
+
+ X
+
+> l
+
+(N (l))2 − E(N (l))2
+
+
+
+≲ n√L
+
+with probability at least 1 − 2n exp( −cn ).Combining all these inequalities and adjusting constants completes the proof. 
+
+A.2 Proof of Lemma 2 
+
+Proof of Lemma 2. The proof for (14a) is similar to the proof of Lemma 1. First, let Q be any fixed matrix of rank at most 2r. Slightly modifying the proof of Lemma 1 shows that we have that for any fixed matrix 
+
+Q it holds that 
+
+∥ X
+
+> l
+
+N (l)QS (l)∥ ≲ Cσs √Lλ max ∥Q∥F
+
+with probability at least 1 − exp( cn − s2). Next, consider 
+
+eQ := arg sup  
+
+> Q:∥Q∥F≤1; rank (Q)≤2r
+
+∥ X
+
+> l
+
+N (l)QS (l)∥.
+
+Let Nε be an ε-net for matrices of rank at most 2r with Frobenius norm at most 1. Then |N ε| ≤ exp( cnr )
+
+by Lemma 3.1 of Candès and Plan (2011). Define the event 
+
+sup 
+
+> Q∈N ε
+
+∥ X
+
+> l
+
+N (l)QS (l)∥ ≤ Cσ √Lnrλ max . (18) By a union bound (18) holds with probability at least 1 − exp( −cnr ) for an appropriate choice of C above. Let Qε be the matrix in Nε within ε of eQ. Without loss of generality we can assume that ( eQ − Qε)U̸ = 0 
+
+(since if it does the result is zero). In this case, note that 
+
+∥  eQ − Qε
+
+U U ⊤∥F ≤ ε < 1,
+
+and hence   eQ − Qε
+
+U U ⊤ is a matrix of rank at most 2r with Frobenius norm at most 1. Furthermore, when (18) holds, 
+
+M := ∥ X
+
+> l
+
+N (l) eQS (l)∥≤ ∥ X
+
+> l
+
+N (l)  eQ − Qε
+
+S(l)∥ + ∥ X
+
+> l
+
+N (l) Qε
+
+S(l)∥≤ ∥   eQ − Qε
+
+U U ⊤∥F ∥ X
+
+> l
+
+N (l)
+
+  eQ − Qε
+
+
+
+∥  eQ − Qε
+
+U U ⊤∥F
+
+S(l)∥ + ∥ X
+
+> l
+
+N (l) Qε
+
+S(l)∥≤ εM + Cσ √Lnrλ max .
+
+This implies that M ≲ √Lnrλ max with probability at least 1 − exp( −cnr ), which is the assertion (14a). To prove (14b), we similarly apply an ε-net, but we also use a decoupling argument. First, fix any matrix 
+
+Q of rank at most 2r. Observe that since each N (l) is a Wigner matrix, it holds that 
+
+EN (l)QN (l) = σ2
+
+2
+
+
+
+Q⊤ + diag  Tr (Q)
+
+.
+
+24 Consequently, we have that 
+
+X
+
+> l
+
+N (l)QN (l) − σ2
+
+2 L Q⊤ + Tr (Q)I ≤ X
+
+> l
+
+H
+
+
+
+N (l)QN (l) − σ2
+
+2 Q⊤
+
+
+
++ X
+
+> l
+
+D
+
+
+
+N (l)QN (l) − σ2
+
+2
+
+ Q + Tr (Q)I
+
+,
+
+where we have separated the off-diagonal from the diagonal. We will bound each term separately for fixed 
+
+Q.
+
+• The off-diagonal. We have that the i, i ′ entry is given by (for i̸ = i′)
+
+
+
+N (l)QN (l)
+
+
+
+> ii ′
+
+− σ2
+
+2 Qi′i =
+
+> n
+
+X
+
+> j,k =1
+
+N (l) 
+
+> ij
+
+Qjk N (l) 
+
+> i′k
+
+− σ2
+
+2 Qi′i.
+
+Let x, y be unit vectors. Then we have that 
+
+X
+
+> l
+
+x⊤H
+
+
+
+N (l)QN (l) − σ2
+
+2 Q⊤
+
+
+
+y
+
+= X
+
+> l
+
+ X
+
+> i̸=i′
+
+X
+
+> j,k
+
+xiyi′ N (l) 
+
+> ij
+
+Qjk N (l) 
+
+> i′k
+
+− σ2
+
+2 x⊤H(Q⊤)y
+
+
+
+= X
+
+> l
+
+ X
+
+> i̸=i′
+
+xiyi′ N (l) 
+
+> ii ′
+
+Qi′iN (l) 
+
+> i′i
+
++ X
+
+> i̸=i′
+
+X  
+
+> j̸=i′,k ̸=i
+
+xiyi′ N (l) 
+
+> ij
+
+Qjk N (l) 
+
+> i′k
+
+− x⊤H(Q⊤)y
+
+
+
+= X
+
+> l
+
+X
+
+> i<i ′
+
+  N (l)
+
+> ii ′
+
+2 − σ2
+
+2
+
+
+
+xiyi′ Qi′i + xi′ yiQii ′
+
+
+
++ X
+
+> l
+
+X
+
+> i̸=i′
+
+X  
+
+> j̸=i′,k ̸=i
+
+xiyi′ N (l) 
+
+> ij
+
+Qjk N (l)
+
+> i′k
+
+.
+
+We will control each of these two terms separately. 
+
+– The first term : Observe that the first term is a sum of independent mean-zero sub-exponential random variables. We have that 
+
+X
+
+> l
+
+X
+
+> i<i ′
+
+  N (l)
+
+> ii ′
+
+2 − σ2
+
+2
+
+
+
+xiyi′ Qii ′ + xi′ yiQi′i
+
+ 2
+
+> ψ1
+
+≤ CLσ 4 X
+
+> i,i ′
+
+ xiyi′ Qi′i
+
+2 ≲ σ4L∥Q∥2,
+
+since x and y are unit vectors. Similarly, we have that 
+
+max 
+
+> i,i ′
+
+  N (l)
+
+> ii ′
+
+2 − σ2
+
+2
+
+
+
+xiyi′ Qi′i + xi′ yiQii ′
+
+
+
+> ψ1
+
+≲ σ2∥Q∥.
+
+Therefore, by the generalized Bernstein inequality (Theorem 2.8.1 of Vershynin (2018)), it holds that 
+
+X
+
+> l
+
+X
+
+> i<i ′
+
+  N (l)
+
+> ii ′
+
+2 − 1
+
+xiyi′ Qi′i + xi′ yiQii ′
+
+
+
+≲ t√Lnσ 2∥Q∥
+
+with probability at least 1 − exp( −c min( t2n, t √Ln )) . Letting t ≍ √nr shows that with probability at least 1 − exp   − c min {n2r2, n 2√Lr  ≥ 1 − exp( −cnr ), it holds that 
+
+X
+
+> l
+
+X
+
+> i<i ′
+
+  N (l)
+
+> ii ′
+
+2 − 1
+
+xiyi′ Qi′i + xi′ yiQii ′
+
+
+
+≲ nr √Lσ 2∥Q∥F .
+
+25 – The second term . We note that for i̸ = i′, j̸ = i′, k ̸ = i, the second term is a U-statistic in N (l) 
+
+> ij
+
+. By the decoupling inequality (Theorem 3.4.1 of De La Peña and Giné (1999)), it holds that 
+
+P
+
+ X
+
+> l
+
+X
+
+> i̸=i′
+
+X  
+
+> j̸=i′,k ̸=i
+
+xiyi′ N (l) 
+
+> ij
+
+Qjk N (l) 
+
+> i′k
+
+> t 
+
+
+
+≤ CP
+
+ X
+
+> l
+
+X
+
+> i̸=i′
+
+X  
+
+> j̸=i′,k ̸=i
+
+xiyi′ fN (l) 
+
+> ij
+
+Qjk N (l) 
+
+> i′k
+
+> Ct 
+
+
+
+,
+
+where fN (l) is an independent copy of N (l). Define the event 
+
+E := max  
+
+> l
+
+∥N (l)∥ ≤ Cσ √nr. 
+
+By a union bound, we note that E holds with probability at least 1 − L exp( −cnr ). We observe that on the event E,
+
+X
+
+> l
+
+X
+
+> i
+
+X
+
+> j
+
+fN (l) 
+
+> ij
+
+xi
+
+ X 
+
+> k̸=i
+
+X 
+
+> i′̸=i,j
+
+Qjk N (l)
+
+> i′k
+
+yi′
+
+ 2
+
+> ψ2
+
+≲ σ2L max 
+
+> l,i
+
+X
+
+> j
+
+ X
+
+> k
+
+X 
+
+> i′̸=k,i
+
+Qjk N (l)
+
+> i′k
+
+yi′
+
+2
+
+≲ σ2L max  
+
+> l
+
+max 
+
+> i
+
+X
+
+> j
+
+e⊤ 
+
+> j
+
+QH P−i N (l) y
+
+> 2
+
+≤ σ2L∥Q∥2 
+
+> F
+
+max  
+
+> l
+
+max  
+
+> i
+
+H P−i N (l) y
+
+> 2
+
+≤ σ2L∥Q∥2 
+
+> F
+
+max  
+
+> l
+
+∥N (l)∥2
+
+≤ σ4Lnr ∥Q∥2 
+
+> F
+
+,
+
+where P−i removes the i’th row of N (l) and H is the hollowing operator. In the final line we used the fact that the spectral norm of any submatrix is bounded by the spectral norm of the matrix itself. Consequently, we have that 
+
+P
+
+ X
+
+> l
+
+X
+
+> i̸=i′
+
+X  
+
+> j̸=i′,k ̸=i
+
+xiyi′ fN (l) 
+
+> ij
+
+Qjk N (l) 
+
+> i′k
+
+> Ctσ 2√Lnr ∥Q∥F ∩ E 
+
+
+
+≤ 2 exp( −ct 2).
+
+If t ≍ √nr , then we have that with probability at least 1 − exp( −cnr )
+
+X
+
+> l
+
+X
+
+> i̸=i′
+
+X  
+
+> j̸=i′,k ̸=i
+
+xiyi′ fN (l) 
+
+> ij
+
+Qjk N (l) 
+
+> i′k
+
+≤ Cσ 2nr √L∥Q∥F .
+
+Combining these bounds and taking a union bound over x and y in an ε-net and applying Lemma 4.4.1 of Vershynin (2018) (adjusting constants if necessary) shows that 
+
+X
+
+> l
+
+H
+
+
+
+N (l)QN (l) − σ2
+
+2 LQ
+
+
+
+≲ nr √Lσ 2∥Q∥F
+
+with probability at least 1 − exp   − cnr .
+
+• The diagonal . We note that since the matrix in question is diagonal, we need only bound it for fixed i
+
+(and take a union bound over i). We have that 
+
+X
+
+> l
+
+X
+
+> j,k
+
+N (l) 
+
+> ij
+
+Qjk N (l) 
+
+> ki
+
+= X
+
+> l
+
+X 
+
+> j̸=k
+
+N (l) 
+
+> ij
+
+Qjk N (l) 
+
+> ki
+
++ X
+
+> l
+
+X
+
+> j
+
+ N (l)
+
+> ij
+
+2Qjj .
+
+By a similar argument to the previous part of the proof, by the decoupling inequality we can show that 
+
+X
+
+> l
+
+X 
+
+> j̸=k
+
+N (l) 
+
+> ij
+
+Qjk N (l) 
+
+> ki
+
+≲ tσ 2√Ln ∥Q∥F
+
+26 with probability at least 1 − exp( −ct 2n). Similarly, 
+
+X
+
+> l
+
+X
+
+> j
+
+ N (l)
+
+> ij
+
+2 − σ2
+
+2 − σ2
+
+2 I{i=j}
+
+
+
+Qjj ≲ t√Lnσ 2∥Q∥F
+
+with probability at least 1 − exp( −c min( t2n, t √Ln )) . The rest of the argument is exactly the same as the previous part, which yields the proof of Eq. (14b). To prove (14c), we first let x, y be deterministic unit vectors of dimension n − r and r respectively. Then we have that 
+
+X
+
+> l
+
+x⊤U ⊤⊥ N (l)U U ⊤N (l)U y = X
+
+> l
+
+⟨z(l)1 , z(l)2 ⟩,
+
+where z(l)1 and z(l)2 are uncorrelated r-dimensional random vectors with covariances equal to σ2Ir respectively. The ψ1 norm is bounded by σ2r, and we can apply Bernstein’s inequality for sums of subexponential random variables to yield that 
+
+P
+
+ X
+
+> l
+
+⟨z(l)1 , z(l)2 ⟩ > σ 2t
+
+
+
+≤ 2 exp 
+
+
+
+− c min 
+
+ t2
+
+Lr 2 , tr
+
+ 
+
+.
+
+Therefore, taking t = C max {√nLr, nr } it holds that 
+
+X
+
+> l
+
+x⊤U ⊤⊥ N (l)U U ⊤N (l)U y ≤ Cσ 2r max {√nL, n }
+
+with probability at least 1−2 exp( −cn ). Taking a net over x, y after adjusting necessary constants completes the proof. The proof for (14d) follows from Lemma 1. 
+
+A.3 Proof of Lemma 3 
+
+Proof. First, recall that 
+
+Lt := − 1
+
+L
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤ X 
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt + 1
+
+L U⊥U ⊤⊥
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+− bUt bU ⊤
+
+> t
+
+1
+
+L
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt + 1
+
+L
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt
+
+Therefore, 
+
+U⊥U ⊤⊥ Lt = − 1
+
+L U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt + 1
+
+L
+
+X
+
+> l
+
+U⊥U ⊤⊥ N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+− 1
+
+L U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt
+
+=: T1 + T2 + T3.
+
+We bound each term in turn. 27 • The term T1. The first term satisfies 
+
+1
+
+L ∥U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt∥F ≤ 1
+
+L ∥U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l)  bUt bU ⊤ 
+
+> t
+
+− U U ⊤S(l) bUt∥F
+
++ 1
+
+L ∥U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l)S(l) bUt∥F
+
+≤ 1
+
+L ∥U ⊤⊥ bUt∥F
+
+X
+
+> l
+
+N (l)  bUt bU ⊤ 
+
+> t
+
+− U U ⊤S(l)
+
++ 1
+
+L ∥U ⊤⊥ bUt∥F ∥ X
+
+> l
+
+N (l)S(l)∥≤ ∥ U ⊤⊥ bUt∥F
+
+ Cσ √nrλ max 
+
+√L ∥ bUt bU ⊤ 
+
+> t
+
+− U U ⊤∥F + σ√nλ max 
+
+√L
+
+
+
+≤ ∥ U ⊤⊥ bUt∥F
+
+ Cσ √nrλ max 
+
+√L ∥U ⊤⊥ bUt∥F + σ√nλ max 
+
+√L
+
+
+
+(19) on the event Egood by (14a) and (14d), where in the final inequality we have applied Lemma 1 of Cai and Zhang (2018). 
+
+• The term T2. We have that 
+
+∥T2∥F = 1
+
+L ∥U ⊤⊥
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUT ∥F
+
+≤ 1
+
+L ∥U ⊤⊥
+
+X
+
+> l
+
+N (l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)S(l)∥F + 1
+
+L ∥U ⊤⊥
+
+X
+
+> l
+
+N (l)S(l)∥F
+
+≤ 1
+
+L ∥ X
+
+> l
+
+N (l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)S(l)∥F + 1
+
+L ∥U ⊤⊥
+
+X
+
+> l
+
+N (l)S(l)∥F
+
+≤ ∥ bUt bU ⊤ 
+
+> t
+
+− U U ⊤∥F
+
+Cσλ max 
+
+√nr 
+
+√L + Cσλ max 
+
+√nr 
+
+√L
+
+≤ ∥ U ⊤⊥ bUt∥F
+
+Cσλ max 
+
+√nr 
+
+√L + Cσλ max 
+
+√nr 
+
+√L , (20) where we have again used (14a) and (14d) and Lemma 1 of Cai and Zhang (2018). 
+
+• The term T3. By exactly the same argument as the term T1, we have that 
+
+∥T3∥F ≤ ∥ U ⊤⊥ bUt∥F
+
+ Cσ √nrλ max 
+
+√L ∥U ⊤⊥ bUt∥F + σ√nλ max 
+
+√L
+
+
+
+. (21) Combining (19),(20), and (21) shows that 
+
+∥U⊥U ⊤⊥ Lt∥F ≤ ∥ U ⊤⊥ bUt∥F
+
+ σ√nrλ max 
+
+√L ∥U ⊤⊥ bUt∥F + σ√nλ max 
+
+√L
+
+
+
++ σ√nrλ max 
+
+√L + Cσ √nrλ max 
+
+√L ∥U ⊤⊥ bUt∥F
+
+≤ ∥ U ⊤⊥ bUt∥F
+
+Cσ √nrλ max 
+
+√L + Cσ √nrλ max 
+
+√L
+
+where the final bound holds as long ∥U ⊤⊥ bUt∥F ≤ 12 .
+
+28 We now bound ∥Lt∥F . Using the same arguments as the previous bound, we have 
+
+∥Lt∥F ≤ 1
+
+L
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤ X 
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+> F
+
++ 1
+
+L U ⊤⊥
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+> F
+
++ 1
+
+L
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt
+
+> F
+
++ 1
+
+L
+
+X
+
+> l
+
+S(l) bUt bU ⊤ 
+
+> t
+
+N (l)
+
+> F
+
+≤ 1
+
+L bUt bU ⊤ 
+
+> t
+
+− U U ⊤
+
+> F
+
+ X
+
+> l
+
+N (l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)S(l) bUt
+
+> F
+
++ U ⊤⊥
+
+X
+
+> l
+
+N (l)S(l)
+
+> F
+
+
+
++ 1
+
+L U ⊤⊥
+
+X
+
+> l
+
+N (l)
+
+bUt bU ⊤ 
+
+> t
+
+− U U ⊤
+
+
+
+S(l)
+
+> F
+
++ 1
+
+L U ⊤⊥
+
+X
+
+> l
+
+N (l)S(l)
+
+> F
+
++ 1
+
+L
+
+X
+
+> l
+
+S(l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)N (l)
+
+> F
+
++ 1
+
+L U ⊤⊥
+
+X
+
+> l
+
+N (l)S(l)
+
+> F
+
++ 1
+
+L
+
+X
+
+> l
+
+S(l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)N (l)
+
+> F
+
++ 1
+
+L U ⊤⊥
+
+X
+
+> l
+
+N (l)S(l)
+
+> F
+
+≤ √2∥U ⊤⊥ bU ∥F
+
+√r∥ bUt bU ⊤ 
+
+> t
+
+− U U ⊤∥F
+
+Cσλ max 
+
+√nr 
+
+√L + Cσλ max 
+
+√nr 
+
+√L
+
+
+
++ √r∥ bUt bU ⊤ 
+
+> t
+
+− U U ⊤∥F
+
+Cσλ max 
+
+√nr 
+
+√L + Cσλ max 
+
+√nr 
+
+√L
+
+≤ ∥ U ⊤⊥ bU ∥F
+
+√r Cσλ max 
+
+√nr 
+
+√L + Cσλ max 
+
+√nr 
+
+√L
+
+which completes the proof. 
+
+A.4 Proof of Lemma 4 
+
+Proof. We have that 
+
+Qt := − 1
+
+L bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt + 1
+
+L
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt. (22) On the event Egood by (14b) for any matrix Q it holds that 
+
+X
+
+> l
+
+N (l)QN (l) − σ2
+
+2
+
+
+
+Q + Tr (Q)I
+
+
+
+≲ σ2nr √L∥Q∥F .
+
+29 By adding and subtracting appropriately, we obtain that 
+
+U⊥U ⊤⊥ Qt = − 1
+
+L U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)N (l) bUt + σ2
+
+2 U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+bUt bU ⊤ 
+
+> t
+
+− U U ⊤
+
+bUt
+
+| {z }
+
+> =: T1
+
+− 1
+
+L U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+X
+
+> l
+
+N (l)U U ⊤N (l) bUt + σ2
+
+2 U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+
+
+U U ⊤ + rIr
+
+bUt
+
+| {z }
+
+> =: T2
+
++ 1
+
+L
+
+X
+
+> l
+
+U⊥U ⊤⊥ N (l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)N (l) bUt − σ2
+
+2 U⊥U ⊤⊥ bUt
+
+| {z }
+
+> =: T3
+
++ 1
+
+L
+
+X
+
+> l
+
+U⊥U ⊤⊥ N (l)U U ⊤N (l)U⊥U ⊤⊥ bUt − σ2
+
+2 rU⊥U ⊤⊥ bUt
+
+| {z }
+
+> =: T4
+
++ 1
+
+L
+
+X
+
+> l
+
+U⊥U ⊤⊥ N (l)U U ⊤N (l)U U ⊤ bUt
+
+| {z }
+
+> =: T5
+
+.
+
+We bound each term in turn. 
+
+• The term T1: By (14b) since Tr ( bU bU ⊤) = Tr (U U ⊤) = r, it holds that 
+
+∥T1∥F = 1
+
+L U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+ X
+
+> l
+
+N (l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)N (l) − σ2
+
+2
+
+  bUt bU ⊤ 
+
+> t
+
+− U U ⊤bUt
+
+> F
+
+≤ 1
+
+L ∥U ⊤⊥ bUt∥F
+
+X
+
+> l
+
+N (l)( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)N (l) − σ2
+
+2 ( bUt bU ⊤ 
+
+> t
+
+− U U ⊤)
+
+≤ ∥ U ⊤⊥ bUt∥F ∥ bUt bU ⊤ 
+
+> t
+
+− U U ⊤∥F
+
+Cσ 2nr √LL
+
+≤ ∥ U ⊤⊥ bUt∥2 
+
+> F
+
+C σ2nr 
+
+√L ,
+
+where the final inequality holds by Lemma 1 of Cai and Zhang (2018). 
+
+• The term T2: By a similar argument, it holds that 
+
+∥T2∥F = 1
+
+L U⊥U ⊤⊥ bUt bU ⊤
+
+> t
+
+ X
+
+> l
+
+N (l)U U ⊤N (l) bUt − σ2
+
+2
+
+ U U ⊤ + rIr
+
+bUt
+
+> F
+
+≤ ∥ U ⊤⊥ bUt∥F ∥U U ⊤∥F
+
+Cσ 2nr 
+
+√L
+
+≤ ∥ U ⊤⊥ bUt∥F Cσ 2 nr 3/2
+
+√L .
+
+• The term T3: Following a similar argument, 
+
+∥T3∥F ≤ ∥ bUt bU ⊤ 
+
+> t
+
+− U U ⊤∥F
+
+Cσ 2nr 
+
+√L
+
+≤ ∥ U ⊤⊥ bU ∥F
+
+Cσ 2nr 
+
+√L .
+
+30 • The term T4. We have that 
+
+∥T4∥F ≤ 1
+
+L ∥U ⊤⊥ bUt∥F U ⊤⊥
+
+  X 
+
+> l
+
+N (l)U U ⊤N (l) − σ2r
+
+2
+
+U⊥
+
+≤ ∥ U ⊤⊥ bUt∥F ∥U U ⊤∥F
+
+Cσ 2nr 
+
+√L
+
+≤ Cσ 2nr 3/2
+
+√L ∥U ⊤⊥ bUt∥F .
+
+• The term T5. We now instead invoke (14c) to note that 
+
+∥ 1
+
+L
+
+X
+
+> l
+
+U⊥U ⊤⊥ N (l)U U ⊤N (l)U U ⊤ bUt∥F ≤ C σ2r3/2 max {√nL, n }
+
+L .
+
+Combining these inequalities shows that 
+
+∥U⊥U ⊤⊥ Qt∥F ≤ ∥ U ⊤⊥ bUt∥2
+
+> F
+
+Cσ 2nr 
+
+√L + ∥U ⊤⊥ bUt∥F
+
+Cσ 2nr 3/2
+
+√L + Cσ 2r3/2 max {√nL, n }
+
+L
+
+≤ ∥ U ⊤⊥ bUt∥F
+
+Cσ 2nr 3/2
+
+√L + Cσ 2r3/2 max {√nL, n }
+
+L ,
+
+where the last inequality holds whenever ∥U ⊤⊥ bUt∥ ≤ 12 , which is assumed. We now bound ∥Qt∥F . We can rewrite Qt via 
+
+Qt := 1
+
+L
+
+
+
+I − bUt bU ⊤
+
+> t
+
+ X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt
+
+= 1
+
+L
+
+
+
+I − bUt bU ⊤
+
+> t
+
+ X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt − σ2
+
+2
+
+  bUt bU ⊤ 
+
+> t
+
++ rIr
+
+bUt,
+
+since (I − bUt bU ⊤ 
+
+> t
+
+) bUt = 0 . Therefore, appealing again to (14b), 
+
+∥Qt∥F ≤√rL
+
+
+
+I − bUt bU ⊤
+
+> t
+
+ X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt − σ2
+
+2
+
+  bUt bU ⊤ 
+
+> t
+
++ rIr
+
+bUt
+
+≤√rL
+
+X
+
+> l
+
+N (l) bUt bU ⊤ 
+
+> t
+
+N (l) bUt − σ2
+
+2
+
+  bUt bU ⊤ 
+
+> t
+
++ rIr
+
+
+
+≤ Cσ 2nr 3/2
+
+√L ∥ bUt bU ⊤ 
+
+> t
+
+∥F
+
+= Cσ 2nr 2
+
+√L
+
+as required. 
+
+A.5 Proof of Lemma 5 
+
+Proof of Lemma 5. The upper bound is immediate. For the lower bound, we first note that 
+
+λr ( bU ⊤ 
+
+> t
+
+U U ⊤ bUt) = λr (cos Θ( bUt, U )) 2 ≥ 1 − ∥ sin Θ( bUt, U )∥2 
+
+> F
+
+≥ 34
+
+31 since ∥ sin Θ( bUt, U )∥2 
+
+> F
+
+≤ 14 by assumption. Consequently, with respect to the positive semidefinite ordering, it holds that 
+
+bU ⊤S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt = bU ⊤ 
+
+> t
+
+U R (l)U ⊤ bUt bU ⊤ 
+
+> t
+
+U R (l)U ⊤ bUt ⪰ 34 bU ⊤ 
+
+> t
+
+U (R(l))2U ⊤ bUt.
+
+Thus, 
+
+X
+
+> l
+
+bU ⊤ 
+
+> t
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt ⪰ 34 bU ⊤ 
+
+> t
+
+U
+
+ X
+
+> l
+
+(R(l))2
+
+
+
+U ⊤ bUt.
+
+Therefore, it holds that 
+
+λr
+
+ X
+
+> l
+
+bU ⊤ 
+
+> t
+
+S(l) bUt bU ⊤ 
+
+> t
+
+S(l) bUt
+
+
+
+≥ 34 λr
+
+bU ⊤ 
+
+> t
+
+U
+
+ X
+
+> l
+
+(R(l))2
+
+
+
+U ⊤ bUt
+
+
+
+≥ 34 λr ( bU ⊤ 
+
+> t
+
+U U ⊤ bUt)λr
+
+ X
+
+> l
+
+(R(l))2
+
+
+
+≥ 916 Lλ 2
+
+≥ Lλ 2
+
+4
+
+which completes the proof. 
+
+## B Proofs for Asymptotic Normality and Inference 
+
+In this section we prove our main asymptotic results; namely Theorems 5 and 7, both of which build on Theorem 2. In order to prove these results we require the following theorem, which isolates the leading-order term in the asymptotic expansion. 
+
+Theorem 9. Suppose that the conditions of Theorem 2 and Theorem 5 hold. Then we have that 
+
+∥U ⊤⊥ bU ∥2 
+
+> F
+
+= ∥ X
+
+> l
+
+U ⊤⊥ N (l)U R (l)(RR ⊤)−1∥2 
+
+> F
+
++ Res ,
+
+where Res satisfies the bound 
+
+Res ≲ σ3κ4r5/2n3/2
+
+λ3L3/2 + σ4κ2n2r7/2
+
+λ4L3/2
+
+with probability at least 1 − exp( −cn ) − exp( −c√L).Proof. See Section B.1. 
+
+B.1 Proof of Theorem 9 
+
+Proof of Theorem 9. Under the conditions of the theorem, with probability at least 1 − exp( −cn ) we have that 
+
+∥ sin Θ( bUt, U )∥F ≲ σκ √nr λ√L . (23) We use this bound without additional remarks in the subsequent analysis. Throughout the proof we will suppress the dependence of bU on the time index t, and assume only that t is taken such that (23) holds. We also note that it is immediate that 
+
+∥(RR ⊤)−1∥ ≤ 1
+
+Lλ 2 ,
+
+32 a fact we will use repeatedly. In the subsequent analysis we will define the orthogonal matrix 
+
+O = arg min 
+
+> OO ⊤=Ir
+
+∥ bU O − U ∥F ;
+
+the Frobenius-optimal orthogonal matrix aligning bU and U . Finally, by Eq. (23) it holds that 
+
+∥ bU O − U ∥F ≲ σκ √nr λ√L ; ∥ bU bU ⊤ − U U ⊤∥F ≲ σκ √nr λ√L ,
+
+which follows from Lemma 1 of Cai and Zhang (2018). 
+
+• Step 1: Initial Expansion . First, it holds that 
+
+X
+
+> l
+
+S(l)U R (l)(RR ⊤)−1 = U
+
+and also that bR(l) = bU ⊤A(l) bU . Thus, using the fact that A(l) = S(l) + N (l), it holds that 
+
+bU O = U + X
+
+> l
+
+N (l)U R (l)(RR ⊤)−1
+
++ X
+
+> l
+
+N (l)U R (l)(O⊤  bR bR⊤−1O − (RR ⊤)−1) + X
+
+> l
+
+S(l)U R (l)(O⊤  bR bR⊤−1O − (RR ⊤)−1)+ X
+
+> l
+
+N (l)  bU bR(l)O − U R (l)O⊤  bR bR⊤−1O + X
+
+> l
+
+S(l)  bU bR(l)O − U R (l)O⊤  bR bR⊤−1O
+
++
+
+bU − X
+
+> l
+
+A(l) bU bR(l)  bR bR⊤−1
+
+
+
+O. (24) We therefore expand U ⊤⊥ bU O via 
+
+U ⊤⊥ bU O = X
+
+> l
+
+U ⊤⊥ N (l)U R (l)(RR ⊤)−1 + X
+
+> l
+
+U ⊤⊥ N (l)  bU bU ⊤A(l) bU O − U R (l)O⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U R (l) O⊤  bR bR⊤−1O − (RR ⊤)−1 + U ⊤⊥
+
+bU − X
+
+> l
+
+A(l) bU bR(l)  bR bR⊤−1
+
+
+
+O
+
+= X
+
+> l
+
+U ⊤⊥ N (l)U R (l)(RR ⊤)−1 + X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U (RR ⊤)−1
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U  O⊤  bR bR⊤−1O − (RR ⊤)−1
+
++ X
+
+> l
+
+U ⊤⊥ N (l)( bU bU ⊤ − U U ⊤)S(l) bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)S(l)( bU O − U )O⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+
+
+U ⊤⊥ N (l) bU bU ⊤N (l) bU OO ⊤  bR bR⊤−1O − U ⊤⊥ N (l)U U ⊤N (l)U O⊤  bR bR⊤−1O
+
+
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U R (l) O⊤  bR bR⊤−1O − (RR ⊤)−1 + U ⊤⊥
+
+bU − X
+
+> l
+
+A(l) bU bR(l)  bR bR⊤−1
+
+
+
+O.
+
+(25) 33 Define 
+
+G(1) := X
+
+> l
+
+U ⊤⊥ N (l)U R (l)(RR ⊤)−1;
+
+G(2) := X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U U ⊤(RR ⊤)−1;
+
+T1 := X
+
+> l
+
+U ⊤⊥ N (l)( bU bU ⊤ − U U ⊤)S(l) bU OO ⊤  bR bR⊤−1O + X
+
+> l
+
+U ⊤⊥ N (l)S(l)( bU O − U )O⊤  bR bR⊤−1O;
+
+T2 := X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U
+
+
+
+O⊤  bR bR⊤−1O − (RR ⊤)−1
+
+
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U R (l)
+
+
+
+O⊤  bR bR⊤−1O − (RR ⊤)−1
+
+
+
+;
+
+T3 := X
+
+> l
+
+U ⊤⊥ N (l) bU bU ⊤N (l) bU OO ⊤  bR bR⊤−1O − X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U U ⊤O⊤  bR bR⊤−1O;
+
+T4 := U ⊤⊥
+
+bU − X
+
+> l
+
+A(l) bU bR(l)  bR bR⊤−1
+
+
+
+O.
+
+We have thus shown that 
+
+U ⊤⊥ bU O = G(1) + G(2) + T1 + T2 + T3 + T4. (26) In the next steps we will bound the residual quantities. 
+
+• Step 2: Bounding T1 through T3. First, in order to bound T1 through T3, we first require the following bound controlling the approximation of   bR bR⊤−1 to (RR ⊤)−1.
+
+Lemma 6. Suppose the conditions of Theorem 9 hold. Let O = OU , bU . Then with probability at least 
+
+1 − exp( −cn ),
+
+X
+
+> l
+
+  bR(l)2 − O ⊤ R(l)2O
+
+
+
+> F
+
+≲ Lλ 2max 
+
+σκ √nr λ√L + σκ √nr λ√L σ2nr 3/2√L + σ2Lr 3/2
+
++ σ2nr 3/2 + σ2r3/2√nL + σr √nλ max 
+
+σκ √nr λ√L + σ√nLrλ max ; (27) 
+
+  bR bR⊤−1 − O ⊤(RR ⊤)−1O
+
+> F
+
+≲ 1
+
+λ2Lσκ 3√nr λ√L (28) 
+
+Proof. See Section B.1.1. In particular, when λ/σ ≫ nr 2κ4/√L, on the event above, it holds that 
+
+∥  bR bR⊤−1∥ ≲ 1
+
+Lλ 2 , (29) a fact that we will use repeatedly. First, we note that on Egood , by (14a), 
+
+X
+
+> l
+
+U ⊤⊥ N (l)  bU bU ⊤ − U U ⊤S(l) bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≤ X
+
+> l
+
+U ⊤⊥ N (l)  bU bU ⊤ − U U ⊤S(l)   bR bR⊤−1
+
+> F
+
+≲ σ2κ2r3/2nLλ 2 . (30) Similarly, on the event Egood , by Eq. (14d) it holds that 
+
+∥ X
+
+> l
+
+U ⊤⊥ N (l)S(l)  bU O − U O⊤  bR bR⊤−1O∥ F ≲ σ√nLλ max 
+
+σ√nrκ λ√L
+
+1
+
+λ2L
+
+≍ σ2n√rκ 2
+
+λ2L (31) 34 Thus, we have shown that 
+
+∥T1∥F ≲ σ2κ2r3/2nLλ 2 . (32) Next, we bound the term T2. First, we have that by (14c) and Lemma 6, 
+
+∥ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U  O⊤  bR bR⊤−1O − (RR ⊤)−1∥F
+
+≲ ∥ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U ∥∥O ⊤  bR bR⊤−1O − (RR ⊤)−1∥F
+
+≲ σ2rn 1
+
+λ2Lσκ 3√nr λ√L ≍ σ3κ3r3/2n3/2
+
+L3/2 .
+
+Similarly, using (14d) instead, 
+
+X
+
+> l
+
+U ⊤⊥ N (l)U R (l) O⊤  bR bR⊤−1O − (RR ⊤)−1 ≲ σ√nLλ max 
+
+λ2Lσκ 3√nr λ√L ≍ σ2κ4n√rλ2L .
+
+Combining these bounds, with probability at least 1 − exp( −cn ),
+
+∥T2∥F ≲ σ2κ4n√rλ2L . (33) Analyzing T3 is slightly more complicated and requires additional expansion, so this analysis is deferred to the following lemma. 
+
+Lemma 7. Under the conditions of Theorem 9, on the event Egood it holds that 
+
+∥T3∥F ≲ σ3n3/2r2κλ3L .
+
+Proof. See Section B.1.2. Thus, we have shown that with high probability, 
+
+∥T1 + T2 + T3∥F ≲ σ3n3/2r2κλ3L + σ2κ4nr 3/2
+
+λ2L .
+
+• Step 3: Bounding T4. We now turn to the quantity T4. This quantity is defined via 
+
+T4 := U ⊤⊥
+
+bU − X
+
+> l
+
+A(l) bU bR(l)  bR bR⊤−1
+
+
+
+O
+
+= U ⊤⊥
+
+bU bR bR⊤
+
+− X
+
+> l
+
+A(l) bU bR(l)
+
+  bR bR⊤−1O
+
+= −U ⊤⊥
+
+ I − bU bU ⊤ X 
+
+> l
+
+A(l) bU bR(l)  bR bR⊤−1O
+
+= −LU ⊤⊥ ∇Riemannian h( bU )  bR bR⊤−1O. (34) Here ∇Riemannian is understood as the Riemannian gradient of h with respect to the Grassmann manifold. We will show that on a good event, this gradient is small deterministically. As a first step we demonstrate a form of geodesic strong convexity and smoothness of h.35 Lemma 8. Under the conditions of Theorem 9, there exists an event E∇2h satisfying P(E∇2h) ≥ 1 −
+
+exp( −cnr ) such that 
+
+3λ2max ∥Ξ∥2 
+
+> F
+
+≥ ∇ 2
+
+> Riemannian
+
+h(W )[ Ξ, Ξ] ≥ λ2
+
+4 ∥Ξ∥2
+
+> F
+
+uniformly over all W ∈ Rn×r satisfying W ⊤W = Ir , ∥ sin Θ( W , U )∥F ≤ C0σκ √nr λ√L , and Ξ ∈ Rn×r
+
+satisfying Ξ⊤W = 0 . Here ∇2 
+
+> Riemannian
+
+is the Riemannian Hessian of h defined on the Grassmann Manifold 
+
+W ⊤W = Ir .Proof. See Section B.1.3. By taking C0 > 100 C1 in Theorem 2, for all iterations t larger than C log   λ/σ √LC1κ√nr 
+
+ it holds that every iterate lies strictly in the interior of the set {W : ∥ sin Θ( W , U )∥F ≤ C0σκ √nr λ√L }. In addition, Algorithm 1 can be written as 
+
+bUt+1 = SVD r
+
+bUt − η∇Riemannian h( bUt)
+
+
+
+,
+
+so that SVD r is a retraction of the iterate onto the Grassmann manifold. Thus, Lemma 8 implies that h is smooth along the retraction curve 
+
+s 7 → h SVD r
+
+  bUt − s∇Riemannian h( bUt),
+
+and thus 
+
+h( bUt+1 ) ≤ h( bUt) + ⟨∇ Riemannian h( bUt), −η∇Riemannian h( bUt)⟩ + 3λ2max 
+
+2 η2∥∇ Riemannian h( bUt)∥2
+
+> F
+
+≤ h( bUt) − η
+
+
+
+1 − 3λ2max η
+
+2
+
+
+
+∥∇ Riemannian h( bUt)∥2 
+
+> F
+
+. (35) The coefficient η 1 − 3λ2max η
+
+> 2
+
+ is strictly positive for η chosen as in Theorem 2. Letting t0 be the smallest value t such that ∥ sin Θ( bUt0 , U )∥F ≤ 2C1σκ √nr λ√L and applying the above result up to time T yields 
+
+η
+
+
+
+1 − 3λ2max η
+
+2
+
+ T −1X
+
+> t=t0
+
+∥∇ Riemannian h( bUt)∥2 
+
+> F
+
+≤ h( bUt0 ) − h( bUT ) ≤ h( bUt0 ) < ∞.
+
+Letting T → ∞ shows that ∥∇ Riemannian h( bUt)∥ → 0. Therefore, there is at least one convergent subsequence by compactness of the Grassmann manifold. Let this limit point be denoted as bU∞. Since the Riemannian gradient is continuous, we must have that ∇Riemannian h( bU∞) = 0 . Thus, every limit point of the iterates must be stationary. Next, note that C0σκ √nr λ√L ≪ 1 under the conditions of Theorem 9. Thus, there is a geodesically convex ball B(U ) satisfying 
+
+W : ∥ sin Θ( W , U )∥F ≤ 2C1σκ √nr λ√L ⊂ B (U ) ⊂ W : ∥ sin Θ( W , U )∥F ≤ C0σκ √nr λ√L .
+
+If necessary we may increase the value of C0. Then every geodesic lies within B(U ). Hence, when the event in Lemma 8 holds, the function h is geodesically strongly convex and smooth within B(U ). Thus, by Corollary 11.22 of Boumal (2023), every stationary point is a global minimizer within this set. 36 Now, suppose that bU∞ is a local minimizer of h within the ball of radius 2C1σκ √nr λ√L . By Lemma 11.28 of Boumal (2023), it holds that 
+
+h( bUt) − h( bU∞) ≤ 2
+
+λ2 ∥∇ Riemannian h( bUt)∥2 
+
+> F
+
+.
+
+Thus, plugging this into (35), we have 
+
+h( bUt+1 ) − h( bU∞) ≤ h( bUt) − h( bU∞) − λ2η
+
+2
+
+
+
+1 − 3λ2max η
+
+2
+
+h( bUt) − h( bU∞)
+
+=
+
+
+
+1 − λ2η
+
+2 + 3λ2max λ2η2
+
+4
+
+h( bUt) − h( bU∞)
+
+≤
+
+
+
+1 − λ2η
+
+4
+
+h( bUt) − h( bU∞),
+
+where we recall that η ≤ cη /λ 2max , and provided that cη is sufficiently small. Next, Lemma 8 and Corollary 10.47 of Boumal (2023) implies that ∇Riemannian h(·) is 3λ2max -Lipschitz, and hence 
+
+∥∇ Riemannian h( bUt)∥2 
+
+> F
+
+= ∥∇ Riemannian h( bUt) − ∇ Riemannian h( bU∞)∥2
+
+> F
+
+≤ 9λ4max dist ( bUt, bU∞)2.
+
+≤ 18 λ4max 
+
+λ2 (h( bUt) − h( bU∞)) 
+
+≤ 18 λ2max κ2
+
+
+
+1 − λ2η
+
+4
+
+t−t0 Cκσ √nr λ√L ,
+
+where the penultimate inequality is due to restricted strong convexity in Lemma 8 (see the argument leading to Equation 11.19 in Boumal (2023)). Thus, plugging in this bound to the expression (34), we obtain 
+
+∥T4∥F ≤ 18 Lλ 2max κ2
+
+
+
+1 − λ2η
+
+8
+
+t−t0 Cκσ √nr λ√L ∥  bR bR⊤−1∥
+
+≲ κ4
+
+
+
+1 − λ2η
+
+4
+
+t−t0
+
+.
+
+Thus, when t − t0 ≥ log 
+
+
+
+> Cσ 2κ2nr λ2L
+
+
+
+1 − λ2η
+
+> 4
+
+−1
+
+(which is guaranteed by the conditions of Theorem 5) we have that 
+
+∥T4∥F ≲ σ2κ2nr λ2L . (36) 
+
+• Step 4: Expanding the square and controlling small-order terms. From (26), 
+
+∥U ⊤⊥ bU ∥2 
+
+> F
+
+= ∥G(1) ∥2 
+
+> F
+
++ ∥G(2) ∥2 
+
+> F
+
++ 2 ⟨G(1) , G(2) ⟩ + 2 
+
+> 4
+
+X
+
+> i=1
+
+⟨G(1) , T i⟩ + 2 
+
+> 4
+
+X
+
+> i=1
+
+⟨G(2) , T i⟩ +
+
+> 4
+
+X
+
+> i=1
+
+∥Ti∥2 
+
+> F
+
+.
+
+We will bound all but the first term. 
+
+– Bounding ∥G(2) ∥2 
+
+> F
+
+. Lemma 2 and (14c) show that on Egood ,
+
+∥G(2) ∥F ≤ √r∥(RR ⊤)−1∥∥ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U ∥
+
+≲
+
+√rλ2L σ2r max {√nL, n }
+
+≲ σ4r3n2
+
+λ4L2 . (37) where we have used the fact that L ≲ n.37 – Bounding ⟨G(1) , G(2) ⟩. Analyzing this quantity is somewhat involved and requires decoupling arguments, so its analysis is contained in the following lemma. 
+
+Lemma 9. Under the conditions of Theorem 9, for all u ≤ L1/4, it holds that 
+
+⟨G(1) , G(2) ⟩ ≲ u κσ 3√nr 5/2
+
+λ3L max {1,
+
+r nL }
+
+with probability at least 1 − r2 exp( −cu 2) − r exp( −cn ).Proof. See Section B.1.4. Thus, by taking u ≍ L1/4, as long as log( r) ≤ c√L, we have, with probability at least 1 − exp( −c√L),that 
+
+⟨G(1) , G(2) ⟩ ≲ L1/4 κσ 3nr 5/2
+
+λ3L3/2 ≲ σ3κn 3/2r5/2
+
+λ3L3/2 . (38) 
+
+– Bounding P
+
+> i
+
+⟨G(1) , T i⟩. For terms T1, T 2, and T4, we apply Cauchy-Schwarz. By (32),(33), and (36) we have that 
+
+|⟨ G(1) , T i⟩| ≲ σ√nr λ√Lσ2κ4nr 3/2
+
+λ2L ≍ σ3κ4n3/2r2
+
+λ3L3/2 .
+
+For the final term ⟨G(1) , T 3⟩, we also require a more involved argument, which is given in the following result. 
+
+Lemma 10. Under the conditions of Theorem 9, with probability at least 1 − exp( −cn ) it holds that 
+
+⟨G(1) , T 3⟩ ≲ σ4κ2n2r7/2
+
+λ4L3/2
+
+Proof. See Section B.1.5. Thus, we have that with probability at least 1 − exp( −cn ),
+
+⟨G(1) , T 1 + T2 + T3 + T4⟩ ≲ σ3n3/2κ4r2
+
+λ3L3/2 + σ4κ2n2r7/2
+
+λ4L3/2 . (39) 
+
+– Bounding P
+
+> i
+
+⟨G(2) , T i⟩. By the argument leading to (37) we have 
+
+∥G(2) ∥F ≲ σ2r3/2√nλ2√L max {1,
+
+r nL } ≲ σ2r3/2nλ2L .
+
+Therefore, by (32), (33), Lemma 7, and (36), 
+
+X
+
+> i
+
+⟨G(2) , T i⟩ ≲ σ2r3/2nλ2L
+
+ σ2κ2r3/2nLλ 2 + σ2κ4n√rλ2L + σ3n3/2r2κλ3L + σ2κ2nr λ2L
+
+
+
+≍ σ4r3n2κ2
+
+λ4L2 + σ4κ4r2n2
+
+λ4L + σ5r7/2κn 5/2
+
+λ5L2 + σ4κ2r5/2n2
+
+λ4L2
+
+≲ σ4r3κ4n2
+
+λ4L2 + σ5r7/2κn 5/2
+
+λ5L2 . (40) 
+
+– Bounding P4 
+
+> i=1
+
+∥Ti∥2 
+
+> F
+
+. By (32), (33), Lemma 7, and (36), we have that 
+
+> 4
+
+X
+
+> i=1
+
+∥Ti∥2 
+
+> F
+
+≲
+
+ σ2κ2r3/2nLλ 2
+
+2
+
++
+
+ σ2κ4n√rλ2L
+
+2
+
++
+
+ σ3n3/2r2κλ3L
+
+2
+
++
+
+ σ2κ2nr λ2L
+
+2
+
+≲ σ4κ8r3n2
+
+λ4L2 + σ6n3r4κ2
+
+λ6L2 . (41) 38 Thus, combining (37), (38), (39), (40), (41), we have that 
+
+∥U ⊤⊥ bU ∥2 
+
+> F
+
+= ∥G(1) ∥2 
+
+> F
+
++ Res ,
+
+where 
+
+Res ≲ σ4r3n2
+
+λ4L2 + σ3κn 3/2r5/2
+
+λ3L3/2 + σ3n3/2κ4r2
+
+λ3L3/2 + σ4κ2n2r7/2
+
+λ4L3/2
+
++ σ4r3κ4n2
+
+λ4L2 + σ5r7/2κn 5/2
+
+λ5L2 + σ4κ8r3n2
+
+λ4L2 + σ6n3r4κ2
+
+λ6L2 .
+
+Recall that in Theorem 9 we assume that 
+
+λ/σ ≫ nr 2κ4
+
+√L .
+
+Thus, term-by-term comparison together with the assumption L ≲ n shows that 
+
+Res ≲ σ3κ4r5/2n3/2
+
+λ3L3/2 + σ4κ2n2r7/2
+
+λ4L3/2 .
+
+This completes the proof. 
+
+B.1.1 Proof of Lemma 6 
+
+Proof of Lemma 6. We have that 
+
+X
+
+> l
+
+
+
+( bR(l))2 − O ⊤(R(l))2O
+
+
+
+> F
+
+= X
+
+> l
+
+bU ⊤(S(l) + N (l)) bU bU ⊤(S(l) + N (l)) bU − O ⊤U ⊤(S(l))2U O
+
+
+
+> F
+
+≤ X
+
+> l
+
+bU ⊤S(l) bU bU ⊤S(l) bU − O ⊤U ⊤(S(l))2U O
+
+
+
+> F
+
++ X
+
+> l
+
+bU ⊤N (l) bU bU ⊤N (l) bU
+
+> F
+
++ 2 X
+
+> l
+
+bU ⊤N (l) bU bU ⊤S(l) bU
+
+> F
+
+≤ X
+
+> l
+
+
+
+OU ⊤S(l)U U ⊤S(l) U O − bU 
+
+> F
+
++ X
+
+> l
+
+
+
+OU ⊤S(l) U U ⊤ − bU bU ⊤S(l) bU
+
+
+
+> F
+
++ X
+
+> l
+
+
+
+(U O − bU )⊤S(l) bU bU ⊤S(l) bU
+
+
+
+> F
+
++ X
+
+> l
+
+bU ⊤N (l) bU bU ⊤N (l) bU
+
+> F
+
++ 2 X
+
+> l
+
+bU ⊤N (l) bU bU ⊤S(l) bU
+
+> F
+
+.
+
+It is straightforward to show that since ∥U ⊤⊥ bU ∥F ≲ σκ √nr λ√L with probability at least 1 − exp( −cn ) when t is chosen as in the lemma then it holds that 
+
+X
+
+> l
+
+
+
+OU ⊤S(l)U U ⊤S(l) U O − bU 
+
+> F
+
+≲ Lλ 2max 
+
+σκ √nr λ√L
+
+X
+
+> l
+
+
+
+OU ⊤S(l) U U ⊤ − bU bU ⊤S(l) bU
+
+
+
+> F
+
+≲ Lλ 2max 
+
+σκ √nr λ√L
+
+X
+
+> l
+
+
+
+(U O − bU )⊤S(l) bU bU ⊤S(l) bU
+
+
+
+> F
+
+≲ Lλ 2max 
+
+σκ √nr λ√L .
+
+Therefore, we focus on the remaining two terms containing N (l).39 • The Term ∥ P 
+
+> l
+
+bU ⊤N (l) bU bU ⊤N (l) bU ∥F . We note that 
+
+∥ X
+
+> l
+
+bU ⊤N (l) bU bU ⊤N (l) bU ∥F
+
+= ∥ X
+
+> l
+
+bU ⊤
+
+
+
+U⊥U ⊤⊥ + U U ⊤
+
+
+
+N (l) bU bU ⊤N (l)
+
+
+
+U⊥U ⊤⊥ + U U ⊤
+
+bU ∥F
+
+≤ ∥ X
+
+> l
+
+bU ⊤U⊥U ⊤⊥ N (l) bU bU ⊤N (l)U⊥U ⊤⊥ bU ∥F
+
++ 2 ∥ X
+
+> l
+
+bU ⊤U⊥U ⊤⊥ N (l)
+
+bU bU ⊤ − U U ⊤
+
+
+
+N (l)U U ⊤ bU ∥F
+
++ 2 ∥ X
+
+> l
+
+bU ⊤U⊥U ⊤⊥ N (l)U U ⊤N (l)U U ⊤ bU ∥F
+
++ ∥ X
+
+> l
+
+bU ⊤U U ⊤N (l)
+
+bU bU ⊤ − U U ⊤
+
+
+
+N (l)U U ⊤ bU ∥F
+
++ ∥ X
+
+> l
+
+bU ⊤U U ⊤N (l)U U ⊤N (l)U U ⊤ bU ∥F
+
+=: 
+
+> 5
+
+X
+
+> i=1
+
+Mi.
+
+We analyze each in turn. 
+
+– The Term M1. By (14b) we have that on the event Egood ,
+
+T1 ≤ ∥ bU ⊤U⊥∥2
+
+> F
+
+X
+
+> l
+
+U ⊤⊥ N (l) bU bU ⊤N (l)U⊥
+
+≤ ∥ bU ⊤U⊥∥2 
+
+> F
+
+U ⊤⊥
+
+X
+
+> l
+
+
+
+N (l) bU bU ⊤N (l) − σ2
+
+2
+
+bU bU ⊤ + rI
+
+ 
+
+U⊥
+
++ ∥ bU ⊤U⊥∥4
+
+> F
+
+σ2Lr 
+
+2
+
+≲
+
+ σκ √nr λ√L
+
+2
+
+σ2nr √L∥ bU bU ⊤∥F +
+
+ σκ √nr λ√L
+
+2
+
+Lσ 2 U ⊤⊥ bU bU ⊤U⊥ + rIn−r
+
+≲
+
+ σκ √nr λ√L
+
+2
+
+σ2nr 3/2√L +
+
+ σκ √nr λ√L
+
+2
+
+σ2Lr. 
+
+– The Term M2. We bound similarly via 
+
+M2 ≲ ∥ bU ⊤U⊥∥F
+
+X
+
+> l
+
+U ⊤⊥ N (l)
+
+bU bU ⊤ − U U ⊤
+
+
+
+N (l)U
+
+≲ ∥ bU ⊤U⊥∥F U ⊤⊥
+
+ X
+
+> l
+
+N (l)
+
+bU bU ⊤ − U U ⊤
+
+
+
+N (l) − σ2
+
+2
+
+bU bU ⊤ − U U ⊤
+
+
+
+U + ∥ bU ⊤U⊥∥F
+
+σ2L
+
+2 U ⊤⊥ bU bU ⊤U
+
+≲ σκ √nr λ√L σ2nr √L∥ bU bU ⊤ − U U ⊤∥F +
+
+ σκ √nr λ√L
+
+2
+
+σ2L
+
+≲
+
+ σκ √nr λ√L
+
+2
+
+σ2nr √L +
+
+ σκ √nr λ√L
+
+2
+
+σ2L. 
+
+40 – The Term M3. We again proceed via a similar argument: 
+
+M3 ≲ ∥ bU ⊤U⊥∥F U ⊤⊥
+
+X
+
+> l
+
+
+
+N (l)U U ⊤N (l) − σ2
+
+2
+
+
+
+U U ⊤ + rI
+
+ 
+
+U⊥ + ∥ bU ⊤U⊥∥F
+
+σ2Lr 
+
+2
+
+≲ σκ √nr λ√L σ2nr √L∥U U ⊤∥F + σκ √nr λ√L σ2Lr 
+
+≲ σκ √nr λ√L σ2nr 3/2√L + σκ √nr λ√L σ2Lr. 
+
+– The Term M4. We simply have that 
+
+M4 ≲ U ⊤ X
+
+> l
+
+
+
+N (l)
+
+bU bU ⊤ − U U ⊤
+
+
+
+N (l) − σ2
+
+2
+
+bU bU ⊤ − U U ⊤
+
+ 
+
+U
+
+> F
+
++ σ2L
+
+2 ∥ bU bU ⊤ − U U ⊤∥F
+
+≤ √r U ⊤ X
+
+> l
+
+
+
+N (l)
+
+bU bU ⊤ − U U ⊤
+
+
+
+N (l) − σ2
+
+2
+
+bU bU ⊤ − U U ⊤
+
+ 
+
+U + σ2L
+
+2 ∥ bU bU ⊤ − U U ⊤∥F
+
+≲ σ2nr 3/2√L∥ bU bU ⊤ − U U ⊤∥F + σ2L∥ bU bU ⊤ − U U ⊤∥F
+
+≲ σκ √nr λ√L σ2nr 3/2√L + σκ √nr λ√L σ2L
+
+– The Term M5. First, we note that 
+
+M5 ≤ √r X
+
+> l
+
+U ⊤N (l)U U ⊤N (l)U .
+
+Define the matrix 
+
+Z := U ⊤N (1) U , · · · , U ⊤N (L)U  ∈ Rr×rL .
+
+Then it holds that 
+
+X
+
+> l
+
+U ⊤N (l)U U ⊤N (l)U = ZZ ⊤ = ∥Z∥2.
+
+A straightforward ε-net argument shows that ∥Z∥ ≲ σ√Lr +σ√nr with probability at least 1−exp( −nr ).Consequently, ∥ZZ ⊤∥2 ≲ σ2Lr + σ2nr + σ2r√nL .Combining these bounds shows that with probability at least 1 − exp( −cn ),
+
+∥ X
+
+> l
+
+bU ⊤N (l) bU bU ⊤N (l) bU ∥F ≲ σκ √nr λ√L σ2nr 3/2√L + σκ √nr λ√L σ2Lr + σ2Lr 3/2 + σ2nr 3/2 + σ2r3/2√nL 
+
+≲ σκ √nr λ√L σ2nr 3/2√L + σ2Lr 3/2 + σ2nr 3/2 + σ2r3/2√nL. 
+
+• The Term ∥ P 
+
+> l
+
+bU ⊤N (l) bU bU ⊤S(l) bU ∥F . We bound using (14a) by 
+
+∥ X
+
+> l
+
+bU ⊤N (l) bU bU ⊤S(l) bU ∥F ≤ X
+
+> l
+
+bU ⊤N (l)  bU bU ⊤ − U U ⊤S(l) bU F
+
++ X
+
+> l
+
+bU ⊤N (l)S(l) bU F
+
+≲ Cσr √nλ max 
+
+σκ √nr λ√L + Cσ √nLrλ max 
+
+.41 Combining all these inequalities, we end up with 
+
+X
+
+> l
+
+  bR(l)2 − O ⊤ R(l)2O
+
+
+
+> F
+
+≲ Lλ 2max 
+
+σκ √nr λ√L + σκ √nr λ√L σ2nr 3/2√L + σ2Lr 3/2
+
++ σ2nr 3/2 + σ2r3/2√nL + σr √nλ max 
+
+σκ √nr λ√L + σ√nLrλ max 
+
+with probability at least 1 − exp( −cn ).To prove the second bound, we note that RR ⊤ has smallest eigenvalue at least Lλ 2. Thus, under the assumption that λ/σ ≫ κ3r2n√L , it holds that 
+
+X
+
+> l
+
+  bR(l)2 − O ⊤ R(l)2O
+
+
+
+> F
+
+≪ Lλ 2,
+
+and hence Weyl’s inequality implies that 
+
+λmin 
+
+ X
+
+> l
+
+  bR(l)2
+
+
+
+≳ Lλ 2.
+
+Thus, we have that 
+
+ X
+
+> l
+
+  bR(l)2
+
+−1
+
+− O ⊤
+
+ X
+
+> l
+
+ R(l)2
+
+−1
+
+O
+
+> F
+
+≲ 1
+
+L2λ4
+
+X
+
+> l
+
+  bR(l)2 − O ⊤ R(l)2O
+
+
+
+> F
+
+≲ 1
+
+λ4L2
+
+
+
+Lλ 2max 
+
+σκ √nr λ√L + σκ √nr λ√L σ2nr 3/2√L + σ2Lr 3/2
+
++ σ2nr 3/2 + σ2r3/2√nL + σr √nλ max 
+
+σκ √nr λ√L + σ√nLrλ max 
+
+
+
+≍ σκ √nr λ√Lκ2
+
+λ2L + σκ √nr λ√Lσ2nr 3/2
+
+λ4L3/2 + σ2r3/2
+
+λ4L3/2
+
++ σ2nr 3/2
+
+λ4L2 + σ2r3/2√nλ4L3/2 + σκ √nr λ√Lσr √nκ λ3L2 + σ√nrκ L3/2λ3 .
+
+The final bound can be directly verified from the assumptions L ≲ n and λ/σ ≫ nr 2κ3/√L.42 B.1.2 Proof of Lemma 7 
+
+Proof. We start with the full decomposition 
+
+T3 = X
+
+> l
+
+U ⊤⊥ N (l) bU bU ⊤N (l) bU OO ⊤  bR bR⊤−1O − X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U O⊤  bR bR⊤−1O
+
+= X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U⊥N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U ⊤⊥ N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U⊥ bU bU ⊤U⊥U⊥N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U⊥ bU bU ⊤U U ⊤N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U⊥U⊥N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤
+
+bU bU ⊤ − U U ⊤
+
+
+
+U U ⊤N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U U ⊤  bU O − U )O⊤  bR bR⊤−1O
+
++ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U O⊤  bR bR⊤−1O
+
+=: 
+
+> 9
+
+X
+
+> i=1
+
+Ji. (42) We will bound each of these terms separately and collect the bounds at the end of the proof. However, first recall that on the event Egood by (14b) it holds that 
+
+X
+
+> l
+
+N (l)QN (l) − σ2L Q⊤ + Tr (Q)I ≲ σ2nr √L∥Q∥F
+
+for all matrices Q of rank at most 2r. We will apply this result repeatedly without reference. For various choices of the matrix Q above, we refer to σ2L Q⊤ + Tr (Q)I as the centering term . In the subsequent analysis, either the centering term will vanish, or we will include it directly. 43 • The Term J1: By adding and subtracting the centering term, we have that 
+
+∥J1∥F = X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U ⊤⊥ N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≤ U ⊤⊥
+
+ X
+
+> l
+
+N (l)U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥ N (l) − σ2LU⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥
+
++ Tr U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥
+
+I
+
+U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
++ σ2L U ⊤⊥
+
+
+
+U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥ + Tr U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥
+
+I
+
+
+
+U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≤ U ⊤⊥
+
+ X
+
+> l
+
+N (l)U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥ N (l) − σ2L U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥
+
++ Tr U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥
+
+ 
+
+U⊥ U ⊤⊥ bU F ∥O ⊤  bR bR⊤−1O∥ 
+
++ σ2L U ⊤⊥
+
+
+
+U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥ + Tr U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥
+
+I
+
+
+
+U⊥ U ⊤⊥ bU F O⊤  bR bR⊤−1O
+
+≲ σ2nr √L∥U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥ ∥F U ⊤⊥ bU F ∥O ⊤  bR bR⊤−1O∥ 
+
++ σ2L
+
+
+
+∥U ⊤⊥ bU bU ⊤U⊥∥F + Tr U ⊤⊥ bU bU ⊤U⊥
+
+
+
+∥U ⊤⊥ bU ∥F ∥O ⊤  bR bR⊤−1O∥ 
+
+≲ σ2nr √L∥U ⊤⊥ bU ∥3 
+
+> F
+
+∥O ⊤  bR bR⊤−1O∥ + σ2L∥U ⊤⊥ bU ∥3 
+
+> F
+
+∥O ⊤  bR bR⊤−1O∥ 
+
+≲ σ2nr √LLλ 2
+
+ σκ √nr λ√L
+
+3
+
++ σ2
+
+λ2
+
+ σκ √nr λ√L
+
+3
+
+(43) 
+
+• The Term J2: Since U ⊤⊥ U = 0 , it holds that Tr (U⊥U ⊤⊥ bU bU ⊤U U ⊤) = Tr (U ⊤U⊥U ⊤⊥ bU bU ⊤U ) = 0 . Then the centering term vanishes and hence 
+
+∥J2∥ = X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+= U ⊤⊥
+
+ X
+
+> l
+
+N (l)U⊥U ⊤⊥ bU bU ⊤U U ⊤N (l)
+
+− σ2L U U ⊤ bU bU ⊤U⊥U ⊤⊥ + Tr U⊥U⊥ bU bU ⊤U U ⊤I
+
+U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≤ U ⊤⊥
+
+ X
+
+> l
+
+N (l)U⊥U ⊤⊥ bU bU ⊤U U ⊤N (l)
+
+− σ2L U U ⊤ bU bU ⊤U⊥U ⊤⊥ + Tr U⊥U⊥ bU bU ⊤U U ⊤I
+
+U⊥ ∥U ⊤⊥ bU ∥F ∥O ⊤  bR bR⊤−1O∥ 
+
+≲ σ2nr √L∥U⊥U ⊤⊥ bU bU ⊤U U ⊤∥F ∥U ⊤⊥ bU ∥F ∥O ⊤  bR bR⊤−1O∥ 
+
+≲ σ2nr √LLλ 2
+
+ σκ √nr λ√L
+
+2
+
+. (44) 44 • The Term J3. Similar to the prior argument, the centering term vanishes, and hence 
+
+∥J3∥F = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U⊥U ⊤⊥ N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+= U ⊤⊥
+
+ X
+
+> l
+
+N (l)U U ⊤ bU bU ⊤U⊥U ⊤⊥ N (l)
+
+− σ2L U⊥U ⊤⊥ bU bU ⊤U U ⊤ + Tr U U ⊤ bU bU ⊤U⊥U ⊤⊥
+
+I
+
+U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≲ σ2nr √Lλ2L ∥U U ⊤ bU bU ⊤U⊥U ⊤⊥ ∥F ∥U ⊤⊥ bU ∥F
+
+≲ σ2nr √Lλ2L
+
+ σκ √nr λ√L
+
+2
+
+. (45) 
+
+• The Term J4. We note that only the trace part of the centering term does not vanish, which gives 
+
+∥J4∥F = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O F
+
+≤ U ⊤⊥
+
+X
+
+> l
+
+
+
+N (l)U U ⊤ bU bU ⊤U U ⊤N (l)
+
+− σ2L U U ⊤ bU bU ⊤U U ⊤ + Tr U U ⊤ bU bU ⊤U U ⊤I
+
+U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
++ σ2LTr U U ⊤ bU bU ⊤U U ⊤ U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≲ σ2nr √Lλ2L ∥U U ⊤ bU bU ⊤U U ⊤∥F ∥U ⊤⊥ bU ∥F + σ2Lr λ2L ∥U ⊤⊥ bU ∥F
+
+≲ σ2nr √L√rλ2Lσκ √nr λ√L + σ2rλ2
+
+σκ √nr λ√L , (46) where we have observed that ∥U U ⊤ bU bU ⊤U U ⊤∥F ≤ √r and Tr (U ⊤ bU bU ⊤U ) = ∥ bU ⊤U ∥2 
+
+> F
+
+≤ r.
+
+• The Term J5. As in previous cases, the centering term vanishes (due to the pre and post multiplication by U ⊤⊥ and U respectively). Consequently, 
+
+∥J5∥F = X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U⊥U⊥N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+= U ⊤⊥
+
+ X
+
+> l
+
+N (l)U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥ N (l)
+
+− σ2L U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥ + Tr U⊥U ⊤⊥ bU bU ⊤U⊥U ⊤⊥
+
+I
+
+U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≲ σ2nr √Lλ2L ∥U ⊤⊥ bU bU ⊤U ⊤⊥ ∥F ∥U ⊤ bU ∥F
+
+≲ σ2nr √L√rλ2L
+
+ σκ √nr λ√L
+
+2
+
+. (47) 45 • The Term J6. The centering term vanishes, yielding 
+
+∥J6∥F = X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U U ⊤N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O F
+
+≤ U ⊤⊥
+
+ X
+
+> l
+
+N (l)U⊥U ⊤⊥ bU bU ⊤U U ⊤N (l)
+
+− σ2L U U ⊤ bU bU ⊤U⊥U ⊤⊥ + Tr U⊥U ⊤⊥ bU bU ⊤U U ⊤I
+
+U U ⊤ bU OO ⊤  bR bR⊤−1O F
+
+≲ σ2nr √Lλ2L ∥U⊥U ⊤⊥ bU bU ⊤U U ⊤∥∥ U ⊤ bU ∥F
+
+≲ σ2nr √Lλ2L
+
+ σκ √nr λ√L
+
+2
+
+. (48) 
+
+• The Term J7. Only the trace term vanishes, yielding 
+
+∥J7∥F = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U⊥U⊥N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+> F
+
+≤ U ⊤⊥
+
+ X
+
+> l
+
+N (l)U U ⊤ bU bU ⊤U⊥U ⊤⊥ N (l)
+
+− σ2L U⊥U ⊤⊥ bU bU ⊤U U ⊤ + Tr U U ⊤ bU bU ⊤U⊥U ⊤⊥
+
+I
+
+U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+> F
+
++ σ2L∥U ⊤⊥ bU bU ⊤U ∥F ∥O ⊤  bR bR⊤−1O∥ 
+
+≲ σ2nr √Lλ2L ∥U U ⊤ bU bU ⊤U⊥U ⊤⊥ ∥F ∥U ⊤ bU ∥F + σ2
+
+λ2
+
+σκ √nr λ√L
+
+≲ σ2nr √L√rλ2Lσκ √nr λ√L + σ2
+
+λ2
+
+σκ √nr λ√L . (49) 
+
+• The Term J8. Here the centering term vanishes giving 
+
+∥J8∥F = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤
+
+bU bU ⊤ − U U ⊤
+
+
+
+U U ⊤N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+= U ⊤⊥
+
+ X
+
+> l
+
+N (l)U U ⊤
+
+bU bU ⊤ − U U ⊤
+
+
+
+U U ⊤N (l)
+
+− σ2L
+
+
+
+U U ⊤  bU bU ⊤ − U U ⊤U U ⊤ + Tr U U ⊤
+
+bU bU ⊤ − U U ⊤
+
+
+
+U U ⊤I
+
+ 
+
+U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+≲ σ2 max {√nLr, nr }
+
+λ2L ∥U U ⊤  bU bU ⊤ − U U ⊤U U ⊤∥F ∥U ⊤ bU ∥F
+
+≲ σ2nr √L√rλ2Lσκ √nr λ√L . (50) 46 • The term J9. For J9 we instead invoke (14c) to yield 
+
+∥J9∥F = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U U ⊤  bU O − U )O⊤  bR bR⊤−1O
+
+> F
+
+≲ X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U U ⊤ ∥ bU O − U ∥F ∥O ⊤  bR bR⊤−1O∥ 
+
+≲ σ2r max {√nL, n }
+
+Lλ 2
+
+σκ √nr λ√L . (51) Define 
+
+δ := σκ √nr λ√L .
+
+Combining (43),(44),(45),(46),(47),(48),(49),(50), and (51), we have that 
+
+X
+
+> i
+
+∥Ji∥F ≲ δ3
+
+ σ2nr √LLλ 2 + σ2
+
+λ2
+
+
+
++ δ2
+
+ σ2nr 3/2√Lλ2L +
+
+
+
++ δ
+
+ σ2nr 3/2√Lλ2L + σ2rλ2 + σ2r max {√nL, n }
+
+Lλ 2
+
+
+
+≲ δ
+
+ σ2nr 3/2
+
+λ2√L + σ2rλ2 + σ2r max {√nL, n }
+
+Lλ 2
+
+
+
+≲ σκ √nr λ√Lσ2nr 3/2
+
+λ2√L ,
+
+where the final bound is due to the assumption that L ≲ n. This completes the proof. 
+
+B.1.3 Proof of Lemma 8 
+
+Proof. Define 
+
+hclean (W ) = 14L
+
+X
+
+> l
+
+∥S(l) − W W ⊤S(l)W W ⊤∥2 
+
+> F
+
+,
+
+which is the noiseless loss function. Then for any Ξ satisfying W ⊤Ξ = 0 ,
+
+∇2
+
+> Riemannian
+
+hclean (W )[ Ξ, Ξ] := 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤Ξ(W ⊤S(l)W )2
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤S(l)ΞW ⊤S(l)W
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+ Ξ⊤S(l)W 2
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+∥Ξ⊤S(l)W ∥2 
+
+> F
+
+. (52) Thus, we have the decomposition 
+
+∇2
+
+> Riemannian
+
+h(W )[ Ξ, Ξ]= ∇2
+
+> Riemannian
+
+hclean (W )[ Ξ, Ξ]+ 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤ΞW ⊤S(l)W W ⊤N (l)W
+
+
+
++ 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤ΞW ⊤N (l)W W ⊤S(l)W
+
+
+
++ 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤Ξ(W ⊤N (l)W )2
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤S(l)ΞW ⊤N (l)W
+
+
+
+− 1
+
+L
+
+X
+
+> L
+
+Tr 
+
+
+
+Ξ⊤N (l)ΞW ⊤S(l)W
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤N (l)ΞW ⊤N (l)W
+
+
+
+− 2
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤S(l)W Ξ⊤N (l)W
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+(Ξ⊤N (l)W )2
+
+
+
+− 2
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+W ⊤S(l)ΞΞ ⊤N (l)W
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+∥Ξ⊤N (l)W ∥2 
+
+> F
+
+.
+
+47 Define 
+
+L∇2h(W , Ξ) := 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤ΞW ⊤S(l)W W ⊤N (l)W
+
+
+
++ 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤ΞW ⊤N (l)W W ⊤S(l)W
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤S(l)ΞW ⊤N (l)W
+
+
+
+− 1
+
+L
+
+X
+
+> L
+
+Tr 
+
+
+
+Ξ⊤N (l)ΞW ⊤S(l)W
+
+
+
+− 2
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤S(l)W Ξ⊤N (l)W
+
+
+
+− 2
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+W ⊤S(l)ΞΞ ⊤N (l)W
+
+
+
+;
+
+Q∇2h(W , Ξ) := 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤Ξ(W ⊤N (l)W )2
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤N (l)ΞW ⊤N (l)W
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+(Ξ⊤N (l)W )2
+
+
+
+− 1
+
+L
+
+X
+
+> l
+
+∥Ξ⊤N (l)W ∥2 
+
+> F
+
+, (53) the first being linear in N (l) and the second being quadratic in N (l). Then we have that 
+
+∇2
+
+> Riemannian
+
+h(W )[ Ξ, Ξ] = ∇2
+
+> Riemannian
+
+hclean (W )[ Ξ, Ξ] + L∇2h(W , Ξ) + Q∇2h(W , Ξ).
+
+First we bound ∇2
+
+> Riemannian
+
+hclean (W )[ Ξ, Ξ] and then we upper bound the two noise terms. 
+
+Bounding ∇2
+
+> Riemannian
+
+hclean : Observe that 
+
+λ2max ∥Ξ∥2 
+
+> F
+
+≥ 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤Ξ(R(l))2
+
+
+
+≥ ∥ Ξ∥2 
+
+> F
+
+λ2.
+
+Without loss of generality we may assume that W = W OW ,U since h(W ) = h(W O) for any orthogonal 
+
+O. Then we have that 
+
+∥W − U ∥F ≤ R := C σκ √nr λ√L ,
+
+where C is some sufficiently large fixed constant. Now suppose that Ξ satisfies Ξ⊤W = 0 . Then the first term on the right hand side of (52) satisfies 
+
+1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤Ξ(W ⊤S(l)W )2
+
+
+
+≥ ∥ Ξ∥2 
+
+> F
+
+λmin 
+
+ 1
+
+L (W ⊤S(l)W )2
+
+
+
+.
+
+We have that 
+
+∥W ⊤U − Ir ∥F ≤ ∥ W − U ∥F ≤ R. 
+
+Thus, for any l, since ∥W ⊤U ∥ ≤ 1,
+
+∥(W ⊤U R (l)U ⊤W )2 − (R(l))2∥F ≤ ∥ (W ⊤U R (l)U ⊤W − R(l))W ⊤U R (l)U ⊤W ∥F + ∥R(l)(W ⊤U R (l)U ⊤W − R(l))∥F
+
+≤ 2λmax ∥W ⊤U R (l)U ⊤W − R(l)∥F
+
+≤ 2λmax 
+
+
+
+2∥W ⊤U − I∥F ∥R(l)∥ + ∥W ⊤U − I∥2 
+
+> F
+
+∥R(l)∥
+
+
+
+≤ 6Rλ 2max .
+
+Thus, it holds that 
+
+1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤Ξ(W ⊤S(l)W )2
+
+
+
+≥ ∥ Ξ∥2
+
+> F
+
+
+
+λ2 − 6Rλ 2max 
+
+
+
+.
+
+48 Similarly 
+
+1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤Ξ(W ⊤S(l)W )2
+
+
+
+≤ ∥ Ξ∥2 
+
+> F
+
+λ2max .
+
+We now upper bound the remaining three terms on the right hand side of (52). First, we note that since 
+
+W ⊤Ξ = 0 , then U ⊤Ξ = ( U − W )⊤Ξ and hence ∥U ⊤Ξ∥F ≤ R∥Ξ∥F . Then it holds that 
+
+1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Ξ⊤S(l)ΞW ⊤S(l)W
+
+
+
+≤ 1
+
+L
+
+X
+
+> l
+
+∥Ξ⊤U ∥2 
+
+> F
+
+λ2max ≤ R2∥Ξ∥2λ2max .
+
+Similarly, 
+
+1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+(Ξ⊤S(l)W )2
+
+
+
+≤ 1
+
+L
+
+X
+
+> l
+
+∥Ξ⊤S(l)W ∥2 
+
+> F
+
+≤ ∥ Ξ∥2R2λ2max ;1
+
+L
+
+X
+
+> l
+
+∥Ξ⊤S(l)W ∥2 
+
+> F
+
+≤ ∥ Ξ∥2R2λ2max .
+
+Thus, we have that 
+
+∇2
+
+> Riemannian
+
+hclean (W )[ Ξ, Ξ] ≥ ∥ Ξ∥2
+
+> F
+
+
+
+λ2 − 6Rλ 2max − 3R2λ2max 
+
+
+
+≥ ∥ Ξ∥2
+
+> F
+
+λ2
+
+2
+
+as long as κ3√nr λ√L ≪ 1. In addition, 
+
+∇2
+
+> Riemannian
+
+hclean (W )[ Ξ, Ξ] ≤ 2λ2max ∥Ξ∥2 
+
+> F
+
+.
+
+Upper bounding L∇2h(W , Ξ). We bound only the first term; the other terms are similar. The first term of L∇2h(W , Ξ) is of the form 
+
+1
+
+L
+
+X
+
+> l
+
+⟨N (l), W Ξ⊤ΞW ⊤S(l)W W ⊤⟩.
+
+Let Q1 and Q2 be any fixed rank at most r matrices with Frobenius norm at most 1. Then a standard Hoeffding inequality argument shows that 
+
+1
+
+L
+
+X
+
+> l
+
+⟨N (l), Q1S(l)Q2⟩ ≲ λmax σ
+
+√L t
+
+with probability at least 1 − exp( −ct 2). Taking a union bound and applying a simple net argument shows that 
+
+1
+
+L
+
+X
+
+> l
+
+⟨N (l), Q1S(l)Q2⟩ ≲ λmax σ√nr 
+
+√L
+
+with probability at least 1 − exp( −cnr ). Applying this argument to each linear quantity shows that 
+
+|L∇2 (W , Ξ)| ≲ ∥Ξ∥2 λmax σ√nr 
+
+√L
+
+with probability at least 1 − exp( −cnr ), uniformly over all matrices Ξ and W .49 Upper bounding Q∇2h(W , Ξ). We bound each term in turn, though the argument is similar. First, for any fixed Q1 and Q2 of rank at most r, define the process 
+
+N (Q1, Q2) := 1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+Q1N (l)Q2N (l)
+
+
+
+− ETr 
+
+
+
+Q1N (l)Q2N (l)
+
+
+
+.
+
+It is straightforward to check that ETr Q1N (l)Q2N (l) = σ2
+
+> 2
+
+Tr (Q1Q⊤ 
+
+> 2
+
+) + Tr (Q1)Tr (Q2). Note that 
+
+Tr (Q1N (l)Q2N (l)) = Vec (N (l))⊤(Q⊤ 
+
+> 1
+
+⊗Q2)Vec (N (l)) (possibly up to transposes depending on vectorization convention, but this does not change the argument). Therefore, up to potential rescaling due to repetition, the quantity N (Q1, Q2) is a quadratic form for the random variable Vec (N (l)). Thus, the Hanson-Wright inequality (Theorem 6.2.1 of Vershynin (2018)) gives 
+
+P
+
+
+
+|N (Q1, Q2)| ≥ t
+
+
+
+≤ 2 exp 
+
+
+
+− cL min 
+
+ t2
+
+σ4∥Q1 ⊗ Q2∥2
+
+> F
+
+, tσ2∥Q1 ⊗ Q2∥
+
+ 
+
+≤ 2 exp 
+
+
+
+− cL min   t2
+
+σ4 , tσ2
+
+
+
+.
+
+Take t ≍ σ2nr L . Then with probability at least 1 − exp( −cnr ),
+
+|N (Q1, Q2)| ≲ σ2nr L ,
+
+where we have implicitly used the fact that L ≲ n. Taking a union bound over all Q1 and Q2 in an ε-net shows that this bound holds uniformly over all Q1 and Q2 in the net. Define 
+
+M := sup  
+
+> ∥Q1∥F=1 ,∥Q2∥=1
+
+|N (Q1, Q2)|,
+
+where the supremum is over rank at most r matrices. Let eQ1, eQ2 be points in the nets such that they are 
+
+ε-close to the maximizers ˇQ1, ˇQ2. Then we have that 
+
+M = |N ( ˇQ1, ˇQ2)| ≤ |N ( eQ1, eQ2)| + |N ( ˇQ1 − eQ1, ˇQ2 − eQ2)| + |N ( ˇQ1 − eQ1, eQ2)| + |N ( eQ1, ˇQ2 − eQ2)|≤ Cσ 2nr L + 8 εM, 
+
+where we have implicitly used the fact that a matrix of rank at most 2r with Frobenius norm at most ε can be written as a sum of two rank at most r matrices with Frobenius norm at most ε. Consequently, we have that M ≲ σ2nr L by taking ε appropriately. We now apply this result to each term in the definition of Q∇2h(W , Ξ). We have that 
+
+1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+W Ξ⊤ΞW ⊤N (l)W W ⊤N (l)
+
+
+
+− σ2
+
+2
+
+
+
+Tr W Ξ⊤ΞW ⊤W W ⊤]+ Tr W Ξ⊤ΞW ⊤]Tr W W ⊤
+
+≲ ∥Ξ∥2
+
+> F
+
+σ2nr L .
+
+We also have that 
+
+σ2
+
+2
+
+Tr W Ξ⊤ΞW ⊤W W ⊤] + Tr W Ξ⊤ΞW ⊤]Tr W W ⊤ = σ2
+
+2
+
+ ∥Ξ∥2 
+
+> F
+
++ ∥Ξ∥2 
+
+> F
+
+r ≲ σ2r∥Ξ∥2 
+
+> F
+
+≲ σ2nr L ∥Ξ∥2 
+
+> F
+
+.
+
+Similarly, the second term in (53) satisfies 
+
+1
+
+L
+
+X
+
+> l
+
+Tr 
+
+
+
+W Ξ⊤N (l)ΞW ⊤N (l)
+
+
+
+− σ2
+
+2
+
+
+
+Tr W Ξ⊤ΞW ⊤ + Tr W Ξ⊤Tr ΞW ⊤
+
+≲ σ2nr L ∥Ξ∥2 
+
+> F
+
+.
+
+50 The expectation satisfies Tr W ΞΞ ⊤W  = ∥Ξ∥2 
+
+> F
+
+, and Tr [W Ξ⊤] = 0 since Ξ⊤W = 0 . The remaining two terms are similar, with centering term equal to zero and r∥Ξ∥2 
+
+> F
+
+respectively. Thus, with probability at least 
+
+1 − exp( −cnr ), we have that 
+
+|Q∇2h(W , Ξ)| ≲ σ2nr L ∥Ξ∥2 
+
+> F
+
+.
+
+Putting it all together. Thus, we have shown that 
+
+∇2
+
+> Riemannian
+
+h(W )[ Ξ, Ξ] ≥ ∥ Ξ∥2
+
+> F
+
+ λ2
+
+2 − C λmax σ√nr 
+
+√L − C σ2nr L
+
+
+
+≥ ∥ Ξ∥2
+
+> F
+
+λ2
+
+4
+
+which holds under the assumption that λ/σ ≥ C κ√nr √L . Similarly, 
+
+∇2
+
+> Riemannian
+
+h(W )[ Ξ, Ξ] ≤ ∥ Ξ∥2
+
+> F
+
+
+
+2λ2max + C λmax σ√nr 
+
+√L + C σ2nr L
+
+
+
+≤ 3λ2max ∥Ξ∥2 
+
+> F
+
+.
+
+This completes the proof. 
+
+B.1.4 Proof of Lemma 9 
+
+Proof. First, we have that 
+
+⟨G(1) , G(2) ⟩ = X
+
+> l
+
+X
+
+> l′
+
+Tr 
+
+
+
+R(l′)U ⊤N (l′)U⊥U ⊤⊥ N (l)U U ⊤N (l)U (RR ⊤)−2
+
+
+
+=
+
+> r
+
+X
+
+> j=1
+
+X
+
+> l
+
+X
+
+> l′
+
+
+
+R(l′)U ⊤N (l′)U⊥U ⊤⊥ N (l)U U ⊤N (l)U (RR ⊤)−2
+
+
+
+> jj
+
+.
+
+We can view the summation above as a vector-valued (asymmetric) U -statistic computed from the matrix observations {N (l)}Ll=1 . We will bound it for fixed j ∈ [r] and take a union bound. Define the vector 
+
+A(l) 
+
+> j
+
+:=  U⊥U ⊤⊥ N (l)U U ⊤N (l)U (RR ⊤)−2 
+
+> ·j
+
+.
+
+Then for fixed j ∈ [r] we can write the inner product as 
+
+X
+
+> l′
+
+ R(l′)U ⊤N (l′)
+
+> j·
+
+, X 
+
+> l̸=l′
+
+A(l)
+
+> j
+
+
+
++ X
+
+> l
+
+ R(l)U ⊤N (l)
+
+> j·
+
+, A(l) 
+
+> j
+
+=: K1 + K2.
+
+We analyze each term separately. 
+
+• The term K1: By Theorem 3.4.1 of De La Peña and Giné (1999) (using an order-two decoupling inequal-ity with an appropriate kernel h), it suffices to consider the case where N (l′) is independent from N (l).Conditioning on P 
+
+> l
+
+A(l) 
+
+> j
+
+, K1 is a sum of independent random variables. Its ψ2 norm satisfies 
+
+X
+
+> l′
+
+ R(l′)U ⊤N (l′)
+
+> j·
+
+, X
+
+> l
+
+A(l)
+
+> j
+
+ 2
+
+> ψ2
+
+≤ Lσ 2 max  
+
+> l′
+
+∥R(l′)∥2 X
+
+> l
+
+A(l)
+
+> j
+> 2
+
+.
+
+Therefore, by Hoeffding’s inequality it holds that 
+
+X
+
+> l′
+
+ R(l′)U ⊤N (l′)
+
+> j·
+
+, X
+
+> l
+
+A(l)
+
+> j
+
+
+
+≲ tσ √Lλ max 
+
+X
+
+> l
+
+A(l)
+
+> j
+
+51 with probability at least 1 − exp( −ct 2). Define the event 
+
+E := 
+
+> r
+
+\
+
+> j=1
+
+ X
+
+> l
+
+A(l) 
+
+> j
+
+≲ σ2r max {√nL, n }
+
+λ4L2
+
+
+
+. (54) On the event (54) it holds that 
+
+X
+
+> l′
+
+ R(l′)U ⊤N (l′)
+
+> j·
+
+, X
+
+> l
+
+A(l)
+
+> j
+
+
+
+≲ tσ √Lλ max 
+
+σ2r max {√nL, n }
+
+λ4L2 ≍ t κσ 3√nr λ3L max {1,
+
+r nL }.
+
+Therefore, we have that 
+
+P
+
+ X
+
+> l′
+
+ R(l′)U ⊤N (l′)
+
+> j·
+
+, X
+
+> l
+
+A(l)
+
+> j
+
+
+
+> Ct κσ 3√nr λ3L max {1,
+
+r nL }
+
+
+
+≤ P
+
+ X
+
+> l′
+
+ R(l′)U ⊤N (l′)
+
+> j·
+
+, X
+
+> l
+
+A(l)
+
+> j
+
+
+
+> Ct κσ 3√nr λ3L max {1,
+
+r nL } ∩ E 
+
+
+
++ P(Ec)
+
+≤ 2 exp( −ct 2) + P(Ec).
+
+By Lemma 2, the event E holds with probability at least 1 − exp( −cn ) by (14c). 
+
+• The term K2. The term K2 is directly a sum of independent random variables. Moreover, we have that 
+
+K2 =
+
+> r
+
+X
+
+> k=1
+> L
+
+X
+
+> l=1
+
+
+
+R(l)U ⊤N (l)U⊥U ⊤⊥ N (l)U
+
+
+
+> jk
+
+
+
+U ⊤N (l)U  (RR ⊤)−1−2
+
+
+
+> kj
+
+.
+
+For fixed j and k this is a sum of L independent random variables with bounded ψ2/3 norm. By Lemma 7 of Hao et al. (2020), with probability at least 1 − δ it holds that 
+
+K2 ≲ r√L max 
+
+> j,k
+
+
+
+R(l)U ⊤N (l)U⊥U ⊤⊥ N (l)U
+
+
+
+> jk
+
+
+
+U ⊤N (l)U  (RR ⊤)−1−2
+
+ 
+
+> kj ψ2/3
+
+plog(1 /δ )+ r max 
+
+> j,k
+
+
+
+R(l)U ⊤N (l)U⊥U ⊤⊥ N (l)U
+
+
+
+> jk
+
+
+
+U ⊤N (l)U  (RR ⊤)−1−2
+
+ 
+
+> kj ψ2/3
+
+  log(1 /δ )3/2
+
+Therefore, it suffices to bound the Orlicz ψ2/3 norm of the random variable above. We have 
+
+
+
+R(l)U ⊤N (l)U⊥U ⊤⊥ N (l)U
+
+
+
+> jk
+
+
+
+U ⊤N (l)U  (RR ⊤)−1−2
+
+ 
+
+> kj ψ2/3
+
+≲
+
+
+
+R(l)U ⊤N (l)U⊥U ⊤⊥ N (l)U
+
+ 
+
+> jk ψ1
+
+
+
+U ⊤N (l)U  (RR ⊤)−1−2
+
+ 
+
+> kj ψ2
+
+≲ σ3nλ max 
+
+√r 1
+
+L2λ4 ≍ σ3nκ √rL2λ3 .
+
+Therefore, letting t = plog(1 /δ ), by taking a union bound for each k, we have that with probability at least 1 − r exp( −ct 2) it holds that 
+
+K2 ≲ t κσ 3nr 3/2
+
+λ3L3/2 + t3 σ3nκr 3/2
+
+L2λ3 .
+
+In particular, as long as t ≤ L1/4 it holds that 
+
+K2 ≲ t κσ 3nr 3/2
+
+λ3L3/2 .
+
+52 Combining these two inequalities and bounding the summation over j by r times the maximum entry and taking a union bound shows that for all t ≤ L1/4,
+
+⟨G(1) , G(2) ⟩ ≲ t κσ 3√nr 2
+
+λ3L max {1,
+
+r nL } + t κσ 3nκr 5/2
+
+L3/2λ3
+
+≲ t κσ 3√nr 5/2
+
+λ3L max {1,
+
+r nL }
+
+with probability at least 1 − r2 exp( −ct 2) − r exp( −cn ).
+
+B.1.5 Proof of Lemma 10 
+
+Proof. First, according to the same decomposition in (42), we have that 
+
+⟨G(1) , T 3⟩ =
+
+> 9
+
+X
+
+> i=1
+
+⟨G(1) , J i⟩,
+
+where we have that 
+
+J1 = X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U⊥N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+J2 = X
+
+> l
+
+U ⊤⊥ N (l)U⊥U ⊤⊥ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+J3 = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U ⊤⊥ N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+J4 = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+J5 = X
+
+> l
+
+U ⊤⊥ N (l)U⊥ bU bU ⊤U⊥U⊥N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+J6 = X
+
+> l
+
+U ⊤⊥ N (l)U⊥ bU bU ⊤U U ⊤N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+J7 = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤ bU bU ⊤U⊥U⊥N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+J8 = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤
+
+bU bU ⊤ − U U ⊤
+
+
+
+U U ⊤N (l)U U ⊤ bU OO ⊤  bR bR⊤−1O
+
+J9 = X
+
+> l
+
+U ⊤⊥ N (l)U U ⊤N (l)U U ⊤  bU O − U )O⊤  bR bR⊤−1O.
+
+We will bound each of these terms in turn. Let EG denote the event that ∥G(1) ∥F ≲ κσ √nr λ√L , which can be shown to happen with probability at least 1 − exp( −cn ) through a similar argument as in the proof of Lemma 1 in Section A.1. For some of the subsequent terms we require additional technical arguments, and for some terms we simply apply Cauchy-Schwarz. 
+
+• The term ⟨G(1) , J 1⟩. We have by Cauchy-Schwarz that 
+
+⟨G(1) , J 1⟩ ≤ ∥ G(1) ∥F ∥J1∥F .
+
+53 On the event EG it holds that ∥G(1) ∥F ≲ σκ √nr λ√L . In addition, by the bound (43), we have that on the event 
+
+Egood 
+
+∥J1∥F ≲ σ2nr √LLλ 2
+
+ σκ √nr λ√L
+
+3
+
++ σ2
+
+λ2
+
+ σκ √nr λ√L
+
+3
+
+,
+
+which gives that 
+
+⟨G(1) , J 1⟩ ≲ σ2nr √LLλ 2
+
+ σκ √nr λ√L
+
+4
+
++ σ2
+
+λ2
+
+ σκ √nr λ√L
+
+4
+
+. (55) 
+
+• The term ⟨G(1) , J 2⟩. Again we use Cauchy Schwarz and the bound (44), to obtain 
+
+⟨G(1) , J 2⟩ ≲ ∥G(1) ∥F ∥J2∥F
+
+≲ σκ √nr λ√Lσ2nr 
+
+√Lλ 2
+
+ σκ √nr λ√L
+
+2
+
+≍
+
+ σκ √nr λ√L
+
+3 σ2nr 
+
+√Lλ 2 , (56) which again holds on the event EG ∩ E good .
+
+• The term ⟨G(1) , J 3⟩. Again we use Cauchy-Schwarz and the bound Eq. (45) to yield 
+
+⟨G(1) , J 3⟩ ≲ ∥G(1) ∥F ∥J3∥F
+
+≲
+
+ σκ √nr λ√L
+
+3 σ2nr 
+
+√Lλ 2 (57) which matches the bound (56). 
+
+• The term ⟨G(1) , J 4⟩. We require a more involved argument. We first decompose 
+
+⟨G(1) , J 4⟩ = X
+
+> l
+
+X
+
+> l′
+
+Tr 
+
+
+
+(RR ⊤)−1R(l′)U ⊤N (l′)U⊥U ⊤⊥ N (l)U U ⊤ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU OO ⊤  bR bR⊤−1O
+
+
+
+= X 
+
+> l̸=l′
+
+Tr 
+
+
+
+(RR ⊤)−1R(l′)U ⊤N (l′)U⊥U ⊤⊥ N (l)U U ⊤ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU   bR bR⊤−1O
+
+
+
++ X
+
+> l
+
+Tr 
+
+
+
+(RR ⊤)−1R(l)U ⊤N (l)U⊥U ⊤⊥ N (l)U U ⊤ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU   bR bR⊤−1O
+
+
+
+.
+
+The first term above represents the off-diagonal contribution, and the second term represents the diagonal contribution. We bound both terms in turn. 
+
+– The off-diagonal. To bound this term we will use an ε-net argument. First, let Q1 ∈ Rr×r be any symmetric positive semidefinite matrix of Frobenius norm at most 1, and let Q2 ∈ Rn−r×r be another matrix of Frobenius norm at most one. We have that 
+
+X 
+
+> l̸=l′
+
+Tr 
+
+
+
+(RR ⊤)−1R(l′)U ⊤N (l′)U⊥U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥Q2
+
+
+
+=
+
+> r
+
+X
+
+> j=1
+
+X 
+
+> l̸=l′
+
+ 
+
+(RR ⊤)−1R(l′)U ⊤N (l′)
+
+
+
+> j·
+
+,
+
+
+
+U⊥U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥Q2
+
+
+
+> j·
+
+
+
+.
+
+Fix an index j. Define 
+
+A(l) 
+
+> j
+
+:= 
+
+
+
+U⊥U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥Q2
+
+
+
+> j·
+
+.
+
+54 By repeating the argument in the proof of Lemma 9 in Section B.1.4, through a decoupling argument we can show that with probability at least 1 − exp( −ct 2) it holds that 
+
+X
+
+> l′
+
+ 
+
+(RR ⊤)−1R(l′)U ⊤N (l′)
+
+
+
+> j·
+
+, X
+
+> l
+
+
+
+U⊥U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥Q2
+
+
+
+> j·
+
+
+
+≲ tσ √L λmax 
+
+Lλ 2
+
+X
+
+> l
+
+A(l) 
+
+> j
+
+.
+
+We note that by Eq. (14b), it holds that with probability at least 1 − exp( −cnr ), uniformly over Q1,
+
+X
+
+> l
+
+U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥ ≤ U ⊤⊥
+
+ X
+
+> l
+
+N (l)U Q 1U ⊤N (l) − σ2L
+
+2 Tr  U Q 1U ⊤
+
+U⊥
+
+> F
+
++ σ2L
+
+2 Tr  U Q 1U ⊤
+
+≲ σ2nr √L∥U Q 1U ⊤∥F + σ2L√r
+
+≲ σ2nr √L + σ2L√r. 
+
+Thus, with probability at least 1 − exp( −ct 2) − exp( −cnr ), uniformly over Q1 it holds that 
+
+X
+
+> l′
+
+ 
+
+(RR ⊤)−1R(l′)U ⊤N (l′)
+
+
+
+> j·
+
+, X
+
+> l
+
+
+
+U⊥U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥Q2
+
+
+
+> j·
+
+
+
+≲ tσ √L λmax 
+
+Lλ 2
+
+
+
+σ2nr √L + σ2L√r
+
+
+
+≍ t σ3κnr λ + t σ3κ√rL λ .
+
+Thus, by taking a union bound over Q2 (and possibly increasing implicit constants in the proof of Eq. (14b)), with probability at least 1 − exp( −cnr ) it holds that 
+
+X 
+
+> l̸=l′
+
+ 
+
+(RR ⊤)−2R(l′)U ⊤N (l′)
+
+
+
+> j·
+
+,
+
+
+
+U⊥U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥Q2
+
+
+
+> j·
+
+
+
+≲ σ3κn 3/2r3/2
+
+λ + σ3κ√nLr λ .
+
+In particular, since this term is linear in Qi, by (29) it holds that with this same probability 
+
+> r
+
+X
+
+> j=1
+
+X 
+
+> l̸=l
+
+ 
+
+(RR ⊤)−1R(l′)U ⊤N (l′)
+
+
+
+> j·
+
+,
+
+
+
+U⊥U ⊤⊥ N (l)U U ⊤ bU bU ⊤U U ⊤N (l)U⊥U ⊤⊥ bU   bR bR⊤−1O
+
+
+
+> j·
+
+
+
+≲ r∥U ⊤ bU bU ⊤U ∥F ∥U ⊤⊥ bU ∥F
+
+ σ3κn 3/2r3/2
+
+λ3L + σ3κ√nr λ3√L
+
+
+
+≲ r3/2 σκ √nr λ√L
+
+ σ3κn 3/2r3/2
+
+λ3L + σ3κ√nr λ3√L
+
+
+
+≍ σ4κ2n2r7/2
+
+λ4L3/2 + σ4κ2nr 3
+
+λ4L .
+
+– The diagonal. We now consider the diagonal term. Instead of a net argument, we will consider the particular choices Q1 = U ⊤ bU bU ⊤U and Q2 = U ⊤⊥ bU   bR bR⊤−1O. Observe that 
+
+X
+
+> l
+
+Tr 
+
+
+
+(RR ⊤)−1R(l)U ⊤N (l)U⊥U ⊤⊥ N (l)U Q 1U ⊤N (l)U⊥Q2
+
+
+
+≤ L max  
+
+> l
+
+∥N (l)∥3∥(RR ⊤)−1R(l)U ⊤∥∥ U⊥U ⊤⊥ ∥∥ U Q 1U ⊤∥∥ U⊥Q2∥F
+
+≲ Lσ 3n3/2 κLλ σκ √nr λ√L
+
+1
+
+Lλ 2
+
+≍ σ4n2κ2√rλ4L3/2 .
+
+where we used the fact that ∥Q2∥F ≲ σκ √nr λ√L 
+
+> 1
+> Lλ 2
+
+when Q2 = U ⊤⊥ bU   bR bR⊤−1O when (29) holds, together with the high probability bound ∥N (l)∥ ≲ σ√n. These bounds hold cumulatively with probability at least 
+
+1 − exp( −cn ).55 Thus, we have shown that 
+
+⟨G(1) , J 4⟩ ≲ σ4κ2n2r7/2
+
+λ4L3/2 + σ4κ2nr 3
+
+λ4L + σ4n2κ2√rλ4L3/2
+
+≲ σ4κ2n2r7/2
+
+λ4L3/2 + σ4κ2nr 3
+
+λ4L
+
+≍ σ4κ2n2r7/2
+
+λ4L3/2 , (58) since L ≲ n.
+
+• The term ⟨G(1) , J 5⟩. Here again we use Cauchy-Schwarz and the bound (47) to yield 
+
+⟨G(1) , J 5⟩ ≲ σκ √nr λ√Lσ2nr 3/2
+
+λ2√L
+
+ σκ √nr λ√L
+
+2
+
+≍ σ5κ3n5/2r3
+
+λ5L2 . (59) 
+
+• The term ⟨G(1) , J 6⟩. Again we apply Cauchy-Schwarz with the bound (48) to yield 
+
+⟨G(1) , J 6⟩ ≲ σκ √nr λ√L
+
+ σ2nr λ2√L
+
+ σκ √nr λ√L
+
+2
+
++ σ2
+
+λ2
+
+σκ √nr λ√L
+
+
+
+≍ σ5κ3n5/2r5/2
+
+λ5L4 + σ4κ2nr λ4L . (60) 
+
+• The term ⟨G(1) , J 7⟩. By a completely identical argument to the term ⟨G(1) , J 4⟩, we can derive the exact same bound, yielding 
+
+⟨G(1) , J 7⟩ ≲ σ4κ2n2r7/2
+
+λ4L3/2 (61) which holds with the same probability as in (58). 
+
+• The term ⟨G(1) , J 8⟩. The same argument as for the term ⟨G(1) , J 4⟩ applies verbatim with different choices of Q1 and Q2, yielding the bound 
+
+⟨G(1) , J 8⟩ ≲ σ4κ2n2r7/2
+
+λ4L3/2 . (62) 
+
+• The term ⟨G(1) , J 9⟩. By Cauchy-Schwarz and (51), 
+
+⟨G(1) , J 9⟩ ≲ σκ √nr λ√Lσ2rn Lλ 2
+
+σκ √nr λ√L
+
+≍ σ4κ2r2n2
+
+λ4L2 . (63) Combining Eqs. (55) to (63), we have that with probability at least 1 − exp( −cn ),
+
+> 9
+
+X
+
+> i=1
+
+⟨G(1) , J i⟩ ≲ σ2nr 
+
+√Lλ 2
+
+ σκ √nr λ√L
+
+4
+
++ σ2
+
+λ2
+
+ σκ √nr λ√L
+
+4
+
++
+
+ σκ √nr λ√L
+
+3 σ2nr 
+
+√Lλ 2
+
++ σ4κ2n2r7/2
+
+λ4L3/2 + σ5κ3n5/2r3
+
+λ5L2 + σ5κ3n5/2r5/2
+
+λ5L4 + σ4κ2nr λ4L + σ4κ2r2n2
+
+λ4L2
+
+≲ σ4κ2n2r7/2
+
+λ4L3/2 ,
+
+where we have used the assumption that L ≲ n and σκ √nr λ√L ≲ 1. This completes the proof. 56 B.2 Proof of Theorem 5 
+
+Proof of Theorem 5. First invoke Theorem 9 to have that 
+
+∥U ⊤⊥ bU ∥2 
+
+> F
+
+= Tr 
+
+
+
+U⊥U ⊤⊥
+
+ X
+
+> l
+
+N (l)U R (l)(RR ⊤)−1
+
+ X
+
+> l
+
+(RR ⊤)−1R(l)U N (l)
+
+ 
+
++ Res ,
+
+where, with probability at least 1 − exp( −cn ) − exp( −c√L),
+
+Res ≲ σ3κ4r5/2n3/2
+
+λ3L3/2 + σ4κ2n2r7/2
+
+λ4L3/2 .
+
+We note that 
+
+σ2pn/ 2∥(RR ⊤)−1∥F ≳ σ2√nr λ2L .
+
+Thus, with probability at least 1 − exp( −cn ) − exp( −c√L), it holds that 
+
+Res 
+
+σ2pn/ 2∥(RR ⊤)−1∥F
+
+≲ σκ 4r2nλ√L + σ2κ2n3/2r3
+
+λ2√L .
+
+We claim that this quantity is o(1) . Indeed, the first quantity is o(1) by assumption. The second term satisfies 
+
+σ2κ2n3/2r3
+
+λ2√L ×
+
+r nL
+
+r Ln ≍ σ2κ2n2r3
+
+λ2L
+
+r Ln ,
+
+which is o(1) again with the assumption that L ≲ n.It therefore suffices to focus on the leading-order term. We further decompose the leading-order term via 
+
+Tr 
+
+
+
+U⊥U ⊤⊥
+
+ X
+
+> l
+
+N (l)U R (l)(RR ⊤)−1
+
+ X
+
+> l
+
+(RR ⊤)−1R(l)U N (l)
+
+ 
+
+= Tr 
+
+ X
+
+> l
+
+N (l)U R (l)(RR ⊤)−1
+
+ X
+
+> l
+
+(RR ⊤)−1R(l)U N (l)
+
+ 
+
+− Tr 
+
+
+
+U U ⊤
+
+ X
+
+> l
+
+N (l)U R (l)(RR ⊤)−1
+
+ X
+
+> l
+
+(RR ⊤)−1R(l)U N (l)
+
+ 
+
+.
+
+The following lemma bounds the second term. 
+
+Lemma 11. Under the conditions of Theorem 5, with probability at least 1 − exp( −ct 2) it holds that 
+
+∥U ⊤ X
+
+> l
+
+N (l)S(l)U (RR ⊤)−1∥F ≲ (√r + t) σκ √r
+
+√Lλ 
+
+Proof. See Section B.2.1. As a result, we have that with probability at least 1 − O(n−10 ),
+
+Tr 
+
+
+
+U U ⊤
+
+ X
+
+> l
+
+N (l)U R (l)(RR ⊤)−1
+
+ X
+
+> l
+
+(RR ⊤)−1R(l)U N (l)
+
+ 
+
+= ∥U ⊤ X
+
+> l
+
+N (l)S(l)U (RR ⊤)−1∥2
+
+> F
+
+≲  r + log( n) + pr log( n)) σ2κ2rLλ 2
+
+≲ σ2κ2r2 log( n)
+
+Lλ 2 . (64) 57 We note that σ2pn/ 2∥(RR ⊤)−1∥F ≳ σ2 √nr λ2L . Therefore, on the event above it holds that 
+
+1
+
+σ2pn/ 2∥(RR ⊤)−1∥F
+
+∥U ⊤ X
+
+l
+
+N (l)S(l)U (RR ⊤)−1∥2
+
+F ≲ λ2Lσ2√nr σ2κ2r2 log( n)
+
+Lλ 2
+
+≲ κ2r3/2 log( n)
+
+√n ≪ 1,
+
+where the final inequality follows from the assumption (11). Thus, it suffices to consider the asymptotics of the remaining term. The remaining term can be written via 
+
+Tr 
+
+ X
+
+l
+
+N (l)U R (l)(RR ⊤)−1
+
+ X
+
+l
+
+(RR ⊤)−1R(l)U N (l)
+
+ 
+
+=
+
+nX
+
+i=1 
+
+nX
+
+k1,k 2=1 
+
+LX
+
+l1,l 2=1 
+
+N (l1)
+
+ik 1 N (l2)
+
+ik 2
+
+ S(l1)U (RR ⊤)−1(RR ⊤)−1U ⊤S(l2)
+
+k1k2
+
+
+
+.
+
+We will apply the martingale central limit theorem to this quantity. Define the coefficient 
+
+cl1l2
+
+k1k2 :=  S(l1)U (RR ⊤)−1(RR ⊤)−1U ⊤S(l2)
+
+k1k2 = e⊤
+
+k1 U R (l1)(RR ⊤)−1(RR ⊤)−1R(l2)U ⊤ek2 .
+
+Define the random variable 
+
+Zikl := 
+
+(
+
+N (l)
+
+kk i = k
+
+√2N (l)
+
+ik i̸ = k, 
+
+so that each Zikl has common variance σ2 and fourth moment σ44 . Then the sum can be written as 
+
+nX
+
+i=1 
+
+nX
+
+k1,k 2=1 
+
+X
+
+l1,l 2
+
+N (l1)
+
+ik 1 N (l2)
+
+ik 2 cl1l2
+
+k1k2
+
+= X
+
+i
+
+X
+
+l
+
+cll ii Z2
+
+iil + X
+
+i
+
+X
+
+l1
+
+X
+
+l2̸ =l1
+
+cl1l2
+
+ii Ziil 1 Ziil 2 + 1
+
+√2
+
+X
+
+i
+
+X
+
+l
+
+X
+
+k̸ =i
+
+cll ik Ziil Zikl + 1
+
+√2
+
+X
+
+i
+
+X
+
+l1
+
+X
+
+l2̸ =l1
+
+X
+
+k̸ =i
+
+cl1l2
+
+ik Ziil 1 Zikl 2
+
++ 1
+
+√2
+
+X
+
+i
+
+X
+
+l1
+
+X
+
+l2̸ =l1
+
+X
+
+k̸ =i
+
+cl1l2
+
+ki Zikl 1 Ziil 2 + 12
+
+X
+
+i
+
+X
+
+l
+
+X
+
+k1̸ =i
+
+X
+
+k2̸ =i,k 1
+
+cll k1k2 Zik 1lZik 2l + 12
+
+X
+
+i
+
+X
+
+l
+
+X
+
+k1̸ =i
+
+cll k1k1 Z2
+
+ik 1l
+
++ 12
+
+X
+
+i
+
+X
+
+l1
+
+X
+
+l2̸ =l1
+
+X
+
+k1̸ =i
+
+X
+
+k2̸ =i,k 1
+
+cl1l2
+
+k1k2 Zik 1l1 Zik 2l2 + 12
+
+X
+
+i
+
+X
+
+l1
+
+X
+
+l2̸ =l1
+
+X
+
+k1̸ =i
+
+cl1l2
+
+k1k1 Zik 1l1 Zik 1l2
+
+= X
+
+i
+
+X
+
+l
+
+cll ii Z2
+
+iil + 2 X
+
+i
+
+X
+
+l1
+
+X
+
+l2<l 1
+
+cl1l2
+
+ii Ziil 1 Ziil 2
+
++ 1
+
+√2
+
+X
+
+i
+
+X
+
+l
+
+X
+
+k<i 
+
+cll ik 
+
+ Ziil Zikl + Zkkl Zikl 
+
+
+
++ 1
+
+√2
+
+X
+
+i
+
+X
+
+l1
+
+X
+
+l2<l 1
+
+X
+
+k<i 
+
+cl1l2
+
+ik 
+
+ Ziil 1 Zikl 2 + Zkkl 1 Zikl 2
+
+
+
++ X
+
+i
+
+X
+
+l
+
+X
+
+k1<i 
+
+X
+
+k2<k 1
+
+cll k1k2 Zik 1lZik 2l + 2 X
+
+i
+
+X
+
+l1
+
+X
+
+l2<l 1
+
+X
+
+k1<i 
+
+X
+
+k2<k 1
+
+cl1l2
+
+k1k2 Zik 1l1 Zik 2l2
+
++ 12
+
+X
+
+i
+
+X
+
+k1<i 
+
+X
+
+l
+
+(cll k1k1 + cll ii )Z2
+
+ik 1l
+
++ X
+
+i
+
+X
+
+k1<i 
+
+X
+
+l1
+
+X
+
+l2<l 1
+
+(cl1l2
+
+k1k1 + cl1l2
+
+ii )Zik 1l1 Zik 1l2 .
+
+58 Let M denote the random variable above. We now calculate the expectation of M . Only the terms with 
+
+Z2 
+
+> ik 1l1
+
+contribute, yielding 
+
+E(M ) = σ2 X
+
+> i
+
+X
+
+> l
+
+cll ii + σ2
+
+2
+
+X
+
+> i
+
+X
+
+> k1<i
+
+X
+
+> l
+
+(cll k1k1 + cll ii )= σ2(n − 1) 2
+
+X
+
+> i
+
+X
+
+> l
+
+e⊤ 
+
+> i
+
+U R (l)(RR ⊤)−1(RR ⊤)−1R(l)U ⊤ei
+
+= σ2(n − 1) 2 Tr 
+
+ X
+
+> l
+
+(R(l))2(RR ⊤)−1(RR ⊤)−1
+
+
+
+= σ2(n − 1) 2 Tr  (RR ⊤)−1,
+
+which is nearly the centering term. Note that  
+
+> σ2
+> 2
+
+Tr  (RR ⊤)−1
+
+σ2pn/ 2∥(RR ⊤)−1∥F
+
+≲ λ2L
+
+√nr σ2rLλ 2 ≍
+
+r rn ≪ 1.
+
+Therefore, if we can show that M −E(M )
+
+> σ2
+
+√n/ 2∥(RR ⊤)−1∥F
+
+→ N (0 , 1) , then it also holds that M − σ2n 
+
+> 2Tr
+
+ (RR ⊤)−1
+
+
+
+> σ2
+
+√n/ 2∥(RR ⊤)−1∥F
+
+→N (0 , 1) since r/n → 0 by (11). We therefore focus on the asymptotic normality of M − EM .We now calculate the variance. In order to do so, we first define a σ-algebra Ft := σ{z1, .. zt}, where 
+
+zt = Zikl with t(i, k, l ) as follows. First, define the set 
+
+I := {(i, k, l ) : 1 ≤ i ≤ n, 1 ≤ l ≤ L, 1 ≤ k ≤ i}.
+
+Then enumerate I via 
+
+(1 , 1, 1) , (1 , 2, 1) , ..., (1 , i, 1) , (2 , 1, 1) , . . . , (n, i, 1) , (1 , 1, 2) , . . . , 
+
+so that first i is fixed, then l is fixed, and then k is fixed (so k increases fastest and i increases slowest). Let 
+
+MT = M − σ2(n−1) 2 Tr (( RR ⊤)−1), which is mean-zero. From this definition it is evident that MT is a sum of martingale differences Yt := Mt − Mt−1 with increments given by 
+
+Yt = At
+
+ Z2 
+
+> t
+
+− σ2 + BtZt,
+
+where for t = t(i, k, l ) we have 
+
+At =
+
+(
+
+cll kk i = kcll kk + cll ii k < i ;
+
+Bt =
+
+
+
+2 P 
+
+> l2<l
+
+cll 2 
+
+> ii
+
+Ziil 2 + 1√2
+
+P
+
+> k2<i
+
+
+
+cll 2 
+
+> ik 2
+
+Zik 2l + P 
+
+> l2<l
+
+cll 2 
+
+> ik 2
+
+Zik 2l2
+
+
+
+, k = i;
+
+P
+
+> l2<l
+
+(cll 2 
+
+> kk
+
++ cll 2 
+
+> ii
+
+)Zikl 2 + 1√2
+
+P 
+
+> l3≥l
+
+cl3lik Zkkl 3 + P
+
+> k2<k
+
+
+
+cll kk 2 Zik 2l + 2 P 
+
+> l2<l
+
+cll 2 
+
+> kk 2
+
+Zik 2l2
+
+
+
+k < i. 
+
+Note that these coefficients are Ft−1 measurable random variables since any appearance of Zi′k′l′ in the definition of Bt has at least one index t less than t(i, k, l ) with respect to this enumeration of I. We compute the conditional variance: 
+
+EY 2 
+
+> t
+
+|F t−1 = A2
+
+> t
+
+ σ44 − σ4) + B2 
+
+> t
+
+σ2 + 2 AtBtσ33 ,
+
+59 where σ44 and σ33 are the noncentral moments of each Zt. Furthermore, observe that Bt is linear in previous 
+
+Zs (for s < t ) and At is deterministic. Therefore, since cross-terms cancel, 
+
+TX
+
+t=1 
+
+EY 2
+
+t =
+
+TX
+
+t=1 
+
+A2
+
+t
+
+ σ44 − σ4) + σ2EB2
+
+t .
+
+Moreover, we have that 
+
+EB2
+
+t =
+
+(
+
+4σ2 P
+
+l2<l (cll 2
+
+ii )2 + σ2
+
+2
+
+P
+
+k2<i (cll 2
+
+ik 2 )2 + σ2
+
+2
+
+P
+
+k2<i 
+
+P
+
+l2<l (cll 2
+
+ik 2 )2 k = i;
+
+σ2 P
+
+l2<l (cll 2
+
+kk + cll 2
+
+ii )2 + σ2
+
+2
+
+P
+
+l3≥l(cl3lik )2 + σ2 P
+
+k2<k (cll kk 2 )2 + 2 σ2 P
+
+k2<k 
+
+P
+
+l2<l (cll 2
+
+kk 2 )2 k < i. 
+
+Therefore, 
+
+TX
+
+t=1 
+
+EY 2
+
+t =
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+(σ44 − σ4)( cll ii )2 +
+
+nX
+
+i=1 
+
+X
+
+k<i LX
+
+l=1 
+
+(σ44 − σ4)( cll kk + cll ii )2
+
++ 4 σ4
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+X
+
+l2<l 
+
+(cll 2
+
+ii )2 + σ4
+
+2
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+X
+
+k2<i 
+
+(cll 2
+
+ik 2 )2 + σ4
+
+2
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+X
+
+k2<i 
+
+X
+
+l2<l 
+
+(cll 2
+
+ik 2 )2
+
++ σ4
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+X
+
+k<i 
+
+X
+
+l2<l 
+
+(cll 2
+
+kk + cll 2
+
+ii )2 + σ4
+
+2
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+X
+
+k<i 
+
+X
+
+l3≥l
+
+(cl3lik )2 + σ4
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+X
+
+k<i 
+
+X
+
+k2<k 
+
+(cll kk 2 )2
+
++ 2 σ4
+
+nX
+
+i=1 
+
+LX
+
+l=1 
+
+X
+
+k<i 
+
+X
+
+k2<k 
+
+X
+
+l2<l 
+
+(cll 2
+
+kk 2 )2
+
+= ( n − 1) X
+
+i,l 
+
+(σ44 − σ4)( cll ii )2 +
+
+nX
+
+i=1 
+
+X
+
+kLX
+
+l=1 
+
+(σ44 − σ4)cll ii cll kk 
+
++ 2 σ4 X
+
+i
+
+X
+
+l1
+
+X
+
+l2
+
+(cl1l2
+
+ii )2 − 2σ4 X
+
+i
+
+X
+
+l
+
+(cll ii )2
+
++ σ4
+
+2
+
+X
+
+i
+
+X
+
+l
+
+X
+
+k
+
+(cll ik )2 − σ4
+
+2
+
+nX
+
+i=1 
+
+X
+
+l
+
+(cll ii )2
+
++ σ4
+
+8
+
+X
+
+i
+
+X
+
+k
+
+X
+
+l1
+
+X
+
+l2
+
+(cl1l2
+
+ik )2 − σ4
+
+8
+
+X
+
+i
+
+X
+
+k
+
+X
+
+l
+
+(cll ik )2
+
++ σ4
+
+4
+
+X
+
+i
+
+X
+
+l
+
+X
+
+k1
+
+X
+
+k2
+
+(cll k1k2 )2 − σ4
+
+2
+
+X
+
+i
+
+X
+
+l
+
+X
+
+k1
+
+(cll k1i)2 + σ4
+
+4
+
+X
+
+i
+
+X
+
+l
+
+(cll ii )2
+
++ σ4
+
+2
+
+X
+
+i,k 1,k 2,l 1,l 2
+
+(cl1l2
+
+k1k2 )2 − σ4 X
+
+i,k 1,l 1,l 2
+
+(cl1l2
+
+k1i )2 + σ4
+
+2
+
+X
+
+i,l 1,l 2
+
+(cl1l2
+
+ii )2
+
++ σ4
+
+4
+
+X
+
+i,k 1,l 1,l 2
+
+(cl1l2
+
+k1k1 )2 + σ4
+
+4
+
+X
+
+i,k 1,l 1,l 2
+
+cl1l2
+
+ii )2 + σ4
+
+2
+
+X
+
+i,k 1,l 1,l 2
+
+cl1l2
+
+k1k1 cl1l2
+
+ii 
+
+− σ4
+
+4
+
+X
+
+i,k 1,l 
+
+(cll k1k1 )2 − σ4
+
+4
+
+X
+
+i,k 1,l 
+
+(cll ii )2 − σ4
+
+2
+
+X
+
+i,k 1,l 
+
+cll k1k1 cll ii (65) 60 We now simplify (65). First, we note that we have the following identity: 
+
+X
+
+k1
+
+X
+
+k2
+
+(cl1l2
+
+k1k2 )2 = X
+
+k1
+
+X
+
+k2
+
+"
+
+e⊤
+
+k1 U R (l1)(RR ⊤)−1(RR ⊤)−1R(l2)U ⊤ek2
+
+#2
+
+= X
+
+j1,j 2,j 3,j 4
+
+
+
+R(l1)(RR ⊤)−1(RR ⊤)−1R(l2)
+
+
+
+j1j2
+
+
+
+R(l1)(RR ⊤)−1(RR ⊤)−1R(l2)
+
+
+
+j3j4
+
+× X
+
+k1
+
+X
+
+k2
+
+Uk1j1 Uk1j3 Uk2j2 Uk2j4
+
+= X
+
+j1,j 2,j 3,j 4
+
+
+
+R(l1)(RR ⊤)−1(RR ⊤)−1R(l2)
+
+
+
+j1j2
+
+
+
+R(l1)(RR ⊤)−1(RR ⊤)−1R(l2)
+
+
+
+j3j4
+
+I{j1 = j3}I{j2 = j4}
+
+= X
+
+j1,j 2
+
+
+
+R(l1)(RR ⊤)−1(RR ⊤)−1R(l2)
+
+2
+
+j1j2
+
+= R(l1)(RR ⊤)−1(RR ⊤)−1R(l2)
+
+2
+
+F
+
+,
+
+where we have used the orthogonality of U above. Therefore, (65) can be written as (65) = ( n − 1)( σ24 − σ4) X
+
+i,l 
+
+(cll ii )2 + ( σ24 − σ4) X
+
+i,k,l 
+
+cll ii cll kk + σ4
+
+
+
+− 2 − 12 + 14 − n
+
+4 − n
+
+4
+
+ X
+
+i,l 
+
+(cll ii )2
+
++ σ4
+
+ n
+
+2 + 2 + 12
+
+ X
+
+i,l 1,l 2
+
+(cl1l2
+
+ii )2
+
++ σ4
+
+2
+
+X
+
+i,k 1,l 1,l 2
+
+cl1l2
+
+k1k1 cl1l2
+
+ii − σ4
+
+2
+
+X
+
+k,k 1,l 
+
+cll k1k1 cll kk 
+
++ σ4
+
+ n
+
+2 − 1 + 18
+
+
+
+∥(RR ⊤)−1∥2
+
+F + σ4
+
+ n
+
+4 − 18
+
+ X
+
+l
+
+∥R(l)(RR ⊤)−1(RR ⊤)−1R(l)∥2
+
+F
+
+= σ4n
+
+2
+
+
+
+1 + 2
+
+n
+
+
+
+∥(RR ⊤)−1∥2
+
+F + σ4n
+
+2
+
+ 12 − 14n
+
+ X
+
+l
+
+∥R(l)(RR ⊤)−1(RR ⊤)−1R(l)∥2
+
+F
+
++
+
+
+
+(n − 1)( σ44 − σ4) − σ4  n
+
+2 − 2.25  X
+
+i,l 
+
+(cll ii )2
+
++ nσ 4
+
+ 12 + 2.5
+
+n
+
+ X
+
+i,l 1,l 2
+
+(cl1l2
+
+ii )2 + σ4
+
+2
+
+X
+
+i,k 1,l 1,l 2
+
+cl1l2
+
+k1k1 cl1l2
+
+ii − σ4
+
+2
+
+X
+
+k,k 1,l 
+
+cll k1k1 cll ii .
+
+We will show that under the conditions of Theorem 5 that this equals σ4n
+
+2 ∥(RR ⊤)−1∥2
+
+F (1 + o(1)) . Indeed, we have that 
+
+(65) − σ4n
+
+2 ∥(RR ⊤)−1∥2
+
+F ≲ σ4∥(RR ⊤)−1∥2
+
+F + Cσ 4n X
+
+l
+
+∥R(l)(RR ⊤)−1(RR ⊤)−1R(l)∥2
+
+F + Cnσ 4 X
+
+i,l 
+
+(cll ii )2
+
++ Cnσ 4 X
+
+i,l 1,l 2
+
+(cl1l2
+
+ii )2 + Cσ 4 X
+
+i,k 1,l 1,l 2
+
+cl1l2
+
+k1k1 cl1l2
+
+ii + Cσ 4 X
+
+k,k 1,l 
+
+cll k1k1 ck1k1
+
+ii .
+
+61 Note that σ4n
+
+2 ∥(RR ⊤)−1∥2
+
+F ≳ σ4nr L2λ4 . We also have that 
+
+σ4n X
+
+i,l 1,l 2
+
+(cl1l2
+
+ii )2 = X
+
+i,l 1,l 2
+
+
+
+e⊤
+
+i U R (l1)(RR ⊤)−1(RR ⊤)−1R(l2)U ⊤ei
+
+2
+
+≤ σ4n max 
+
+i ∥e⊤
+
+i U ∥2 X
+
+i,l 1,l 2
+
+∥e⊤
+
+i U ∥2∥R(l1)(RR ⊤)−1(RR ⊤)−1R(l2)∥2
+
+F
+
+≤ ∥ U ∥22,∞
+
+σ4nκ 4rL2λ4 (66) 
+
+≪ σ4nr L2λ4
+
+as long as ∥U ∥22,∞ ≪ 1
+
+κ4 . The same arguments hold for each of the other terms containing cl1l2
+
+ii or cll ii as well. In addition, 
+
+σ4n X
+
+l
+
+∥R(l)(RR ⊤)−1(RR ⊤)−1R(l)∥2
+
+F ≲ σ4nrκ 4
+
+L3λ4 ≪ σ4nr L2λ4
+
+as long as κ4
+
+L ≪ 1. Thus, 
+
+TX
+
+t=1 
+
+EY 2
+
+t = σ4n
+
+2 ∥(RR ⊤)−1∥2
+
+F
+
+
+
+1 + o(1) 
+
+
+
+.
+
+For simplicity, define 
+
+s2 = X
+
+t
+
+EY 2
+
+t = σ4n
+
+2 ∥(RR ⊤)−1∥2
+
+F
+
+ 1 + o(1) .
+
+It suffices to prove the asymptotic normality of Mt−EMt
+
+s . We apply the martingale central limit theorem (Lemma 9.12 of Bai and Silverstein (2010)). We need to show that 
+
+PTt=1 EY 2
+
+t |F t−1
+
+s2
+
+p
+
+−→ 1; (67) 
+
+PTt=1 EY 2
+
+t I{Y 2
+
+t ≥ εs 2}
+
+s2 → 0 (68) for all ε > 0. To prove (67), we have that 
+
+TX
+
+t=1 
+
+EY 2
+
+t |F t−1 = X
+
+t
+
+A2
+
+t (σ44 − σ4) + B2
+
+t σ2 + 2 AtBtσ33
+
+= ( σ44 − σ4) X
+
+i,l 
+
+(cll ii )2 + σ2 X
+
+i,l 
+
+"
+
+2 X
+
+l2<l 
+
+cll 2
+
+ii Ziil 2 + 1
+
+√2
+
+X
+
+k2<i 
+
+
+
+cll 2
+
+ik 2 Zik 2l + X
+
+l2<l 
+
+cll 2
+
+ik 2 Zik 2l2
+
+#2
+
++ 2 σ33
+
+X
+
+i,l 
+
+cll ii 
+
+"
+
+2 X
+
+l2<l 
+
+cll 2
+
+ii Ziil 2 + 1
+
+√2
+
+X
+
+k2<i 
+
+
+
+cll 2
+
+ik 2 Zik 2l + X
+
+l2<l 
+
+cll 2
+
+ik 2 Zik 2l2
+
+#
+
++ X
+
+i,l 
+
+X
+
+k<i 
+
+cll kk + cll ii 
+
+2(σ44 − σ4)+ σ2 X
+
+i,l 
+
+X
+
+k<i 
+
+" X
+
+l2<l 
+
+(cll 2
+
+kk + cll 2
+
+ii )Zikl 2 + 1
+
+√2
+
+X
+
+l3≥l
+
+cl3lik Zkkl 3 + X
+
+k2<k 
+
+
+
+cll kk 2 Zik 2l + 2 X
+
+l2<l 
+
+cll 2
+
+kk 2 Zik 2l2
+
+#2
+
++ 2 σ33
+
+X
+
+i,l 
+
+X
+
+k<i 
+
+[cll kk + cll ii ]
+
+" X
+
+l2<l 
+
+(cll 2
+
+kk + cll 2
+
+ii )Zikl 2 + 1
+
+√2
+
+X
+
+l3≥l
+
+cl3lik Zkkl 3 + X
+
+k2<k 
+
+
+
+cll kk 2 Zik 2l + 2 X
+
+l2<l 
+
+cll 2
+
+kk 2 Zik 2l2
+
+#
+
+.
+
+62 Define 
+
+T1 := ( σ44 − σ4) X
+
+i,l 
+
+(cll ii )2 + X
+
+i,l 
+
+X
+
+k<i 
+
+cll kk + cll ii 
+
+2(σ44 − σ4); 
+
+T2 := 2 σ33
+
+X
+
+i,l 
+
+cll ii 
+
+"
+
+2 X
+
+l2<l 
+
+cll 2
+
+ii Ziil 2 + 1
+
+√2
+
+X
+
+k2<i 
+
+
+
+cll 2
+
+ik 2 Zik 2l + X
+
+l2<l 
+
+cll 2
+
+ik 2 Zik 2l2
+
+#
+
++ 2 σ33
+
+X
+
+i,l 
+
+X
+
+k<i 
+
+[cll kk + cll ii ]
+
+" X
+
+l2<l 
+
+(cll 2
+
+kk + cll 2
+
+ii )Zikl 2 + 1
+
+√2
+
+X
+
+l3≥l
+
+cl3lik Zkkl 3 + X
+
+k2<k 
+
+
+
+cll kk 2 Zik 2l + 2 X
+
+l2<l 
+
+cll 2
+
+kk 2 Zik 2l2
+
+#
+
+T3 := σ2 X
+
+i,l 
+
+"
+
+2 X
+
+l2<l 
+
+cll 2
+
+ii Ziil 2 + 1
+
+√2
+
+X
+
+k2<i 
+
+
+
+cll 2
+
+ik 2 Zik 2l + X
+
+l2<l 
+
+cll 2
+
+ik 2 Zik 2l2
+
+#2
+
++ σ2 X
+
+i,l 
+
+X
+
+k<i 
+
+" X
+
+l2<l 
+
+(cll 2
+
+kk + cll 2
+
+ii )Zikl 2 + 1
+
+√2
+
+X
+
+l3≥l
+
+cl3lik Zkkl 3 + X
+
+k2<k 
+
+
+
+cll kk 2 Zik 2l + 2 X
+
+l2<l 
+
+cll 2
+
+kk 2 Zik 2l2
+
+#2
+
+.
+
+We analyze T1, T 2, and T3 separately. 
+
+• The term T1. By a similar argument to (66) it holds that T1 ≪ s2.
+
+• The term T2. As for T2, we note that it is mean-zero, and, furthermore, 
+
+ET 22 ≤ 8σ63 E
+
+" X
+
+i,l 
+
+cll ii 
+
+
+
+2 X
+
+l2<l 
+
+cll 2
+
+ii Ziil 2 + 1
+
+√2
+
+X
+
+k2<i 
+
+cll 2
+
+ik 2 Zik 2l + 1
+
+√2
+
+X
+
+k2<i 
+
+X
+
+l2<l 
+
+cll 2
+
+ik 2 Zik 2l2
+
+#2
+
++ 8 σ63 E
+
+" X
+
+i,l 
+
+X
+
+k<i 
+
+[cll kk + cll ii ] X
+
+l2<l 
+
+(cll 2
+
+kk + cll 2
+
+ii )Zikl 2 + 1
+
+√2
+
+X
+
+l3≥l
+
+cl3lik Zkkl 3 + X
+
+k2<k 
+
+cll kk 2 Zik 2l + 2 X
+
+k2<k 
+
+X
+
+l2<l 
+
+cll 2
+
+kk 2 Zik 2l2
+
+!# 2
+
+≤ 8σ63 σ2 X
+
+i,l 
+
+X
+
+l2<l 
+
+4( cll ii )2(cll 2
+
+ii )2 + X
+
+i,l 
+
+X
+
+k2<i 
+
+12 (cll ii )2(cll 2
+
+ik 2 )2 + X
+
+i,l 
+
+X
+
+k2<i 
+
+X
+
+l2<l 
+
+12 (cll ii )2(cll 2
+
+ik 2 )2
+
+!
+
++ 8 σ63 σ2
+
+" X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l2<l 
+
+(cll kk + cll ii )2(cll 2
+
+kk + cll 2
+
+ii )2 + X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l3≥l
+
+12 (cll kk + cll ii )2(cl3lik )2
+
+#
+
++ 8 σ63 σ2
+
+" X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+k2<k 
+
+(cll kk + cll ii )2(cll kk 2 )2 + 4 X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+k2<k 
+
+X
+
+l2<l 
+
+(cll kk + cll ii )2(cll 2
+
+kk 2 )2
+
+#
+
+≲ σ8 X
+
+i,l,k,k 2,l 2
+
+(cll ii )2(cll 2
+
+kk 2 )2
+
+≲ nσ 8 max 
+
+i,l (cll ii )2 X
+
+l,k,k 2l2
+
+(cll 2
+
+kk 2 )2
+
+≲ nσ 8 max 
+
+i,l (cll ii )2∥(RR ⊤)−1∥2
+
+F .
+
+We note that Cauchy-Schwarz implies that 
+
+|cl1l2
+
+kk 1 | ≤ ∥ U ∥22,∞
+
+κ2rL2λ2 .
+
+Thus, 
+
+nσ 8 max 
+
+i,l (cll ii )2∥(RR ⊤)−1∥2
+
+F ≲ nσ 8rL2λ4 ∥U ∥42,∞
+
+κ4r2
+
+L4λ4 ≍ ∥ U ∥42,∞
+
+nσ 8r3κ4
+
+L6λ8 .
+
+63 As a result, Chebyshev’s inequality implies 
+
+P
+
+
+
+|T2| ≥ εs 2
+
+
+
+≲ ∥U ∥42,∞
+
+nσ 8r3κ4
+
+L6λ8
+
+1
+
+ε2s4
+
+≲ ∥U ∥42,∞
+
+nσ 8r3κ4
+
+L6λ8
+
+1
+
+ε2
+
+L4λ8
+
+r2n2σ8
+
+≲ ∥U ∥42,∞
+
+rκ 4
+
+L2nε 2 → 0
+
+by Eq. (11), which implies that T2 → 0 in probability. 
+
+• The term T3. From the previous calculations, we note that T3 has expected value σ4n
+
+2 ∥(RR ⊤)−1∥2
+
+F
+
+ 1 + 
+
+o(1) . We therefore prove the convergence in probability to its expected value. We decompose T3 via: 
+
+T3 = 4 σ2 X
+
+i,l 
+
+X
+
+l2<l 
+
+ cll 2
+
+ii 
+
+2Z2
+
+iil 2 + σ2
+
+2
+
+X
+
+i,l 
+
+X
+
+k2<i 
+
+ cll ik 2
+
+2Z2
+
+ik 2l + σ2
+
+2
+
+X
+
+i,l 
+
+X
+
+k2<i 
+
+X
+
+l2<l 
+
+ cll 2
+
+ik 2
+
+2Z2
+
+ik 2l2
+
++ σ2 X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l2<l 
+
+ cll 2
+
+kk + cll 2
+
+ii 
+
+2Z2
+
+ikl 2 + σ2 12
+
+X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l3≥l
+
+ cl3lik 
+
+2Z2
+
+kkl 3
+
++ σ2 X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+k2<k 
+
+ cll kk 2
+
+2Z2
+
+ik 2l + 4 σ2 X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+k2<k 
+
+X
+
+l2<l 
+
+ cll 2
+
+kk 2
+
+2Z2
+
+ik 2l2
+
++ 4σ2
+
+√2
+
+X
+
+i,l 
+
+X
+
+l2<l 
+
+X
+
+k2<i 
+
+cll 2
+
+ii cll ik 2 Ziil 2 Zik 2l
+
++ 4σ2
+
+√2
+
+X
+
+i,l 
+
+X
+
+l2<l 
+
+X
+
+k2<i 
+
+X
+
+l′
+
+> 2
+
+<l 
+
+cll 2
+
+ii cll ′
+
+> 2
+
+ik 2 Ziil 2 Zik 2l′
+
+> 2
+
++ σ2 X
+
+i,l 
+
+X
+
+k2<i k′
+
+> 2
+
+̸ =k2
+
+cll ik 2 cll 2
+
+ik ′
+
+> 2
+
+Zik 2lZik ′
+
+> 2
+
+l2 + σ2
+
+2
+
+X
+
+i,l 
+
+X
+
+k2<i k′
+
+> 2
+
+̸ =k2
+
+X
+
+l2<l 
+
+X
+
+l′
+
+> 2
+
+<l 
+
+cll 2
+
+ik 2 cll ′
+
+> 2
+
+ik ′
+
+> 2
+
+Zik 2l2 Zik ′
+
+> 2
+
+l′
+
+> 2
+
++ σ2 2
+
+√2
+
+X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l2<l 
+
+X
+
+l3≥l
+
+(cll 2
+
+kk + cll 2
+
+ii )cl3lik Zikl 2 Zkkl 3
+
++ 2 σ2 X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l2<l 
+
+X
+
+k2<k 
+
+(cll 2
+
+kk + cll 2
+
+ii )cll kk 2 Zikl 2 Zik 2l
+
++ 4 σ2 X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l2<l 
+
+X
+
+k2<k 
+
+X
+
+l′
+
+> 2
+
+<l 
+
+(cll 2
+
+kk + cll 2
+
+ii )cll ′
+
+> 2
+
+kk 2 Zikl 2 Zik 2l′
+
+> 2
+
++ σ2 2
+
+√2
+
+X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l3≥l
+
+X
+
+k2<k 
+
+cl3lik cll kk 2 Zkkl 3 Zik 2l
+
++ σ2 4
+
+√2
+
+X
+
+i,l 
+
+X
+
+k<i 
+
+X
+
+l3≥l
+
+X
+
+k2<k 
+
+X
+
+l2<l 
+
+cl3lik cll 2
+
+kk 2 Zkkl 3 Zik 2l2
+
+We claim that we can write this as Z⊤QQ ⊤Z, where Z is the vector associated to all unique components of Zikl and Q is a matrix defined as follows. First, recall the set I := {(i, k, l ), k ≤ i, l ≤ L}. Define 
+
+J1 := {(i, l, l 2) : l2 < l } and J2 := {(i, l, k, l 2) : k < i, l 2 < l }, with J = J1 ∪ J 2. We write Q ∈ R|I|×|J | 
+
+64 with entries given by 
+
+Q(i′,k ′,l ′),(i,l,l 2) =
+
+
+
+2σ c ll 2 
+
+> ii
+
+, (i′, k ′, l ′) = ( i, i, l 2),σ
+
+√2 cll ik ′ , i′ = i, k ′ < i, l ′ = l, σ
+
+√2 cll ′ 
+
+> ik ′
+
+, i′ = i, k ′ < i, l ′ < l, 
+
+0, otherwise ,
+
+Q(i′,k ′,l ′),(i,l,k,l 2) =
+
+
+
+σc ll 2 
+
+> kk
+
++ σc ll 2 
+
+> ii
+
+, (i′, k ′, l ′) = ( i, k, l 2),σ
+
+√2 cl′lik , (i′, k ′, l ′) = ( k, k, l ′), l ′ ≥ l, σc ll kk 2 , i′ = i, k ′ < k, l ′ = l, 
+
+2 σc ll ′ 
+
+> kk 2
+
+, i′ = i, k ′ < k, l ′ < l, 
+
+0, otherwise .
+
+With this definition, we note that ET3 = σ2∥Q∥2 
+
+> F
+
+, and, moreover, T3 = Z⊤QQ ⊤Z. Therefore, we may apply the Hanson-Wright inequality to Z⊤QQ ⊤Z. In particular, it holds that 
+
+P
+
+
+
+Z⊤QQ ⊤Z − σ2∥Q∥2 
+
+> F
+
+> σ 2∥Q∥2 
+
+> F
+
+t
+
+
+
+≤ 2 exp 
+
+
+
+− c ∥Q∥2
+
+> F
+
+∥Q∥2 min( t2, t )
+
+
+
+.
+
+Thus, convergence in probability is achieved if ∥Q∥2 
+
+> F
+
+/∥Q∥2 → ∞ . We now upper bound ∥Q∥2. First, we have that ∥Q∥2 ≤ ∥ Q∥1,1∥Q∥∞,∞ (these are operator norms with respect to these vector spaces). Note that every entry of Q satisfies 
+
+max |Q(i′k′l′),(i,l,l 2)| ≤ Cσ max  
+
+> ikll ′
+
+|cll ′ 
+
+> ik
+
+|.
+
+We simply count the number of nonzeros per row and column of Q. Note that the only time that Q has nonzero entries within a row it must be that i′ = i. Thus, we may only vary k′ and l′, meaning there are at most O(nL ) nonzero entries. Similarly for the columns, yielding 
+
+∥Q∥2 ≤ Cσ 2n2L2 max  
+
+> ikll ′
+
+|cll ′ 
+
+> ik
+
+|2
+
+≲ Cn 2L2∥U ∥42,∞
+
+κ2r2
+
+L4λ4 ≍ ∥ U ∥42,∞
+
+σ2n2
+
+L2λ4 .
+
+Thus, 
+
+∥Q∥2
+
+> F
+
+∥Q∥2 ≳ σ2n∥(RR ⊤)−1∥2
+
+> F
+
+∥U ∥42,∞ σ2n2
+
+> L2λ4
+
+≳
+
+> σ2nλ4L2
+
+∥U ∥42,∞ σ2n2
+
+> L2λ4
+
+≍ 1
+
+∥U ∥42,∞n ,
+
+which diverges by (11). Combining our results for T1, T2, and T3, we have proven (67). We now prove (68). We will first bound the quantity P 
+
+> t
+
+EY 4 
+
+> t
+
+. We recall that 
+
+Yt = At(Z2 
+
+> t
+
+− σ2) + BtZt,
+
+where Bt can be written as P 
+
+> s<t
+
+asZs, where as are deterministic coefficients on each Zs. Thus, by subgaussianity, we have that 
+
+EY 4 
+
+> t
+
+= A4
+
+> t
+
+
+
+σ88 − 4σ2σ66 + 6 σ4σ44 − 3σ8
+
+
+
++ 6 A2 
+
+> t
+
+(σ44 − σ4)σ2EB2 
+
+> t
+
++ σ44 EB4
+
+> t
+
+≲ σ8A4 
+
+> t
+
++ σ6A2 
+
+> t
+
+EB2 
+
+> t
+
++ σ4EB4 
+
+> t
+
+. (69) 65 We first compute P
+
+t EB4
+
+t . We have 
+
+E[B4
+
+t ] = 
+
+
+
+σ44
+
+" P
+
+l2<l 16( cll 2
+
+ii )4 + P
+
+k2<i 14 (cll ik 2 )4 + P
+
+k2<i 
+
+P
+
+l2<l 14 (cll 2
+
+ik 2 )4
+
+#
+
++6 σ4
+
+ P
+
+l2<l 
+
+P
+
+l′
+
+> 2
+
+<l, l ′
+
+> 2
+
+<l 2 16( cll 2
+
+ii )2(cll ′
+
+> 2
+
+ii )2
+
++ P
+
+l2<l 
+
+P
+
+k2<i 2( cll 2
+
+ii )2(cll ik 2 )2 + P
+
+l2<l 
+
+P
+
+k2<i 
+
+P
+
+l′
+
+> 2
+
+<l 2( cll 2
+
+ii )2(cll ′
+
+> 2
+
+ik 2 )2
+
++ P
+
+k2<i 
+
+P
+
+k′
+
+> 2
+
+<i, k ′
+
+> 2
+
+<k 2
+
+14 (cll ik 2 )2(cll ik ′
+
+> 2
+
+)2 + P
+
+k2<i 
+
+P
+
+k′
+
+> 2
+
+<i 
+
+P
+
+l′
+
+> 2
+
+<l 14 (cll ik 2 )2(cll ′
+
+> 2
+
+ik ′
+
+> 2
+
+)2
+
++ P
+
+k2<i 
+
+P
+
+l2<l 
+
+P
+
+k′
+
+> 2
+
+<i 
+
+P
+
+l′
+
+> 2
+
+<l, (k′
+
+> 2
+
+,l ′
+
+> 2
+
+)<(k2,l 2) 14 (cll 2
+
+ik 2 )2(cll ′
+
+> 2
+
+ik ′
+
+> 2
+
+)2
+
+
+
+, k = iσ44
+
+" P
+
+l2<l (cll 2
+
+kk + cll 2
+
+ii )4 + P
+
+l3≥l 14 (cl3lik )4 + P
+
+k2<k (cll kk 2 )4 + P
+
+k2<k 
+
+P
+
+l2<l 16( cll 2
+
+kk 2 )4
+
+#
+
++6 σ4
+
+" P
+
+l2<l 
+
+P
+
+l′
+
+> 2
+
+<l, l ′
+
+> 2
+
+<l 2 (cll 2
+
+kk + cll 2
+
+ii )2(cll ′
+
+> 2
+
+kk + cll ′
+
+> 2
+
+ii )2 + P
+
+l2<l 
+
+P
+
+l3≥l 12 (cll 2
+
+kk + cll 2
+
+ii )2(cl3lik )2
+
++ P
+
+l2<l 
+
+P
+
+k2<k (cll 2
+
+kk + cll 2
+
+ii )2(cll kk 2 )2 + P
+
+l2<l 
+
+P
+
+k2<k 
+
+P
+
+l′
+
+> 2
+
+<l 4( cll 2
+
+kk + cll 2
+
+ii )2(cll ′
+
+> 2
+
+kk 2 )2
+
++ P
+
+l3<l ′
+
+> 3
+
+, l 3,l ′
+
+> 3
+
+≥l 14 (cl3lik )2(cl′
+
+> 3
+
+lik )2 + P
+
+l3≥l
+
+P
+
+k2<k 12 (cl3lik )2(cll kk 2 )2
+
++ P
+
+l3≥l
+
+P
+
+k2<k,l 2<l 2( cl3lik )2(cll 2
+
+kk 2 )2 + P
+
+k2<k 
+
+P
+
+k′
+
+> 2
+
+<k,k ′
+
+> 2
+
+<k 2 (cll kk 2 )2(cll kk ′
+
+> 2
+
+)2
+
++ P
+
+k2<k 
+
+P
+
+k′
+
+> 2
+
+<k,l 2<l 4( cll kk 2 )2(cll 2
+
+kk ′
+
+> 2
+
+)2 + P k2<k,k ′
+
+> 2
+
+<k l2<l,l ′
+
+> 2
+
+<l, (k′
+
+> 2
+
+,l ′
+
+> 2
+
+)<(k2,l 2)
+
+16( cll 2
+
+kk 2 )2(cll ′
+
+> 2
+
+kk ′
+
+> 2
+
+)2
+
+#
+
+, k < i. 
+
+Note that each term above consists of at most O(n2L2) terms, each of which are bounded by max i,k,l 1,l 2 (cl1l2
+
+ik )4.We now sum this over t; i.e., over k ≤ i and l ≤ L, which has at most O(n2L) terms, giving 
+
+X
+
+t
+
+EB4
+
+t ≲ n4L3σ4 max 
+
+i,k,l 1,l 2
+
+(cl1l2
+
+ik )4.
+
+We recall that from the definition of the coefficients cl1l2
+
+ik we have that 
+
+cl1l2
+
+ik = e⊤
+
+i U R (l1)(RR ⊤)−1(RR ⊤)−1R(l2)U ⊤ek ≲ ∥U ∥22,∞
+
+κ2rλ2L2 .
+
+We also note that from our previous calculation σ2 P
+
+t EB2
+
+t ≲ s2. We further recall that by the definition of At, we have that P
+
+t A4
+
+t ≲ n2L max i,k,l 1,l 2 (cl1l2
+
+ik )4. Thus, combining these observations with (69), we have that 
+
+X
+
+t
+
+EY 4
+
+t ≲ σ8n2L max 
+
+i,k,l 1,l 2
+
+(cl1l2
+
+ik )4 + σ6 max 
+
+i,k,l 1,l 2
+
+(cl1l2
+
+ik )2 X
+
+t
+
+EB2
+
+t + n4L3σ8 max 
+
+i,k,l 1,l 2
+
+(cl1l2
+
+ik )4
+
+≲ σ8n2L∥U ∥82,∞
+
+κ8r4
+
+λ8L8 + σ4∥U ∥42,∞
+
+κ4r2
+
+λ4L4 s2 + n4L4σ8∥U ∥82,∞
+
+κ8r4
+
+λ8L8
+
+≲ s2∥U ∥42,∞
+
+σ4κ4r2
+
+λ4L4 + ∥U ∥82,∞
+
+σ8n4r4κ8
+
+λ8L4
+
+≲ s4
+
+ L2λ4
+
+nrσ 4 ∥U ∥42,∞
+
+σ4κ4r2
+
+λ4L4 + L4λ8
+
+n2r2σ8 ∥U ∥82,∞
+
+σ8n4r4κ8
+
+λ8L4
+
+
+
+≍ s4
+
+
+
+∥U ∥42,∞
+
+κ4rnL 4 + ∥U ∥82,∞n2r2κ8
+
+
+
+.
+
+Thus, we see that the term in the parentheses is o(1) whenever (11) holds. This completes the proof. 66 B.2.1 Proof of Lemma 11 
+
+Proof. First, we note that 
+
+∥U ⊤ X
+
+> l
+
+N (l)S(l)U (( RR ⊤)−1)∥F ≤√rLλ 2 ∥U ⊤ X
+
+> l
+
+N (l)S(l)∥.
+
+We now bound the quantity U ⊤ P 
+
+> l
+
+N (l)S(l). The proof is markedly similar to the proof of Lemma 1. Modifying the proof, by taking a net over the set of vectors of dimension r we can show that 
+
+∥U ⊤ X
+
+> l
+
+N (l)S(l)∥ ≤ Csσ √Lλ max 
+
+with probability at least 1 − exp( cr − s2). Therefore, taking s ≍ √r + t shows that 
+
+∥U ⊤ X
+
+> l
+
+N (l)S(l)∥ ≤ Cσ (√r + t)√Lλ max 
+
+with probability at least 1 − exp( −ct 2).
+
+B.3 Proof of Theorem 7 
+
+We now provide the following result, which provides consistent estimators of the asymptotic mean and variance. 
+
+Lemma 12. Under the conditions of Theorem 5, with probability at least 1 − exp( −cn ) it holds that  
+
+> σ2n
+> 2
+
+Tr 
+
+
+
+(RR ⊤)−1
+
+
+
+− Tr 
+
+  bR bR⊤−1
+
+
+
+σ2pn/ 2∥(RR ⊤)−1∥F
+
+= o(1); 
+
+1 − ∥  bR bR⊤−1∥F
+
+∥(RR ⊤)−1∥F
+
+= o(1) .
+
+Proof. See Section B.3.1. We are now prepared to prove Theorem 7. 
+
+Proof of Theorem 7. First, we note that Theorem 5 implies that 
+
+∥ sin Θ( bU , U )∥2 
+
+> F
+
+− σ2n 
+
+> 2
+
+Tr  (RR ⊤)−1
+
+σ2pn/ 2∥(RR ⊤)−1∥Fd
+
+−→ N (0 , 1) .
+
+Thus, it holds that 
+
+lim inf  
+
+> n→∞
+
+P
+
+
+
+∥ sin Θ( bU , U )∥2 
+
+> F
+
+∈ σ2n
+
+2 Tr  (RR ⊤)−1 ± zα/ 2σ2pn/ 2∥(RR ⊤)−1∥F
+
+
+
+≥ 1 − α. 
+
+We also have that the interval above is of length of order at most σ2√nr Lλ 2 ≲ σ2nr Lλ 2 × 1√nr , uniformly over all 
+
+P(λ) where λ satisfies λ ≫ nr 2κ4 
+
+> √L
+
+. Define 
+
+μ := σ2n
+
+2 Tr  (RR ⊤)−1; bμ = σ2n
+
+2 Tr    bR bR⊤−1;
+
+ν = σ2pn/ 2∥(RR ⊤)−1∥F ; bν = σ2pn/ 2∥  bR bR⊤−1∥F .
+
+67 Define 
+
+Zn := ∥ sin Θ( bU , U )∥2 
+
+> F
+
+− μν ; an = bμ − μν ; bn = bνν .
+
+Then we have that 
+
+P
+
+
+
+∥ sin Θ( bU , U )∥2 
+
+> F
+
+∈ dCI α
+
+
+
+= P|Zn − an| ≤ zα/ 2bn .
+
+Slutsky’s theorem and Lemma 12 implies that Zn − and
+
+−→ N (0 , 1) and zα/ 2bnp
+
+−→ zα/ 2. Furthermore, we have that |an| = o(1) , |bn − 1| = o(1) . Then we have that 
+
+lim inf P|Zn − an| ≤ zα/ 2bn ≥ lim inf P|Zn| ≤ zα/ 2(1 − o(1)) − o(1) → 1 − α. 
+
+Thus we have the desired coverage. The bound on the length follows immediately from Lemma 12. 
+
+B.3.1 Proof of Lemma 12 
+
+Proof of Lemma 12. From Lemma 6, we have that 
+
+σ2n
+
+2 Tr 
+
+
+
+(RR ⊤)−1
+
+
+
+− σ2n
+
+2 Tr 
+
+  bR bR⊤−1
+
+
+
+≤ √r σ2n
+
+2
+
+ X
+
+> l
+
+  bR(l)2
+
+−1
+
+− O ⊤
+
+ X
+
+> l
+
+ R(l)2
+
+−1
+
+O
+
+> F
+
+≲ σκ √nr λ√Lκ2σ2n√rλ2L + σκ √nr λ√Lσ4n2r2
+
+λ4L3/2 + σ4nr 2
+
+λ4L3/2
+
++ σ4n2r2
+
+λ4L2 + σ4r2n3/2
+
+λ4L3/2 + σκ √nr λ√Lσ3r3/2n2κλ3L2 + σ3n3/2rκ L3/2λ3
+
+≍ σ3κ3n3/2rλ3L3/2 + σ5κn 5/2r5/2
+
+λ5L2 + σ4nr 2
+
+λ4L3/2
+
++ σ4n2r2
+
+λ4L2 + σ4r2n3/2
+
+λ4L3/2 + σ4κ2n5/2r2
+
+λ4L5/2 + σ3n3/2rκ L3/2λ3 . (70) We will show that the right hand side of (70) is o σ2n∥(RR ⊤)−1∥F
+
+. Recall that ∥(RR ⊤)−1∥2 
+
+> F
+
+≳ rL2λ4 .Thus, it suffices to show that multiplying (70) by λ2Lσ2√nr yields a term that is o(1) .We have 
+
+λ2Lσ2√nr 
+
+ σ3κ3n3/2rλ3L3/2 + σ5κn 5/2r5/2
+
+λ5L2 + σ4nr 2
+
+λ4L3/2
+
+σ4n2r2
+
+λ4L2 + σ4r2n3/2
+
+λ4L3/2 + σ4κ2n5/2r2
+
+λ4L5/2 + σ2n3/2rκ L3/2λ3
+
+
+
+≍ σκ 3n√rλ√L + σ3κn 2r2
+
+λ3L + σ2√nr 3/2
+
+λ2√L + σ2n3/2r3/2
+
+λ2L + σ2r3/2nλ2√L + σ2κ2n2r2
+
+λ2L3/2 + σn √rκ 
+
+√Lλ = o(1) ,
+
+where the final bound is o(1) since λ/σ ≫ nr 2κ4 
+
+> √L
+
+and L ≲ n.Next, by (28), 
+
+∥(RR ⊤)−1∥F − ∥   bR bR⊤−1∥F ≤
+
+ X
+
+> l
+
+  bR(l)2
+
+−1
+
+− O ⊤
+
+ X
+
+> l
+
+ R(l)2
+
+−1
+
+O
+
+> F
+
+≲ σκ √nr λ√Lκ2
+
+λ2L + σκ √nr λ√Lσ2nr 3/2
+
+λ4L3/2 + σ2r3/2
+
+λ4L3/2
+
++ σ2nr 3/2
+
+λ4L2 + σ2r3/2√nλ4L3/2 + σκ √nr λ√Lσr √nκ λ3L2 + σ√nrκ L3/2λ3 .
+
+68 Thus, 
+
+1 − ∥  bR bR⊤−1∥F
+
+∥(RR ⊤)−1∥F
+
+≲ Lλ 2
+
+√r
+
+ σκ √nr λ√Lκ2
+
+λ2L + σκ √nr λ√Lσ2nr 3/2
+
+λ4L3/2 + σ2r3/2
+
+λ4L3/2
+
++ σ2nr 3/2
+
+λ4L2 + σ2r3/2√nλ4L3/2 + σκ √nr λ√Lσr √nκ λ3L2 + σ√nrκ L3/2λ3
+
+
+
+≍ σκ 3√nλ√L + σ3κn 3/2r3/2
+
+λ3√L + σ2rλ2√L + σ2nr λ2L + σ2r√nλ2√L + σ2κ2rn λ2L3/2 + σ√nκ 
+
+√Lλ 
+
+= o(1) ,
+
+where the final bound holds since λ/σ ≫ nr 2κ4 
+
+> √L
+
+. This completes the proof. 
+
+## C Proofs of Lower Bounds 
+
+In this section we prove all of our lower bounds. First, in Section C.1 we prove Theorem 3. In Section C.2 we prove the computational lower bound of Theorem 4, and finally in Section C.3 we prove Theorem 6 and Theorem 8 in tandem. 
+
+C.1 Proof of Theorem 3 
+
+Proof of Theorem 3. The proof is a standard Fano’s inequality argument. Consider the metric space Bn−r,r =
+
+{U : U ∈ On−r,r } with the metric ∥U1U ⊤ 
+
+> 1
+
+− U2U ⊤ 
+
+> 2
+
+∥F . Let M (a) denote the packing number of this metric space. By Lemma 5 of Koltchinskii and Xia (2015), the packing number M (√rε ) of this set for r ≤ n − 2r
+
+satisfies 
+
+ cε
+
+r(n−r)
+
+≤ M (√rε ) ≤
+
+ Cε
+
+r(n−r)
+
+.
+
+Since r ≤ c√n, 3r ≤ n for n sufficiently large. By taking ε = c/ 2, we can find a subset U ⊂ B n−r,r with 
+
+|U| ≥ 2r(n−2r) such that for any Ui̸ = Uj in U it holds that 
+
+∥UiU ⊤ 
+
+> i
+
+− Uj U ⊤ 
+
+> j
+
+∥F ≥ c
+
+2
+
+√r. 
+
+For each Ui ∈ U , define eUi via 
+
+eUi =
+
+√1 − δIr√δUi
+
+
+
+,
+
+which is an orthonormal matrix. We thus have that if eUi̸ = eUj , then 
+
+∥ eUi eU ⊤ 
+
+> i
+
+− eUj eU ⊤ 
+
+> j
+
+∥F ≥ p2δ(1 − δ)∥Ui − Uj ∥F ≥ p2δ(1 − δ) inf 
+
+> O:OO ⊤=Ir
+
+∥∥ Ui − Uj O∥ F
+
+≥ pδ(1 − δ)∥UiU ⊤ 
+
+> i
+
+− Uj U ⊤ 
+
+> j
+
+∥F
+
+≥ c
+
+2
+
+prδ (1 − δ).
+
+69 We now let S(l) 
+
+> i
+
+= λ eUi eU ⊤ 
+
+> i
+
+for all l. Then under GOE noise with variance σ2 it holds that 
+
+KL 
+
+S(l) 
+
+> i
+
+, S(l)
+
+> j
+
+
+
+= L
+
+2σ2 ∥λ eUi eU ⊤ 
+
+> i
+
+− λ eUj eU ⊤ 
+
+> j
+
+∥2
+
+> F
+
+= Lλ 2
+
+2σ2 ∥ eUi eU ⊤ 
+
+> i
+
+− eUj eU ⊤ 
+
+> j
+
+∥2
+
+> F
+
+≤ C λ2Lσ2 ∥ eUi − eUj ∥2
+
+> F
+
+≤ C λ2Lδr σ2 .
+
+Thus, by the generalized Fano’s lemma, it holds that 
+
+inf 
+
+> bU
+
+sup   
+
+> U∈{ eUi}mi=1
+
+E∥ bU bU ⊤ − U U ⊤∥2 
+
+> F
+
+≥ cδ (1 − δ)r
+
+
+
+1 − C λ2 
+
+> σ2
+
+Lδr + log(2) 
+
+r(n − 2r) log(2) 
+
+
+
+.
+
+Since ∥ sin Θ( U , V )∥2 
+
+> F
+
+= 12 ∥U U ⊤ − V V ⊤∥2 
+
+> F
+
+, by taking δ = c0
+
+  σ2nλ2L ∧ 1 for some sufficiently small constant 
+
+c0, we obtain the result. 
+
+C.2 Proof of Theorem 4 
+
+Proof. We follow a similar proof to Lyu and Xia (2023). First, by section A.2 of Kunisky et al. (2022), we can without loss of generality assume that N (l) consists of IID N (0 , σ 2) noise and σ2 = 1 (by dividing through by σ). Following Lyu and Xia (2023), we let the prior distribution for (M , ε) be denoted as Π. By Theorem 2.6 of Kunisky et al. (2022), it holds that 
+
+∥L≤Dn ∥2 = 1 + EΠ
+
+> ⌊D/ 2⌋
+
+X
+
+> k=1
+
+1(2 k)! ⟨ε(1) , ε(2) ⟩2k⟨M (1) , M (2) ⟩2k,
+
+where (M (1) , ε(1) ) is independent from (M (2) , ε(2) ). We note that equation (44) of Lyu and Xia (2023) continues to apply in our setting, yielding 
+
+E⟨ε(1) , ε(2) ⟩2k =
+
+L + k − 1
+
+k
+
+
+
+.
+
+We now note a slight difference from their proof: we have that 
+
+⟨M (1) , M (2) ⟩ = λ2⟨u1u⊤ 
+
+> 1
+
+, u2u⊤ 
+
+> 2
+
+⟩ = λ2
+
+n2
+
+ nX
+
+> i=1
+
+U (1)  
+
+> i
+
+U (2) 
+
+> i
+
+2
+
+,
+
+where U (1)  
+
+> i
+
+and U (2)  
+
+> i
+
+are two independent collections of Rademachers. However, we note that the product of two Rademacher random variables is again Rademacher, and hence we have that 
+
+E
+
+ X
+
+> i
+
+Ui
+
+4k
+
+≤ n2k(4 k − 1)!! .
+
+Thus, 
+
+E⟨M (1) , M (2) ⟩2k = λ4k
+
+n4k E
+
+ nX
+
+> i=1
+
+Ui
+
+4k
+
+≤ λ4k
+
+n4k n2k(4 k − 1)!! = λ4k
+
+n2k (4 k − 1)!! .
+
+70 Thus, we have that 
+
+∥L≤Dn ∥2 = 1 + 
+
+> ⌊D/ 2⌋
+
+X
+
+> k=1
+
+(4 k − 1)!! (2 k)! 
+
+L + k − 1
+
+k
+
+ λ4k
+
+n2k ≤ 1 + 
+
+> ⌊D/ 2⌋
+
+X
+
+> k=1
+
+L + k − 1
+
+k
+
+ 4kλ4k
+
+n2k =: 1 + 
+
+> ⌊D/ 2⌋
+
+X
+
+> k=1
+
+Tk.
+
+We have that 
+
+Tk+1 
+
+Tk
+
+= 4λ4
+
+n2
+
+ L+1 
+
+> k+1
+
+ L+k−1
+
+> k
+
+ = 4λ4
+
+n2
+
+L + kk + 1 ≲ λ4Ln2 ≤ 12 ,
+
+provided that λ2 ≲ n√L , which follows from the assumption that λ = o  √nL1/4
+
+. We thus have that 
+
+∥L≤Dn ∥2 ≤ 1 + O
+
+ λ4Ln2
+
+
+
+= 1 + o(1) ,
+
+as required. 
+
+C.3 Proof of Theorems 6 and 8 
+
+Proof. We will prove both results in tandem. In particular, we will identify a construction of priors P∗ 
+
+> 1
+
+and 
+
+P∗ 
+
+> 2
+
+where P∗ 
+
+> 1
+
+and P∗ 
+
+> 2
+
+lie in eP(λ1) and eP(λ2) respectively, and, furthermore, if λ1 = λ2, then both lie in 
+
+P(λ1). Therefore, we focus on Theorem 8. For simplicity, let P1 = P(λ1) and define P2 similarly. To prove Theorem 8 we need to prove the two inequalities 
+
+L∗
+
+> α
+
+(P1, P2) ≥ σ2nr Lλ 21
+
+σ√nr 
+
+√Lλ 2
+
+; (71) 
+
+L∗
+
+> α
+
+(P1, P2) ≥ C σ2nr Lλ 21
+
+1
+
+√nr . (72) We will prove both statements separately under a common framework. Given a set P∗ 
+
+> 1
+
+⊂ P 1 and an alternative hypothesis space P∗ 
+
+> 2
+
+⊂ P 2 ⊂ P 1, we will show that for all U ∈ P ∗ 
+
+> 2
+
+it holds that 
+
+Tr 
+
+
+
+U ∗⊥U ∗⊤ ⊥ U U 
+
+
+
+= μ, 
+
+for an appropriate choice of μ, where U ∗ ∈ P ∗ 
+
+> 1
+
+satisfies U ∗⊤ U ∗⊥ = 0 . We further note that 
+
+∥U ⊤⊥ bU ∥2 
+
+> F
+
+= Tr  U ⊤⊥ bU bU ⊤U⊥
+
+ = Tr 
+
+
+
+U⊥U ⊤⊥ bU bU ⊤
+
+
+
+.
+
+Therefore, since ∥ sin Θ( U , bU )∥2 
+
+> F
+
+= ∥U ⊤⊥ bU ∥2 
+
+> F
+
+, any confidence interval for ∥ sin Θ( U , bU )∥2 
+
+> F
+
+is also a confidence interval for Tr 
+
+
+
+U⊥U ⊤⊥ bU bU ⊤
+
+
+
+. Therefore, we have that 
+
+μ = ∥ sin Θ( U ∗, U1)∥2 
+
+> F
+
+.
+
+Let fπP∗
+
+> 1
+
+be the density function for the uniform prior over P∗ 
+
+> 1
+
+, with a similar definition for P∗ 
+
+> 2
+
+. By Lemma 1 of Cai and Guo (2017) it holds that 
+
+LCI α (P∗ 
+
+> 1
+
+) ≥ sup  
+
+> θ∈P ∗
+> 2∪P ∗
+> 1
+
+Eθ L(CI α) ≥ | μ|
+
+
+
+1 − 2α − TV  fπP∗
+
+> 1
+
+, f πP∗
+
+> 2
+
+
+
+> +
+
+. (73) 71 Therefore, the result is proven if we can lower bound μ and select an appropriate P∗ 
+
+> 1
+
+such that TV (fπP∗
+
+> 1
+
+, f πP∗
+
+> 2
+
+) ≤
+
+c, where c is a sufficiently small constant. By the inequality 
+
+TV (f1, f 2) ≤ 12
+
+pχ2(f1, f 2), (74) we can simply upper bound the χ2 divergence. First we consider the inequality (71) and give our construction. Since r ≥ 2, set r′ := ⌊r/ 2⌋, and set 
+
+r0 = r − r′. Let 
+
+W =
+
+ Ir0
+
+0(n−r0)×r0
+
+
+
+∈ Rn×r0 .
+
+In addition, define 
+
+V ∗ := 
+
+ 0r0×r′
+
+Ir′
+
+0(n−r)×r′
+
+ ∈ Rn×r′
+
+.
+
+Then set 
+
+U ∗ := [ W , V ∗] ∈ Rn×r .
+
+Note that U ∗ is orthonormal. Now, suppose that Z ∈ R(n−r)×r′
+
+satisfies ∥Z∥F = 1 . Set, for some parameter 
+
+ρ to be chosen momentarily, 
+
+VZ := 
+
+
+
+0r0×r′
+
+Ir′
+
+ρZ
+
+ (Ir′ + ρ2Z⊤Z)−1/2 ∈ Rn×r′
+
+,
+
+and define UZ := [ W , VZ ], which is orthonormal by construction. Under the null P∗ 
+
+> 1
+
+we define 
+
+S(l) 
+
+> ∗
+
+= S∗ = λ′W W ⊤ + λ2V ∗V ∗⊤ ,
+
+where λ′ is chosen such that r0(λ′)2 + r′λ22 = rλ 21. We note that in the case λ2 = λ1, then λ′ = λ1, and 
+
+{S(l) 
+
+> ∗
+
+}Ll=1 all lie in the parameter space P(λ1). Similarly, we set 
+
+S(l) 
+
+> Z
+
+≡ SZ = λ′W W ⊤ + λ2VZ V ⊤ 
+
+> Z
+
+.
+
+The matrices S∗ and SZ have subspaces U ∗ and UZ respectively, and both matrices lie in our parameter space. Moreover, since W is shared, it holds that 
+
+∥ sin Θ( UZ , U ∗)∥2 
+
+> F
+
+= ∥ sin Θ( VZ , V ∗)∥2 
+
+> F
+
+= Tr  ρ2Z⊤Z(Ir′ + ρ2Z⊤Z)−1.
+
+Since ∥Z∥F = 1 , it is straightforward to demonstrate that ρ2 
+
+> 1+ ρ2
+
+≤ ∥ sin Θ( VZ , V ∗)∥2 
+
+> F
+
+≤ ρ2. Assuming that 
+
+ρ ≪ 1 yields that ∥ sin Θ( UZ , U ∗)∥2 
+
+> F
+
+≳ ρ2.We let πP∗ 
+
+> 2
+
+be the uniform prior over matrices Z satisfying ∥Z∥F = 1 . We claim that 
+
+χ2(fπP∗
+
+> 1
+
+, f πP∗
+
+> 2
+
+) + 1 = EZ,Z′ exp 
+
+ Lλ 22
+
+σ2 ⟨VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ , VZ′ V ⊤ 
+
+> Z′
+
+− V ∗V ∗⊤ ⟩
+
+
+
+. (75) Assuming this for the moment, we upper bound the right hand side above. We have that 
+
+VZ V ⊤ 
+
+> Z
+
+=
+
+
+
+0 0 00 (Ir′ + ρ2Z⊤Z)−1 ρ(Ir′ + ρ2Z⊤Z)−1Z⊤
+
+0 ρZ(Ir′ + ρ2Z⊤Z)−1 ρ2Z(Ir′ + ρ2Z⊤Z)−1Z⊤
+
+ .
+
+72 Thus, 
+
+VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ 
+
+=
+
+
+
+0 0 00 (Ir′ + ρ2Z⊤Z)−1 − Ir′ ρ(Ir′ + ρ2Z⊤Z)−1Z⊤
+
+0 ρZ(Ir′ + ρ2Z⊤Z)−1 ρ2Z(Ir′ + ρ2Z⊤Z)−1Z⊤
+
+
+
+=
+
+
+
+0 0 00 0 ρ(Ir′ + ρ2Z⊤Z)−1Z⊤
+
+0 ρZ(Ir′ + ρ2Z⊤Z)−1 0
+
+ +
+
+
+
+0 0 00 (Ir′ + ρ2Z⊤Z)−1 − Ir′ 00 0 ρ2Z(Ir′ + ρ2Z⊤Z)−1Z⊤
+
+
+
+:= X(1)  
+
+> Z
+
++ X(2)  
+
+> Z
+
+.
+
+It therefore holds that 
+
+⟨VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ , VZ′ V ⊤ 
+
+> Z′
+
+− V ∗V ∗⊤ ⟩ = ⟨X(1)  
+
+> Z
+
+, X(1)  
+
+> Z′
+
+⟩ + ⟨X(2)  
+
+> Z
+
+, X(2)  
+
+> Z′
+
+⟩ + ⟨X(1)  
+
+> Z
+
+, X(2)  
+
+> Z′
+
+⟩ + ⟨X(1)  
+
+> Z′
+
+, X(2)  
+
+> Z
+
+⟩.
+
+We analyze each term separately. First, we have that 
+
+⟨X(1)  
+
+> Z
+
+, X(1)  
+
+> Z′
+
+⟩ = 2 ρ2Tr 
+
+
+
+Z⊤ Ir′ + ρ2Z⊤Z−1 Ir′ + ρ2Z′⊤Z′−1Z′⊤
+
+
+
+.
+
+Since ρ ≪ 1 and ∥Z⊤Z∥F ≤ 1, we may write the Neumann series 
+
+ Ir′ + ρ2Z⊤Z−1 =
+
+> ∞
+
+X
+
+> k=0
+
+(−1) kρ2k(Z⊤Z)k.
+
+Plugging this series in yields 
+
+⟨X(1)  
+
+> Z
+
+, X(1)  
+
+> Z′
+
+⟩ = 2 ρ2⟨Z, Z′⟩ + R, 
+
+where |R| ≤ Cρ 4. Using a similar argument for X(2)  
+
+> Z
+
+shows that the remaining terms are all bounded by 
+
+Cρ 4. As a result, (75) yields 
+
+EZ,Z′ exp 
+
+ Lλ 22
+
+σ2 ⟨VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ , VZ′ V ⊤ 
+
+> Z′
+
+− V ∗V ∗⊤ ⟩
+
+
+
+≤ exp 
+
+ CLλ 22ρ4
+
+σ2
+
+
+
+EZ,Z′ exp 
+
+ 2Lλ 22ρ2
+
+σ2 ⟨Z, Z′⟩
+
+
+
+.
+
+Next, we note that Z and Z′ are matrices drawn uniformly from ∥Z∥F = 1 ; thus, the inner product ⟨Z, Z′⟩
+
+is equivalent to the inner product for two independent uniform random variables of dimension (n − r)r′.Since the inner product between two independent uniform random variables is subgaussian with ψ2 norm at most C√(n−r)r′ , it holds that if r′ ≍ r,
+
+exp 
+
+ CLλ 22ρ4
+
+σ2
+
+
+
+EZ,Z′ exp 
+
+ 2Lλ 22ρ2
+
+σ2 ⟨Z, Z′⟩
+
+
+
+≤ exp 
+
+ CLλ 22ρ4
+
+σ2
+
+
+
+exp 
+
+
+
+C L2λ42ρ4
+
+σ4nr 
+
+
+
+.
+
+Now, take 
+
+ρ2 = cρ
+
+σ2nr Lλ 21
+
+σ√nr λ2
+
+√L .
+
+Plugging this in yields 
+
+χ2(P∗ 
+
+> 1
+
+, P∗ 
+
+> 2
+
+) + 1 ≤ exp 
+
+ Cc 2
+
+> ρ
+
+Lλ 22
+
+σ2
+
+ σ4n2r2
+
+L2λ41
+
+σ2nr λ22L
+
+ 
+
++ Cc 2
+
+> ρ
+
+L2λ42
+
+σ4nr 
+
+ σ4n2r2
+
+L2λ41
+
+σ2nr λ22L
+
+ 
+
+≤ exp 
+
+
+
+Cc 2
+
+> ρ
+
+1
+
+C40
+
++ Cc 2
+
+> ρ
+
+1
+
+C20
+
+
+
+,
+
+73 where the final bound follows since λ1/σ ≥ C0 nr √L and λ2 ≤ λ1. If C0 is sufficiently large or cρ is sufficiently small, the above is bounded by 1 + ε2 for some small ε.Similarly, if λ2 ≥ nr √L , we then take ρ2 = cρ σ2√nr Lλ 21
+
+to yield 
+
+exp 
+
+ Cc 2
+
+> ρ
+
+Lλ 22σ4nr σ2λ41L2
+
+
+
+exp 
+
+
+
+Cc 2
+
+> ρ
+
+L2λ42σ4nr λ41L2nrσ 4
+
+
+
+= exp 
+
+ Cc 2
+
+> ρ
+
+λ22σ2nr λ41L
+
+
+
+exp 
+
+
+
+Cc 2
+
+> ρ
+
+λ42
+
+λ41
+
+
+
+.
+
+This remains bounded whenever λ1 ≥ C0σpnr/L , which it is by assumption (indeed, we assume that 
+
+λ1/σ ≫ nr √L ). This completes the proof of both inequalities provided we can justify (75). We now justify the χ2 calculation. Recall that fπP∗
+
+> 1
+
+denotes the joint law of {A(l)}Ll=1 under the null parameter S(l) 
+
+> ∗
+
+, and for each Z let fZ denote the joint law under the alternative parameter S(l) 
+
+> Z
+
+. We have that 
+
+S(l) 
+
+> Z
+
+− S(l) 
+
+> ∗
+
+== λ2
+
+ VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ .
+
+Let π be the distribution of Z. Then we have that 
+
+fπP∗
+
+> 2
+
+:= 
+
+Z
+
+fZ dπ (Z).
+
+Hence 
+
+χ2(fπP∗
+
+> 2
+
+, f πP∗
+
+> 1
+
+) + 1 = 
+
+Z Z
+
+EfπP∗
+
+> 1
+
+"
+
+fZ
+
+fπP∗
+
+> 1
+
+fZ′
+
+fπP∗
+
+> 1
+
+#
+
+dπ (Z)dπ (Z′).
+
+We now compute the inner expectation. For fixed Z, since the noise is Gaussian, 
+
+fZ
+
+fπP∗
+
+= exp 
+
+(
+
+1
+
+σ2
+
+> L
+
+X
+
+> l=1
+
+D
+
+N (l), λ 2
+
+ VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ E
+
+− 12σ2
+
+> L
+
+X
+
+> l=1
+
+∥λ2
+
+ VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ ∥2
+
+> F
+
+)
+
+= exp 
+
+(
+
+λ2
+
+σ2
+
+> L
+
+X
+
+> l=1
+
+D
+
+N (l), VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ E
+
+− Lλ 22
+
+2σ2 ∥ VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ ∥2
+
+> F
+
+)
+
+.
+
+Multiplying the two likelihood ratios yields 
+
+fZ
+
+fπP∗
+
+fZ′
+
+fπP∗
+
+= exp 
+
+(
+
+λ2
+
+σ2
+
+> L
+
+X
+
+> l=1
+
+D
+
+N (l), VZ V ⊤ 
+
+> Z
+
++ VZ′ V ⊤ 
+
+> Z′
+
+− 2V ∗V ∗⊤ E)
+
+× exp 
+
+
+
+− Lλ 22
+
+2σ2
+
+ ∥VZ′ V ⊤ 
+
+> Z′
+
+− V ∗V ∗⊤ ∥2 
+
+> F
+
++ ∥VZ′ V ⊤ 
+
+> Z′
+
+− V ∗V ∗⊤ ∥2
+
+> F
+
+ 
+
+.
+
+It is straightforward to demonstrate that for any matrix M ,
+
+E
+
+ λ2
+
+σ2 ⟨N (l), M ⟩
+
+
+
+= exp 
+
+ λ22
+
+2σ2 ∥M ∥2
+
+> F
+
+
+
+.
+
+Thus, by independence over l, we obtain 
+
+EfπP∗
+
+fZ
+
+fπP∗
+
+fZ′
+
+fπP∗
+
+= exp 
+
+ λ22L
+
+2σ2 ∥VZ V ⊤ 
+
+> Z
+
++ VZ′ V ⊤ 
+
+> Z′
+
+− 2V ∗V ∗⊤ ∥2
+
+> F
+
+
+
+× exp 
+
+
+
+− Lλ 22
+
+2σ2
+
+
+
+∥VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ ∥2 
+
+> F
+
++ ∥VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ ∥2
+
+> F
+
+ 
+
+= exp 
+
+ λ22L
+
+2σ2 ⟨VZ V ⊤ 
+
+> Z
+
+− V ∗V ∗⊤ , VZ′ V ⊤ 
+
+> Z′
+
+− V ∗V ∗⊤ ⟩
+
+
+
+.
+
+This completes the proof. 74 References 
+
+Joshua Agterberg. Statistical Inference for Linear Functions of Eigenvectors with Small Eigengaps, August 2023. 5 Joshua Agterberg and Joshua Cape. An Overview of Asymptotic Normality in Stochastic Blockmodels: Cluster Analysis and Inference. Statistical Science , 41(2):354–385, May 2026. ISSN 0883-4237, 2168-8745. doi: 10.1214/24-STS970. 5 Joshua Agterberg and Anru Zhang. Statistical Inference for Low-Rank Tensors: Heteroskedasticity, Sub-gaussianity, and Applications. The Annals of Statistics, To Appear . doi: 10.48550/arXiv.2410.06381. 5Joshua Agterberg and Anru R. Zhang. Estimating Higher-Order Mixed Memberships via the $\ell_{2,\infty}$ Tensor Perturbation Bound. Journal of the American Statistical Association , 120(550): 1214–1224, April 2025. ISSN 0162-1459. doi: 10.1080/01621459.2024.2404265. 6.2 Joshua Agterberg, Zachary Lubberts, and Carey E. Priebe. Entrywise Estimation of Singular Vectors of Low-Rank Matrices With Heteroskedasticity and Dependence. IEEE Transactions on Information Theory , 68 (7):4618–4650, July 2022. ISSN 1557-9654. doi: 10.1109/TIT.2022.3159085. 3, 5 Joshua Agterberg, Zachary Lubberts, and Jesús Arroyo. Joint Spectral Clustering in Multilayer Degree-Corrected Stochastic Blockmodels. Journal of the American Statistical Association , 120(551):1607–1620, July 2025. ISSN 0162-1459. doi: 10.1080/01621459.2025.2516201. 5 Gérard Ben Arous, Song Mei, Andrea Montanari, and Mihai Nica. The Landscape of the Spiked Tensor Model. Communications on Pure and Applied Mathematics , 72(11):2282–2330, 2019. ISSN 1097-0312. doi: 10.1002/cpa.21861. 5 Jesús Arroyo, Avanti Athreya, Joshua Cape, Guodong Chen, Carey E. Priebe, and Joshua T. Vogelstein. Inference for Multiple Heterogeneous Networks with a Common Invariant Subspace. Journal of Machine Learning Research , 22(142):1–49, 2021. ISSN 1533-7928. 1, 1, 5 Arnab Auddy, Dong Xia, and Ming Yuan. Tensors in High-Dimensional Data Analysis: Methodological Opportunities and Theoretical Challenges. Annual Review of Statistics and Its Application , 12(Volume 12, 2025):527–551, March 2025. ISSN 2326-8298, 2326-831X. doi: 10.1146/annurev-statistics-112723-034548. 5Zhidong Bai and Jack W. Silverstein. Spectral Analysis of Large Dimensional Random Matrices . Springer Series in Statistics. Springer, New York, NY, 2010. ISBN 978-1-4419-0660-1 978-1-4419-0661-8. doi: 10.1007/978-1-4419-0661-8. B.2 Zhigang Bao, Xiucai Ding, and and Ke Wang. Singular vector and singular subspace distribution for the matrix denoising model. The Annals of Statistics , 49(1):370–392, February 2021. ISSN 0090-5364, 2168-8966. doi: 10.1214/20-AOS1960. 4, 5 Nicolas Boumal. An Introduction to Optimization on Smooth Manifolds . Cambridge University Press, March 2023. ISBN 978-1-009-17871-6. Google-Books-ID: fO2wEAAAQBAJ. B.1 Changxiao Cai, Gen Li, Yuejie Chi, H. Vincent Poor, and Yuxin Chen. Subspace estimation from unbalanced and incomplete data matrices: $\ell_{2,\infty}$ statistical guarantees. The Annals of Statistics , 49(2): 944–967, April 2021a. ISSN 0090-5364, 2168-8966. doi: 10.1214/20-AOS1986. 3 T. Tony Cai and Zijian Guo. Confidence intervals for high-dimensional linear regression: Minimax rates and adaptivity. The Annals of Statistics , 45(2):615–646, April 2017. ISSN 0090-5364, 2168-8966. doi: 10.1214/16-AOS1461. 4.1, 4.1, 4.2, 5, C.3 75 T. Tony Cai and Zijian Guo. Accuracy assessment for high-dimensional linear regression. The Annals of Statistics , 46(4):1807–1836, August 2018. ISSN 0090-5364, 2168-8966. doi: 10.1214/17-AOS1604. 4.1, 5 T. Tony Cai and Mark G. Low. An adaptation theory for nonparametric confidence intervals. The Annals of Statistics , 32(5):1805–1840, October 2004. ISSN 0090-5364, 2168-8966. doi: 10.1214/009053604000000049. 5T. Tony Cai and Mark G. Low. On adaptive estimation of linear functionals. The Annals of Statistics , 33 (5):2311–2343, October 2005. ISSN 0090-5364, 2168-8966. doi: 10.1214/009053605000000633. 5 T. Tony Cai and Mark G. Low. Optimal adaptive estimation of a quadratic functional. The Annals of Statistics , 34(5):2298–2325, October 2006. ISSN 0090-5364, 2168-8966. doi: 10.1214/009053606000000849. 5T. Tony Cai and Anru Zhang. Rate-optimal perturbation bounds for singular subspaces with applications to high-dimensional statistics. The Annals of Statistics , 46(1):60–89, February 2018. ISSN 0090-5364, 2168-8966. doi: 10.1214/17-AOS1541. 3, A.3, A.3, A.4, B.1 T. Tony Cai, Mark G. Low, and Yin Xia. Adaptive confidence intervals for regression functions under shape constraints. The Annals of Statistics , 41(2):722–750, April 2013. ISSN 0090-5364, 2168-8966. doi: 10.1214/12-AOS1068. 5 T. Tony Cai, Mark Low, and Zongming Ma. Adaptive Confidence Bands for Nonparametric Regression Functions. Journal of the American Statistical Association , 109(507):1054–1070, July 2014. ISSN 0162-1459. doi: 10.1080/01621459.2013.879260. 5 T. Tony Cai, Zijian Guo, and Rong Ma. Statistical Inference for High-Dimensional Generalized Linear Models With Binary Outcomes. Journal of the American Statistical Association , 118(542):1319–1332, April 2023. ISSN 0162-1459. doi: 10.1080/01621459.2021.1990769. 5 Tianxi Cai, T. Tony Cai, and Zijian Guo. Optimal Statistical Inference for Individualized Treatment Effects in High-Dimensional Models. Journal of the Royal Statistical Society Series B: Statistical Methodology , 83 (4):669–719, September 2021b. ISSN 1369-7412. doi: 10.1111/rssb.12426. 5 Emmanuel J. Candès and Yaniv Plan. Tight Oracle Inequalities for Low-Rank Matrix Recovery From a Minimal Number of Noisy Random Measurements. IEEE Transactions on Information Theory , 57(4): 2342–2359, April 2011. ISSN 1557-9654. doi: 10.1109/TIT.2011.2111771. A.2 Alexandra Carpentier, Olga Klopp, Matthias Löffler, and Richard Nickl. Adaptive confidence sets for matrix completion. Bernoulli , 24(4A):2429–2460, November 2018. ISSN 1350-7265. doi: 10.3150/17-BEJ933. 4.1, 5Shuxiao Chen, Sifan Liu, and Zongming Ma. Global and individualized community detection in inhomo-geneous multilayer networks. The Annals of Statistics , 50(5):2664–2693, October 2022. ISSN 0090-5364, 2168-8966. doi: 10.1214/22-AOS2202. 5 Yuxin Chen, Chen Cheng, and Jianqing Fan. Asymmetry helps: Eigenvalue and eigenvector analyses of asymmetrically perturbed low-rank matrices. The Annals of Statistics , 49(1):435–458, February 2021a. ISSN 0090-5364, 2168-8966. doi: 10.1214/20-AOS1963. 5 Yuxin Chen, Yuejie Chi, Jianqing Fan, and Cong Ma. Spectral Methods for Data Science: A Statistical Perspective. Foundations and Trends ® in Machine Learning , 14(5):566–806, October 2021b. ISSN 1935-8237, 1935-8245. doi: 10.1561/2200000079. 5 Chen Cheng, Yuting Wei, and Yuxin Chen. Tackling Small Eigen-Gaps: Fine-Grained Eigenvector Esti-mation and Inference Under Heteroscedastic Noise. IEEE Transactions on Information Theory , 67(11): 7380–7419, November 2021. ISSN 1557-9654. doi: 10.1109/TIT.2021.3111828. 5 76 Manlio De Domenico, Vincenzo Nicosia, Alexandre Arenas, and Vito Latora. Structural reducibility of multilayer networks. Nature Communications , 6(1):6864, April 2015. ISSN 2041-1723. doi: 10.1038/ ncomms7864. 6.2 Víctor H. De La Peña and Evarist Giné. Decoupling . Probability and its Applications. Springer, New York, NY, 1999. ISBN 978-1-4612-6808-6 978-1-4612-0537-1. doi: 10.1007/978-1-4612-0537-1. A.2, B.1.4 Xiucai Ding. High dimensional deformed rectangular matrices with applications in matrix denoising. 
+
+Bernoulli , 26(1):387–417, February 2020. ISSN 1350-7265. doi: 10.3150/19-BEJ1129. 5 Jianqing Fan, Yingying Fan, Xiao Han, and Jinchi Lv. Asymptotic Theory of Eigenvectors for Random Matrices With Diverging Spikes. Journal of the American Statistical Association , 117(538):996–1009, April 2022. ISSN 0162-1459. doi: 10.1080/01621459.2020.1840990. 5 Zijian Guo, Wanjie Wang, T. Tony Cai, and Hongzhe Li. Optimal Estimation of Genetic Relatedness in High-Dimensional Linear Models. Journal of the American Statistical Association , 114(525):358–369, January 2019. ISSN 0162-1459. doi: 10.1080/01621459.2017.1407774. 5 Botao Hao, Anru Zhang, and Guang Cheng. Sparse and Low-Rank Tensor Estimation via Cubic Sketchings. 
+
+IEEE Transactions on Information Theory , 66(9):5927–5964, September 2020. ISSN 1557-9654. doi: 10.1109/TIT.2020.2982499. B.1.4 Marc Hoffmann and Richard Nickl. On adaptive inference and confidence bands. The Annals of Statistics ,39(5):2383–2409, October 2011. ISSN 0090-5364, 2168-8966. doi: 10.1214/11-AOS903. 5 Sihan Huang, Haolei Weng, and Yang Feng. Spectral Clustering via Adaptive Layer Aggregation for Multi-Layer Networks. Journal of Computational and Graphical Statistics , July 2023. ISSN 1061-8600. 5 Bing-Yi Jing, Ting Li, Zhongyuan Lyu, and Dong Xia. Community Detection on Mixture Multilayer Net-works Via Regularized Tensor Decomposition. The Annals of Statistics , 49(6):3181–3205, 2021. ISSN 0090-5364. 5, 6.2 Vladimir Koltchinskii and Dong Xia. Optimal Estimation of Low Rank Density Matrices. Journal of Machine Learning Research , 16(53):1757–1792, 2015. ISSN 1533-7928. C.1 Dmitriy Kunisky, Alexander S. Wein, and Afonso S. Bandeira. Notes on Computational Hardness of Hypoth-esis Testing: Predictions Using the Low-Degree Likelihood Ratio. In Paula Cerejeiras and Michael Reissig, editors, Mathematical Analysis, its Applications and Computation , pages 1–50, Cham, 2022. Springer In-ternational Publishing. ISBN 978-3-030-97127-4. doi: 10.1007/978-3-030-97127-4_1. 3.1, C.2 Jing Lei, Kehui Chen, and Brian Lynch. Consistent community detection in multi-layer network data. 
+
+Biometrika , 107(1):61–73, March 2020. ISSN 0006-3444. doi: 10.1093/biomet/asz068. 5 Jing Lei, , and Kevin Z. Lin. Bias-Adjusted Spectral Clustering in Multi-Layer Stochastic Block Models. 
+
+Journal of the American Statistical Association , 118(544):2433–2445, October 2023. ISSN 0162-1459. doi: 10.1080/01621459.2022.2054817. 1, 2.1, 3, 5 Jing Lei, Anru R. Zhang, and Zihan Zhu. Computational and statistical thresholds in multi-layer stochastic block models. The Annals of Statistics , 52(5):2431–2455, October 2024. ISSN 0090-5364, 2168-8966. doi: 10.1214/24-AOS2441. 3.1, 5 O. V. Lepskii. Asymptotically Minimax Adaptive Estimation. I: Upper Bounds. Optimally Adaptive Esti-mates. Theory of Probability & Its Applications , 36(4):682–697, January 1992. ISSN 0040-585X, 1095-7219. doi: 10.1137/1136085. 5 O. V. Lepskii. Asymptotically Minimax Adaptive Estimation. II. Schemes without Optimal Adaptation: Adaptive Estimators. Theory of Probability & Its Applications , 37(3):433–448, January 1993. ISSN 0040-585X, 1095-7219. doi: 10.1137/1137095. 5 77 Jingyang Li and Zhongyuan Lyu. HeteroJIVE: Joint Subspace Estimation for Heterogeneous Multi-View Data, December 2025. arXiv:2512.02866 [math]. 5 Xiaoyu Liu, Yiming Liu, Guangming Pan, Lingyue Zhang, and Zhixiang Zhang. Asymptotic limits of spiked eigenvalues and eigenvectors of signal-plus-noise matrices with weak signals and heteroskedastic noise. 
+
+Bernoulli , 31(3):2351–2376, August 2025. ISSN 1350-7265. doi: 10.3150/24-BEJ1808. 5 Eric F. Lock, Katherine A. Hoadley, J. S. Marron, and Andrew B. Nobel. Joint and individual variation explained (JIVE) for integrated analysis of multiple data types. The Annals of Applied Statistics , 7(1): 523–542, March 2013. ISSN 1932-6157, 1941-7330. doi: 10.1214/12-AOAS597. 5 Joshua Daniel Loyal and Yuguo Chen. An Eigenmodel for Dynamic Multilayer Networks. Journal of Machine Learning Research , 24(128):1–69, 2023. ISSN 1533-7928. 1 Yuetian Luo and Chao Gao. Computational lower bounds for graphon estimation via low-degree polynomials. 
+
+The Annals of Statistics , 52(5):2318–2348, October 2024. ISSN 0090-5364, 2168-8966. doi: 10.1214/ 24-AOS2437. 3.1 Yuetian Luo and Anru R. Zhang. Tensor clustering with planted structures: Statistical optimality and computational limits. The Annals of Statistics , 50(1):584–613, February 2022. ISSN 0090-5364, 2168-8966. doi: 10.1214/21-AOS2123. 5 Yuetian Luo and Anru R. Zhang. Tensor-on-tensor regression: Riemannian optimization, over-parameterization, statistical-computational gap and their interplay. The Annals of Statistics , 52(6):2583– 2612, December 2024. ISSN 0090-5364, 2168-8966. doi: 10.1214/24-AOS2396. 5 Zhongyuan Lyu and Dong Xia. Optimal estimation and computational limit of low-rank Gaussian mixtures. The Annals of Statistics , 51(2):646–667, April 2023. ISSN 0090-5364, 2168-8966. doi: 10.1214/23-AOS2264. 3.1, 3.1, 1, 5, 6.2, C.2 Zhongyuan Lyu, Ting Li, and Dong Xia. Optimal Clustering of Discrete Mixtures: Binomial, Poisson, Block Models, and Multi-layer Networks, November 2023a. arXiv:2311.15598 [math]. 5 Zhongyuan Lyu, Dong Xia, and Yuan Zhang. Latent Space Model for Higher-Order Networks and Generalized Tensor Decomposition. Journal of Computational and Graphical Statistics , 32(4):1320–1336, October 2023b. ISSN 1061-8600. doi: 10.1080/10618600.2022.2164289. 1 Zhengchi Ma and Rong Ma. Optimal Estimation of Shared Singular Subspaces Across Multiple Noisy Matrices. IEEE Transactions on Information Theory , 72(5):3277–3300, May 2026. ISSN 1557-9654. doi: 10.1109/TIT.2026.3667733. 1, 5 P W MacDonald, E Levina, and J Zhu. Latent space models for multiplex networks with shared structure. 
+
+Biometrika , 109(3):683–706, September 2022. ISSN 1464-3510. doi: 10.1093/biomet/asab058. 1 Richard Nickl and Sara van de Geer. Confidence Sets in Sparse Regression. The Annals of Statistics , 41(6): 2852–2876, 2013. ISSN 0090-5364. 5 Subhadeep Paul and Yuguo Chen. Spectral and matrix factorization methods for consistent community detection in multi-layer networks. The Annals of Statistics , 48(1):230–250, February 2020. ISSN 0090-5364, 2168-8966. doi: 10.1214/18-AOS1800. 1, 1.1, 5 Victor H. de la Pena and S. J. Montgomery-Smith. Decoupling Inequalities for the Tail Probabilities of Multivariate $U$-Statistics. The Annals of Probability , 23(2):806–816, April 1995. ISSN 0091-1798, 2168-894X. doi: 10.1214/aop/1176988291. A.1 Zhangni Pu, Xiaozhuo Zhang, Jiang Hu, and Zhidong Bai. The asymptotic properties of the extreme eigenvectors of high-dimensional generalized spiked covariance models. Bernoulli , 32(2):1620–1644, May 2026. ISSN 1350-7265. doi: 10.3150/25-BEJ1924. 5 78 James Robins and Aad van der Vaart. Adaptive nonparametric confidence sets. The Annals of Statistics ,34(1):229–253, February 2006. ISSN 0090-5364, 2168-8966. doi: 10.1214/009053605000000877. 5 João D. Semedo, Amin Zandvakili, Christian K. Machens, Byron M. Yu, and Adam Kohn. Cortical Areas Interact through a Communication Subspace. Neuron , 102(1):249–259.e4, April 2019. ISSN 0896-6273. doi: 10.1016/j.neuron.2019.01.026. 1 Roman Vershynin. High-Dimensional Probability: An Introduction with Applications in Data Science . Cam-bridge Series in Statistical and Probabilistic Mathematics. Cambridge University Press, Cambridge, 2018. ISBN 978-1-108-41519-4. doi: 10.1017/9781108231596. 1.3, A.2, B.1.3 Dong Xia. Normal approximation and confidence region of singular subspaces. Electronic Journal of Statis-tics , 15(2):3798–3851, January 2021. ISSN 1935-7524, 1935-7524. doi: 10.1214/21-EJS1876. 4, 5 Dong Xia, Anru R. Zhang, and Yuchen Zhou. Inference for low-rank tensors—no need to debias. The Annals of Statistics , 50(2):1220–1245, April 2022. ISSN 0090-5364, 2168-8966. doi: 10.1214/21-AOS2146. 1.1, 4, 5Fangzheng Xie. Bias-Corrected Joint Spectral Embedding for Multilayer Networks With Invariant Subspace: Entrywise Eigenvector Perturbation and Inference. IEEE Transactions on Information Theory , 70(12): 9036–9083, December 2024a. ISSN 1557-9654. doi: 10.1109/TIT.2024.3471953. 3, 5 Fangzheng Xie. Entrywise limit theorems for eigenvectors of signal-plus-noise matrix models with weak signals. Bernoulli , 30(1):388–418, February 2024b. ISSN 1350-7265. doi: 10.3150/23-BEJ1602. 5 Fangzheng Xie and Yichi Zhang. Higher-order entrywise eigenvectors analysis of low-rank random matrices: Bias correction, Edgeworth expansion and bootstrap. The Annals of Statistics , 53(4):1667–1696, August 2025. ISSN 0090-5364, 2168-8966. doi: 10.1214/25-AOS2520. 5 Yuling Yan, Yuxin Chen, and Jianqing Fan. Inference for heteroskedastic PCA with missing data. The Annals of Statistics , 52(2):729–756, April 2024. ISSN 0090-5364, 2168-8966. doi: 10.1214/24-AOS2366. 5 Yuepeng Yang and Cong Ma. Estimating shared subspace with AJIVE: the power and limitation of multiple data matrices, February 2025. arXiv:2501.09336 [stat]. 5 Anru Zhang and Dong Xia. Tensor SVD: Statistical and Computational Limits. IEEE Transactions on Information Theory , 64(11):7311–7338, November 2018. ISSN 1557-9654. doi: 10.1109/TIT.2018.2841377. 5Anru R. Zhang, T. Tony Cai, and Yihong Wu. Heteroskedastic PCA: Algorithm, optimality, and ap-plications. The Annals of Statistics , 50(1):53–80, February 2022. ISSN 0090-5364, 2168-8966. doi: 10.1214/21-AOS2074. 3, 5 Runbing Zheng and Minh Tang. Limit results for distributed estimation of invariant subspaces in multiple networks inference and PCA, May 2024. arXiv:2206.04306 [math]. 5 Yuchen Zhou and Yuxin Chen. Deflated HeteroPCA: Overcoming the curse of ill-conditioning in het-eroskedastic PCA. The Annals of Statistics , 53(1):91–116, February 2025. ISSN 0090-5364, 2168-8966. doi: 10.1214/24-AOS2456. 3 79

@@ -1,0 +1,128 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-07T21:06:16.777152+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.06483v1",
+      "source": "arxiv",
+      "title": "Statistically and Computationally Optimal Estimation and Inference of Common Subspaces",
+      "abstract": "Given multiple data matrices, many problems in statistics and data science rely on estimating a common subspace that captures certain structure shared by all the data matrices. In this paper we investigate the statistical and computational limits for the common subspace model in which one observes a collection of symmetric low-rank matrices perturbed by noise, where each low-rank matrix shares the same common subspace. Our main results identify several regimes of the signal-to-noise ratio (SNR) such that estimation and inference are statistically or computationally optimal, and we refer to these regimes as weak SNR, moderate SNR, strong estimation SNR, and strong inference SNR. First, we propose an estimator based on projected gradient descent initialized via spectral sum of squares and show that it achieves the optimal $\\sinΘ$ error rate under strong estimation SNR. These results are complemented by both statistical and computational lower bounds identifying the weak and moderate estimation SNR regimes. Next, we turn to statistical inference for the $\\sinΘ$ distance itself, and we show that our estimator has an asymptotically Gaussian distribution in the strong inference SNR regime. Based on this limiting result we propose confidence intervals and show that they are adaptively minimax optimal in the strong inference SNR regime, where adaptivity is measured in terms of the SNR. Finally, we show that adaptive confidence intervals are information-theoretically impossible below the strong inference SNR regime. Consequently, our results unveil a novel phenomenon: despite the SNR being ``above'' the computational limit for estimation, adaptive statistical inference may still be information-theoretically impossible.",
+      "authors": [
+        "Joshua Agterberg"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "math.OC",
+        "math.SP",
+        "stat.ME"
+      ],
+      "published": "2026-06-04T17:58:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.06483v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "common subspace estimation for low-rank matrices applicable to low-rank representation denoising",
+      "llm_evidence_cn": "公共子空间估计用于低秩矩阵，可用于低秩表示去噪",
+      "llm_evidence": "公共子空间估计用于低秩矩阵，可用于低秩表示去噪",
+      "canonical_evidence": "公共子空间估计用于低秩矩阵，可用于低秩表示去噪",
+      "llm_tldr_en": "Studies statistical and computational limits for estimating a common subspace from multiple low-rank symmetric matrices perturbed by noise; proposes projected gradient estimator; has potential application in low-rank denoising of hyperspectral data.",
+      "llm_tldr_cn": "本文研究从多个被噪声干扰的低秩对称矩阵中估计公共子空间的统计与计算极限。提出基于投影梯度的估计器，并在不同信噪比下达到最优。该方法可为高光谱图像的低秩表示去噪提供理论支撑和算法基础。",
+      "llm_tldr": "本文研究从多个被噪声干扰的低秩对称矩阵中估计公共子空间的统计与计算极限。提出基于投影梯度的估计器，并在不同信噪比下达到最优。该方法可为高光谱图像的低秩表示去噪提供理论支撑和算法基础。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.00517v1",
+      "source": "arxiv",
+      "title": "Deep neural network yields regularization for ill-posed inverse problems",
+      "abstract": "This paper studies the regularization of ill-posed inverse problems by deep neural networks (DNNs). We extend architecture-based regularization from shallow networks to deep models by developing a deterministic framework in which the admissible network class is enlarged adaptively and the resulting architecture complexity acts as the regularization mechanism. We propose two discrepancy-principle-driven expanding DNN algorithms to treat the cases where an explicit parameter-radius bound is available and unavailable, respectively. For both algorithms, we prove the finite termination of the adaptive expansion procedure and the convergence of the regularized solutions as the noise level vanishes. In addition, we derive explicit asymptotic bounds on the terminal network architecture, thereby quantifying how the required network complexity scales with the noise level. Numerical experiments on several representative linear and non-linear inverse problems support the theoretical findings and illustrate the practical usefulness of the proposed framework.",
+      "authors": [
+        "Qiao Zhu",
+        "Lan Wang",
+        "Ye Zhang"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-05-30T04:15:23+00:00",
+      "link": "https://arxiv.org/pdf/2606.00517v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deep neural network regularization for inverse problems applicable to image denoising",
+      "llm_evidence_cn": "深度神经网络正则化反问题的方法可应用于图像去噪",
+      "llm_evidence": "深度神经网络正则化反问题的方法可应用于图像去噪",
+      "canonical_evidence": "深度神经网络正则化反问题的方法可应用于图像去噪",
+      "llm_tldr_en": "Proposes a deterministic framework where deep neural network architecture complexity acts as regularization for ill-posed inverse problems, with convergence guarantees; can be adapted for hyperspectral image denoising.",
+      "llm_tldr_cn": "本文针对不适定反问题，提出一种深度神经网络自适应扩展正则化框架，将网络结构复杂度作为正则化机制。证明了在噪声水平趋近于零时正则化解的收敛性。该方法可迁移至高光谱图像去噪等逆问题，提供理论保证。",
+      "llm_tldr": "本文针对不适定反问题，提出一种深度神经网络自适应扩展正则化框架，将网络结构复杂度作为正则化机制。证明了在噪声水平趋近于零时正则化解的收敛性。该方法可迁移至高光谱图像去噪等逆问题，提供理论保证。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.03393v2",
+      "source": "arxiv",
+      "title": "Flicker-DDPM: Accelerating Denoising Diffusion via 1/f Colored Noise Injection",
+      "abstract": "We propose a novel diffusion model, Flicker-DDPM, which incorporates flicker (1/f) noise inspired by self-organized criticality (SOC), a widely observed phenomenon in natural systems. Unlike denoising diffusion probabilistic models (DDPMs), which employ isotropic white noise in the forward process, Flicker-DDPM adopts colored noise with power-law spectra to better match the spectral statistics of natural images, whose power spectra typically follow P(k) proportional to 1/k^α. To this end, we develop a colored-noise module based on a spatial correlation kernel, σ(d) = (d + 1)^{-η}, and theoretically establish that adjusting η controls the spectral exponent α of the generated 1/fα noise, enabling adaptation to datasets with diverse spectral characteristics. On CIFAR-10, Flicker DDPM matches or surpasses the generation quality of a standard DDPM baseline using 3.33 times fewer sampling steps, with negligible additional computational cost per step. We further develop a frequency-domain linear theory demonstrating that spectrally matched colored noise linearizes the reverse trajectory, theoretically explaining the observed sampling acceleration.",
+      "authors": [
+        "KeXiang Mao",
+        "FanCheng Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-02T09:36:09+00:00",
+      "link": "https://arxiv.org/pdf/2606.03393v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "denoising diffusion model with colored noise, applicable to image denoising",
+      "llm_evidence_cn": "去噪扩散模型采用有色噪声，可用于图像去噪",
+      "llm_evidence": "去噪扩散模型采用有色噪声，可用于图像去噪",
+      "canonical_evidence": "去噪扩散模型采用有色噪声，可用于图像去噪",
+      "llm_tldr_en": "Proposes Flicker-DDPM incorporating 1/f colored noise to accelerate denoising diffusion, better matching natural image statistics.",
+      "llm_tldr_cn": "针对扩散模型使用白噪声与自然图像谱统计不匹配的问题，本文提出Flicker-DDPM，通过引入1/f有色噪声和空间相关核，使前向过程更符合自然图像功率谱。该方法加速了去噪扩散并提升了生成质量，其噪声建模思路可迁移至高光谱影像去噪中的噪声抑制。",
+      "llm_tldr": "针对扩散模型使用白噪声与自然图像谱统计不匹配的问题，本文提出Flicker-DDPM，通过引入1/f有色噪声和空间相关核，使前向过程更符合自然图像功率谱。该方法加速了去噪扩散并提升了生成质量，其噪声建模思路可迁移至高光谱影像去噪中的噪声抑制。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -6,30 +6,32 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-06
-- 运行时间：2026-06-06 20:57:53 UTC
+- 最新运行日期：2026-06-07
+- 运行时间：2026-06-07 21:10:06 UTC
 - 运行状态：成功
 - 本次总论文数：3
 - 精读区：0
 - 速读区：3
 
 ### 今日简报（AI）
-今日速读三篇图像处理相关论文，涵盖全场景图像修复、热红外高光谱分解和水下图像增强。值得关注全局修复智能体DiTTo的排序感知能力和水下图像RQUL-UIE利用数据集内自监督解决标签质量问题。下一步可优先精读这两篇，尝试复现方法或迁移到自身任务场景。
-- 详情：[/202606/06/README](/202606/06/README)
+今日速读3篇论文，重点覆盖公共子空间优化估计和深度神经网络正则化逆问题。  
+其中《Statistically and Computationally Optimal Estimation and Inference of Common Subspaces》得分最高（7.0分），适合关注统计学习与降维方法的读者。  
+建议优先浏览该文的估计与推断方法，再结合实际问题尝试其算法实现。
+- 详情：[/202606/07/README](/202606/07/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [DiTTo: Scalable Order-aware All-in-One Image Restoration Agent](/202606/06/2605.30915v2-ditto-scalable-order-aware-all-in-one-image-restoration-agent)  
+1. [Statistically and Computationally Optimal Estimation and Inference of Common Subspaces](/202606/07/2606.06483v1-statistically-and-computationally-optimal-estimation-and-inference-of-common-subspaces)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：公共子空间估计用于低秩矩阵，可用于低秩表示去噪
+2. [Deep neural network yields regularization for ill-posed inverse problems](/202606/07/2606.00517v1-deep-neural-network-yields-regularization-for-ill-posed-inverse-problems)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：顺序感知的多退化全能恢复方法
-2. [TeX-1500: A Paired Real-World LWIR Hyperspectral Dataset and Benchmark for Temperature-Emissivity-Texture Decomposition](/202606/06/2606.03806v1-tex-1500-a-paired-real-world-lwir-hyperspectral-dataset-and-benchmark-for-temperature-emissivity-texture-decomposition)  
+   evidence：深度神经网络正则化反问题的方法可应用于图像去噪
+3. [Flicker-DDPM: Accelerating Denoising Diffusion via 1/f Colored Noise Injection](/202606/07/2606.03393v2-flicker-ddpm-accelerating-denoising-diffusion-via-1f-colored-noise-injection)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：高光谱数据集与分解用于恢复
-3. [RQUL-UIE: Revitalizing Quality-Unstable Labels for Underwater Image Enhancement via In-Dataset Self-Supervision](/202606/06/2606.06176v1-rqul-uie-revitalizing-quality-unstable-labels-for-underwater-image-enhancement-via-in-dataset-self-supervision)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：基于扩散的水下图像去噪，技术可迁移至高光谱图像
+   evidence：去噪扩散模型采用有色噪声，可用于图像去噪
 
 
 <div class="dpr-home-promo-card">
