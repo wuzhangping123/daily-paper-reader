@@ -1,0 +1,3814 @@
+Title: A Robust Optimization Approach to Sparse Principal Component Analysis
+
+URL Source: https://arxiv.org/pdf/2606.03553v1
+
+Published Time: Wed, 03 Jun 2026 01:06:23 GMT
+
+Number of Pages: 40
+
+Markdown Content:
+# A Robust Optimization Approach to Sparse Principal Component Analysis 
+
+## David Vävinggren 1, Francis Bach 2, André M. H. Teixeira 1,Dave Zachariah 1, and Antônio H. Ribeiro 1,3
+
+> 1
+
+Uppsala University, Sweden 
+
+> 2
+
+PSL Research University / INRIA, France 
+
+> 3
+
+Science for Life Laboratory, Sweden 
+
+Abstract 
+
+While principal component analysis (PCA) is a fundamental tool for dimensionality reduction, its dense representations make it ill-suited for high-dimensional data. Existing methods address this by promoting sparsity through explicit ℓ1-penalties, but these are not obvious to tune due to the unsupervised nature of the task. In contrast, we propose Adversarial PCA (AdvPCA), which leverages robust optimization to achieve sparsity by optimizing the reconstruction objective against bounded, worst-case latent space perturbations. We show that this formulation admits a closed-form reduction, leading to a practical iterative algorithm that alternates between adversarial linear regression-style updates for the sparse encoder and orthogonal updates for the decoder. By theoretically characterizing the solution, we derive a data-adaptive parameterization that allows the algorithm to perform effectively out of the box. We validate these claims through numerical experiments on synthetic and real-world genomics data. 
+
+# 1 Introduction 
+
+Principal component analysis (PCA) is a standard technique for reducing the dimensionality of data [31, 40], and is one of the most common techniques for data compression and data visualization [10, ch. 10]. For a target dimension k ≤ d, PCA can be formulated as the reconstruction problem 
+
+min 
+
+> A,B n
+
+X
+
+> i=1
+
+xi − AB ⊤xi 
+
+> 22
+
+subject to A⊤A = Ik, (1) where zero-mean datapoints D = {xi}ni=1 in Rd are compressed and then reconstructed by linear transfor-mations B ∈ Rd×k and A ∈ Rd×k respectively [37, ch. 23]. Intuitively, the columns of A span a linear subspace through the origin and decide the space in which the reconstructions must ultimately reside. This subspace is typically of much lower dimension than the original input space, thereby enabling dimensionality reduction. On the other hand, B plays a different role in that it determines how the original input variables are linearly combined to form the latent representation. This selection is well-known to be dense in the case of PCA, meaning that all input dimensions contribute to the reconstruction, albeit at different magnitudes [24, ch. 11]. Because PCA produces dense combinations of the input variables, it is generally poorly adapted to the high-dimensional regime ( n < d ) [16, ch. 8] [23]. To combat this issue, it is common to promote sparse combinations of the input variables [46, ch. 8], i.e., sparsity in the matrix B, motivated by the fact that the intrinsic structure of high-dimensional data often can be captured by a small subset of features [10, ch. 10]. Prior works, e.g., the Sparse PCA algorithm [52], have formulated this by augmenting (1) with ℓ1-norm penalties over the columns of B. A problem with this approach, however, is that it is not obvious how the hyperparameters introduced in this Lasso-type [41] setting should be tuned. In particular, the unsupervised nature of the task makes standard techniques like cross-validation difficult to apply directly. Recent works have shown adversarially trained linear regression to be a viable alternative to Lasso, exhibiting similar regularization behavior while enjoying favorable properties [33, 35]. Most notably, contrary to the Lasso, 1
+
+> arXiv:2606.03553v1 [stat.ML] 2 Jun 2026
+
+(a) Input space (b) Latent space (c) Reconstruction 
+
+z = B⊤x + r ˜x = Az 
+
+Figure 1: Visualization of Adversarial PCA. (a) Input data xi ∈ R3. (b) The encoder B⊤ ∈ R2×3
+
+maps data x to the latent space Z = R2, where an adversary r is allowed to perturb within a limited budget (shaded rectangle). (c) The perturbed latent representation ˜x is mapped back to the original space via the orthonormal decoder A ∈ R3×2. The resulting reconstructions lie on a 2-dimensional plane in R3 defined by the columns of A, denoted α1 and α2.the hyperparameter tuning does not require knowledge of the noise level present in the data. By building on the linear adversarial training framework, we aim to achieve a PCA method that can leverage this adaptive property for compression in the high-dimensional data regime. To this end, we propose a robust optimization approach to sparse PCA which (instead of the Lasso) leverages linear adversarial training to naturally promote sparse input variable combinations. By optimizing against worst-case perturbations, we derive a min-max formulation of PCA (1) given by 
+
+min 
+
+> A,B n
+
+X
+
+> i=1
+
+max 
+
+> ri∈Ωδ
+
+xi − A(B⊤xi + ri) 22 subject to A⊤A = Ik, (2) where we introduce an adversary r that is allowed to perturb each B⊤x within a fixed budget Ωδ . As will be shown, our formulation allows for the inner maximum to be solved in closed-form, decomposing the problem into k independent adversarial linear regression problems that induce sparsity in the matrix B.This makes the method well-equipped to handle high-dimensional problems out of the box. We name our method Adversarial PCA (AdvPCA ) motivated by the strong connection to linear adversarial training. An illustration of the AdvPCA procedure is presented in Figure 1. Our primary contribution is the proposal of Adversarial PCA (2), casting sparse dimensionality reduction as a robust optimization problem over the latent space. Specifically: 1. In Section 4, we derive a closed-form solution to the inner maximization of (2) and provide an efficient solver tailored to the resulting objective. 2. In Section 5, we establish theoretical connections between our latent space formulation and the input-perturbed counterpart , proving that the two are perfectly equivalent in the k = 1 case. 3. In Section 6, we study the theoretical properties of the solution . We characterize the regularization path of the solution by quantifying regimes of high and low regularization, and use the intuition gained to 
+
+propose a practical choice of adversarial radius δ.4. In Section 7, we validate our method with numerical experiments on synthetic and real-world data, demonstrating the efficacy of Adversarial PCA when compared to sparse PCA baselines. 
+
+# 2 Related Work 
+
+Sparse principal component analysis. Thresholding (see Section 3) is an ad hoc way of achieving sparse principal components. [6] find this unreliable, while [22] find empirically that incorporating a threshold 2can be helpful in high dimensions. Equivalent to posing PCA as a reconstruction problem is the “maximize-variance” perspective. Imposing an ℓ0-restriction on the criterion is then a natural way of introducing sparsity, however it makes the problem doubly nonconvex [16, ch. 8.2]. [25] relaxes this formulation when introducing the SCoTLASS procedure by replacing the ℓ0-constraint with ℓ1 and making use of the Lasso [41]. [9] in turn relaxes SCoTLASS and propose the convex semidefinite program DSPCA. Shifting perspective, [52] recast PCA as a regression-type reconstruction problem and extend it into an elastic net formulation [51], thereby contributing the Sparse PCA algorithm. More recent literature shifts from algorithm development towards establishing limits and rates for different sparse PCA methods, as seen in works from [11] and [7]. 
+
+Robust principal component analysis. Robustness in the context of PCA typically refers to robustness against grossly corrupted observations, or outliers. Specifically, since PCA maximizes variance using squared errors, outliers heavily affect the empirical covariance by inflating the variance in certain directions [24, ch. 10]. Early methods replace the empirical covariance with robust alternatives that downweight extreme observations [26]. [29] proposes foundational M-estimators for multivariate scatter, with [44] alleviating previously necessary assumptions. Another common approach to robust PCA is based on projection pursuit (PP) [14, 17]. [18] combine robust covariance estimation and PP when proposing the ROBPCA method, yielding more accurate estimates with improved computational properties. Other robust PCA methods aim to decompose the data matrix into a low-rank and a sparse component. [8] show that it is possible to recover the two components by solving a convex program called principal component pursuit (PCP). Although convex, the PCP program suffers from high computational cost [4], which more recent methods focus on improving [27, 50]. To conclude the robust PCA section, we want to emphasize that the goal of Adversarial PCA is not to be robust against outliers like above mentioned methods. Adversarial PCA simply uses tools from robust optimization to achieve a sparse PCA formulation . This is an important distinction. 
+
+Robust regression and adversarial training. The robust regression framework has a long standing connection with sparse methods. Early papers connect robust linear regression with square-root Lasso [49], a version where the unsquared residual norm naturally scales out the unknown data noise level [3]. Similar tools are used to study adversarial training in linear models. [19, 43] use linear models to explain robustness phenomena in neural networks; [32] study the impact of overparameterization on adversarial robustness; [30] investigate how dataset size affects adversarial performance. Other works provide insight into the asymptotics of linear adversarial training [20, 39]. More recent contributions focus on the implicit regularization of adversarial linear regression [33, 35, 48]. 
+
+# 3 Background 
+
+Principal component analysis. PCA plays a central role in machine learning as a standard dimensionality reduction technique. PCA (1) aims to find linear transformations A, B ∈ Rd×k such that the reconstruction error over the data is minimized in the least squared sense. Specifically, given k ≤ d, B⊤ ∈ Rk×d compresses the input x ∈ Rd into a lower-dimensional representation z = B⊤x ∈ Rk. Then, A ∈ Rd×k (approximately) recovers the original input from its compressed counterpart by reconstructing x as ˜x = Az = AB ⊤x ∈ Rd.Because ˜x = Az , ˜x is constrained to the k-dimensional subspace defined by the columns of A (see Figure 1). An important characteristic of PCA is that any optimal solution to (1) must have matrices A, B that coincide [37, ch. 23.1], which implies that the solution is an orthogonal projection. This makes the subsequent solution simple and very elegant. To be precise, let D = {xi}ni=1 be a set of n zero-mean datapoints in Rd, and let 
+
+X ∈ Rn×d be the corresponding data matrix. Then, PCA is solved simply by letting the columns of A and 
+
+B be the k leading eigenvectors of X⊤X, or equivalently, the k leading right-singular vectors of the singular value decomposition (SVD) of X.
+
+Thresholding. The issue with PCA is that the solution is notoriously dense [24], which only makes it suitable in data-rich settings ( n > d ). To circumvent this, a common approach is to force the lower-dimensional representations to be sparse combinations of the input variables. Perhaps the simplest way of achieving this (which typically serves as a baseline) is through thresholding: solve PCA and decouple A and 
+
+B by thresholding B according to Bij := Bij 1{| Bij | ≥ ε} ∀ (i, j ) ∈ [d] × [k].
+
+Sparse PCA. A more sophisticated approach to enforce sparsity in B is to extend (1) with ℓ1-penalties and 3make use of the Lasso. This is the core idea behind the Sparse PCA algorithm [52]: 
+
+min 
+
+> A,B n
+
+X
+
+> i=1
+
+xi − AB ⊤xi 
+
+> 22
+
++
+
+> k
+
+X
+
+> j=1
+
+λj ∥βj ∥1 subject to A⊤A = Ik, (3) which in essence is a regularized reconstruction problem where λj ∈ R+ ∀j ∈ [k] are hyperparameters controlling the sparsity, and A = [ α1, . . . , α k] and B = [ β1, . . . , β k] are both matrices in Rd×k. By solving (3), an approximate solution to PCA can be achieved with the added benefit of sparse input combinations. The full objective of Sparse PCA also includes an additional sum of ridge penalties that ensure uniqueness, but they are excluded in (3) for simplicity. 
+
+Adversarial linear regression. Adversarially trained linear regression has been shown to be a viable alternative to traditional Lasso and ridge regression, exhibiting similar regularization behavior while enjoying favorable properties [33, 35]. A defining feature of the formulation is that the inner maximization can be solved in closed-form, leaving a convex problem with an explicit regularization term. To be precise, adversarial linear regression satisfies 
+
+min 
+
+> β
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+max 
+
+> ∥∆xi∥≤ δ
+
+ yi − β⊤(xi + ∆ xi)2 = min 
+
+> β
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+  yi − β⊤xi + δ ∥β∥∗
+
+2 , (4) where ∥·∥ ∗ denotes the dual norm of ∥·∥ and δ ≥ 0. Indeed, comparing (4) to a traditional method such as the Lasso, with objective 
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ yi − β⊤xi
+
+2 + λ ∥β∥1
+
+for λ ∈ R+, the main connection is clear: the norm-penalty is now inside the square. Another feature is that the type of penalty directly depends on the norm defining the perturbation set. Lastly, and perhaps most importantly, a key advantage of the adversarial formulation is that it has been shown to attain near-oracle performance for a choice of δ independent of the data noise level. This is analogous to the square-root Lasso [3]. 
+
+# 4 Proposed Formulation 
+
+Building on the adversarial linear regression framework, we propose a min-max formulation that naturally induces sparsity by optimizing the reconstruction objective against worst-case perturbations. This is formu-lated as an extension of the original PCA formulation (1), where the objective is augmented with adversarial perturbations acting directly in the latent space: 
+
+min 
+
+> A,B n
+
+X
+
+> i=1
+
+max 
+
+> ri∈Ωδ
+
+xi − A(B⊤xi + ri) 22 subject to A⊤A = Ik, (5) where A = [ α1, . . . , α k] and B = [ β1, . . . , β k] are both matrices in Rd×k. We define Ωδ to be an axis-aligned hyperrectangle (or weighted ℓ∞-norm) in the latent space, given by 
+
+Ωδ =
+
+> k
+
+Y
+
+> j=1
+
+−δj ∥βj ∥1 , δ j ∥βj ∥1
+
+ ⊂ Rk, (6) where {δ1, . . . , δ k} is a set of nonnegative adversarial radii. While this choice of set may initially appear unmotivated, subsequent sections will demonstrate its necessity for the algorithm’s efficacy. For now, we summarize the motivation with (i) perturbations in the latent space in combination with the axis-aligned geometry of the set (product of intervals) decomposes (5) into independent adversarial linear regression problems , making the inner maximum solvable in closed-form; and (ii) the ℓ1-norm is what promotes sparsity in β, and comes from the relationship between input and latent space perturbations. We refer to Section 5 for a detailed discussion on this manner. 44.1 Closed-Form Reformulation 
+
+By design, the geometry of Ωδ ensures a closed-form solution for the inner maximum in (5): 
+
+Proposition 1. Let x ∈ Rd and Ωδ ⊂ Rk be given by (6). Furthermore, let A, B ∈ Rd×k such that 
+
+A⊤A = Ik. Then, the inner maximization of (5) can be solved in closed-form: max 
+
+> r∈Ωδ
+
+x − A(B⊤x + r) 22 = x − AA ⊤x 22 +
+
+> k
+
+X
+
+> j=1
+
+ |β⊤ 
+
+> j
+
+x − α⊤ 
+
+> j
+
+x| + δj ∥βj ∥1
+
+2 ,
+
+with maximizer ˆr given entry-wise by ˆrj = sign (β⊤ 
+
+> j
+
+x − α⊤ 
+
+> j
+
+x) δj ∥βj ∥1 for all j = 1 , . . . , k .Proposition 1 shows that bounded latent perturbations have a regularizing effect on B, controlled by the ad-versarial radii {δ1, . . . , δ k}. Notably, the closed form decomposes into the standard PCA reconstruction error 
+
+x − AA ⊤x 22 plus an adversarial penalty regularizing B, and recovers ordinary PCA when δ1 = · · · = δk = 0 .Using Proposition 1, we equivalently reformulate (5): 
+
+min 
+
+> A,B n
+
+X
+
+> i=1
+
+
+
+xi − AA ⊤xi 
+
+> 22
+
++
+
+> k
+
+X
+
+> j=1
+
+ |β⊤ 
+
+> j
+
+xi − α⊤ 
+
+> j
+
+xi| + δj ∥βj ∥1
+
+2
+
+
+
+subject to A⊤A = Ik. (7) A key property of (7) is that for a fixed A, the minimization over B decomposes into k independent opti-mization tasks, one for each column. That is, for the jth component, (7) can be written as 
+
+arg min 
+
+> βj
+> n
+
+X
+
+> i=1
+
+ |α⊤ 
+
+> j
+
+xi − β⊤ 
+
+> j
+
+xi| + δj ∥βj ∥1
+
+2
+
+which exactly recovers the robust objective of adversarial linear regression (4) with the exception that β is fitted to α⊤x instead of a supervised target y. Moreover, the ℓ1-penalty on β naturally promotes the desired sparsity. In the following section, we show how to leverage this decoupled structure to solve (7) through a block coordinate descent optimization scheme. 
+
+## 4.2 Proposed Solver 
+
+We propose an iterative solver, alternating between solving for A and B. If A is considered fixed, (7) reduces to k one-dimensional adversarial linear regression problems that are solved independently. On the other hand, if B and the adversarial perturbations are fixed, A admits a closed-form solution. 
+
+Fix A, solve for B. First, A is initialized to the solution of ordinary PCA, i.e., A := V1: k where V is given by the SVD of X and the subscript denotes the first k columns. With A fixed, (7) simplifies to 
+
+min  
+
+> B=[ β1,...β k]
+> k
+
+X
+
+> j=1
+> n
+
+X
+
+> i=1
+
+ |β⊤ 
+
+> j
+
+xi − α⊤ 
+
+> j
+
+xi| + δj ∥βj ∥1
+
+2
+
+| {z }  
+
+> fj(βj)
+
+, (8) where the sums have been swapped (without issue since all elements are non-negative). By denoting the inner sum fj (βj ), it is easy to see that the minimization separates over j. Therefore, (8) equals Pkj=1 min βj fj (βj )
+
+where each min βj fj (βj ) is an adversarial linear regression problem trying to fit α⊤x with an ℓ1-norm penalty on β. This subproblem is convex, and is therefore readily solved using, e.g., cvxpy [1, 12]. However, to speed up computation we use the solver proposed by [34] (referred to as eta_trick() in Algorithm 1), which is tailored to the linear adversarial training problem. This allows for more efficient optimization; see Appendix A.3 for details. 5Freeze the adversary R. When solving for A, we first return to the primal problem formulation (5) and write it in matrix form as 
+
+min  
+
+> A,B
+
+max 
+
+> R∈Ωnδ
+
+X − (XB + R)A⊤ 2
+
+> F
+
+subject to A⊤A = Ik,
+
+(9) where Ωnδ = Qni=1 Ωδ and ∥·∥ F denotes the Frobe-nius norm. Further, we also extend the maximiz-ing argument ˆr in Proposition 1 into matrix form according to bR = sign (X(B − A)) D ∈ Rn×k, where the sign is operating element-wise over the matrix 
+
+X(B − A) ∈ Rn×k and right-multiplying with D =diag( δ1 ∥β1∥1 , . . . , δ k ∥βk∥1) simply scales each column with its diagonal. Substituting the maximizing argu-ment bR back into (9) and only optimizing over A then yields 
+
+min  
+
+> A
+
+∥X − (XB + bR)A⊤∥2
+
+> F
+
+subject to A⊤A = Ik.
+
+(10) 
+
+Algorithm 1: AdvPCA 
+
+input: X; δ1, . . . , δ k; ϵ = 0 .5
+
+init: U, Σ, V ⊤ ← SVD (X); A ← V1: k
+
+repeat 
+
+▷ Fix A, solve for B 
+
+for j ← 1 to k do 
+
+Bj ← eta _trick (X, A j , δ j )
+
+▷ Solve for R 
+
+E ← X(B − A)
+
+for j ← 1 to k do 
+
+Rj ← sign (Ej )δj ∥Bj ∥1
+
+▷ Fix B, solve for A 
+
+U, Σ, V ⊤ ← SVD (X⊤(XB + R)) 
+
+Aupd ← U1: kV ⊤
+
+Asmooth ← ϵA + (1 − ϵ)Aupd 
+
+U, Σ, V ⊤ ← SVD (Asmooth )
+
+A ← U1: kV ⊤
+
+until StopCondition 
+
+return A, B 
+
+Now, Equation (10) has a closed-form solution given XB + bR is fixed with respect to A, which evidently is not the case. To circumvent this dependency, we freeze the adversaries when updating A. More precisely, letting 
+
+A denote A from the previous optimization step, we decouple the adversary from the current optimization variable A by computing bR using A and the newly updated B. This alternating min-max strategy is a well-established practice in robust optimization, mirroring standard adversarial training routines such as projected gradient descent (PGD) [28, 47]. 
+
+Fix B, solve for A. With B fixed and bR constant w.r.t. A, (10) becomes an orthogonal Procrustes problem [15, ch. 6.4.1] which we solve in the next proposition: 
+
+Proposition 2. Let bR = sign (X(B − A)) D ∈ Rn×k and let X⊤(XB + bR) = U ΣV ⊤ be the singular value decomposition. Then, bA = U1: kV ⊤ is the global minimizer of (10), where U1: k denotes the first k
+
+columns of U .We now have all the pieces to present the full Adversarial PCA algorithm; see Algorithm 1. We assume X
+
+to be centered (zero-mean columns) and let matrices with subscripts indicate the corresponding column. To ensure stable convergence for larger δ, we dampen the global A-update by taking a weighted average of the current and updated A matrix followed by an orthogonal projection back onto the manifold of orthogonal matrices. See Appendix A.4 for details. 
+
+# 5 Relationship with Input Space Perturbations 
+
+We establish the relationship between input and latent space perturbations to motivate our specific choice of Ωδ . We provide intuition behind perturbing the latent representations, demonstrating that unlike input space perturbations, this approach yields a formulation consistent with ordinary PCA. 
+
+The equivalence in one dimension. Typically, adversarial perturbations are introduced directly in the input space, constrained by an upper bound on the norm. For the case of linear regression, as shown in (4), this amounts to augmenting the standard objective with a local maximization: 
+
+min 
+
+> β∈Rd
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ yi − β⊤xi
+
+2 robust 
+
+−−−−→ min 
+
+> β∈Rd
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+max 
+
+> ∥∆xi∥≤ δ
+
+ yi − β⊤(xi + ∆ xi)2 . (11) 6To simplify the analogy to PCA, we consider a special case of the PCA objective (1) where k = 1 , meaning the matrices A, B ∈ Rd×k reduce to vectors α, β ∈ Rd. The corresponding, perhaps most standard way of introducing adversarial perturbations in PCA would then be given by 
+
+min 
+
+> α,β ∈Rd
+> n
+
+X
+
+> i=1
+
+xi − αβ ⊤xi
+
+> 22
+> robust
+
+−−−−→ min 
+
+> α,β ∈Rd
+> n
+
+X
+
+> i=1
+
+max  
+
+> ∥∆xi∥≤ δ
+
+xi − αβ ⊤(xi + ∆ xi) 22 . (12) Mimicking the linear regression case, the target input is left undisturbed and the adversary is only allowed to act on the input being reconstructed. To connect this standard input space formulation in (12) to the general latent AdvPCA objective in (5), let L(α, β ) denote the inner maximum of (12) for a single sample x. Through Proposition 3, we establish that this natural way of perturbing in the input space is exactly equivalent to perturbing in the latent space. 
+
+Proposition 3. Let x ∈ Rd and α, β ∈ Rd such that ∥α∥2 = 1 . Further, let L(α, β ) denote the worst-case adversarial reconstruction loss. Then, for an adversarial radius δ ≥ 0 and conjugate exponents 
+
+p, q ≥ 1 satisfying 1/p + 1 /q = 1 , the following expressions for L(α, β ) are equal: (a) L(α, β ) = max ∥∆x∥p≤δ x − αβ ⊤(x + ∆ x) 22. (Input space perturbation) (b) L(α, β ) = max |r|≤ δ∥β∥q x − α(β⊤x + r) 22. (Latent space perturbation) (c) L(α, β ) = x − αα ⊤x 22 +
+
+
+
+|β⊤x − α⊤x| + δ ∥β∥q
+
+2
+
+. (Closed-form maximum) Additionally, if α = β is imposed, then L(α, β ) = x − ββ ⊤x 22 + δ2 ∥β∥2 
+
+> q
+
+.Parts (a) and (b) establish the core equivalence; the substitution r = β⊤∆x projects the adversary into a single dimension and Hölder’s inequality [38, ch. 9] then translates the norm constraint. This bounds the latent perturbation as |r| = |β⊤∆x| ≤ ∥ ∆x∥p∥β∥q ≤ δ∥β∥q and shows the intuition behind letting Ωδ be a product of independent intervals [−δ ∥β∥q , +δ ∥β∥q ] (a hyperrectangle). Part (c) subsequently evaluates this maximum in closed form, yielding an objective convex in β where the adversarial radius δ explicitly dictates the amount of regularization. This behavior is most apparent in the special case where α = β. Finally, to promote sparsity in β, we set q = 1 in the proposed formulation (5), inducing an ℓ1-norm penalty. By conjugate exponents, this mathematically corresponds to defending against an ℓ∞-norm adversary in the original input space. 
+
+Inconsistency when scaling to multiple dimensions. A defining feature of PCA is that the solution stays consistent across multiple values of k. To be precise, solving PCA for k components and then another time for k + 1 components (using the same data), the first k components of the two solutions should be consistent with each other. Now, consider generalizing part (a) of Proposition 3 to multiple dimensions. For 
+
+k > 1, the vector β ∈ Rd is extended to the matrix B ∈ Rd×k meaning the adversary becomes a vector 
+
+r = B⊤∆x ∈ Rk. Thus, because ∆x maps to all k dimensions of the latent representation, the optimal adversarial direction for ∆x will generally depend on all k columns of B simultaneously . Hence, the solution of Adversarial PCA would change with k, which is not in line with ordinary PCA. Instead, by perturbing in the latent space, independence between components is kept intact meaning solving for different k has no impact on the solution. 
+
+# 6 Properties of the Solution 
+
+Many structural properties of adversarial linear regression naturally extend to Adversarial PCA. To isolate this behavior, we examine the step in the solver when A is fixed, which reduces the problem to k indepen-dent adversarial linear regression problems as was shown in Equation (8). For the analysis, we define the (empirical) Adversarial PCA risk as 
+
+bRδ (β) = 
+
+> n
+
+X
+
+> i=1
+
+ |α⊤xi − β⊤xi| + δ ∥β∥1
+
+2 , (13) 7where we drop the subscript j for notational convenience since all k subproblems have identical properties. Let bβ ∈ arg min β bRδ (β) denote the resulting estimator. The behavior of the estimator is governed by the ad-versarial radius δ ≥ 0. Specifically, Proposition 4 and Proposition 5 characterize its behavior by quantifying two extremes of the regularization path. Proposition 4 defines the regime where the adversary is sufficiently weak. This allows the minimum ℓ1-norm interpolator to remain optimal. Conversely, Proposition 5 estab-lishes the threshold at which the adversary becomes so strong that the trivial zero vector is the only optimal solution. These results are adapted from [33, thm. 1] and [33, prop. 3], respectively. 
+
+Proposition 4. Assume n < d and that the data matrix X ∈ Rn×d has full row rank. Further, let ˆν
+
+denote the solution of max ∥X⊤ν∥∞≤1 ν⊤Xα and let ¯δ be given by 
+
+¯δ = 1
+
+n ∥ˆν∥−1 
+
+> ∞
+
+.
+
+Then, the minimum ℓ1-norm interpolator bβ = arg min Xα =Xβ ∥β∥1 minimizes the Adversarial PCA risk (13) if and only if δ ∈ [0 , ¯δ ].
+
+Proposition 5. The zero solution bβ = 0 minimizes the Adversarial PCA risk (13) if and only if 
+
+δ ≥ δmax = X⊤Xα ∞
+
+∥Xα ∥1
+
+.
+
+In addition, let X = U ΣV ⊤ be the singular value decomposition and consider the case where α is set to the jth standard principal component, namely α := vj with corresponding left singular vector uj and singular value σj . Then, δmax simplifies to δmax = σj  
+
+> ∥vj∥∞
+> ∥uj∥1
+
+.Figure 2 visualizes the two regimes induced by ¯δ and 
+
+δmax . We fit AdvPCA using k = 1 over a range of δs on 
+
+n = 500 datapoints in R250 . Worth noting is that when 
+
+δ ≤ ¯δ in accordance with Proposition 4, since AdvPCA is initialized to PCA, it recovers the same β as applying basis pursuit to the principal component. To better understand the generalization of Adversarial PCA, we bound the estimation error of our empirical estimator bβ under the spiked covariance data model (see Appendix A.2). The following proposition provides a deterministic upper bound on this error, measured in the squared Σ∗-norm. 10 2 10 1    
+
+> 10 12
+> 10 9
+> 10 6
+> 10 3
+> 10 0
+> 10 3
+> ‖Xα  − X̂ β‖2
+> F
+
+¯δ    
+
+> 1.2 1.4 1.6 1.8 2.0
+
+δ
+
+> 0.0
+> 0.2
+> 0.4
+> ‖̂β‖∞
+
+δmax 
+
+Figure 2: Phase transitions ¯δ, δmax .
+
+(Bottom ) bβ = 0 for δ ≥ δmax . (Top ) bβ in-terpolates Xα when δ ∈ [0 , ¯δ ].
+
+Proposition 6. Let bβ ∈ arg min β bRδ (β) minimize the Adversarial PCA risk (13), and let β∗ denote the true parameter with parameter error b∆ = bβ − β∗. Further, assume X ∈ Rn×d follows the spiked covariance model with true covariance Σ∗ and empirical covariance bΣ = 1 
+
+> n
+
+X⊤X. Then, for any fixed vector α and δ ≥ 0, the following bound on the error b∆ holds:                    
+
+> ∥b∆∥2Σ∗≤ ∥ b∆∥2Σ∗−bΣ+4
+> n(α−β∗)⊤X⊤Xb∆ + 4δn∥X(α−β∗)∥1(∥β∗∥1− ∥ bβ∥1) + 2 δ2
+> 
+> ∥β∗∥21+∥bβ∥21
+> 
+
+.
+
+Remark. The utility of the bound in Proposition 6 is that it isolates different sources of estimation error and demonstrates how the estimator behaves as n grows. Specifically, we show in the proof given in Appendix B.6 84 5 6 7 8 9 10 
+
+log 2 (d)        
+
+> 0.3
+> 0.6
+> 0.9
+> 1.2
+> cos sim (β ∗ ,̂ β)
+> d=n
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours) 45678910
+
+log 2 (d)  
+
+> 0.0
+> 0.3
+> 0.6
+> 0.9
+> cos sim (β ∗ ,̂ β)
+> d=n
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure 3: Sparse versus dense system. (Left ) We draw n = 150 datapoints from the spiked covariance model with β∗ = e1 as the true sparse spike direction, and evaluate the recovery of this direction from the generated data by fitting the models using k = 1 . We measure the absolute cosine similarity over various d
+
+for a fixed τ = 2 .5. We report mean ±1 standard deviation over 20 independent draws. ( Right ) The data matrix X and the true direction β∗ are subjected to a random orthogonal rotation, which redistributes the signal across all dimensions and makes β∗ dense. that ∥ b∆∥2Σ∗−bΣ ≤ ∥ Σ∗ − bΣ∥∞ ∥ b∆∥21 where the covariance gap shrinks at a rate of ∥Σ∗ − bΣ∥∞ ≲ pln( d)/n ,meaning this term vanishes asymptotically. Similarly, the term 1 
+
+> n
+
+∥X(α − β∗)∥1 concentrates around a constant. Therefore, by setting the radius δ ∝ 1/√n, all terms on the right-hand side vanish with increasing 
+
+n except for 4 
+
+> n
+
+(α − β∗)⊤X⊤X b∆. This term persists as a constant error floor, representing the geometric projection of the estimation error onto the adversarial direction (α − β∗) evaluated over the empirical data. 
+
+# 7 Numerical Experiments 
+
+While AdvPCA is valid for any δ ≥ 0, practical use requires δ ∈ [0 , δ max ). Guided by the theoretical error decay in the previous remark, we scale this maximum bound by setting δ := δmax 
+
+pln( d)/n throughout the experiments, unless stated otherwise. In Appendix C.1.3, we present additional results for other choices of 
+
+δ. We compare AdvPCA to ordinary PCA, thresholded PCA and Sparse PCA. To establish straightforward baselines without relying on hyperparameter tuning (as this is not an obvious procedure), we run Sparse PCA using the default scikit-learn configuration. Similarly, for thresholded PCA, we simply apply a threshold of ε = 0 .1, which we find as a natural heuristic for truncating unit-norm principal components. 
+
+Synthetic data from the spiked covariance model. We evaluate our method using the spiked covariance model from [46, ch. 8.2.2], described in Appendix A.2. In short, let β∗j := ej ∈ Rd for j = 1 , . . . , k 
+
+be the true principal directions with associated eigengaps τj ≥ 0. We form the covariance matrix Σ∗ =
+
+Id + Pkj=1 τj β∗j β⊤∗j , ensuring all eigenvalues equal one except in the k spiked directions. Finally, we draw n
+
+datapoints xi ∼ N(0 , Σ∗) to form X ∈ Rn×d, from which we aim to recover the true directions β∗1, . . . , β ∗k; see Figure 3 and Figure 4. We supplement these experiments with material in Appendix A.4 and Appendix C.1. 1 2 3 4 5 6 7 8 9 10 
+
+Component index j         
+
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> cos sim (β∗j,̂ βj) PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours) 12345678910
+
+Component index j 
+
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> ‖̂βj‖0 (nonzeros)
+> d= 500
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure 4: Multi-component recovery. We evaluate the methods on k = 10 principal components where 
+
+n = 500 datapoints in R500 are drawn from the spiked model, and report mean ±1 standard deviation over 20 independent draws. We let the eigengaps τj decrease with j, making successive directions harder to recover (see Appendix C.1.3 for details). ( Left ) Absolute cosine similarity with true β∗j = ej . ( Right ) Corresponding 
+
+ℓ0-norm showing sparsity of the solution. 9An application in genomics. To complement the synthetic data, we analyze the high-dimensional MAGIC wheat dataset [36], where the input features are gene sequence variations (SNPs). Sparsity is highly desir-able in this context to identify distinct, co-varying genetic markers rather than dense combinations of the entire genome. As shown in Figure 5, AdvPCA achieves an out-of-sample reconstruction error on par with the baseline methods while yielding sparser and more interpretable components. Further details on this experiment can be found in Appendix C.2. 1 5 10 15 20 25 
+
+k (number of components)      
+
+> 5.2
+> 5.4
+> 5.6
+> ‖X − ˜X‖2
+> F
+> 1e6
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours) 1510 15 20 25
+
+Component index j 
+
+> 10 3
+> 10 4
+> ‖̂βj‖0 (nonzeros)
+> d= 55067
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure 5: Reconstructing the MAGIC wheat dataset. We evaluate the methods on a multi-parent inter-cross population of wheat comprising n = 504 inbred lines genotyped across d = 55 067 SNP markers. (Left ) We use an 80/20 train-test split, fitting k = 25 components on the training set and evaluating the reconstruction error on the held-out test set. We report the mean ± 1 standard deviation across 10 independent splits. ( Right ) Corresponding sparsity of the solution. 
+
+# 8 Conclusion 
+
+We propose a robust optimization approach to sparse PCA that naturally induces sparsity and is well-suited for high-dimensional problems. Hyperparameter tuning in unsupervised learning remains an important challenge in modern data science. The adversarial formulation provides a valuable perspective with favorable theoretical properties to guide the parameterization, showing promising results out of the box. Our work is best understood in the context of its limitations. AdvPCA solves a min-max problem that is not concave-convex, restricting global theoretical guarantees. We underline that the nonconvexity of the outer problem also applies to Sparse PCA [52]. Furthermore, establishing the exact decay properties in Proposition 6 warrants further study to better understand how the radius δ dictates the solution. A promising avenue for future work is extending the framework to kernel PCA using techniques similar to [35], as well as exploring other norms, e.g., structured PCA via the nonconvex ℓ1/2-norm [21]. Finally, analyzing the adjusted total variance is also another important avenue for future work. 
+
+# 9 Acknowledgments and Disclosure of Funding 
+
+We would like to thank Paul Häusner and Ayca Özcelikkale for their valuable feedback on early versions of this manuscript. AHR is partially supported by the Wallenberg AI, Autonomous Systems and Software Program (WASP) funded by the Knut and Alice Wallenberg Foundation and by eSSENCE and SciLifeLab. AMHT and DZ are both supported by the Swedish Research Council under grants 2023-05234 and 2024-03903 respectively, as well as the Knut and Alice Wallenberg Foundation. FB is supported by the France 2030 program “PR[AI]RIE-PSAI” (ANR-23-IACL-0008). 
+
+# References 
+
+[1] Akshay Agrawal, Robin Verschueren, Steven Diamond, and Stephen Boyd. A rewriting system for convex optimization problems. Journal of Control and Decision , 5(1):42–60, 2018. [2] Francis Bach. The “ η-trick” reloaded: Multiple kernel learning – Machine Learning Research Blog, 2019. 10 [3] Alexandre Belloni, Victor Chernozhukov, and Lie Wang. Square-root lasso: Pivotal recovery of sparse signals via conic programming. Biometrika , 98(4):791–806, 2011. [4] Thierry Bouwmans and El Hadi Zahzah. Robust PCA via principal component pursuit: A review for a comparative evaluation in video surveillance. Computer Vision and Image Understanding , 122:22–34, 2014. [5] Stephen Boyd and Lieven Vandenberghe. Convex Optimization . Cambridge University Press, 2004. [6] Jorge Cadima and Ian T Jolliffe. Loading and correlations in the interpretation of principle compenents. 
+
+Journal of Applied Statistics , 22(2):203–214, 1995. [7] T. Tony Cai, Zongming Ma, and Yihong Wu. Sparse PCA: Optimal rates and adaptive estimation. The Annals of Statistics , 41(6):3074–3110, 2013. [8] Emmanuel J. Candès, Xiaodong Li, Yi Ma, and John Wright. Robust principal component analysis? 
+
+Journal of the ACM , 58(3):1–37, 2011. [9] Alexandre d’Aspremont, Laurent El Ghaoui, Michael I. Jordan, and Gert R. G. Lanckriet. A direct formulation for sparse PCA using semidefinite programming. SIAM Review , 49(3):434–448, 2007. [10] Marc Peter Deisenroth, A. Aldo Faisal, and Cheng Soon Ong. Mathematics for Machine Learning .Cambridge University Press, 2020. [11] Yash Deshpande and Andrea Montanari. Information-theoretically optimal sparse PCA. In IEEE International Symposium on Information Theory , pages 2197–2201, 2014. [12] Steven Diamond and Stephen Boyd. CVXPY: A Python-embedded modeling language for convex optimization. Journal of Machine Learning Research , 17(83):1–5, 2016. [13] Alan Edelman, Tomás A. Arias, and Steven T. Smith. The geometry of algorithms with orthogonality constraints. SIAM Journal on Matrix Analysis and Applications , 20(2):303–353, 1998. [14] Jerome H. Friedman and John W. Tukey. A projection pursuit algorithm for exploratory data analysis. 
+
+IEEE Transactions on Computers , C-23(9):881–890, 1974. [15] Gene H. Golub and Charles F. Van Loan. Matrix Computations . The Johns Hopkins University Press, 2013. [16] Trevor Hastie, Robert Tibshirani, and Martin Wainwright. Statistical Learning with Sparsity: The Lasso and Generalizations . CRC press, 2015. [17] Peter J. Huber. Projection pursuit. The Annals of Statistics , 13:435–475, 1985. [18] Mia Hubert, Peter J. Rousseeuw, and Karlien Vanden Branden. ROBPCA: A new approach to robust principal component analysis. Technometrics , 47(1):64–79, 2005. [19] Andrew Ilyas, Shibani Santurkar, Dimitris Tsipras, Logan Engstrom, Brandon Tran, and Aleksander Madry. Adversarial Examples Are Not Bugs, They Are Features. Advances in Neural Information Processing Systems (NeurIPS) , 2019. [20] Adel Javanmard, Mahdi Soltanolkotabi, and Hamed Hassani. Precise tradeoffs in adversarial training for linear regression. In Conference on Learning Theory , volume 125, pages 2034–2078, 2020. [21] Rodolphe Jenatton, Guillaume Obozinski, and Francis Bach. Structured sparse principal component analysis. In Conference on Artificial Intelligence and Statistics (AISTATS) , volume 9, pages 366–373, 2010. [22] Iain M. Johnstone and Arthur Yu Lu. On consistency and sparsity for principal components analysis in high dimensions. Journal of the American Statistical Association , 104(486):682–693, 2009. [23] Iain M. Johnstone and Debashis Paul. PCA in High Dimensions: An Orientation. Proceedings of the IEEE , 106(8):1277–1292, 2018. 11 [24] I. T. Jolliffe. Principal Component Analysis . Springer, 2002. [25] Ian T. Jolliffe, Nickolay T. Trendafilov, and Mudassir Uddin. A modified principal component technique based on the LASSO. Journal of Computational and Graphical Statistics , 12(3):531–547, 2003. [26] Gilad Lerman and Tyler Maunu. An overview of robust subspace recovery. Proceedings of the IEEE ,106(8):1380–1410, 2018. [27] Zhouchen Lin, Risheng Liu, and Zhixun Su. Linearized alternating direction method with adaptive penalty for low-rank representation. Advances in Neural Information Processing Systems (NeurIPS) ,2011. [28] Aleksander Madry, Aleksandar Makelov, Ludwig Schmidt, Dimitris Tsipras, and Adrian Vladu. Towards Deep Learning Models Resistant to Adversarial Attacks. In International Conference on Learning Representations (ICLR) , 2018. [29] Ricardo Antonio Maronna. Robust M-estimators of multivariate location and scatter. The Annals of Statistics , 4(1):51–67, 1976. [30] Yifei Min, Lin Chen, and Amin Karbasi. The curious case of adversarially robust models: More data can help, double descend, or hurt generalization. In Proceedings of the Thirty-Seventh Conference on Uncertainty in Artificial Intelligence , volume 161, pages 129–139, 2021. [31] Karl Pearson. LIII. On lines and planes of closest fit to systems of points in space. The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science , 2(11):559–572, 1901. [32] Antônio H. Ribeiro and Thomas B. Schön. Overparameterized Linear Regression under Adversarial Attacks. IEEE Transactions on Signal Processing , 71:601–614, 2023. [33] Antônio H. Ribeiro, Dave Zachariah, Francis Bach, and Thomas B. Schön. Regularization properties of adversarially-trained linear regression. Advances in Neural Information Processing Systems (NeurIPS) ,2023. [34] Antônio H. Ribeiro, Thomas B. Schön, Dave Zachariah, and Francis Bach. Efficient Optimization Algorithms for Linear Adversarial Training. In International Conference on Artificial Intelligence and Statistics (AISTATS) , volume 258, pages 1207–1215, 2025. [35] Antônio H. Ribeiro, David Vävinggren, Dave Zachariah, Thomas B. Schön, and Francis Bach. Kernel Learning with Adversarial Features: Numerical Efficiency and Adaptive Regularization. Advances in Neural Information Processing Systems (NeurIPS) , 2025. [36] Michael F. Scott, Nick Fradgley, Alison R. Bentley, Thomas Brabbs, Fiona Corke, Keith A. Gard-ner, Richard Horsnell, Phil Howell, Olufunmilayo Ladejobi, Ian J. Mackay, Richard Mott, and James Cockram. Limited haplotype diversity underlies polygenic trait architecture across 70 years of wheat breeding. Genome Biology , 22(1):137, 2021. [37] Shai Shalev-Shwartz and Shai Ben-David. Understanding Machine Learning: From Theory to Algo-rithms . Cambridge University Press, 2014. [38] John Michael Steele. The Cauchy-Schwarz Master Class: An Introduction to the Art of Mathematical Inequalities . Cambridge University Press, 2010. [39] Hossein Taheri, Ramtin Pedarsani, and Christos Thrampoulidis. Asymptotic Behavior of Adversarial Training in Binary Linear Classification. In IEEE International Symposium on Information Theory (ISIT) , pages 127–132, 2022. [40] Alaa Tharwat. A tutorial on principal component analysis. International Journal of Applied Pattern Recognition , 3(3):197–240, 2016. [41] Robert Tibshirani. Regression shrinkage and selection via the LASSO. Journal of the Royal Statistical Society. Series B (Methodological) , 58(1):267–288, 1996. 12 [42] Michail Tsagris, Christina Beneki, and Hossein Hassani. On the folded normal distribution. Mathematics ,2(1):12–28, 2014. [43] Dimitris Tsipras, Shibani Santurkar, Logan Engstrom, Alexander Turner, and Aleksander Madry. Ro-bustness May Be At Odds with Accuracy. In International Conference on Learning Representations (ICLR) , 2019. [44] David E. Tyler. A distribution-free M-estimator of multivariate scatter. The Annals of Statistics , 15: 234–251, 1987. [45] Roman Vershynin. High-Dimensional Probability: An Introduction with Applications in Data Science .Cambridge University Press, 2026. [46] Martin J. Wainwright. High-Dimensional Statistics: A Non-Asymptotic Viewpoint . Cambridge Univer-sity Press, 2019. [47] Yisen Wang, Xingjun Ma, James Bailey, Jinfeng Yi, Bowen Zhou, and Quanquan Gu. On the conver-gence and robustness of adversarial training. In International Conference on Machine Learning (ICM) ,volume 97, pages 6586–6595, 2019. [48] Yiling Xie and Xiaoming Huo. High-dimensional (Group) Adversarial Training in Linear Regression. 
+
+Advances in Neural Information Processing Systems (NeurIPS) , 2024. [49] Huan Xu, Constantine Caramanis, and Shie Mannor. Robust regression and lasso. In Advances in Neural Information Processing Systems (NeurIPS) , 2008. [50] Xiaoming Yuan and Junfeng Yang. Sparse and Low-Rank Matrix Decomposition Via Alternating Di-rection Methods. Pacific Journal of Optimization , 9(1):167–180, 2013. [51] Hui Zou and Trevor Hastie. Regularization and Variable Selection via the Elastic Net. Journal of the Royal Statistical Society. Series B (Statistical Methodology) , 67(2):301–320, 2005. [52] Hui Zou, Trevor Hastie, and Robert Tibshirani. Sparse Principal Component Analysis. Journal of Computational and Graphical Statistics , 15(2):265–286, 2006. 13 A Robust Optimization Approach to Sparse Principal Component Analysis Appendix 
+
+## David Vävinggren, Francis Bach, André M. H. Teixeira, Dave Zachariah, Antônio H. Ribeiro 
+
+In the Appendix, we provide additional material supporting the main text. In Appendix A, we supply information left out in the paper and also expand on some areas; in Appendix B, we prove all results in the paper; and in Appendix C, we provide additional experimental results. 
+
+# Contents 
+
+A Supplementary Material ii 
+
+A.1 PCA and Eigenvector Inconsistency . . . . . . . . . . . . . . . . . . . . . . . . . . ii A.2 The Spiked Covariance Model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . iii A.3 Efficient Solver of Linear Adversarial Regression Problems . . . . . . . . . . . . . . iii A.4 Smoothed Update of the A Matrix . . . . . . . . . . . . . . . . . . . . . . . . . . . iv A.5 The Subgradient . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . v
+
+B Proofs vi 
+
+B.1 Proof of Proposition 1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . vi B.2 Proof of Proposition 2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . vii B.3 Proof of Proposition 3 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . viii B.4 Proof of Proposition 4 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ix B.5 Proof of Proposition 5 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . xi B.6 Proof of Proposition 6 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . xiii B.7 Proof of Algorithm 2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . xviii 
+
+C Additional Experimental Results xix 
+
+C.1 Spiked Covariance Data Model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . xix C.2 The MAGIC Diverse Wheat Dataset . . . . . . . . . . . . . . . . . . . . . . . . . . xxvi A Supplementary Material 
+
+In this section, we provide supplementary material complementing the main text. We expand on some areas and provide additional information that could not fit in the paper. 
+
+## A.1 PCA and Eigenvector Inconsistency 
+
+PCA is a linear dimensionality reduction technique that exploits an important property of high-dimensional data: dimensions are often correlated meaning it is typically concentrated near a lower-dimensional manifold. This manifold is not necessarily linear, but PCA finds the best rank-k linear approximation to it. Once the subspace is found the data can be projected onto it, which reduces the dimension while preserving as much information as possible. PCA hinges on the assumption that the dimension of the data d is sufficiently small in relation to the num-ber of datapoints available, n. The high-dimensional setting poses issues that have been studied extensively over the years. Johnstone and Paul [23] give an orientation into these phenomena, and labels them eigen-value spreading , eigenvalue bias and eigenvector inconsistency . Perhaps least recognized of the three is the eigenvector inconsistency, which refers to the fact that leading eigenvectors in high-dimensional PCA can be inconsistent estimates when d grows proportionally with n.We assume the data D = {xi}ni=1 are drawn i.i.d. from an underlying distribution px on Rd, with zero mean and covariance Σ. The sample covariance matrix is then given by bΣ = 1
+
+> n
+
+Pni=1 xix⊤ 
+
+> i
+
+. The traditional formulation of large sample theory assumes d to be fixed and n to be large; in this setting it is well-known that bΣ estimates Σ consistently. For example, if the data is assumed to be i.i.d., then bΣ → Σ as n → ∞ 
+
+[46]. We write the population covariance as 
+
+Σ = 
+
+> d
+
+X
+
+> ℓ=1
+
+τℓuℓu⊤ 
+
+> ℓ
+
+= U T U ⊤,
+
+where U is a d × d orthogonal matrix whose columns {uℓ}dℓ=1 are the eigenvectors of Σ and T is a diagonal matrix containing the corresponding eigenvalues. By convention and without loss of generality, the eigenval-ues are arranged in decreasing order such that τ1 ≥ τ2 ≥ . . . ≥ τd. In the same fashion, we write the sample covariance matrix as 
+
+bΣ = 
+
+> d
+
+X
+
+> ℓ=1
+
+ξℓvℓv⊤ 
+
+> ℓ
+
+= V ΞV ⊤,
+
+where we use the same convention as for the population. The asymptotic result for the covariance matrix presented above now extends to its decomposition; if d is considered fixed, one can show that ξℓ → τℓ and 10 0 10 1 10 2    
+
+> τ1
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 〈u1, v 1
+> 〉2
+> ν= 10
+> ν= 4
+> ν= 1
+> ν= 0 .1
+
+Figure A.1: Plot illustrating the eigenvector inconsistency showcased in (A.1). Here, ⟨u1, v 1⟩ = 0 means that the estimate v1 is orthogonal to u1. Hence, the estimate is as good as a random guess and provides no information about u1 for low signal strength τ1.ii vℓ → uℓ ∀ℓ = 1 , . . . , d as n → ∞ . However, if we no longer consider d as fixed and instead let d grow proportionally with n, the eigenvector inconsistency presents itself. For the leading eigenvector, Johnstone and Paul [23] show that 
+
+⟨u1, v 1⟩2 →
+
+
+
+1 − ν/ (τ1 − 1) 2
+
+1 + ν/ (τ1 − 1) , τ1 > 1 + √ν, 
+
+0, τ1 ∈ [1 , 1 + √ν],
+
+(A.1) when d/n → ν > 0. This result is plotted in Figure A.1. Broadly speaking, this result shows that the leading eigenvalue (corresponding to the signal strength along the leading eigenvector) needs to be large enough to match d. If τ1 remains fixed and d and is allowed to grow, the inconsistency properties can only get worse. 
+
+## A.2 The Spiked Covariance Model 
+
+In the Sparse PCA literature, it is common to study models under simpler classes of covariance matrices. Two common ones are the spiked Wigner model and the spiked Wishart model, e.g., considered in [11]. These allow for analysis and tractable derivations. In this work, we use the spiked covariance model from [46, ch. 8.2.2]. Let zi ∼ N(0 , 1) and wi ∼ N(0 , I d) be i.i.d. noise and β∗ ∈ Rd be the true (unknown) spike direction. Moreover, let τ define the spike strength, which is a quantity similar to the Signal-to-Noise Ratio (SNR). Then, let xi = √τ z iβ∗ + wi, i = 1 , . . . , n ,which means xi has zero mean and true covariance matrix Σ∗ = τ β ∗β∗⊤ + Id. By construction, this setup means that β∗ is the unique maximal eigenvector of Σ∗ with eigenvalue 1 + τ . All other eigenvalues are located at 1, meaning τ is the eigengap. To accommodate arbitrary eigenvalue spectra and multiple spike directions in our empirical evaluations, we generalize the rank-1 model to a full spectral formulation. Let D = diag( λ1, . . . , λ d) be a diagonal matrix of eigenvalues and V ∈ Rd×d be an orthogonal matrix whose columns encode the corresponding eigenvectors. For a generalized k-spiked model, we configure the spectrum by setting the top k eigenvalues to λj = 1 + τj
+
+for j = 1 , . . . , k , where τj are the respective eigengaps, and the remaining d − k ambient eigenvalues to 1.The orthogonal matrix V can then be instantiated to inject arbitrary, potentially sparse, spike directions into the ambient space. To draw a finite-sample data matrix X ∈ Rn×d with the exact population covariance Σ∗ = V DV ⊤, we first sample a latent noise matrix Z ∈ Rn×d whose entries are drawn i.i.d. from a standard normal distribution, 
+
+N(0 , 1) . The observed data matrix is then constructed via the transformation 
+
+X = ZD 1/2V ⊤. (A.2) By construction, the i-th sample (corresponding to the i-th row of X) is formed by the linear combination 
+
+xi = V D 1/2zi, where zi ∈ Rd is the i-th row of Z. Because zi has an identity covariance matrix, this affine transformation guarantees that each sample has zero mean and exactly recovers the prescribed true covariance: 
+
+E[xix⊤ 
+
+> i
+
+] = V D 1/2E[ziz⊤ 
+
+> i
+
+]D1/2V ⊤
+
+= V DI dV ⊤
+
+= V DV ⊤ = Σ ∗.
+
+This generative procedure explicitly connects our theoretical covariance assumptions to the practical sim-ulation of our datasets, allowing independent control over the geometric structure of the eigenvectors in V
+
+and the signal-to-noise ratios in D.
+
+## A.3 Efficient Solver of Linear Adversarial Regression Problems 
+
+In Section 4.2, we use Algorithm 2 for the k independent adversarial linear regression problems. Algorithm 2 leverages what is sometimes referred to as the η-trick, see e.g [2]. iii It is an alternating minimization scheme designed to improve compu-tational performance over standard general-purpose convex solvers like 
+
+cvxpy [1, 12]. Solving adversarial linear regression problems this way was proposed by [34]. By reformu-lating the objective, the optimiza-tion is reduced to iteratively solving a weighted ridge regression problem (which admits a fast, closed-form solution) and updating the varia-tional parameters η. We provide a proof for the algorithm in Ap-pendix B.7. We want to highlight that a critical implementation detail (left out of the algorithm for clar-ity) is numerical stability. When 
+
+δ → 0 or residuals vanish, the η
+
+updates risk division by zero. In the actual implementation, this is routinely handled by adding a small smoothing constant ε > 0 to the denominators. We refer the reader to [34] for a detailed discussion on this stabilization step. 
+
+Algorithm 2: η-trick 
+
+input: {xi}ni=1 ; α; δ ≥ 0
+
+init: wi ← 1 for i = 1 , . . . , n γj ← 1 for j = 1 , . . . , d 
+
+repeat 
+
+▷ Solve weighted ridge problem 
+
+β ← arg min β
+
+Pni=1 wi(α⊤xi − β⊤xi)2 + Pdj=1 γj β2
+
+> j
+
+▷ Set η
+
+for i ← 1 to n do 
+
+η(i)0 ← |α⊤xi − β⊤xi||α⊤xi − β⊤xi| + δ∥β∥1
+
+for j ← 1 to d do 
+
+η(i) 
+
+> j
+
+← δ |βj ||α⊤xi − β⊤xi| + δ∥β∥1
+
+▷ Update weights 
+
+for i ← 1 to n do 
+
+wi ← 1
+
+η(i)0
+
+for j ← 1 to d do 
+
+γj ← δ2 Pni=1 
+
+1
+
+η(i)
+
+> j
+
+until StopCondition 
+
+return β
+
+## A.4 Smoothed Update of the A Matrix 
+
+In Algorithm 1, we employ a smoothed update of the A matrix to stabilize the iterative optimization procedure. For small values of δ, we find empirically that the optimization is stable even without the smoothing, however, smoothing greatly improves the ability to converge for larger δs. In Figure A.2, we show an example of the difference when running Algorithm 1 with ϵ = 0 .5 (smoothing) versus ϵ = 0 (no smoothing) using δj = 0 .4δmax ,j for j = 1 , . . . , 10 in the multi-component recovery experiment presented in Figure 4. The training loss refers to the objective in (7). We see that we achieve a much more stable decrease in loss as well as a lower final value. 0 2 4 6 8
+
+Iteration        
+
+> 12000
+> 10000
+> 8000
+> Training loss  Average loss 01234567
+
+Iteration 
+
+> 10000
+> 8000
+> 6000
+> Training loss  Average loss
+
+Figure A.2: We use δj = 0 .4δmax ,j for j = 1 , . . . , 10 in the multi-component recovery experiment presented in Figure 4 to illustrate the difference between optimizing with and without smoothing. The training loss refers to the objective in (7), and the grey curves are 20 independent runs from different random draws of data from the spiked model. ( Left ) With smoothing, using ϵ = 0 .5. ( Right ) Without smoothing, using ϵ = 0 .To implement the smoothing, we cannot simply update A ← ϵA + (1 − ϵ)Aupd . Because the set of orthogonal matrices forms a curved manifold, taking a linear step pushes the matrix off the constraint surface into the iv ambient space, violating the strict requirement that A⊤A = Ik. To address this issue, we allow the step into the ambient space but also follow it up by projecting the smoothed matrix back onto the nearest valid point on the manifold of orthogonal matrices [13]. Finding the closest orthogonal matrix to our smoothed target 
+
+Asmooth is formulated as the orthogonal Procrustes problem 
+
+min 
+
+> A⊤A=I
+
+∥A − Asmooth ∥2 
+
+> F
+
+.
+
+We solve this Procrustes problem in the exact same way as when updating A, i.e., using the singular value decomposition; see Appendix B.2. 
+
+## A.5 The Subgradient 
+
+We compute the subgradient of the Adversarial PCA risk (13), as this will be used in the proofs later on. Consider the minimization of the risk, 
+
+arg min 
+
+> β
+
+bRδ (β) = arg min 
+
+> βn
+
+X
+
+> i=1
+
+ |α⊤xi − β⊤xi| + δ ∥β∥1
+
+2 ,
+
+where we minimize over β ∈ Rd. Let gi : Rd → R be defined as gi(β) = |α⊤xi − β⊤xi| + δ ∥β∥1, so that the risk bRδ (β) is given by 
+
+bRδ (β) = 
+
+> n
+
+X
+
+> i=1
+
+gi(β)2.
+
+bRδ is convex in β since gi is convex and nonnegative, but it is not differentiable everywhere because of the absolute value. For convex functions however, the notion of subgradients naturally extends derivatives into the space of non-differentiable functions. Given a convex function f : Rd → R, a vector v ∈ Rd is said to be a subgradient of f at β if 
+
+f (β′) ≥ f (β) + ⟨v, β ′ − β⟩ for all β′ ∈ Rd.
+
+The set of all subgradients of f at β is called the subdifferential, and is a convex set denoted ∂f (β). If f is differentiable at β, then this consists of a single element. In case of the absolute value function f : R → R given by f (β) = |β|, the subdifferential is given by 
+
+∂|β| =
+
+
+
+{+1 } β > 0,
+
+{− 1} β < 0,
+
+[−1, +1] β = 0 .
+
+We use this to derive an expression for the subdifferential of bRδ (β), which is the set of all subgradients. To start, 
+
+∂ bRδ (β) = ∂
+
+> n
+
+X
+
+> i=1
+
+gi(β)2 = 2 
+
+> n
+
+X
+
+> i=1
+
+gi(β)∂g i(β),
+
+where ∂g i(β) = ∂|α⊤xi − β⊤xi| + δ∂ ∥β∥1. Here, we apply the result for |·| , which gives 
+
+∂|α⊤xi − β⊤xi| =
+
+
+
+{+1 } α⊤xi − β⊤xi > 0
+
+{− 1} α⊤xi − β⊤xi < 0[−1, +1] α⊤xi − β⊤xi = 0 
+
+| {z }
+
+> si
+
+∂  α⊤xi − β⊤xi
+
+ = si(−xi),
+
+and 
+
+∂ ∥β∥1 = z, where zj =
+
+
+
+{+1 } βj > 0
+
+{− 1} βj < 0[−1, +1] βj = 0 
+
+for j = 1 , . . . , d. 
+
+vWe therefore have 
+
+∂ bRδ (β) = 2 
+
+> n
+
+X
+
+> i=1
+
+ |α⊤xi − β⊤xi| + δ ∥β∥1
+
+ (−sixi + δz ) ⊆ Rd.
+
+By noting that |α⊤xi − β⊤xi|si = α⊤xi − β⊤xi, this can be simplified to 
+
+12 ∂ bRδ (β) = {X⊤X (β − α)} + ∥X(β − α)∥1 δz − δ ∥β∥1 X⊤s + nδ 2 ∥β∥1 z. 
+
+# B Proofs 
+
+In the Proofs section, we give proofs to all results presented in the paper. 
+
+## B.1 Proof of Proposition 1 
+
+Proof. We denote the adversarial PCA objective as 
+
+L(A, B ) = max 
+
+> r∈Ωδ
+
+x − A(B⊤x + r) 22 .
+
+Expanding the norm gives 
+
+x − A(B⊤x + r) 22 = ( x − A(B⊤x + r)) ⊤(x − A(B⊤x + r)) = x⊤x − x⊤A(B⊤x + r) − (B⊤x + r)⊤A⊤x + ( B⊤x + r)⊤ A⊤A
+
+> =Ik
+
+(B⊤x + r)= x⊤(Id − 2AB ⊤ + BB ⊤)x + 2 r⊤(B − A)⊤x + r⊤r
+
+= x⊤ (B − A)( B − A)⊤ + Id − AA ⊤ x + 2 r⊤(B − A)⊤x + r⊤r. 
+
+Letting e = ( B − A)⊤x, where we note e ∈ Rk, gives 
+
+x − A(B⊤x + r) 22 = e⊤e + x⊤x − x⊤AA ⊤x + 2 r⊤e + r⊤r, 
+
+and hence 
+
+L(A, B ) = e⊤e + x⊤x − x⊤AA ⊤x + max 
+
+> r∈Ωδ
+
+r⊤r + 2 r⊤e .
+
+If we let Ωδ be the hyperrectangle given by Ωδ = Qkj=1 
+
+−δj ∥βj ∥1 , δ j ∥βj ∥1
+
+, we get max 
+
+> r∈Ωδ
+
+r⊤r + 2 r⊤e = max    
+
+> |rj|≤ δj∥βj∥1
+> k
+
+X
+
+> j=1
+
+r2 
+
+> j
+
++ 2 rj ej =
+
+> k
+
+X
+
+> j=1
+
+max    
+
+> |rj|≤ δj∥βj∥1
+
+r2 
+
+> j
+
++ 2 rj ej
+
+since we have k separable constraints and k separable objective functions. The maximization is now solvable directly: max    
+
+> |rj|≤ δj∥βj∥1
+
+r2 
+
+> j
+
++ 2 rj ej =
+
+
+
+r2 
+
+> j
+
++ 2 rj ej   
+
+> rj=+ δj∥βj∥1
+
+if ej ≥ 0
+
+r2 
+
+> j
+
++ 2 rj ej   
+
+> rj=−δj∥βj∥1
+
+if ej < 0=
+
+(δ2 
+
+> j
+
+∥βj ∥21 + 2 δj ∥βj ∥1 ej if ej ≥ 0
+
+δ2 
+
+> j
+
+∥βj ∥21 − 2δj ∥βj ∥1 ej if ej < 0= δ2 
+
+> j
+
+∥βj ∥21 + 2 δj ∥βj ∥1 |ej |.
+
+vi So 
+
+L(A, B ) = x⊤x − x⊤AA ⊤x + e⊤e +
+
+> k
+
+X
+
+> j=1
+
+δ2 
+
+> j
+
+∥βj ∥21 + 2 δj ∥βj ∥1 |ej |
+
+= ∥x∥22 − A⊤x 22 +
+
+> k
+
+X
+
+> j=1
+
+ |ej | + δj ∥βj ∥1
+
+2
+
+leaving us with the final expression for L(A, B ). Note that the perturbation maximizing the objective corresponds to rj = sign (ej ) δj ∥βj ∥1. Also note that ∥x∥22 − A⊤x 22 = x − AA ⊤x 22 since A⊤A = Ik.
+
+## B.2 Proof of Proposition 2 
+
+Proof. We want to solve 
+
+min  
+
+> A
+
+X − (XB + bR)A⊤ 2
+
+> F
+
+subject to A⊤A = Ik, (A.3) with bR = sign (X(B − A)) D ∈ Rn×k. Expanding the norm gives 
+
+X − (XB + bR)A⊤ 2 
+
+> F
+
+= Tr 
+
+n
+
+(X − (XB + bR)A⊤)⊤(X − (XB + bR)A⊤)
+
+o
+
+> (a)
+
+= Tr X⊤X − 2 Tr 
+
+n
+
+X⊤(XB + bR)A⊤o
+
++ Tr 
+
+(
+
+(XB + bR)⊤(XB + bR) A⊤A
+
+> =Ik
+
+)
+
+,
+
+where (a) uses the cyclic property of the trace. Because A⊤A = Ik, the cross term is the only one dependent on A, meaning (A.3) is equivalent to 
+
+max  
+
+> A
+
+Tr 
+
+n
+
+X⊤(XB + bR)A⊤o
+
+subject to A⊤A = Ik. (A.4) Now, let 
+
+X⊤(XB + bR) = U ΣV ⊤
+
+be the singular value decomposition. Since X⊤(XB + bR) ∈ Rd×k for d ≥ k, we have U ∈ Rd×d, Σ ∈ Rd×k
+
+and V ∈ Rk×k where U ⊤U = U U ⊤ = Id and V ⊤V = V V ⊤ = Ik. Substituting the SVD gives 
+
+Tr 
+
+n
+
+X⊤(XB + bR)A⊤o
+
+= Tr U ΣV ⊤A⊤ = Tr V ⊤A⊤U Σ .
+
+Let Q = V ⊤A⊤U ∈ Rk×d. Because U and V are orthogonal matrices and A has orthonormal columns, Q
+
+has orthonormal rows: 
+
+QQ ⊤ = V ⊤A⊤U (V ⊤A⊤U )⊤ = V ⊤A⊤ U U ⊤
+
+> =Id
+
+AV = V ⊤ A⊤A
+
+> =Ik
+
+V = V ⊤V = Ik.
+
+Thus, we can rewrite the trace as 
+
+Tr {QΣ} =
+
+> k
+
+X
+
+> i=1
+
+qii σi.
+
+Since QQ ⊤ = Ik, the row vectors of Q have a unit ℓ2-norm, which bounds its elements such that qii ≤ 1.Furthermore, by definition, the singular values are non-negative ( σi ≥ 0). Therefore, the sum P qii σi is maximized when every diagonal element qii is as large as possible. This maximum is achieved when qii = 1 
+
+vii for all i = 1 , . . . , k , which implies that Q must be a rectangular (fat) identity matrix Ik×d = [ Ik | 0] . Setting 
+
+Q = Ik×d, we solve for the optimal A:
+
+V ⊤A⊤U = Q = Ik×d ⇔ A = U I d×kV ⊤ = U1: kV ⊤ ,
+
+where U1: k denotes the first k columns of U . This yields the final closed-form update for A.
+
+## B.3 Proof of Proposition 3 
+
+We start by showing the equivalence between input and latent space perturbations. 
+
+Proof. We define 
+
+L(α, β ) = max  
+
+> ∥∆x∥p≤δ
+
+x − αβ ⊤(x + ∆ x) 22 .
+
+Making the variable substitution β⊤∆x = r and using Hölder’s inequality [38, ch. 9], namely 
+
+|r| = |β⊤∆x| ≤ ∥ ∆x∥p ∥β∥q ≤ δ ∥β∥q ,
+
+gives 
+
+L(α, β ) = max  
+
+> ∥∆x∥p≤δ
+
+x − α(β⊤x + β⊤∆x) 22 = max 
+
+> |r|≤ δ∥β∥q
+
+x − α(β⊤x + r) 22 .
+
+To complete the proof, we must verify that the upper bound of Hölder’s inequality is tight for any conjugate pair p, q ≥ 1. By the definition of the dual norm (see e.g. [5, app. A.1.6]) 
+
+∥β∥q = sup 
+
+> ∥ν∥p≤1
+
+β⊤ν, 
+
+there always exists a vector ν satisfying ∥ν∥p ≤ 1 that maximizes the inner product such that β⊤ν = ∥β∥q . By scaling this vector to utilize the full adversarial budget, we construct the worst-case perturbation ∆x⋆ = δν .This guarantees strict feasibility, as ∥∆x⋆∥p ≤ δ, and achieves exactly β⊤∆x⋆ = δ ∥β∥q . By symmetry, the lower bound −δ ∥β∥q is also attainable. Consequently, the inner product r = β⊤∆x can span the entire interval [−δ ∥β∥q , δ ∥β∥q ], confirming the equivalence of the optimization domains. We move on and solve the inner maximum. 
+
+Proof. We start from the input space formulation 
+
+L(α, β ) = max  
+
+> ∥∆x∥p≤δ
+
+x − αβ ⊤(x + ∆ x) 22
+
+and expand the norm: 
+
+x − αβ ⊤(x + ∆ x) 22 = ( x − αβ ⊤(x + ∆ x)) ⊤(x − αβ ⊤(x + ∆ x)) = x⊤x − 2x⊤αβ ⊤(x + ∆ x) + ( x + ∆ x)⊤β α ⊤α
+
+> =1
+
+β⊤(x + ∆ x)= ∥x∥22 − (α⊤x)2 + ( β⊤x − α⊤x)2 + ( β⊤∆x)2 + 2 β⊤∆x(β⊤x − α⊤x).
+
+Isolating terms dependent on ∆x then gives 
+
+L(α, β ) = ∥x∥22 − (α⊤x)2 + ( β⊤x − α⊤x)2 + max 
+
+> ∥∆x∥p≤δ
+
+n
+
+(β⊤∆x)2 + 2 β⊤∆x(β⊤x − α⊤x)
+
+o
+
+.
+
+viii We now let r = β⊤∆x and e = ( β − α)⊤x:
+
+L(α, β ) = ∥x∥22 − (α⊤x)2 + e2 + max 
+
+> ∥∆x∥p≤δ
+
+{r2 + 2 re }.
+
+Again, by using Hölder’s inequality, we finally have 
+
+L(α, β ) = ∥x∥22 − (α⊤x)2 + e2 + max 
+
+> |r|≤ δ∥β∥q
+
+{r2 + 2 re },
+
+which is maximized by r = δ ∥β∥q if e ≥ 0 and r = −δ ∥β∥q if e < 0. Hence 
+
+L(α, β ) = ∥x∥22 − (α⊤x)2 + e2 +
+
+
+
+δ2 ∥β∥2 
+
+> q
+
++ 2 δ ∥β∥q e if e ≥ 0
+
+δ2 ∥β∥2 
+
+> q
+
+− 2δ ∥β∥q e if e < 0= ∥x∥22 − (α⊤x)2 + |e|2 + δ2 ∥β∥2 
+
+> q
+
++ 2 δ ∥β∥q |e|
+
+= ∥x∥22 − (α⊤x)2 + ( |e| + δ ∥β∥q )2
+
+leaving us with our final expression for L(α, β ). Note that the perturbation maximizing the objective corresponds to r = sign (e) δ ∥β∥q . Also note that ∥x∥22 − (α⊤x)2 = x − αα ⊤x 22 since α⊤α = 1 .We end with showing the case when α = β.
+
+Proof. 
+
+max 
+
+> ∥∆x∥p≤δ
+
+x − ββ ⊤(x + ∆ x) 22
+
+= max 
+
+> ∥∆x∥p≤δ
+
+(
+
+x⊤x − 2x⊤ββ ⊤(x + ∆ x) + ( x + ∆ x)⊤β β⊤β
+
+> =1
+
+β⊤(x + ∆ x)
+
+)
+
+= max 
+
+> ∥∆x∥p≤δ
+
+n
+
+x⊤(I − ββ ⊤)x + ∆ x⊤ββ ⊤∆x
+
+o
+
+= x⊤(I − ββ ⊤)x + max 
+
+> ∥∆x∥p≤δ
+
+(β⊤∆x)2 (a) 
+
+= ∥x − ββ ⊤x∥22 + δ2 ∥β∥2
+
+> q
+
+where we use Hölder’s inequality in (a), i.e., that |β⊤∆x| ≤ ∥ ∆x∥p ∥β∥q ≤ δ ∥β∥q .
+
+## B.4 Proof of Proposition 4 
+
+This proof is adapted from [33, thm. 1]. The following lemma is used to prove Proposition 4. We start by proving this. 
+
+Lemma 1. Let X ∈ Rn×d be full row rank. The minimum ℓ1-norm interpolator then admits the following dual problem: 
+
+min  
+
+> Xα =Xβ
+
+∥β∥1 = max 
+
+> ∥X⊤ν∥∞≤1
+
+ν⊤Xα. 
+
+Furthermore, bβ and ˆν are primal and dual optimal, respectively, if and only if X⊤ ˆν ∈ ∂ ∥ bβ∥1.
+
+Proof. We study the primal problem 
+
+min  
+
+> Xα =Xβ
+
+∥β∥1 .
+
+ix We first note that we have a feasible problem ( β = α trivially feasible) with a convex objective function subject to an affine constraint. Therefore, Slater’s condition is satisfied and strong duality holds (see e.g. [5, ch. 5.2.3]). The following is standard duality theory, with notation from [5, ch. 5]. The Lagrangian of the primal problem is given by 
+
+L(β, ν ) = ∥β∥1 + ν⊤(Xα − Xβ )
+
+where ν ∈ Rn denotes the dual variable. The Lagrange dual function is then given by 
+
+g(ν) = inf 
+
+> β∈Rd
+
+L(β, ν ) = inf 
+
+> β∈Rd
+
+∥β∥1 + ν⊤(Xα − Xβ ) = ν⊤Xα + inf 
+
+> β∈Rd
+
+∥β∥1 − (X⊤ν)⊤β
+
+> (a)
+
+= ν⊤Xα − sup 
+
+> β∈Rd
+
+(X⊤ν)⊤β − ∥ β∥1 ,
+
+where we in (a) use that inf x{f (x)} = − sup x{− f (x)} holds for an arbitrary function f . By the definition of the conjugate of a function, see e.g. [5, ch. 3.3], we identify that the sup is a conjugate: 
+
+sup 
+
+> β∈Rd
+
+(X⊤ν)⊤β − ∥ β∥1 = X⊤ν ∗ 
+
+> 1
+
+.
+
+Further, the conjugate of this ℓ1-norm is given by 
+
+X⊤ν ∗ 
+
+> 1
+
+=
+
+(0 X⊤ν ∞ ≤ 1,
+
+∞ otherwise .
+
+So for the Lagrange dual function g(ν) to be bounded, we have the implicit constraint X⊤ν ∞ ≤ 1. Using this, we can formulate the dual problem: 
+
+sup g(ν) = sup 
+
+> ∥X⊤ν∥∞≤1
+
+ν⊤Xα .
+
+Finally, to establish the optimality condition, we rely on the KKT conditions (see e.g. [5, ch. 5.5.3]). Since strong duality holds, the primal optimal bβ must minimize the Lagrangian evaluated at the dual optimal ˆν.This means the zero vector must be in the subdifferential of L(β, ˆν) with respect to β, evaluated at bβ:
+
+0 ∈ ∂ ∥ bβ∥1 − X⊤ ˆν ⇒ X⊤ ˆν ∈ ∂ ∥ bβ∥1 .
+
+We now move on to prove Proposition 4. 
+
+Proof. Let bβ be the minimum ℓ1-norm interpolator arg min Xα =Xβ ∥β∥1 and let X ∈ Rn×d be full row rank such that n < d . We want to prove that bβ minimizes the Adversarial PCA risk (13), given by 
+
+bRδ (β) = 
+
+> n
+
+X
+
+> i=1
+
+ |α⊤xi − β⊤xi| + δ ∥β∥1
+
+2 ,
+
+if and only if 
+
+δ ≤ 1
+
+n ∥ˆν∥−1 
+
+> ∞
+
+,
+
+where ˆν is the solution to the convex problem max ∥X⊤ν∥∞≤1 ν⊤Xα .To prove the theorem, we make use of the subdifferential of the risk (see Appendix A.5), satisfying 
+
+12 ∂ bRδ (β) = {X⊤X(β − α)} + ∥X(β − α)∥1 δz − δ ∥β∥1 X⊤s + nδ 2 ∥β∥1 z. 
+
+xEvaluating the subdifferential at the interpolator bβ means we have X bβ = Xα , which simplifies the subdif-ferential according to 12 ∂ bRδ ( bβ) = −δ ∥ bβ∥1 X⊤∂ ∥0∥1 + nδ 2 ∥ bβ∥1 ∂ ∥ bβ∥1 .
+
+Because bRδ is convex, bβ is a global minimizer if and only if 0 ∈ ∂ bRδ ( bβ). For the zero vector to be in this set, there must exist some specific subgradient ˆs ∈ ∂ ∥0∥1 and some ˆz ∈ ∂ ∥ bβ∥1 such that 
+
+0 = −δ ∥ bβ∥1 X⊤ ˆs + nδ 2 ∥ bβ∥1 ˆz. 
+
+Assuming bβ̸ = 0 , we equivalently have 
+
+X⊤ ˆs = nδ ˆz. 
+
+From Lemma 1, we know that the specific subgradient ˆz ∈ ∂ ∥ bβ∥1 at optimality is determined by the dual solution as ˆz = X⊤ ˆν. Substituting this yields 
+
+X⊤ ˆs = nδX ⊤ ˆν. 
+
+By assumption, X ∈ Rn×d with n < d has full row rank, which means its transpose X⊤ has full column rank. Consequently, X⊤ has a trivial null space, allowing us to drop it from both sides of the equation and obtain 
+
+ˆs = nδ ˆν. 
+
+By definition, any element ˆs ∈ ∂ ∥0∥1 must satisfy ∥ˆs∥∞ ≤ 1. Therefore, for bβ to be the global minimizer, we must have 
+
+∥nδ ˆν∥∞ ≤ 1,
+
+which, because n and δ are strictly non-negative, rearranges to the required bound 
+
+δ ≤ 1
+
+n ∥ˆν∥−1 
+
+> ∞
+
+.
+
+Conversely, if δ > (n ∥ˆν∥∞)−1, we would have 
+
+∥ˆs∥∞ = nδ ∥ˆν∥∞ > 1,
+
+which violates the bound required for ˆs to be a valid element of the subdifferential ∂ ∥0∥1. This means no such subgradient exists, 0 /∈ ∂ bRδ ( bβ), and therefore bβ is not the global minimizer. 
+
+## B.5 Proof of Proposition 5 
+
+This proof is adapted from [33, prop. 3]. 
+
+Proof. We want to prove that the zero solution bβ = 0 minimizes the Adversarial PCA risk (13), given by 
+
+bRδ (β) = 
+
+> n
+
+X
+
+> i=1
+
+ |α⊤xi − β⊤xi| + δ ∥β∥1
+
+2 ,
+
+if and only if 
+
+δ ≥ δmax = X⊤Xα ∞
+
+∥Xα ∥1
+
+.
+
+To prove the proposition, we use the subdifferential of the risk; the complete derivation can be found in Appendix A.5. The subdifferential of the risk satisfies 
+
+12 ∂ bRδ (β) = {X⊤X (β − α)} + δ ∥X(β − α)∥1 z − δ ∥β∥1 X⊤s + nδ 2 ∥β∥1 z. 
+
+xi Because bRδ is convex, bβ = 0 is a global minimizer if and only if 0 ∈ ∂ bRδ (0) . Evaluating the subdifferential at β = 0 simplifies the expression significantly, yielding the set 
+
+12 ∂ bRδ (0) = −{ X⊤Xα } + δ ∥Xα ∥1 ∂ ∥0∥1 .
+
+For the zero vector to be in this set, there must exist some specific subgradient ˆz ∈ ∂ ∥0∥1 such that 
+
+0 = −X⊤Xα + δ ∥Xα ∥1 ˆz. 
+
+Solving for ˆz then gives 
+
+ˆz = 1
+
+δ ∥Xα ∥1
+
+X⊤Xα, 
+
+and taking the ℓ∞-norm on both sides gives 
+
+∥ˆz∥∞ = 1
+
+δ ∥Xα ∥1
+
+X⊤Xα ∞ .
+
+From the definition of the subdifferential of the absolute value function (see Appendix A.5), any element 
+
+ˆz ∈ ∂ ∥0∥1 must satisfy ∥ˆz∥∞ ≤ 1. Thus, if 
+
+δ = X⊤Xα ∞
+
+∥Xα ∥1
+
+,
+
+then ∥ˆz∥∞ = 1 and subsequently 0 ∈ ∂ bRδ (0) , implying β = 0 is the global minimizer. The same goes for 
+
+δ > X⊤Xα ∞
+
+∥Xα ∥1
+
+since this implies ∥ˆz∥∞ < 1. However, if 
+
+δ < X⊤Xα ∞
+
+∥Xα ∥1
+
+,
+
+then ∥ˆz∥∞ > 1, meaning no such subgradient ˆz ∈ ∂ ∥0∥1 can exist, and consequently β = 0 is not the global minimizer of bRδ (β). Thus, the statement is proven. Finally, we show that δmax is directly linked to the singular values of X when α is a standard principal component. Consider k ≤ d components and let the SVD of X ∈ Rn×d be given by U ΣV ⊤, where U ∈ Rn×n
+
+such that U ⊤U = U U ⊤ = In, Σ ∈ Rn×d, and V ∈ Rd×d such that V ⊤V = V V ⊤ = Id. This implies that 
+
+X⊤X = V Σ⊤U ⊤U ΣV ⊤ = V Σ⊤ΣV ⊤.
+
+Consider the jth subproblem where α is set to the jth right singular vector, namely α = vj . We then have 
+
+X⊤Xα = V Σ⊤ΣV ⊤vj = V Σ⊤Σej = σ2 
+
+> j
+
+vj ,
+
+where σj is the corresponding singular value. Taking the ℓ∞-norm gives 
+
+X⊤Xα ∞ = σ2 
+
+> j
+
+∥vj ∥∞ .
+
+The denominator can similarly be written as 
+
+Xα = U ΣV ⊤vj = U Σej = σj uj ,
+
+where uj denotes the jth left singular vector. Taking the ℓ1-norm yields 
+
+∥Xα ∥1 = σj ∥uj ∥1 .
+
+By substituting these back into the expression for δmax , we conclude that 
+
+δmax = X⊤Xα ∞
+
+∥Xα ∥1
+
+= σ2 
+
+> j
+
+∥vj ∥∞
+
+σj ∥uj ∥1
+
+= σj
+
+∥vj ∥∞
+
+∥uj ∥1
+
+.
+
+xii B.6 Proof of Proposition 6 
+
+Proposition bound: 
+
+Proof. As before, for a fixed vector α and δ ≥ 0, we define the Adversarial PCA risk (13) as 
+
+bRδ (β) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ |x⊤ 
+
+> i
+
+α − x⊤ 
+
+> i
+
+β| + δ ∥β∥1
+
+2 .
+
+Furthermore, let bβ ∈ arg min β bRδ (β) minimize the empirical risk and β∗ the population counterpart. Using this notation, we let b∆ = bβ − β∗ and want to find a bound for ∥ bβ − β∗∥2Σ∗ = ∥ b∆∥2Σ∗ , where we let Σ∗ denote the true covariance of the data D = {xi ∈ Rd : i ∈ [n]}.Now, since bRδ ( bβ) ≤ bRδ (β∗) by definition, we have that 
+
+0 ≤ ∥ b∆∥2Σ∗ ≤ ∥ b∆∥2Σ∗ + bRδ (β∗) − bRδ ( bβ)
+
+| {z }
+
+> ≥0
+
+.
+
+The difference in risk can, after some algebra, be shown to equal 
+
+bRδ (β∗) − bRδ ( bβ) = − 1
+
+n ∥X b∆∥22 + 2
+
+n (α − β∗)⊤X⊤X b∆+ 2δn (∥β∗∥1 ∥X(α − β∗)∥1 − ∥ bβ∥1 ∥X(α − bβ)∥1)+ δ2(∥β∗∥21 − ∥ bβ∥21) ≥ 0.
+
+We simplify the 2δ/n -term: 
+
+∥β∗∥1 ∥X(α − β∗)∥1 − ∥ bβ∥1 ∥X(α − bβ)∥1
+
+> (a)
+
+≤ ∥ bβ∥1 ∥X b∆∥1 + ∥X(α − β∗)∥1 (∥β∗∥1 − ∥ bβ∥1)
+
+> (b)
+
+≤ √n ∥ bβ∥1 ∥X b∆∥2 + ∥X(α − β∗)∥1 (∥β∗∥1 − ∥ bβ∥1),
+
+where (a) is the reverse triangle inequality and (b) the fact that ∥·∥ 1 ≤ √n ∥·∥ 2. Rearranging then gives 
+
+1
+
+n ∥X b∆∥22 − 1
+
+√n ∥X b∆∥2 2δ ∥ bβ∥1
+
+−
+
+ 2 
+
+> n
+
+(α − β∗)⊤X⊤X b∆ + 2δn ∥X(α − β∗)∥1 (∥β∗∥1 − ∥ bβ∥1) + δ2(∥β∗∥21 − ∥ bβ∥21)
+
+
+
+≤ 0.
+
+We now identify that we have something on the form f (y) = y2 − by − c ≤ 0 for y = 1√n ∥X b∆∥2, and that we can use the following lemma: 
+
+Lemma 2. Consider f : R → R given by f (x) = x2 − bx − c, where b, c ∈ R. If f (x) ≥ 0 ∀x, then 
+
+b2 + 4 c ≤ 0. Similarly, if ∃ x s.t. f (x) ≤ 0, then b2 + 4 c ≥ 0.
+
+Proof. 
+
+f (x) = x2 − bx − c =
+
+
+
+x − b
+
+2
+
+2
+
+− b2 + 4 c
+
+4 .
+
+Since  x − b
+
+> 2
+
+2 ≥ 0 for all x ∈ R, the global minimum of the function occurs at x = b 
+
+> 2
+
+, where f   b
+
+> 2
+
+ = − b2+4 c 
+
+> 4
+
+.If f (x) ≥ 0 for all x, then specifically f   b
+
+> 2
+
+ ≥ 0, which immediately requires b2 + 4 c ≤ 0. Conversely, if 
+
+b2 + 4 c ≥ 0, then f   b
+
+> 2
+
+ ≤ 0, demonstrating there exists an x such that f (x) ≤ 0.xiii Since f (y) ≤ 0, we have to have b2 + 4 c ≥ 0. After simplifying, this gives 
+
+2
+
+n (α − β∗)⊤X⊤X b∆ + 2δn ∥X(α − β∗)∥1 (∥β∗∥1 − ∥ bβ∥1) + δ2 ∥β∗∥21 ≥ 0. (A.5) Since (A.5) holds by Lemma 2, the conditions are met for a second one: 
+
+Lemma 3. Consider f : R → R given by f (x) = x2 − bx − c and g : R → R given by g(x) = x2 − b2 − 2c
+
+where b, c ∈ R. If b2 + 4 c ≥ 0 and f (x) ≤ 0, then g(x) ≤ f (x).
+
+Proof. We aim to show that f (x) − g(x) ≥ 0. First, we expand the difference between the two functions: 
+
+f (x) − g(x) = ( x2 − bx − c) − (x2 − b2 − 2c) = b2 − bx + c. 
+
+Observe that we can construct this exact expression by expanding the perfect square (x−b)2 and subtracting our function f (x):
+
+(x − b)2 − f (x) = ( x2 − 2bx + b2) − (x2 − bx − c) = b2 − bx + c. 
+
+Therefore, we establish the direct algebraic identity: 
+
+f (x) − g(x) = ( x − b)2 − f (x).
+
+Since the square of any real number is non-negative, we know (x − b)2 ≥ 0. We are explicitly given the condition that f (x) ≤ 0, which implies −f (x) ≥ 0. Because f (x) − g(x) is expressed as the sum of two non-negative terms, it must also be non-negative: 
+
+f (x) − g(x) ≥ 0 = ⇒ g(x) ≤ f (x).
+
+Note: The condition b2 + 4 c ≥ 0 guarantees that the premise f (x) ≤ 0 is attainable for some x ∈ R.Thus, we have y2 − b2 − 2c ≤ y2 − by − c. This gives 
+
+− 1
+
+n ∥X b∆∥22 + 4
+
+n (α − β∗)⊤X⊤X b∆ + 4δn ∥X(α − β∗)∥1 (∥β∗∥1 − ∥ bβ∥1)+ 2 δ2 
+
+∥β∗∥21 + ∥ bβ∥21
+
+
+
+≥ 0.
+
+To summarize, we have shown 
+
+0 ≤ bRδ (β∗) − bRδ ( bβ) ≤ − 1
+
+n ∥X b∆∥22 + 4
+
+n (α − β∗)⊤X⊤X b∆ + 4δn ∥X(α − β∗)∥1 (∥β∗∥1 − ∥ bβ∥1)+ 2 δ2 
+
+∥β∗∥21 + ∥ bβ∥21
+
+
+
+,
+
+and hence we have that 
+
+0 ≤ ∥ b∆∥2Σ∗ ≤ ∥ b∆∥2Σ∗−bΣ + 4
+
+n (α − β∗)⊤X⊤X b∆+ 4δn ∥X(α − β∗)∥1 (∥β∗∥1 − ∥ bβ∥1)+ 2 δ2 
+
+∥β∗∥21 + ∥ bβ∥21
+
+
+
+where we have used that bΣ = 1 
+
+> n
+
+X⊤X denotes the empirical covariance. xiv Rates mentioned in the remark: 
+
+Proof. We start by looking at the term 
+
+1
+
+n ∥X(α − β∗)∥1 = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+| (α − β∗)⊤xi
+
+| {z }
+
+> yi∈R
+
+|.
+
+E[y] = 0 and V[y] = ( α − β∗)⊤Σ∗(α − β∗); letting (α − β∗)⊤Σ∗(α − β∗) = σ2 
+
+> y
+
+therefore means y ∼ N(0 , σ 2 
+
+> y
+
+).
+
+|y| follows a folded normal distribution [42], and hence has mean 
+
+E[|y|] = σy
+
+r 2
+
+π
+
+and variance 
+
+V[|y|] = σ2 
+
+> y
+
+− 2
+
+π σ2 
+
+> y
+
+= π − 2
+
+π σ2 
+
+> y
+
+.
+
+Furthermore, |y| is sub-Gaussian with parameter σy . To see this, we can write y = σy z, where z ∼ N(0 , 1) .We then define the function f (z) = σy |z| = |y|, and note that 
+
+|f (z1) − f (z2)| = σy || z1| − | z2|| ≤ σy |z1 − z2| = σy ∥z1 − z2∥2 ,
+
+meaning f is a σy -Lipschitz function applied to a standard Gaussian variable. By Gaussian concentration for Lipschitz functions (see e.g. [46, Thm. 2.26]), f (z) = |y| is sub-Gaussian with parameter σy .We now use the Hoeffding bound for a sum of independent sub-Gaussian variables, see e.g. [46, prop. 2.5]: 
+
+P
+
+> n
+
+X
+
+> i=1
+
+|yi| − σy
+
+r 2
+
+π
+
+!
+
+≥ t
+
+!
+
+≤ exp 
+
+
+
+− t2
+
+2 Pni=1 σ2
+
+> y
+
+
+
+,
+
+so 
+
+P 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+|yi| ≥ t + nσ y
+
+p2/π n
+
+!
+
+≤ exp 
+
+
+
+− t2
+
+2nσ 2
+
+> y
+
+
+
+,
+
+and 
+
+P 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+|yi| ≤ t + nσ y
+
+p2/π n
+
+!
+
+≥ 1 − exp 
+
+
+
+− t2
+
+2nσ 2
+
+> y
+
+
+
+.
+
+Letting 
+
+exp 
+
+
+
+− t2
+
+2nσ 2
+
+> y
+
+
+
+= 2 γ for γ ∈ (0 , 1/2) 
+
+finally implies that 
+
+1
+
+n ∥X(α − β∗)∥1 = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+|yi| ≤ √2σy
+
+√π +
+
+√2σy
+
+√n
+
+pln ( γ−1/2) 
+
+with probability at least 1 − 2γ. We move on and consider ∥ b∆∥2Σ∗−bΣ. We have 
+
+∥ b∆∥2Σ∗−bΣ = b∆⊤(Σ ∗ − bΣ) b∆ ≤ ∥ Σ∗ − bΣ∥∞ ∥ b∆∥21 .
+
+We now want to find a bound for 
+
+∥Σ∗ − bΣ∥∞ .
+
+Using the spiked model, described in detail in Appendix A.2, we get 
+
+Σ∗ − bΣ = τ 1 − 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+z2
+
+> i
+
+!
+
+β∗β∗⊤ − √τ β ∗
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ziw⊤
+
+> i
+
+!
+
+−
+
+"√τ β ∗
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ziw⊤
+
+> i
+
+!# ⊤
+
++ Id − 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+wiw⊤ 
+
+> i
+
+,
+
+xv and then applying the triangle inequality gives 
+
+Σ∗ − bΣ ∞
+
+≤ τ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+z2 
+
+> i
+
+− 1
+
+!
+
+β∗β∗⊤
+
+> ∞
+
+| {z }
+
+> ∗○
+
++ 2 √τ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ziwi
+
+!
+
+β∗⊤
+
+> ∞
+
+| {z } 
+
+> ∗○∗○
+
++ Id − 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+wiw⊤
+
+> i
+> ∞
+
+| {z }  
+
+> ∗○∗○∗○
+
+.
+
+∗○:
+
+We note that 1
+
+> n
+
+Pni=1 z2 
+
+> i
+
+− 1 is a scalar and that Pni=1 z2 
+
+> i
+
+∼ χ2(n). Following [46, ex. 2.11], we have that this particular chi-squared is sub-exponential with parameters (ν, α ) = (2 √n, 4) , which gives the two-sided bound 
+
+P 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+z2 
+
+> i
+
+− 1 ≥ t
+
+!
+
+≤ 2e−nt 2/8 ∀t ∈ (0 , 1) .
+
+Thus, 
+
+P 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+z2 
+
+> i
+
+− 1 ≤ t
+
+!
+
+≥ 1 − 2e−nt 2/8,
+
+and letting e−nt 2/8 = γ for γ ∈ (0 , 1/2) therefore gives 
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+z2 
+
+> i
+
+− 1 ≤ 2√2
+
+√n
+
+pln ( γ−1)
+
+with probability at least 1 − 2γ. Using this and the fact that ∥β∗β∗⊤∥∞ = ∥β∗∥2
+
+> ∞
+
+, we have 
+
+τ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+z2 
+
+> i
+
+− 1
+
+!
+
+β∗β∗⊤
+
+> ∞
+
+= τ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+z2 
+
+> i
+
+− 1 β∗β∗⊤
+
+> ∞
+
+≤ τ 2√2
+
+√n
+
+pln ( γ−1) ∥β∗∥2
+
+> ∞
+
+with probability at least 1 − 2γ.Note here that this bound is only valid for t ∈ (0 , 1) , however the criterion is easily met for relatively low n;e.g., for γ = 0 .025 , n can be as low as 30 .
+
+∗○ ∗○:
+
+We denote the jth entry of wi as wij , meaning wij ∼ N (0 , 1) ∀(i, j ) ∈ [n] × [d]. This means 
+
+2 √τ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ziwi
+
+!
+
+β∗⊤
+
+> ∞
+
+= 2√τ
+
+√n ∥β∗∥∞ max 
+
+> j∈[d]
+
+1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij .
+
+We first aim to bound the absolute sum 1√n |Pni=1 ziwij | for a fixed j ∈ [d]. From [45, rem. 2.9.4], for every 
+
+t ≥ 0 we have that 
+
+P 1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≥ t
+
+!
+
+≤
+
+(2e−c1t2
+
+t ≤ √n, 
+
+2e−c1t√n t ≥ √n, (A.6) since {ziwij }ni=1 is a set of independent, zero mean, subexponential random variables for a constant c1 > 0
+
+depending only on the subexponential norm of ziwij . For small deviations from the mean (t ≤ √n), we get a Gaussian tail bound, and for large deviation (t ≥ √n), we get heavier subexponential tails. Now, by using the properties of the union, we have that 
+
+P max 
+
+> j∈[d]
+
+1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≥ t
+
+!
+
+= P
+
+
+
+> d
+
+[
+
+> j=1
+
+(
+
+1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≥ t
+
+)
+
+≤
+
+> d
+
+X
+
+> j=1
+
+P 1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≥ t
+
+!
+
+,
+
+xvi and we can then apply (A.6) to each individual term. First, assuming t ≤ √n, we get 
+
+P max 
+
+> j∈[d]
+
+1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≥ t
+
+!
+
+≤
+
+> d
+
+X
+
+> j=1
+
+2e−c1t2
+
+= 2 de −c1t2
+
+,
+
+which means 
+
+P max 
+
+> j∈[d]
+
+1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≤ t
+
+!
+
+≥ 1 − 2de −c1t2
+
+.
+
+By letting de −c1t2
+
+= γ for γ ∈ (0 , 1/2) , we get 
+
+max 
+
+> j∈[d]
+
+1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≤
+
+s
+
+ln ( d/γ )
+
+c1
+
+with probability at least 1 − 2γ. This holds as long as n ≥ ln ( d/γ ) 
+
+> c1
+
+.If we use the same reasoning but instead assume the second case, i.e., t ≥ √n, we get 
+
+max 
+
+> j∈[d]
+
+1
+
+√n
+
+> n
+
+X
+
+> i=1
+
+ziwij ≤ ln ( d/γ )
+
+c1
+
+√n
+
+with probability at least 1 − 2γ, where we have let de −c1t√n = γ. This holds as long as n ≤ ln ( d/γ ) 
+
+> c1
+
+.Thus, we can conclude that 
+
+2 √τ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ziwi
+
+!
+
+β∗⊤
+
+> ∞
+
+≤ 2√τ ∥β∗∥∞
+
+
+
+ln ( d/γ )
+
+c1n n ≤ ln ( d/γ )
+
+c1
+
+s
+
+ln ( d/γ )
+
+nc 1
+
+n ≥ ln ( d/γ )
+
+c1
+
+
+
+with probability at least 1 − 2γ and for a constant c1 > 0.
+
+∗○ ∗○ ∗○:
+
+For the third and final term, we note that the matrix Id − 1
+
+> n
+
+Pni=1 wiw⊤ 
+
+> i
+
+now provides a mixture between ∗○
+
+and ∗○ ∗○, with the important property that all entries of the matrix are sub-exponential with zero mean. By denoting 
+
+W = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+wiw⊤ 
+
+> i
+
+− Id
+
+the diagonal elements are given by 
+
+Wjj = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+w2 
+
+> ij
+
+− 1,
+
+i.e., what we had in ∗○, and the off-diagonal elements are given by 
+
+Wjk = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+wij wik , j̸ = k
+
+which is what we dealt with in ∗○ ∗○. By the same reasoning as before, and using ∥W ∥∞ = max j,k |Wjk |,we have that 
+
+P
+
+
+
+max  
+
+> j,k
+
+|Wjk | ≥ t
+
+
+
+= P
+
+[
+
+> j,k
+
+{| Wjk | ≥ t}
+
+ ≤ X
+
+> j,k
+
+P (|Wjk | ≥ t) .
+
+xvii Again using [45, rem. 2.9.4] then gives 
+
+∥W ∥∞ = Id − 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+wiw⊤
+
+> i
+> ∞
+
+≤
+
+
+
+2 ln ( d/ √γ)
+
+c2n n ≤ 2 ln ( d/ pγ)
+
+c2
+
+s
+
+2 ln ( d/ √γ)
+
+nc 2
+
+n ≥ 2 ln ( d/ √γ)
+
+c2
+
+for a constant c2 > 0.We conclude that using the spiked covariance model, treating τ , γ and ∥β∗∥∞ as constants, with high probability we have 
+
+Σ∗ − bΣ ∞
+
+≲
+
+r ln dn .
+
+## B.7 Proof of Algorithm 2 
+
+The algorithm we use was proposed by Ribeiro et al. [34]. We outline the main steps of the proof and refer the reader to this paper for a more detailed description. 
+
+Proof. We want to solve 
+
+arg min 
+
+> βn
+
+X
+
+> i=1
+
+ |α⊤xi − β⊤xi| + δ ∥β∥1
+
+2 (A.7) As outlined already, by solving this subproblem, (8) is given by the sum of the individual solutions and thus the ”fix A, solve for B” part is completed. Note here that we drop the j-subscript for simplicity. We denote the summand ∗○:
+
+arg min 
+
+> βn
+
+X
+
+> i=1
+
+ |α⊤xi − β⊤xi| + δ ∥β∥1
+
+2
+
+| {z }
+
+> ∗○
+
+.
+
+We now use something that is sometimes referred to as the η-trick (see e.g [2]): 
+
+∥w∥21 = min 
+
+> η∈∆d
+> d
+
+X
+
+> ℓ=1
+
+w2
+
+> ℓ
+
+ηℓ
+
+,
+
+where the set ∆d is a simplex. If we think of ∥w∥21 as ∗○, then we get 
+
+∗○ = min 
+
+> η(i)∈∆(i)
+> d+1
+
+(
+
+(α⊤xi − β⊤xi)2
+
+η(i)0
+
++ δ2
+
+> d
+
+X
+
+> ℓ=1
+
+β2
+
+> ℓ
+
+η(i)
+
+> ℓ
+
+)
+
+.
+
+This is uniquely minimized at 
+
+η(i)0 = |α⊤xi − β⊤xi||α⊤xi − β⊤xi| + δ ∥β∥1
+
+, and η(i) 
+
+> ℓ
+
+= δ|βℓ||α⊤xi − β⊤xi| + δ ∥β∥1
+
+.
+
+If we set 
+
+wi := 1
+
+η(i)0
+
+, and γℓ := δ2
+
+> n
+
+X
+
+> i=1
+
+1
+
+η(i)
+
+> ℓ
+
+,
+
+xviii we can write (A.7) as 
+
+arg min 
+
+> βn
+
+X
+
+> i=1
+
+wi(α⊤xi − β⊤xi)2 +
+
+> d
+
+X
+
+> ℓ=1
+
+γℓβ2 
+
+> ℓ
+
+. (A.8) (A.8) is a weighted ridge regression problem that can be solved using standard methods. To summarize, when we include the minimization over η, we get a joint problem over β and η. Since the minimization over 
+
+η is uniquely given in closed-form, we can iterate between fixing β and η and solve for one at a time until convergence. 
+
+# C Additional Experimental Results 
+
+We provide additional experimental results to give better insight into the performance of the algorithm, and demonstrate how different experiment setups affect the results. 
+
+## C.1 Spiked Covariance Data Model 
+
+For the experiments on synthetic data drawn from the spiked covariance model, we refer to Appendix A.2 for a detailed description of the data generating process. 
+
+C.1.1 Sparse Versus Dense System 
+
+We complement Figure 3 with additional plots where we vary the eigengap τ . Other than τ , the setup is exactly the same. For example, we use n = 150 samples drawn from the spiked covariance model with true spike vector β∗ = e1, and do 20 repeats over different draws of data. 4 5 6 7 8 9 10 
+
+## log 2 (d)
+
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity)         
+
+> d=n
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+> 45678910
+
+## log 2 (d)
+
+Rotated data (no expected sparsity)   
+
+> d=n
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.3: τ = 2 .xix 4 5 6 7 8 9 10 
+
+## log 2 (d)
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity) 
+
+d = n
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 
+
+4 5 6 7 8 9 10 
+
+## log 2 (d)
+
+Rotated data (no expected sparsity) 
+
+d = n
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) Figure A.4: τ = 3 .4 5 6 7 8 9 10 
+
+## log 2 (d)
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity) 
+
+d = n
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 
+
+4 5 6 7 8 9 10 
+
+## log 2 (d)
+
+Rotated data (no expected sparsity) 
+
+d = n
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 
+
+Figure A.5: τ = 3 .5.4 5 6 7 8 9 10 
+
+## log 2 (d)
+
+0.0 
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity) 
+
+d = n
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 
+
+4 5 6 7 8 9 10 
+
+## log 2 (d)
+
+Rotated data (no expected sparsity) 
+
+d = n
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 
+
+Figure A.6: τ = 4 .xx We also perform the same experiment as a function of n for a fixed d = 250 .6 7 8 9 10 
+
+## log 2 (n)
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+6 7 8 9 10 
+
+## log 2 (n)
+
+Rotated data (no expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.7: τ = 2 .6 7 8 9 10 
+
+## log 2 (n)
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+1.2 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+6 7 8 9 10 
+
+## log 2 (n)
+
+Rotated data (no expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.8: τ = 2 .5.6 7 8 9 10 
+
+## log 2 (n)
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+1.2 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+6 7 8 9 10 
+
+## log 2 (n)
+
+Rotated data (no expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.9: τ = 3 .xxi 6 7 8 9 10 
+
+## log 2 (n)
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+6 7 8 9 10 
+
+## log 2 (n)
+
+Rotated data (no expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.10: τ = 3 .5.6 7 8 9 10 
+
+## log 2 (n)
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> cos sim (β ∗ ,̂ β)
+
+Nonrotated data (expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+6 7 8 9 10 
+
+## log 2 (n)
+
+Rotated data (no expected sparsity)   
+
+> n=d
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.11: τ = 4 .
+
+C.1.2 Varying the Eigengap 
+
+We complement Figure 3 with an experiment where we plot the cosine similarity as a function of τ . We let 
+
+n = 500 and show results for different values of d, illustrating both low and high-dimensional scenarios. 1 2 3 4 5
+
+τ
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> cos sim (β ∗ ,̂ β)
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.12: d = 100 .xxii 1 2 3 4 5
+
+τ
+
+0.0 
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> cos sim (β ∗ ,̂ β)
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) Figure A.13: d = 250 .1 2 3 4 5
+
+τ
+
+0.0 
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> cos sim (β ∗ ,̂ β)
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 
+
+Figure A.14: d = 500 .1 2 3 4 5
+
+τ
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+> cos sim (β ∗ ,̂ β)
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 
+
+Figure A.15: d = 750 .xxiii 1 2 3 4 5
+
+τ
+
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> cos sim (β ∗ ,̂ β)
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.16: d = 1000 .
+
+C.1.3 Multi-Component Recovery 
+
+In Figure 4, we spike in multiple directions, generalizing the rank-one model used in the top row to several directions. As described in Appendix A.2, drawing data from the spiked covariance model requires us to set multiple eigengaps τ1, . . . , τ k, or equivalently, multiple eigenvalues λ1, . . . , λ k where λj = 1 + τj ∀j ∈ [k].In Figure 4 and all additional plots in this section, we set the eigenvalues {λj }kj=1 according to a decaying spectrum which we present in Figure A.17. 1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> λj
+
+Figure A.17: Decaying eigenvalue spectrum for the multi-component recovery experiment. In the subsequent plots, we show the performance for different values of δ when we let it be a fixed fraction of δmax across all components. That is, we let δj = Cδ max ,j for different C ≤ 1. We highlight that for 
+
+C = 0 ⇒ δj = 0 ∀j ∈ [k], we recover PCA as described in Section 4.1; this is shown in Figure A.18 specifically. 1 2 3 4 5 6 7 8 9 10 
+
+Component index j         
+
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> cos sim (β∗j,̂ βj) PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours) 12345678910
+
+Component index j 
+
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> ‖̂βj‖0 (nonzeros)
+> d= 500
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.18: C = 0 .xxiv 1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+> cos sim (β∗j,̂ βj)
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500  
+
+> ‖̂βj‖0 (nonzeros)
+> d= 500
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.19: C = 0 .05 .1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+> cos sim (β∗j,̂ βj)
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500  
+
+> ‖̂βj‖0 (nonzeros)
+> d= 500
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.20: C = 0 .1.1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+> cos sim (β∗j,̂ βj)
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500  
+
+> ‖̂βj‖0 (nonzeros)
+> d= 500
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.21: C = 0 .2.1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+> cos sim (β∗j,̂ βj)
+
+PCA 
+
+ε-PCA 
+
+Sparse PCA 
+
+AdvPCA (Ours) 1 2 3 4 5 6 7 8 9 10 
+
+Component index j
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500  
+
+> ‖̂βj‖0 (nonzeros)
+> d= 500
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.22: C = 0 .3.xxv C.2 The MAGIC Diverse Wheat Dataset 
+
+In Figure 5, we reconstruct the MAGIC diverse wheat dataset [36] and measure the reconstruction error 
+
+∥X − eX∥2 
+
+> F
+
+for the matrix X ∈ Rn×d of wheat genome, along with the ℓ0-norm of the solution. The dataset contains n = 504 samples of dimension d = 55 067 . We do this for k = 25 components motivated by the eigenvalue spectrum from PCA, which we present in Figure A.23. 0 100 200 300 400 500 
+
+Component index j  
+
+> 10 3
+> 10 2
+> Explained variance ratio
+> Per-component variance
+
+k = 25      
+
+> 0100 200 300 400 500
+
+k (components used) 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Cumulative explained variance
+> Cumulative variance
+
+k = 25 
+
+Figure A.23: Eigenvalue spectrum for the MAGIC diverse wheat dataset for the full k = n = 504 dimensions. We see a sharp drop in per-component variance in the first ∼10 components, and after that the spectrum flattens out indicating that even though the data is very high-dimensional, it is not low-rank. Intuitively, this could make sense seeing as we are working with genomics data which should be somewhat high-rank if evolution has been successful, but this is a very hand-wavy argument which we have no citation to back. Either way, based on the spectrum in Figure A.23, we let k = 25 for the reconstruction experiment as this captures the most variation in the per-component variance. After k = 25 , the decay is rather linear. In Figure A.24, we show the exact spectrum for the k = 25 components used in Figure 5. 0 5 10 15 20 25 
+
+Component index j     
+
+> 0.010
+> 0.015
+> 0.020
+> Explained variance ratio
+> Per-component variance
+> 0510 15 20 25
+
+k (components used) 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Cumulative explained variance
+> Cumulative variance
+
+Figure A.24: Eigenvalue spectrum for the k = 25 components used in the MAGIC experiment presented in Figure 5. This is essentially a zoomed-in version of Figure A.23. In addition to the ℓ0-norm, we also present the ℓ1-norm of the solution. xxvi 1 5 10 15 20 25 
+
+# Component index j
+
+50 
+
+100 
+
+150 
+
+> ‖̂βj‖1
+> PCA
+> ε-PCA
+> Sparse PCA
+> AdvPCA (Ours)
+
+Figure A.25: Corresponding ℓ1-norm of the solution in the MAGIC experiment presented in Figure 5. xxvii

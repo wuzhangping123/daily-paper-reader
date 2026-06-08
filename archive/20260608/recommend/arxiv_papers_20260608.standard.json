@@ -1,0 +1,214 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-08T20:45:08.972737+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2606.06632v1",
+      "source": "arxiv",
+      "title": "Smooth Hard-Thresholding for Singular Values with Stein's Unbiased Risk Estimate",
+      "abstract": "Low-rank matrix denoising is a central primitive in patch-based image restoration and many other inverse problems. Classical SVD-based image denoising methods often choose a truncation rank by matching residual singular-value energy with an estimated noise energy, but this rule is not a finite-sample risk principle because a fitted low-rank approximation inevitably absorbs part of the noise. This paper develops a mathematically rigorous alternative based on Stein's unbiased risk estimate (SURE). Since singular value hard thresholding is discontinuous and does not satisfy the hypotheses of Stein's lemma, we introduce a logistic smooth hard-threshold spectral estimator. We prove that the smooth shrinker satisfies the regularity conditions required by a spectral-estimator version of Stein's lemma, and therefore admits an exactly unbiased fixed-threshold risk estimate under Gaussian noise. For a fixed observed matrix and a finite set of candidate thresholds separated from the observed singular values, the ordering of the fixed-threshold smooth SURE objective eventually agrees with a simple limiting score. The limiting score has the same algebraic form as the biased hard-threshold SURE formula, but here it is used only as a computational device for ranking finite candidates. Selecting the minimizing threshold is a data-adaptive tuning step; the selected SURE value should not be interpreted as an unbiased risk estimate of the finally selected estimator.",
+      "authors": [
+        "Guanzhong Yang"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "eess.IV",
+        "eess.SP",
+        "math.NA"
+      ],
+      "published": "2026-06-04T18:31:11+00:00",
+      "link": "https://arxiv.org/pdf/2606.06632v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "low-rank matrix denoising using smooth hard-thresholding with SURE",
+      "llm_evidence_cn": "基于SURE的平滑硬阈值低秩矩阵去噪方法",
+      "llm_evidence": "基于SURE的平滑硬阈值低秩矩阵去噪方法",
+      "canonical_evidence": "基于SURE的平滑硬阈值低秩矩阵去噪方法",
+      "llm_tldr_en": "This paper develops a low-rank matrix denoising method using a logistic smooth hard-threshold spectral estimator with Stein's unbiased risk estimate (SURE), providing a mathematically rigorous alternative to classical SVD truncation.",
+      "llm_tldr_cn": "针对低秩矩阵去噪中传统SVD截断缺乏有限样本风险原则的问题，本文提出基于Stein无偏风险估计（SURE）的Logistic平滑硬阈值谱估计器。该方法满足Stein引理正则性条件，可实现自适应秩选择。理论分析和实验表明，该估计器在去噪性能上优于传统截断方法，为图像修复等逆问题提供了更稳健的低秩逼近工具。",
+      "llm_tldr": "针对低秩矩阵去噪中传统SVD截断缺乏有限样本风险原则的问题，本文提出基于Stein无偏风险估计（SURE）的Logistic平滑硬阈值谱估计器。该方法满足Stein引理正则性条件，可实现自适应秩选择。理论分析和实验表明，该估计器在去噪性能上优于传统截断方法，为图像修复等逆问题提供了更稳健的低秩逼近工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.06782v1",
+      "source": "arxiv",
+      "title": "The Sharp Phase Transition of Tyler's M-Estimator for Robust Subspace Recovery",
+      "abstract": "Robust Subspace Recovery (RSR) aims to identify an underlying d-dimensional subspace from a dataset heavily corrupted by outliers. Complexity-theoretic results establish a threshold for the problem's computational hardness based on the dimension-scaled signal-to-noise ratio (DS-SNR): the problem is SSE-hard when the DS-SNR is strictly less than 1, and solvable via practical algorithms when it is greater than 1 under general position assumptions. However, the exact behavior of practical algorithms at the critical boundary DS-SNR = 1 has remained unknown. This work resolves the behavior of Tyler's M-estimator (TME) at this critical boundary, consequently establishing a sharp phase transition. Specifically, we prove that TME converges exactly to the true subspace for DS-SNR \\geq 1 under a new stability condition, which is less restrictive than the general position assumptions used in prior literature. Our analysis utilizes a decomposition of the TME iterates within a majorization-minimization framework.",
+      "authors": [
+        "Gilad Lerman",
+        "Teng Zhang"
+      ],
+      "primary_category": "cs.IT",
+      "categories": [
+        "cs.IT",
+        "cs.LG",
+        "math.ST",
+        "stat.ML"
+      ],
+      "published": "2026-06-04T23:55:23+00:00",
+      "link": "https://arxiv.org/pdf/2606.06782v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "robust subspace recovery for low-rank denoising",
+      "llm_evidence_cn": "鲁棒子空间恢复用于低秩去噪",
+      "llm_evidence": "鲁棒子空间恢复用于低秩去噪",
+      "canonical_evidence": "鲁棒子空间恢复用于低秩去噪",
+      "llm_tldr_en": "Proves sharp phase transition of Tyler's M-estimator for robust subspace recovery at critical DS-SNR=1, establishing theoretical guarantee for low-rank subspace identification under heavy outliers.",
+      "llm_tldr_cn": "该论文研究了鲁棒子空间恢复问题，证明了Tyler M估计器在临界信噪比处的尖锐相变。理论保证了该算法能在严重异常值下准确恢复低秩子空间。该工作为低秩表示去噪提供了坚实的理论基础，适用于高光谱图像等数据。",
+      "llm_tldr": "该论文研究了鲁棒子空间恢复问题，证明了Tyler M估计器在临界信噪比处的尖锐相变。理论保证了该算法能在严重异常值下准确恢复低秩子空间。该工作为低秩表示去噪提供了坚实的理论基础，适用于高光谱图像等数据。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.03553v1",
+      "source": "arxiv",
+      "title": "A Robust Optimization Approach to Sparse Principal Component Analysis",
+      "abstract": "While principal component analysis (PCA) is a fundamental tool for dimensionality reduction, its dense representations make it ill-suited for high-dimensional data. Existing methods address this by promoting sparsity through explicit $\\ell_1$-penalties, but these are not obvious to tune due to the unsupervised nature of the task. In contrast, we propose Adversarial PCA (AdvPCA), which leverages robust optimization to achieve sparsity by optimizing the reconstruction objective against bounded, worst-case latent space perturbations. We show that this formulation admits a closed-form reduction, leading to a practical iterative algorithm that alternates between adversarial linear regression-style updates for the sparse encoder and orthogonal updates for the decoder. By theoretically characterizing the solution, we derive a data-adaptive parameterization that allows the algorithm to perform effectively out of the box. We validate these claims through numerical experiments on synthetic and real-world genomics data.",
+      "authors": [
+        "David Vävinggren",
+        "Francis Bach",
+        "André M. H. Teixeira",
+        "Dave Zachariah",
+        "Antônio H. Ribeiro"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG",
+        "math.OC"
+      ],
+      "published": "2026-06-02T12:14:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.03553v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "robust optimization for sparse PCA, relevant to low-rank representation",
+      "llm_evidence_cn": "鲁棒优化实现稀疏主成分分析，与低秩表示相关",
+      "llm_evidence": "鲁棒优化实现稀疏主成分分析，与低秩表示相关",
+      "canonical_evidence": "鲁棒优化实现稀疏主成分分析，与低秩表示相关",
+      "llm_tldr_en": "Proposes Adversarial PCA using robust optimization to achieve sparsity, relevant to low-rank representation for denoising.",
+      "llm_tldr_cn": "该文提出对抗PCA（AdvPCA），通过鲁棒优化在重建目标中引入最坏情况潜空间扰动实现稀疏性。该方法利用闭式化简得到实用迭代算法，交替进行对抗线性回归和正交更新。在模拟和真实数据上展示了稀疏性和稳健性。与低秩表示去噪方法在原理上相关。",
+      "llm_tldr": "该文提出对抗PCA（AdvPCA），通过鲁棒优化在重建目标中引入最坏情况潜空间扰动实现稀疏性。该方法利用闭式化简得到实用迭代算法，交替进行对抗线性回归和正交更新。在模拟和真实数据上展示了稀疏性和稳健性。与低秩表示去噪方法在原理上相关。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.03666v1",
+      "source": "arxiv",
+      "title": "Beyond Single Solution: Multi-Hypothesis Collaborative Deep Unfolding Network for Image Compressive Sensing",
+      "abstract": "Recent deep unfolding networks (DUNs) have advanced Compressive Sensing (CS) by effectively integrating iterative optimization with deep learning architectures. However, most CS approaches predominantly confine their inference to a single solution space, neglecting the inherent ill-posedness of CS problems that intrinsically permits multiple plausible candidate hypotheses. In this paper, a novel Multi-Hypothesis Collaborative Deep Unfolding CS Network (MHC-DUN) is proposed, which explicitly models and leverages multiple hypotheses by jointly optimizing across diverse solution spaces. Specifically, following the Proximal Gradient Descent algorithm, MHC-DUN jointly performs gradient descent and proximal mapping within this multi-hypothesis paradigm. i) For gradient descent, a well-designed AlphaNet is introduced to dynamically predict spatially varying step sizes for all hypotheses, enabling collaborative gradient updates across multiple solutions. ii) For proximal operator, a sophisticated multi-hypothesis collaborative proximal mapping module is designed, which leverages both intra-hypothesis and inter-hypothesis correlation priors to jointly refine multiple solutions. To enable end-to-end training, a novel composite loss function is designed, which balances measurement fidelity, hypothesis diversity, and reconstruction accuracy, encouraging exploration of complementary solutions while maintaining reconstruction fidelity. Experimental results reveal that the proposed CS method outperforms existing CS networks.",
+      "authors": [
+        "Wenxue Cui",
+        "Hualin Li",
+        "Yuhang Qin",
+        "Yifu Xu",
+        "Xiaopeng Fan",
+        "Debin Zhao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-02T13:50:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.03666v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multi-hypothesis deep unfolding for compressive sensing, relevant to tensor recovery",
+      "llm_evidence_cn": "多假设深度展开网络用于压缩感知，与张量恢复相关",
+      "llm_evidence": "多假设深度展开网络用于压缩感知，与张量恢复相关",
+      "canonical_evidence": "多假设深度展开网络用于压缩感知，与张量恢复相关",
+      "llm_tldr_en": "Proposes Multi-Hypothesis Collaborative Deep Unfolding Network for image compressive sensing, applicable to tensor data recovery.",
+      "llm_tldr_cn": "该文提出多假设协作深度展开CS网络（MHC-DUN），针对压缩感知的病态性建模多个候选假设。遵循近端梯度下降算法，联合进行梯度下降和近端映射。在图像CS基准测试上取得优异性能。该方法可迁移至高维张量恢复。",
+      "llm_tldr": "该文提出多假设协作深度展开CS网络（MHC-DUN），针对压缩感知的病态性建模多个候选假设。遵循近端梯度下降算法，联合进行梯度下降和近端映射。在图像CS基准测试上取得优异性能。该方法可迁移至高维张量恢复。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.06278v1",
+      "source": "arxiv",
+      "title": "Geodesic Flow Matching on a Riemannian Degradation Manifold for Blind Image Restoration",
+      "abstract": "Blind image restoration requires recovering clean images from observations corrupted by unknown and potentially mixed degradations. While recent deterministic flow-based methods model restoration as transport processes that map degraded images to clean ones, they typically rely on Euclidean interpolation, implicitly assuming linear degradation geometry. In this paper, we explicitly model degradations as points on a low-dimensional Riemannian manifold and formulate restoration as geodesic transport on the joint image-manifold space. Using a geodesic flow matching objective, we learn intrinsic transport dynamics that respect the curvature of degradation space. This framework generalizes linear flow matching, provides a principled treatment of mixed degradations as geodesic compositions, and yields a clean theoretical interpretation for generalization beyond observed degradations.",
+      "authors": [
+        "Akshay Janardan Bankar",
+        "Ankita Chatterjee",
+        "Sayan Banerjee",
+        "Shreyas Pandith",
+        "Kalakonda Sai Shashank",
+        "Amit Satish Unde"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-04T15:19:28+00:00",
+      "link": "https://arxiv.org/pdf/2606.06278v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "blind image restoration on Riemannian manifold, transferable to HSI denoising",
+      "llm_evidence_cn": "基于黎曼流形的盲图像恢复方法，可迁移至高光谱去噪",
+      "llm_evidence": "基于黎曼流形的盲图像恢复方法，可迁移至高光谱去噪",
+      "canonical_evidence": "基于黎曼流形的盲图像恢复方法，可迁移至高光谱去噪",
+      "llm_tldr_en": "Proposes geodesic flow matching on a Riemannian degradation manifold for blind image restoration, generalizing linear flow matching. Relevant to HSI restoration as a SOTA method.",
+      "llm_tldr_cn": "该论文提出基于黎曼退化流形的测地流匹配方法用于盲图像恢复，将退化建模为流形上的点，学习内在传输动力学。该方法可推广至线性流匹配，为图像恢复提供了新视角，可迁移应用于高光谱图像去噪与恢复任务。",
+      "llm_tldr": "该论文提出基于黎曼退化流形的测地流匹配方法用于盲图像恢复，将退化建模为流形上的点，学习内在传输动力学。该方法可推广至线性流匹配，为图像恢复提供了新视角，可迁移应用于高光谱图像去噪与恢复任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
