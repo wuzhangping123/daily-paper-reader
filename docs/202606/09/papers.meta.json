@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-09",
+  "date": "2026-06-09",
+  "generated_at": "2026-06-09T20:44:33",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/09/2606.05369v1-anti-hyperspectral-anomaly-detection-a-first-study-on-stealthy-lipschitz-forcing-perturbations-against-unknown-detectors",
+      "section": "quick",
+      "title_en": "Anti-Hyperspectral Anomaly Detection: A First Study on Stealthy Lipschitz-Forcing Perturbations Against Unknown Detectors",
+      "authors": "Chia-Hsiang Lin, Si-Sheng Young, Jon Atli Benediktsson",
+      "date": "2026-06-03",
+      "pdf": "https://arxiv.org/pdf/2606.05369v1",
+      "score": "7.0",
+      "evidence": "高光谱异常检测与对抗扰动",
+      "tldr": "首次提出抗高光谱异常检测（AHAD）技术，通过Lipschitz-forcing扰动使目标不被检测，适用于未知检测器。采用ARAB正则化将异常融入背景并引入伪异常，结合矩阵移位不确定性建模实现鲁棒扰动。实验表明单一扰动可同时规避几乎所有基准检测器，并提出了新评估指标ArmCBA。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral imagery represents the best contemporary technology to remotely detect anomalous objects. Nevertheless, hyperspectral anomaly detection (HAD) technique makes ground facilities/situations completely exposed. For the first time, we develop the first anti-HAD (AHAD) technique rendering the key objects undetected, without perfect coordinate/position state information (CSI) of the detectors (e.g., reconnaissance aircraft). Our AHAD algorithm is generally applicable to defend against almost all the existing benchmark data-driven and model-driven HAD methods. AHAD is fundamentally different from conventional adversarial attacks, so novel theory is needed. We customize novel regularizers for assimilating real anomalies into the backgrounds (ARAB) and fooling the detectors with pseudo-anomalies, thereby optimizing an energy-efficient stealthy perturbation signal for AHAD. The ARAB regularization is mathematically interpretable as flattening the topology-enhanced anomaly/background structures in the feature space, hence termed Lipschitz-forcing perturbations. Considering the imperfect CSI, we further develop a robust AHAD criterion, where the uncertainty is mathematically described as matrix-shifting misalignment for statistically generating the robust perturbation. Comprehensive experiments demonstrate the effectiveness and robustness of our AHAD algorithm across diverse real-world datasets. Remarkably, our algorithm generates a single AHAD perturbation signal that can simultaneously evade almost all benchmark detectors, greatly enhancing its practicality, given that the reconnaissance detector type is usually unknown. To the best of our knowledge, this is the first formal AHAD study. As a side contribution, we propose a new quantitative performance index, ArmCBA, to evaluate the robustness of an HAD method against our AHAD signal.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/09/2606.02310v1-deep-learning-for-remote-sensing-to-improve-flood-inundation-mapping",
+      "section": "quick",
+      "title_en": "Deep Learning for Remote Sensing to Improve Flood Inundation Mapping",
+      "authors": "Yogesh Bhattarai, Vijay Chaudhary, Wai Lim Kim, Sanjib Sharma",
+      "date": "2026-06-01",
+      "pdf": "https://arxiv.org/pdf/2606.02310v1",
+      "score": "6.0",
+      "evidence": "去噪扩散模型用于遥感洪水图像云去除",
+      "tldr": "洪水是全球最严重的自然灾害，及时准确的淹没制图依赖于光学卫星，但云层覆盖严重限制其可用性。传统去云方法难以捕捉洪水动态，而本研究提出的基于Masked Diffusion Transformer的扩散概率模型，通过自注意力和掩码令牌学习重建云遮挡区域。在Sentinel-2B洪水图像上，该方法生成的无云图像保持了水体连续性和光谱特征，比传统方法更优。该工作为光学洪水监测提供了鲁棒、物理一致的云去除方案，提升了灾害风险管理中的观测可靠性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Flooding is the most pervasive natural disaster worldwide. Timely and accurate flood inundation mapping are essential for informing disaster risk management. Optical satellite missions provide high-resolution, multispectral observations critical for flood detection and inundation mapping. However, their operational utility is severely constrained by cloud cover during extreme precipitation events. Conventional cloud-removal techniques based on temporal compositing or interpolation often fail to capture inundation dynamics. In this study, we introduce a cloud-removal framework for flood imagery based on Denoising Diffusion Probabilistic Models, leveraging the Masked Diffusion Transformer architecture. The proposed approach exploits self-attention mechanisms to capture wider spatial context and employs masked token modeling to explicitly learn the reconstruction of cloud-obscured regions. Trained on multispectral Sentinel-2B flood scenes with realistic cloud patterns, the model generates cloud-free image realizations that preserve both visual fidelity and hydrological consistency. Reconstruction performance is evaluated using standard image quality metrics alongside flood-specific hydrological measures, demonstrating improved continuity of water bodies and preservation of spectral signatures critical for water detection indices. The results indicate that diffusion-based generative modeling offers a robust and physically consistent alternative for cloud removal in optical flood monitoring, enabling more reliable, continuous observations to support disaster risk management and flood-related decision making.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/09/2606.09382v1-consecutive-support-matching-induced-parameter-tuning-accelerates-momentum-iterative-hard-thresholding",
+      "section": "quick",
+      "title_en": "Consecutive Support Matching Induced Parameter Tuning Accelerates Momentum Iterative Hard Thresholding",
+      "authors": "Samrat Mukhopadhyay, Debasmita Mukherjee",
+      "date": "2026-06-08",
+      "pdf": "https://arxiv.org/pdf/2606.09382v1",
+      "score": "6.0",
+      "evidence": "迭代硬阈值用于稀疏信号恢复，可应用于低秩表示",
+      "tldr": "动量加速迭代硬阈值算法在稀疏信号恢复中依赖参数调优，但支持频繁变化使调参困难。提出CosMIHT，通过连续支持匹配自适应规则：先用保守参数，当连续迭代支持相同时，用轻量幂法估计特征值并切换到最优重球参数。两阶段收敛理论证明：支持发现阶段线性收敛，锁定阶段以高概率实现近似最优加速。实验表明无需手动调参即优于现有方法且保持恢复性能。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Momentum-based acceleration of iterative hard thresholding (IHT) can dramatically speed up sparse signal recovery from linear measurements, but its effectiveness hinges on careful parameter tuning -- a task complicated by the frequent support changes inherent to hard thresholding. We propose CosMIHT(Consecutive Support Matching Induced Momentum IHT), which resolves this difficulty through a simple adaptive rule: start with the conservative parameters and whenever two consecutive iterates share the same support, estimate the extreme eigenvalues of the support restricted Gram matrix via a lightweight power method and switch to the corresponding optimal heavy-ball parameters. This mechanism allows CosMIHT to automatically interpolate between cautious MIHT-like behavior during support discovery and near-optimal accelerated convergence after support identification.   Under standard restricted isometry assumptions, we develop a two-phase convergence theory. In the \\emph{wandering phase}, we establish a linear contraction of the recovery error up to a noise floor and derive an explicit upper bound on the number of iterations required to identify the correct support. In the \\emph{lock-in} phase, we establish that, with a randomly initialized power method based eigenvalue estimates that depend on the number of power iterations, the algorithm enjoys, with high probability, a near-optimal accelerated convergence rate akin to the heavy ball method. We corroborate the theoretical findings with extensive numerical experiments on both noiseless and noisy measurements demonstrating that CosMIHT achieves faster convergence than state-of-the-art iterative sparse recovery techniques without compromising the recovery performance.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

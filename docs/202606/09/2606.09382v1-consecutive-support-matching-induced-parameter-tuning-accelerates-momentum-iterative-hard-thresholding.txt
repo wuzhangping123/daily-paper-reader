@@ -1,0 +1,2237 @@
+Title: Consecutive Support Matching Induced Parameter Tuning Accelerates Momentum Iterative Hard Thresholding
+
+URL Source: https://arxiv.org/pdf/2606.09382v1
+
+Published Time: Tue, 09 Jun 2026 02:09:08 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# Consecutive Support Matching Induced Parameter Tuning Accelerates Momentum Iterative Hard Thresholding 
+
+Samrat Mukhopadhyay ∗, Member (IEEE) and Debasmita Mukherjee †
+
+Abstract —Momentum-based acceleration of iterative hard thresholding (IHT) can dramatically speed up sparse signal recovery from linear measurements, but its effectiveness hinges on careful parameter tuning—a task complicated by the frequent support changes inherent to hard thresholding. We propose 
+
+CosMIHT (Consecutive Support Matching Induced Momentum IHT), which resolves this difficulty through a simple adaptive rule: start with the conservative parameters and whenever two consecutive iterates share the same support, estimate the extreme eigenvalues of the support restricted Gram matrix via a lightweight power method and switch to the corresponding optimal heavy-ball parameters. This mechanism allows CosMIHT 
+
+to automatically interpolate between cautious MIHT-like be-havior during support discovery and near-optimal accelerated convergence after support identification. Under standard restricted isometry assumptions, we develop a two-phase convergence theory. In the wandering phase , we establish a linear contraction of the recovery error up to a noise floor and derive an explicit upper bound on the number of iterations required to identify the correct support. In the lock-in phase, we establish that, with a randomly initialized power method based eigenvalue estimates that depend on the number of power iterations, the algorithm enjoys, with high probability, a near-optimal accelerated convergence rate akin to the heavy ball method. We corroborate the theoretical findings with extensive numerical experiments on both noiseless and noisy measurements demonstrating that CosMIHT achieves faster convergence than state-of-the-art iterative sparse recovery techniques without com-promising the recovery performance. 
+
+Index Terms —Iterative hard thresholding; consecutive support matching; heavy-ball; Restricted Isometry Property (RIP); sup-port identification; compressed sensing. 
+
+I. I NTRODUCTION 
+
+We consider the sparse recovery problem: given a measure-ment vector y = Ax ⋆ + e ∈ RM , where A ∈ RM ×N is a known sensing matrix and e is measurement noise, recover the K-sparse vector x⋆ ∈ RN . This amounts to solving 
+
+min  
+
+> x∈RN
+> 12
+
+∥y − Ax ∥22 s.t. ∥x∥0 ≤ K. (1) Although (1) is NP-hard in general, it can be solved effi-ciently under regularity conditions on A, notably the restricted isometry property (RIP) [1]. Among the many algorithmic approaches, including convex relaxations such as Basis Pur-suit [2] and LASSO [3], and greedy methods such as OMP [4], CoSaMP [5], and SP [6], iterative hard thresholding (IHT) [7] 
+
+∗ is with the Department of Electronics Engineering, IIT (ISM) Dhanbad 
+
+† is with the Department of Computer Science, Techno Bengal Institute of Technology 
+
+stands out for its simplicity: each iteration requires only a matrix-vector product and a hard thresholding step, yet IHT achieves near-optimal recovery guarantees under RIP. Since IHT is essentially projected gradient descent onto the set of K-sparse vectors, a natural question is whether it can benefit from momentum-based acceleration. In smooth convex optimization over convex sets, Polyak’s heavy-ball method [8] and Nesterov’s accelerated gradient [9] are known to achieve optimal first-order convergence rates, substantially outper-forming vanilla gradient descent. This has motivated several accelerated IHT variants, such as, Fast Lipschitz Iterative Hard Tresholding (FLIHT) [10], Heavy Ball Hard Thresholding (HBHT) [11] and Momentum IHT (MIHT) [12]. Among these, MIHT has demonstrated particularly strong empirical performance by incorporating an exponentially weighted sum of all past gradient directions as the descent direction, rather than only the current gradient direction, which makes it conceptually analogous to the heavy-ball method. Despite its empirical success, MIHT leaves a critical ques-tion unaddressed: how should the momentum parameter β
+
+and step size μ be tuned? In classical heavy-ball method for minimizing convex quadratic functions over convex sets, the optimal parameters are explicit functions of the condition number of the Hessian of the objective restricted to the feasible set. For IHT-type methods, however, this reasoning breaks down because the effective Hessian of the objective function changes as the active support changes across iterations . When the support set St = supp( xt) shifts, the restricted Hessian 
+
+A⊤ 
+
+> St
+
+ASt changes abruptly, invalidating any parameter choice tuned to the previous support. Aggressive momentum that ac-celerates convergence on a stable support can cause divergence during support transitions. This tension between acceleration and support stability is the central difficulty in parameter selection for MIHT. Ideally, one wants cautious, safe parameters while the support is still being discovered, and aggressive, optimally tuned parameters once the support has stabilized. The key observation underly-ing this work is that consecutive support agreement provides a cheap, reliable signal for deciding when to switch from conservative to aggressive parameters. We propose CosMIHT (Consecutive Support Matching In-duced Momentum IHT), which integrates an adaptive param-eter tuning rule into MIHT. The core mechanism is simple: the algorithm starts with conservative parameter values and keeps using each iteration until two consecutive iterates share 
+
+> arXiv:2606.09382v1 [cs.IT] 8 Jun 2026
+
+the same support, distinct from the one before and then 
+
+CosMIHT estimates the extreme eigenvalues of the restricted Gram matrix A⊤ 
+
+> St
+
+ASt via a lightweight power method and switches to the optimal heavy-ball parameters using these eigenvalue estimates. Following this, CosMIHT keeps using these updated parameters until again two consecutive supports match, albeit, distinct from the one before. This allows the algorithm to interpolate automatically between safe MIHT-like behavior during support discovery and near-optimal acceler-ated convergence after support identification. Our specific contributions are as follows: (i) Algorithm design. We propose CoSMIHT (Algorithm 2), an IHT variant where the momentum and step-size pa-rameters are updated adaptively based on consecutive support matching. The only hyperparameters requiring manual selection are the conservative defaults (μ, β ) and the number of power iterations r.(ii) Two-phase convergence theory. We establish a rigorous two-phase convergence analysis under RIP:  
+
+> •
+
+Wandering phase (Propositions 2–3): We prove global linear contraction of the error up to a noise floor, using conservative parameter bounds that hold uniformly across all support configurations.  
+
+> •
+
+Lock-in phase (Section IV-A3): Once the support stabilizes—which we show happens in finite time (The-orem 1)—the dynamics reduce to the classical heavy-ball iteration on a K-dimensional subspace, converging at a rate governed by 
+
+q
+
+ˆβ, where ˆβ is the optimally tuned momentum parameter. (iii) Finite lock-in time guarantees. We provide an explicit upper bound on the number of iterations required for CoSMIHT to identify the correct support (Theorem 1), expressed in terms of the RIP constant, the signal-to-noise ratio, and the minimum nonzero entry of x⋆.(iv) Power method accuracy analysis. We analyze the accuracy of the eigenvalue estimates produced by the power method (Proposition 5), providing high-probability bounds on the number of power iterations r needed to ensure that the tuned parameters are ϵ-close to optimal. (v) Numerical validation. We corroborate the theoretical findings with simulations comparing CoSMIHT against IHT, FLIHT, and MIHT in both noiseless and noisy settings, demonstrating improved recovery probability and faster convergence. 
+
+A. Paper Organization 
+
+Section II collects notation and preliminary results. Sec-tion III presents the CoSMIHT algorithm. Section IV contains the convergence analysis, including wandering phase bounds, lock-in time guarantees, and lock-in phase convergence rates as well as a discussion on the computational complexity. Section V presents numerical experiments. II. P RELIMINARIES 
+
+Notation: Bold lowercase/uppercase denote vectors/matrices. Transpose is (·)⊤. For an index set 
+
+Algorithm 1 POWER Method 
+
+Require: B ∈ RK×K , b ∈ RK , r ∈ Z+ 
+
+> 1:
+
+Initialize b0 = b 
+
+> 2:
+
+for k = 1 , 2, · · · , r do  
+
+> 3:
+
+bk = Bb k−1 
+
+> 4:
+
+end for  
+
+> 5:
+
+Return br 
+
+> ∥br∥2
+
+Algorithm 2 CoSMIHT : Consecutive Support Matching In-duced Momentum Iterative Hard Thresholding 
+
+Require: y, A, sparsity K, stepsize μ > 0, momentum β ∈
+
+[0 , 1) , no. of power iterations r, time horizon T 
+
+> 1:
+
+Initialize: x0 = 0, v0 = 0, b0 = g
+
+> ∥g∥2
+
+, where g ∼N (0, I), S−1 = ∅, β −1 = β, μ−1 = μ 
+
+> 2:
+
+for t = 0 , 1, 2, . . . , T − 1 do  
+
+> 3:
+
+St = supp( xt)
+
+Consecutive support matching induced parameter tuning  
+
+> 4:
+
+if t > 0, St = St−1 and St−1̸ = St−2 then  
+
+> 5:
+
+bt,r = POWER (A⊤ 
+
+> St
+
+ASt , b0, r ) 
+
+> 6:
+
+ct,r = POWER (∥ASt ∥2 
+
+> F
+
+IK − A⊤ 
+
+> St
+
+ASt , b0, r ) 
+
+> 7:
+
+lt = ∥ASt ct,r ∥22, Lt = ∥ASt bt,r ∥22 
+
+> 8:
+
+μt ← 4(√Lt+√lt)2 , βt ←
+
+ √Lt−√lt√Lt+√lt
+
+2 
+
+> 9:
+
+else  
+
+> 10:
+
+βt ← βt−1, μt ← μt−1 
+
+> 11:
+
+end if  
+
+> 12:
+
+gt = −A⊤(y − Ax t) 
+
+> 13:
+
+vt+1 = βtvt − μtgt 
+
+> 14:
+
+xt+1 ← H K
+
+ xt + vt+1  
+
+> 15:
+
+end for  
+
+> 16:
+
+Output: xT
+
+S ⊆ [N ] := {1, . . . , N }, xS is the restriction, and supp( x)
+
+the support. HK (z) keeps the K largest-magnitude entries of 
+
+z and zeros the rest. 
+
+Assumption 1 (Restricted Isometry Property) . The matrix 
+
+A ∈ RM ×N satisfies the restricted isometry property (RIP) of order K, with a restricted isometry constant (RIC) δK if the following holds: 
+
+δK := max   
+
+> S⊂[N]: |S|≤ K
+
+IK − A⊤ 
+
+> S
+
+AS 2→2 < 1, (2) where ∥·∥ 2→2 denotes the operator norm. 
+
+Lemma 1 (Theorem 1 [13]) . Let x⋆ be K-sparse with support 
+
+S. For any z, ∥H K (z) − x⋆∥2 ≤ ω∥(z − x⋆)S∪T ∥2 where 
+
+T = supp( HK (z)) , and ω = 1+ √52 is the hard-thresholding expansion constant. 
+
+III. P ROPOSED ALGORITHM 
+
+We propose CosMIHT (Algorithm 2) by integrating a
+
+consecutive support matching induced parameter tuning step 
+
+with the MIHT computations. Specifically, at step t, we first estimate the support St of the current iterate xt and update the momentum parameter βt and step size μt based on St, S t−1,and St−2, as follows. If there is a support change at step t,i.e., St−1̸ = St, then the supports have not stabilized yet and we retain the previous parameters βt = βt−1, μ t = μt−1.If St = St−1, then there are two cases to consider. If 
+
+St−1̸ = St−2, i.e., the support just stabilized at t, then we update the parameters βt and μt to the optimal parameters for Polyak’s heavy-ball method (see lines 5–8 of Algorithm 2). If St−1 = St−2, then the support stabilized before t − 1, and 
+
+CosMIHT reuses the parameters from step t − 1.IV. T HEORETICAL RESULTS 
+
+A. Convergence analysis of CoSMIHT 
+
+We begin this section with a convergence analysis of 
+
+CoSMIHT . Recall that we aim to solve the optimization problem 
+
+min 12 ∥y − Ax ∥22 s.t. ∥x∥0 ≤ K, (P1) (3) where we adopt the measurement model y = Ax ⋆ + e where 
+
+x⋆ is K-sparse with support S⋆.We first establish that, under sufficient signal-to-noise ratio, the optimization problem (P1) has a unique K-sparse solution supported on S⋆, which serves as the target for our conver-gence analysis. 
+
+Proposition 1. The problem (P1) admits a unique solution bx
+
+with support S⋆ if 
+
+∥x⋆∥2
+
+∥e∥2
+
+> 21 − δ2K
+
+. (4) 
+
+Furthermore, under (4) , the following holds: 
+
+bxS⋆ = x⋆S⋆ + A† 
+
+> S⋆
+
+e. (5) 
+
+Proof. Note that S⋆ is the support of one of the optimal so-lutions of (P1) if S⋆ ∈ arg min S⊂[N ]: |S|=K P ⊥ 
+
+> S
+
+y 22, which is equivalent to P ⊥ 
+
+> S⋆
+
+y 2 ≤ P ⊥ 
+
+> S
+
+y 2 , ∀S ⊂ [N ] : |S| = K.Using the measurement model, 
+
+P ⊥ 
+
+> S⋆
+
+y 2 = P ⊥ 
+
+> S⋆
+
+e 2 ≤ ∥ e∥2 , (6) Therefore, 
+
+P ⊥ 
+
+> S
+
+y 2 ≥ P ⊥ 
+
+> S
+
+AS⋆\S x⋆S⋆\S 2
+
+− P ⊥ 
+
+> S
+
+e 2
+
+≥ (1 − δ2K ) ∥x⋆∥2 − ∥ e∥2 . (7) Consequently, S⋆ ∈ arg min S⊂[N ]: |S|=K P ⊥ 
+
+> S
+
+y 2 if 
+
+2 ∥e∥2 ≤ (1 − δ2K ) ∥x⋆∥2 . (8) Therefore, S⋆ is the unique optimal set if the condition (4) is satisfied. Furthermore, the optimal solution bx to (P1) then becomes the least squares solution on the support S⋆, so that 
+
+bxS⋆ = A† 
+
+> S⋆
+
+y, which results in (5). We divide the convergence analysis into two phases. The first phase is termed the wandering phase , where essentially the algorithm wanders through different supports, and the second phase is referred to as the lock-in phase where the algorithm locks in to a fixed support. To define these phases mathematically, we first define the lock-in time as below: 
+
+T0 = arg min {t ≥ 1 : Sτ = S⋆, ∀τ ≥ t} . (9) Using this definition, the two phases are equivalent to the time intervals Ii, i = 1 , 2, defined as below: 
+
+I1 = {1 ≤ t ≤ T0 − 1} , (Wandering Phase ) (10) 
+
+I2 = {T0 ≤ t ≤ T } . (Lock-in Phase ) (11) We now analyze the CoSMIHT algorithm for each of these phases. 
+
+1) Wandering phase convergence analysis of CoSMIHT : In this phase, as the support is not stabilized, CosMIHT under-goes frequent support switching. By combining the analysis of MIHT [12] with the parameter selection rule of CosMIHT 
+
+(Lines 5–10 in Algorithm 2), we state two results which analyze the evolution of xt and vt in this phase. Recall from Lemma 1 that ω ≥ 1 denotes the hard-thresholding expansion constant. 
+
+Proposition 2. Let Et = ∥xt − bx∥2 and Vt = ∥H 2K (vt)∥2,for each t ≥ 1. Then, the following holds: 
+
+Et
+
+Vt
+
+
+
+⪯ Q
+
+Et−1
+
+Vt−1
+
+
+
++ ξ ∥e∥2
+
+11
+
+
+
+, (12) 
+
+where 
+
+Q =
+
+ ωρ ωα γ√1 + δ3K α
+
+
+
+, (13) 
+
+with 
+
+γ = max 
+
+ 11 − δ3K
+
+, μ 
+
+
+
+, α = max δ23K , β , (14) 
+
+ρ = max 
+
+
+
+|μ − 1| + μδ 3K , 2δ3K
+
+1 − δ3K
+
+
+
+, ξ = ωγ p1 + δ3K .
+
+(15) 
+
+Proof. The proof is postponed to Appendix A. Using Proposition 2, we now obtain the following result. 
+
+Proposition 3. Under the conditions 
+
+δ3K < 12ω + 1 , ωγ √1 + δ3K
+
+1 − ωρ < 1 − αα , μ < 11 − δ3K
+
+,
+
+(16) 
+
+CoSMIHT satisfies 
+
+Et ≤ ∥bx∥2
+
+2 (λt
+
+> 1
+
+(1 − sin θ) + λt
+
+> 2
+
+(1 + sin θ)) + ξ ∥e∥2 (( ω − 1) α + 1) (1 − λ1)(1 − λ2) , (17) 
+
+Vt ≤ ∥bx∥2 b cos θ
+
+2ωα (λt 
+
+> 1
+
+− λt
+
+> 2
+
+)+ ξ ∥e∥2 cos θ
+
+(1 − λ1)(1 − λ2)
+
+
+
+γp1 + δ3K − ωρ + α + 1 2
+
+
+
+, (18) 
+
+λ2 < 0 < λ 1 < 1, (19) where tan θ = α−ωρ  
+
+> 2b
+
+, b = pωαγ √1 + δ3K and 
+
+λi = ωρ + b(tan θ + ( −1) i−1 sec θ), i = 1 , 2. (20) 
+
+Proof. The proof is postponed to Appendix B. 
+
+2) Lock-in Time analysis of CosMIHT : We now show that if the noise is sufficiently small, i.e., if ∥e∥2 is small enough, then CosMIHT always locks in to the correct support S⋆ after a finite number of iterations. 
+
+Theorem 1. Under the condition (16) , the lock-in time is upper bounded as below: 
+
+Tlock -in ≤
+
+
+
+ln 
+
+ √2∥x⋆∥2(ρ+ b cos θω )
+
+> x⋆
+> min −ξ∥e∥2υ
+
+
+
+ln(1 /λ 1)
+
+
+
+, (21) 
+
+where 
+
+υ = ρ
+
+(1 − λ1)(1 − λ2)
+
+"
+
+(ω − 1) α + 1 + α cos θ
+
+
+
+γp1 + δ3K − ωρ + α + 1 2
+
+ #
+
+. (22) 
+
+Proof. We need to find a t such that St+1 = S⋆ for all τ ≥
+
+t + 1 . For this to happen, we must ensure that, at time t, for any i ∈ S⋆ and j / ∈ S⋆, the following holds: 
+
+(xt + vt+1 )i ≥ (xt + vt+1 )j . (23) Now, the left hand side (LHS) of (23) can be lower bounded as below: 
+
+(xt + vt+1 )i ≥ | bxi| − (xt − bx + vt+1 )i
+
+= |bxi| − (xt − bx + βtvt − μtgt)i
+
+≥ | bx| − (( I − μtA⊤A)( xt − bx)) i
+
+− βt vti − μt (A⊤e)i . (24) On the other hand, the right hand side (RHS) of (23) can be upper bounded as below: 
+
+(xt + vt+1 )j = (xt − bx + βtvt − μtgt)j
+
+≤ (( I − μtA⊤A)( xt − bx)) j
+
++ βt vtj + μt (A⊤e)j (25) Therefore, the lock-in condition (23) is satisfied if the follow-ing holds: 
+
+(( I − μtA⊤A)( xt − bx)) j + βt vtj + μt (A⊤e)j
+
+< |bxi| − (( I − μtA⊤A)( xt − bx)) i
+
+− βt vti − μt (A⊤e)i . (26) which in turn is satisfied if 
+
+√2  (( I − μtA⊤A)( xt − bx)) i,j + βt (vt)i,j 
+
+ < |bxi| .
+
+(27) Recalling the condition (5), a sufficient condition ensuring the above is 
+
+√2( |μt − 1| + μtδ3K )Et + βtVt ≤ x⋆
+
+> min
+
+, (28) where x⋆ 
+
+> min
+
+= min i∈S⋆ |xi| . Recalling the bounds of ρt =
+
+|μt − 1|+μtδ3K and βt from Proposition 2, we get a sufficient condition for lock-in at time t as below: 
+
+√2( ρE t + αV t) ≤ x⋆
+
+> min
+
+. (29) Recalling the evolution inequalities (17) and (18), which hold by virtue of the conditions (16), and recalling that eigenvalue of Q satisfy |λ2| < λ 1 from (19), the above is satisfied if the following holds: 
+
+√2 ∥x⋆∥2
+
+
+
+ρ + b cos θω
+
+
+
+λt
+
+> 1
+
+< x ⋆ 
+
+> min
+
+− ξρ ∥e∥2
+
+(1 − λ1)(1 − λ2)
+
+"
+
+(ω − 1) α + 1 + α cos θ
+
+
+
+γp1 + δ3K − ωρ + α + 1 2
+
+ #
+
+, (30) which in turn can be easily checked to be satisfied if t ≥
+
+Tlock -in from (21). 
+
+3) Lock-in phase convergence analysis of CosMIHT :
+
+Theorem 1 guarantees that CosMIHT identifies the correct support in finite time. Once CosMIHT locks in to the correct support S⋆ (which is guaranteed under sufficient signal-to-noise ratio as given in Theorem 1), the parameters βt, μ t are fixed, and the trajectory of CosMIHT becomes identical to that of the heavy-ball method, with the Hessian being A⊤ 
+
+> S⋆
+
+AS⋆ .To conduct a convergence analysis of CosMIHT in the lock-in phase, we first look at the update steps constrained to S⋆.We first denote bμ = μTlock -in and bβ = βTlock -in . Now note that for t ≥ Tlock -in , the support of xt is S⋆, so that 
+
+xt+1  
+
+> S⋆
+
+= xtS⋆ + vt+1  
+
+> S⋆
+
+, t ≥ Tlock -in . (31) Then, using the fact that P ⊥ 
+
+> S⋆
+
+AS⋆ = 0S⋆ , for t ≥ Tlock -in + 1 ,
+
+xt+1  
+
+> S⋆
+
+= xtS⋆ + vt+1 
+
+> S⋆
+
+= xtS⋆ + bβvtS⋆ + bμA⊤ 
+
+> S⋆
+
+(y − AS⋆ xtS⋆ )=⇒ xt+1  
+
+> S⋆
+
+− bxS⋆ = ( IK − bμA⊤ 
+
+> S⋆
+
+AS⋆ )( xtS⋆ − bxS⋆ )+ bβ(xtS⋆ − xt−1 
+
+> S⋆
+
+)=⇒ ht+1 = ( IK − bμΦ)ht + bβ(ht − ht−1), (32) where ht = xtS⋆ − bxS⋆ and Φ = A⊤ 
+
+> S⋆
+
+AS⋆ . This is the update equation of the classical Polyak’s heavy-ball method. Although analysis of this system is classical, we present here for completeness and then elaborate on the implications. 
+
+Proposition 4. The sequence {ht}t≥Tlock -in +1 enjoys the fol-lowing convergence guarantee: 
+
+ht 
+
+> 2
+
+= O
+
+√K eβ t−Tlock -in −12
+
+
+
+, (33) where g(x) = x + √x2 − 1 and 
+
+qeβ =
+
+qbβg 
+
+max 
+
+ max 
+
+> 1≤i≤K
+
+1 + bβ − bμλ ⋆i
+
+2
+
+qbβ
+
+, 1
+
+ , (34) 
+
+where λ⋆ 
+
+> 1
+
+≥ · · · ≥ λ⋆K are the eigenvalues of A⊤ 
+
+> S⋆
+
+AS⋆ .Proof. The proof is postponed to Appendix C. Now recall that post lock-in we have (line 8 of Algorithm 2) 
+
+bβ =
+
+√L − √l
+
+√L + √l
+
+!2
+
+, bμ = 4(√L + √l)2 , (35) where 
+
+L = ∥AS⋆ b∥22 ,l = ∥AS⋆ c∥22 , (36) 
+
+b = POWER (A⊤ 
+
+> S⋆
+
+AS⋆ , b0, r ),
+
+c = POWER (∥AS⋆ ∥2 
+
+> F
+
+IK − A⊤ 
+
+> S⋆
+
+AS⋆ , b0, r ). (37) Let B = A⊤ 
+
+> S⋆
+
+AS⋆ , and denote the eigenvalues of B by 
+
+λ⋆ 
+
+> 1
+
+≥ · · · ≥ λ⋆K , which satisfy 1 − δK ≤ λ⋆K ≤ λ⋆ 
+
+> 1
+
+≤ 1 + δK
+
+by the RIP of A. When L = λ1 and l = λK , the parameters 
+
+bβ and bμ reduce to the optimal heavy-ball parameters for B.This guarantee is achievable in the limit of indefinitely many power iterations; however, since only finitely many iterations are performed in practice, there is an approximation error between L and λ1, and between l and λK . This error renders bβ
+
+and bμ suboptimal and consequently degrades the convergence rate 
+
+qeβ. We now show that, with an appropriate initialization of the power method, a certain number of iterations suffices to control this approximation error within a prescribed toler-ance, thereby bringing the resulting convergence rate within a desired accuracy of the optimal rate 
+
+ √λ⋆ 
+
+> 1−
+
+√λ⋆K
+
+√λ⋆ 
+
+> 1+
+
+√λ⋆K
+
+2
+
+.
+
+Proposition 5. Let there be a number c > 1 such that the matrix A⊤ 
+
+> S⋆
+
+AS⋆ satisfies max {μ2, η K−1} ≤ 1 
+
+> c
+
+, where μ2 =
+
+> λ⋆
+> 2
+> λ⋆
+> 1
+
+and ηK−1 =  
+
+> P
+> i̸=K−1λ⋆i
+> P
+> i̸=Kλ⋆i
+
+. Then, with the initialization of Algorithm POWER used in CosMIHT , and with K ≥ 3, ϵ > 0,the following is ensured with probability greater than 1 −
+
+1/K p, for any p ≥ 1,
+
+r ≥
+
+
+
+ln 
+
+ 4Kp+2 λ⋆
+
+> 1
+> πϵ
+
+
+
+2 ln c
+
+
+
+=⇒ λ⋆ 
+
+> 1
+
+− ϵ ≤ L ≤ λ⋆
+
+> 1
+
+,λ⋆K ≤ l ≤ λ⋆K + ϵ. (38) 
+
+Remark 1 (Practical rule of thumb) . Since max {μ2, η K−1} <
+
+1 and the logarithmic dependence on K and ϵ−1 is mild, the number of power iterations required is typically r = O(log K)
+
+for moderate accuracy, making the eigenvalue estimation lightweight. 
+
+Proof. The proof is postponed to Appendix D. Using the above proposition, we come to the following result: 
+
+Theorem 2. If AS⋆ satisfies the regularity conditions as in Proposition 5 and with K ≥ 3, ϵ > 0 and p ≥ 1, if r is specified as in Proposition 5 then for any t ≥ Tlock -in + 1 , the following holds with probability ≥ 1 − 1/K p,
+
+xt − bx 2 = O
+
+√K
+
+ δ3K
+
+
+
+1 + 2ϵλ⋆ 
+
+> 1−λ⋆K
+
+
+
+1 + p1 − δ23K
+
+
+
+> t
+
+ . (39) 
+
+Proof. The proof is postponed to Appendix E. 
+
+B. Computational Complexity Analysis 
+
+In this section we carry out a computational complexity analysis of the proposed CosMIHT in terms of the number of floating point operations (flops) required to execute their steps. It follows from the description of CosMIHT in Algorithm 2 that at step t, there are two types of computations involved: the compulsory computations (lines 11–13 of Algorithm 2) and the conditional computations (lines 5–8 of Algorithm 2). In the following, we list down the (order of) flops for different computational tasks. For the conditional computations, 1) Power iterations for Lt computation (line 5): O(rM K ),2) Power iterations for lt computation (line 6): O(rM K ) + 
+
+O(rK 2),3) Lt, l t computations (line 7): O(KM ) + O(K).For the compulsory computations, 1) Gradient computation (line 11): O(M N ),2) Momentum update (line 12): O(N ),3) Estimate update (line 13): O(N ) + O(K ln N ).Note that the extra computational burden of CosMIHT com-pared to MIHT is only due to the conditional computations. The description of the support matching condition in Algo-rithm 2 implies that the conditional computations are executed only when the current support matches with the previous support, which in turn differs from the support before. Conse-quently, the maximum number of times this can happen within the wandering phase is limited by Tlock -in /2. Furthermore, when CosMIHT enters the lock-in phase, it requires 1 iteration of the conditional computation for the last time, totaling at most Tlock -in /2 + 1 iterations of conditional computations. Therefore, the total conditional computation amounts to be 
+
+O (rM KT lock -in ). Since Tlock -in is essentially O
+
+ ∥x⋆∥2
+
+> x⋆
+> min
+
+
+
+, and since for x⋆ with subGaussian non-zero entries ∥x⋆∥2
+
+> x⋆
+> min
+
+≈ √K
+
+with high probability, the extra conditional computations of 
+
+CosMIHT is about O(rKM ln K), which can be substantially smaller than the total compulsory computations of O(T M N ).Therefore, CosMIHT is essentially computationally as light as MIHT, yet enjoying the improved convergence as depicted in the previous sections. V. N UMERICAL EXPERIMENTS 
+
+In this section we perform extensive numerical simulations to test the recovery performance as well as convergence speed of the proposed algorithms and compare them with 0 25 50 75 100 125 150 175 200       
+
+> t
+> 10 17
+> 10 14
+> 10 11
+> 10 8
+> 10 5
+> 10 2
+> 10 1
+> 10 4
+> xt x 22
+> MIHT
+> CosMIHT
+
+(a) σ = 0 .0 25 50 75 100 125 150 175 200      
+
+> t
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> xt x 22
+> MIHT
+> CosMIHT
+
+(b) σ = 10 −3
+
+Fig. 1: MSE vs iterations for noiseless and noisy measure-ments. 150 200 250 300 350 400 
+
+> M
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Recovery probability
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(a) σ = 0 .150 200 250 300 350 400  
+
+> M
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Recovery probability
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(b) σ = 10 −3
+
+Fig. 2: Recovery Probability vs M for noiseless and noisy measurements. 0 25 50 75 100 125 150 175 200 
+
+> K
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Recovery probability
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(a) σ = 0 .0 25 50 75 100 125 150 175 200  
+
+> K
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Recovery probability
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(b) σ = 10 −3
+
+Fig. 3: Recovery Probability vs K for noiseless and noisy measurements. 150 200 250 300 350 400 
+
+> M
+> 120
+> 140
+> 160
+> 180
+> 200
+> No. of iterations for convergence
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(a) σ = 0 .150 200 250 300 350 400  
+
+> M
+> 120
+> 140
+> 160
+> 180
+> 200
+> No. of iterations for convergence
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(b) σ = 10 −3
+
+Fig. 4: No. of iterations for convergence vs M for noiseless and noisy measurements. the state-of-the-art methods, for which we have chosen the MIHT as the benchmark, as well as the classical IHT [7] and the FLIHT [10]. We use Monte-Carlo simulations where 0 25 50 75 100 125 150 175 200 
+
+> K
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> Average number of iterations for convergence
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(a) σ = 0 .0 25 50 75 100 125 150 175 200  
+
+> K
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> Average number of iterations for convergence
+> IHT
+> MIHT
+> CosMIHT
+> FLIHT
+
+(b) σ = 10 −3
+
+Fig. 5: No. of iterations for convergence vs K for noiseless and noisy measurements. we generate 200 independent instances of the matrix A as well as the unknown vector x⋆ and the noise e, execute the recovery algorithms for each of these instances and com-pute the recovery metrics for each of the algorithms and finally obtain the recovery performance of the algorithms by averaging the metrics over all these instances. In each of these instances, we generate a random RM ×N Gaussian matrix with i.i.d. ∼ N (0 , 1) entries and then l2−normalize the columns to obtain A. Furthermore, we randomly select a set of K elements as the support of x⋆ and then generate K
+
+i.i.d. ∼ N (0 , 1) numbers as the entries of x⋆. Moreover, we generate e ∼ N (0, σ IM ), where M σ 2 is the noise power. For the simulation setup, we consider N = 1000 , the range of M
+
+is taken to be 150 to 450 (in steps of 20 ) and the range of K
+
+is taken to be 2 to 200 (in steps of 10 ). We use the parameters 
+
+μ = 0 .6, β = 0 .8 for MIHT (as guided by [12]), μ = 0 .6 for IHT, and for FLIHT, we use μ = 5(1+ √6K/M +√2) 2 , which is very close to 5/(1+ δ6K ) with probability larger than 1−e−M
+
+(see [10]) and performs well empirically. The experiments have been performed on an Apple Macbook Pro 16 core Laptop. In Figure 1, the mean squared error ∥xt − bx∥2 / ∥bx∥2
+
+is plotted with respect to iterations for σ = 0 and σ = 10 −3.For the noiseless case, the two-phase convergence behavior of 
+
+CosMIHT is clearly observed, whereas for the noisy case the behavior is less pronounced, as the MSE is to be expected to be dominated by the statistical error induced by measurement noise. We evaluate the (empirical) probability of successful recov-ery as the fraction of instances for which ∥xT −bx∥2
+
+∥bx∥2
+
+< 10 −3.In Figs. 2 and 3, the probability of success are plotted with re-spect to M (with fixed K = 80 ) and K (with fixed M = 256 ), respectively for the cases σ = 0 and σ = 10 −3. In the noiseless cases (Figs. 2(a) and 3(a)) it is clearly observed that the probability of recovery performance of CosMIHT is exactly the same as that of MIHT and surpasses those of vanilla IHT and FLIHT. This is expected as the support searching phase of 
+
+CosMIHT is very similar to that of MIHT with the post lock-in behavior being markedly different. This effect is pronounced for the noisy case ( σ = 10 −3) in Figs. 2(b) and 3(b), where the probability of recovery of CosMIHT is significantly higher than that of MIHT and having the best critical values, while being comparable to those of IHT and FLIHT. We compute the number of iterations required for conver-gence to be the first time τ such that xτ +1 − xτ 
+
+> 2
+
+< 10 −10 .We plot the mean number of iterations for convergence re-quired for the different algorithms for noiseless and noisy measurements in Figs. 4 and 5. In all the Figs. it is clear that 
+
+CosMIHT enjoys significantly reduced number of iterations for convergence compared to all the other algorithms in the range of comparisons. Only IHT is comparable or maybe even can have smaller number of iterations for convergence, however at the expense of inferior probability of success, as can be seen from the corresponding ranges in Figs. 2 and 3. REFERENCES [1] E. J. Candès and T. Tao, “Decoding by linear programming,” IEEE Transactions on Information Theory , vol. 51, no. 12, pp. 4203–4215, 2005. [2] S. S. Chen, D. L. Donoho, and M. A. Saunders, “Atomic decomposition by basis pursuit,” SIAM Journal on Scientific Computing , vol. 20, no. 1, pp. 33–61, 1998. [3] R. Tibshirani, “Regression shrinkage and selection via the LASSO,” 
+
+Journal of the Royal Statistical Society: Series B , vol. 58, no. 1, pp. 267–288, 1996. [4] J. A. Tropp and A. C. Gilbert, “Signal recovery from random mea-surements via orthogonal matching pursuit,” IEEE Transactions on Information Theory , vol. 53, no. 12, pp. 4655–4666, 2007. [5] D. Needell and J. A. Tropp, “CoSaMP: Iterative signal recovery from incomplete and inaccurate samples,” Applied and Computational Har-monic Analysis , vol. 26, no. 3, pp. 301–321, 2009. [6] W. Dai and O. Milenkovic, “Subspace pursuit for compressive sens-ing signal reconstruction,” IEEE Transactions on Information Theory ,vol. 55, no. 5, pp. 2230–2249, 2009. [7] T. Blumensath and M. E. Davies, “Iterative hard thresholding for compressed sensing,” Applied and Computational Harmonic Analysis ,vol. 27, no. 3, pp. 265–274, 2009. [8] B. T. Polyak, “Some methods of speeding up the convergence of iter-ation methods,” USSR Computational Mathematics and Mathematical Physics , vol. 4, no. 5, pp. 1–17, 1964. [9] Y. Nesterov, “A method of solving a convex programming problem with convergence rate O(1 /k 2),” Soviet Mathematics Doklady , vol. 27, no. 2, pp. 372–376, 1983. [10] V. Cevher, “An ALPS view of sparse recovery,” in IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , 2011, pp. 5808–5811. [11] Z. Sun, J. Zhou, Y.-B. Zhao, and N. Meng, “Heavy-ball-based hard thresholding algorithms for sparse signal recovery,” Journal of Compu-tational and Applied Mathematics , vol. 430, p. 115264, 2023. [12] W. Jin and L.-J. Xie, “Momentum-based iterative hard thresholding algorithm for sparse signal recovery,” IEEE Signal Processing Letters ,vol. 32, pp. 1346–1350, 2025. [13] J. Shen and P. Li, “A tight bound of hard thresholding,” Journal of Machine Learning Research , vol. 18, no. 208, pp. 1–42, 2018. 
+
+APPENDIX AWe first note that y = Ax ⋆ + e = Abx + P ⊥ 
+
+> S⋆
+
+e. Therefore, it follows directly from the analysis of MIHT in Theorem 1 of [12] that the following holds for any time t:
+
+Et
+
+Vt
+
+
+
+⪯ Qt
+
+Et−1
+
+Vt−1
+
+
+
++ ξt P ⊥ 
+
+> S⋆
+
+e 2
+
+11
+
+
+
+, (40) where 
+
+Qt =
+
+ ωρ t ωβ t
+
+μt
+
+√1 + δ2K βt
+
+
+
+,ξt = ωμ t
+
+p1 + δ3K , (41) where ρt = |μt − 1| + μtδ3K . Now, let t0 = 0 and define, for any k ≥ 0
+
+τk = min {t > t k : St̸ = St−1}, (42) 
+
+tk+1 = min {t > τ k : St = St−1}. (43) Then it is clear that τ0 = 1 and for any k ≥ 0, St̸ = St−1 for 
+
+τk ≤ t ≤ tk+1 − 1 and St = St−1 for any tk ≤ t ≤ τk − 1.Therefore, from the description of Algorithm 2 it follows that 
+
+μt
+
+βt
+
+
+
+=
+
+"
+
+μβ
+
+#
+
+, 1 ≤ t ≤ t1 − 1
+
+
+
+> 4
+
+(√Ltk +√ltk )2
+
+ √Ltk −√ltk
+
+√Ltk +√ltk
+
+2
+
+ , tk ≤ t ≤ tk+1 − 1, k ≥ 1.
+
+(44) Now note that, for any t,
+
+4(√Lt + √lt)2
+
+> AM-GM
+
+≤ 1
+
+√Ltlt
+
+> Eq. (82)
+
+≤ 1
+
+lt
+
+> Eq. (78)
+
+≤ 11 − δK
+
+≤ 11 − δ3K
+
+,
+
+pLtk − pltk
+
+pLtk + pltk
+
+!2 Eq. (77) 
+
+≤
+
+ √1 + δK − √1 − δK
+
+√1 + δK + √1 − δK
+
+2
+
+= 1 − p1 − δ2
+
+> K
+
+δK
+
+!2
+
+≤ δ2 
+
+> K
+
+≤ δ23K . (45) Consequently, we get 
+
+μt ≤ max 
+
+
+
+μ, 11 − δ3K
+
+
+
+=: γ, βt ≤ max β, δ 23K =: α, ρt ≤ max 
+
+
+
+|μ − 1| + μδ 3K , 2δ3K
+
+1 − δ3K
+
+
+
+=: ρ. (46) Using this upper bound in the evolution inequality (40) proves the assertion. APPENDIX BWe obtain from (12) that 
+
+Et
+
+Vt
+
+
+
+≤ Qt
+
+E0
+
+V0
+
+
+
++ ξ ∥e∥2
+
+> t−1
+
+X
+
+> j=0
+
+Qj
+
+11
+
+
+
+. (47) Note that as all the entries of Q are positive, the Perron-Frobenius theorem ensures that there are two unequal real val-ued eigenvalues of Q, denoted by λ1, λ 2 such that λ1 > |λ2|.Furthermore, if v1, v2 are two eigenvectors corresponding to λ1, λ 2, respectively, then v1 has positive entries and the entries of v2 have opposite signs. Since the eigenvalues are distinct, one can diagonalize Q as Q = V ΛV −1, where 
+
+Λ =
+
+λ1 00 λ2
+
+
+
+, and V = v1 v2
+
+, where v1, v2 are eigen-vectors corresponding to the eigenvalues λ1, λ 2, respectively. Also, denoting V −1 =
+
+u⊤
+
+> 1
+
+u⊤
+
+> 2
+
+
+
+, one finds that for any t ≥ 0,
+
+Qt = λt
+
+> 1
+
+v1u⊤ 
+
+> 1
+
++ λt
+
+> 2
+
+v2u⊤ 
+
+> 2
+
+. (48) Therefore, from (40), using E0 = x0 − bx 2 = ∥bx∥2 and 
+
+V 0 = ∥H 2K (0)∥2 = 0 , one obtains, 
+
+Et
+
+Vt
+
+
+
+⪯ ∥ bx∥2 (λt
+
+> 1
+
+v1u11 + λt
+
+> 2
+
+v2u21 )+ ξ ∥e∥2
+
+ 1 − λt
+
+> 1
+
+1 − λ1
+
+v1(u11 + u12 ) + 1 − λt
+
+> 2
+
+1 − λ2
+
+v2(u21 + u22 )
+
+
+
+.
+
+(49) Recalling the expression of Q from (13), denoting b =
+
+pωαγ √1 + δ3K , tan θ = α−ωρ  
+
+> 2b
+
+, and setting vi =
+
+ 1
+
+vi2
+
+
+
+, i =1, 2, it is straightforward to compute the following for i = 1 , 2,
+
+λi = ωρ + b(tan θ + ( −1) i−1 sec θ), (50) 
+
+vi = bωα cos θ
+
+ ωα cos θb
+
+sin θ + ( −1) i−1
+
+
+
+, (51) 
+
+ui = (−1) i
+
+2
+
+sin θ + ( −1) i
+
+− ωα cos θb
+
+
+
+. (52) To find a sufficient condition ensuring λ1 < 1, note that 
+
+λ1 < 1 ⇔ ωρ + α + p(ωρ − α)2 + 4 ωαγ √1 + δ3K
+
+2 < 1
+
+⇔ (ωρ − α)2 + 4 ωαγ p1 + δ3K < (ωρ + α − 2) 2
+
+⇔ ωαγ p1 + δ3K < ωρα − (ωρ + α) + 1 
+
+⇔ ωαγ p1 + δ3K < (1 − ωρ )(1 − α),
+
+⇔ ωρ < 1, 0 < α < 1, ωγ √1 + δ3K
+
+1 − ωρ < 1 − αα . (53) Note that one necessary condition for the above to hold is 
+
+ρ < 1 
+
+> ω
+
+. Recalling the expression for ρ from (15), it follows that the following is necessary to get λ1 < 1:
+
+2δ3K
+
+1 − δ3K
+
+< 1
+
+ω ⇔ δ3K < 12ω + 1 . (54) Now, we claim that if μ < 11−δ3K (so that γ = 1 /(1 − δ3K )), 
+
+λ2 < 0. To see this, first note that, 
+
+λ1λ2 = ωα 
+
+
+
+ρ − γp1 + δ3K
+
+
+
+= ωα 
+
+1 − δ3K
+
+
+
+ρ(1 − δ3K ) − p1 + δ3K
+
+
+
+. (55) Now we consider two cases. 
+
+a) 0 < μ ≤ (1 −3δ3K )(1 −δ3K )2 : In this case, using δ3K < 12ω+1 it is straightforward to verify that μ < 1 and that ρ = 1 − μ(1 −
+
+δ), so that, (55) yields, 
+
+λ1λ2 = ωα 
+
+1 − δ3K
+
+((1 − μ(1 − δ3K ))(1 − δ3K ) − p1 + δ3K ) < 0.
+
+(56) Therefore, as λ1 > 0, in this case, λ2 < 0.
+
+b) (1 −3δ3K )(1 −δ3K )2 ≤ μ ≤ 11−δ3K : In this case, it is easy to verify that ρ = 2δ3K 
+
+> 1−δ3K
+
+so that from (55) 
+
+λ1λ2 = ωα 
+
+1 − δ3K
+
+(2 δ3K − p1 + δ3K )) . (57) As δ3K < 12ω+1 = 1√5+2 , it is easy to verify that the right-hand side (RHS) above is negative. Since λ1 > 0, this implies that λ2 < 0.Since the spectral radius is λ1, if λ1 < 1, we also have 
+
+|λ2| < 1, so that the following holds 
+
+Et
+
+Vt
+
+
+
+⪯ ∥ bx∥2 (λt
+
+> 1
+
+v1u11 + λt
+
+> 2
+
+v2u21 )+ ξ ∥e∥2
+
+ v1(u11 + u12 )1 − λ1
+
++ v2(u21 + u22 )1 − λ2
+
+
+
+. (58) After some straightforward but tedious algebraic calculations, one can derive the inequalities (17) and (18) from the above. APPENDIX CTo proceed further, let us first denote ut =
+
+ ht
+
+ht−1
+
+
+
+, so that the post lock-in evolution of CosMIHT produces the following: 
+
+ut+1 =
+
+(1 + bβ)IK − bμΦ − bβIK
+
+IK 0
+
+
+
+ut, t ≥ Tlock -in + 1 .
+
+(59) Further, let the eigenvalues of Φ be denoted by 1+ δK ≥ λ1 ≥· · · λK ≥ 1 − δK , and Φ = U ⊤ΛU be the corresponding eigenvalue decomposition. Furthermore, let Π be a 2K × 2K
+
+permutation matrix with the following elements: 
+
+Πij =
+
+
+
+1, i is odd, j = i+1 2
+
+1, i is even, j = K + i
+
+> 2
+
+0. else (60) Then, with ∆t = Π
+
+U 00 U
+
+
+
+ut, t ≥ Tlock -in , one can show the following: 
+
+∆t+1 =
+
+
+
+C1 0 · · · 00 C2 · · · 0
+
+... ... . . . ...
+
+0 0 · · · CK
+
+ ∆t, (61) where 
+
+Ci =
+
+1 + bβ − bμλ i − bβ
+
+1 0
+
+
+
+, i = 1 , · · · , K. (62) To continue further, let ati =
+
+∆t
+
+> 2i−1
+
+∆t
+
+> 2i
+
+
+
+for i = 1 , · · · , K ,
+
+t ≥ Tlock -in + 1 . Then, we have, 
+
+at+1  
+
+> i
+
+= Ciati, i = 1 , · · · , K. (63) Let us denote the eigenvalues of Ci by νji , j = 1 , 2. Then depending on whether or not ν1i = ν2i, we have two cases: a) ν1i = ν2i = νi (critically damped case): In this case, using Jordan decomposition, one can obtain vectors c1, c2 and 
+
+d1, d2 such that for any τ ≥ 1,
+
+Cτi = ντi (c1d⊤ 
+
+> 1
+
++ c2d⊤ 
+
+> 2
+
++ τ ν −1 
+
+> i
+
+), (64) so that 
+
+ati = Ct−Tlock -in  
+
+> i
+
+aTlock -in 
+
+> i
+
+=⇒ at+1   
+
+> i2
+
+≤ | νi|t−Tlock -in (|νi| ∥ c1∥2 d⊤ 
+
+> 1
+
+aTlock -in 
+
+> i
+
++ |νi| ∥ c2∥2 d⊤ 
+
+> 2
+
+aTlock -in  
+
+> i
+
++ ( t − Tlock -in )) =⇒ at+1   
+
+> i2
+
+= O(|νi|t−Tlock -in ). (65) Note that for the optimal heavy-ball parameters, this critically damped case is the typical regime, and the polynomial prefac-tor in t is at most linear, which is absorbed by the exponential decay. 
+
+b) ν1i̸ = ν2i (over/under-damped case): In this case, using similarity transformation one can diagonalize Ci and one can obtain the following for some vectors c1, c2 and 
+
+d1, d2 and for any τ ≥ 1:
+
+Cτi = ντ
+
+> 1i
+
+c1d⊤ 
+
+> 1
+
++ ντ
+
+> 2i
+
+c2d⊤ 
+
+> 2
+
+, (66) so that 
+
+ati = Ct−Tlock -in  
+
+> i
+
+aTlock -in 
+
+> i
+
+=⇒ at+1   
+
+> i2
+
+≤ | ν1i|t+1 −Tlock -in ∥c1∥2 d⊤ 
+
+> 1
+
+aTlock -in 
+
+> i
+
++ |ν2i|t+1 −Tlock -in ∥c2∥2 d⊤ 
+
+> 2
+
+aTlock -in 
+
+> i
+
+=⇒ at+1   
+
+> i2
+
+= O(max  
+
+> j
+
+|νji |t+1 −Tlock -in ). (67) Therefore, in any case, if max j |νji | < 1, one can write, 
+
+at+1   
+
+> i2
+
+≤ O (max  
+
+> j
+
+|νji |t−Tlock -in ) (68) Consequently, if max ij |νji | < 1, then one can write, for t ≥
+
+Tlock -in + 1 ,
+
+∆t+1  
+
+> 2
+
+≤ O (√K max  
+
+> ij
+
+|νji |t−Tlock -in ). (69) Since ht+1  
+
+> 2
+
+≤ ut+1  
+
+> 2
+
+= ∆t+1 
+
+> 2
+
+, we get for t ≥
+
+Tlock -in + 1 .Et = xt − bx 2 ≤ O (√K max  
+
+> ij
+
+|νji |t−1−Tlock -in ). (70) Therefore, Et → 0 as t → ∞ i.e, xt → bx as t → ∞ as long as the spectral radius satisfies max ij |νji | < 1. One can easily check that the eigenvalues of Ci are obtained as roots of the following equation: 
+
+ν2 − (1 + bβ − bμλ i)ν + bβ = 0 , (71) which has solutions 
+
+ν1i = 1 + bβ − bμλ i +
+
+q
+
+(1 + bβ − bμλ i)2 − 4 bβ
+
+2 , (72) 
+
+ν2i = 1 + bβ − bμλ i −
+
+q
+
+(1 + bβ − bμλ i)2 − 4 bβ
+
+2 , (73) We now obtain conditions which ensure that, for a fixed i,the spectral radius is less than 1 by analyzing the sign of 
+
+(1 + bβ − bμλ i)2 − 4 bβ.1) (1 + bβ − bμλ i)2 ≤ 4 bβ: In this case, it is easy to see that 
+
+pbμλ i ∈
+
+
+
+1 −
+
+qbβ, 1 + 
+
+qbβ
+
+
+
+and |ν1i| = |ν2i| =
+
+qbβ.Hence the spectral radius is 
+
+qbβ.2) (1 + bβ − bμλ i)2 > 4 bβ: In this case, pbμλ i /∈
+
+1 −
+
+qbβ, 1 + 
+
+qbβ
+
+
+
+and the spectral radius can be found to be |1+ bβ−bμλ i|+
+
+√(1+ bβ−bμλ i)2−4 bβ 
+
+> 2
+
+>
+
+qbβ. 
+
+Therefore, one can write 
+
+max 
+
+> 1≤i≤Kj∈1,2
+
+|νji | ≤ 
+
+qbβ g 
+
+max 
+
+ max 
+
+> 1≤i≤K
+
+1 + bβ − bμλ i
+
+2
+
+qbβ
+
+, 1
+
+ ,
+
+(74) where g(x) = x + √x2 − 1.APPENDIX D
+
+Analysis for L: Let the spectral decomposition of B be given by B = RΛR⊤, where R = [r1 · · · , rK ] is aunitary matrix and Λ = diag( λ1, · · · , λ K ). Using the spectral decomposition of B as B = PKi=1 λirir⊤ 
+
+> i
+
+, we obtain, 
+
+L =
+
+PKi=1 λ2r+1  
+
+> i
+
+wi
+
+PKi=1 λ2ri wi
+
+= λ1 · w1 + PKi=2 μ2r+1  
+
+> i
+
+wi
+
+w1 + PKi=2 μ2ri wi
+
+!
+
+, (75) where wi = (g⊤ri)2
+
+> ∥g∥22
+
+, 1 ≤ i ≤ K, and μi = λi 
+
+> λ1
+
+, 2 ≤ i ≤ K.Therefore, we find that, 
+
+0 ≤ 1 − Lλ1
+
+=
+
+PKi=2 (1 − μi)μ2ri wi
+
+w1 + PKi=2 μ2ri wi
+
+≤ (1 − μK )μ2r 
+
+> 2
+
+(P  
+
+> j̸=1
+
+wj )
+
+w1
+
+. (76) Letting w1 = cos 2 ψ, so that P  
+
+> j̸=1
+
+wj = ∥r1∥22−w1 = sin 2 ψ,one obtains, 
+
+0 ≤ 1 − Lλ1
+
+≤ (1 − μK )μ2r 
+
+> 2
+
+tan 2 ψ
+
+=⇒ λ1 ≥ L ≥ λ1(1 − (1 − κ−1)μ2r 
+
+> 2
+
+tan 2 ψ), (77) where we recognized that μK = λK 
+
+> λ1
+
+= κ−1, where κ is the condition number of B.
+
+Analysis for l: Let us denote γi = Tr [B] − λi and ηi = γi 
+
+> γK
+
+,1 ≤ i ≤ K . Then it follows, using step similar to the analysis of L above, that 
+
+l = λK + γK −
+
+PKi=1 γ2r+1  
+
+> i
+
+wi
+
+PKi=1 γ2ri wi
+
+=⇒ l − λK
+
+γK
+
+=
+
+PK−1 
+
+> i=1
+
+(1 − ηi)η2ri wi
+
+PK−1 
+
+> i=1
+
+η2ri wi + wK
+
+≤ (1 − η1)η2rK−1
+
+PK−1 
+
+> i=1
+
+wi
+
+wK
+
+= (1 − η1)η2rK−1 tan 2 ζ
+
+=⇒ λK ≤ l ≤ λK + ( K − 1) λ1(1 − κ−1)η2rK−1 tan 2 ζ, 
+
+(78) where wK = cos 2 ζ, and we have recognized that η1 =P    
+
+> i̸=1 λi
+> P
+> j̸=Kλj
+
+≥ (K−1) λK 
+
+> (K−1) λ1
+
+= λK 
+
+> λ1
+
+= κ−1, and that γK =
+
+P  
+
+> j̸=K
+
+λj ≤ (K − 1) λ1.Now, we let ϵ > 0 be such that 
+
+λ1(1 − κ−1)μ2r 
+
+> 2
+
+tan 2 ψ ≤ ϵ, (79) 
+
+(K − 1) λ1(1 − κ−1)η2rK−1 tan 2 ζ ≤ ϵ, (80) which is ensured if 
+
+r ≥
+
+
+
+ln 
+
+ λ1 max {tan 2 ψ, (K−1) tan 2 ζ}
+
+> ϵ
+
+
+
+2 ln 
+
+ 1max {μ2,η K−1}
+
+
+
+. (81) Consequently, with r satisfying (81), one obtains, 
+
+λ1 − ϵ ≤ L ≤ λ1, λ K ≤ l ≤ λK + ϵ. (82) We now further find upper bounds on tan 2 ψ and tan 2 ζ
+
+with high probability using the initialization as depicted in 
+
+CosMIHT (line 1 of Algorithm 2). Let g ∼ N (0, I) and let wi = (g⊤ri)2
+
+> ∥g∥22
+
+for i = 1 , · · · , K .We will show that, for some threshold γ to be chosen later, 
+
+w1 ≥ γ and wK ≥ γ with high probability. To do this, we first write, 
+
+P w1 ≥ γ, w K ≥ γ
+
+≥ 1 − P w1 < γ  − P wK < γ . (83) Now, note that w1 as well as wK are distributed identically as 
+
+B   12 , K−12
+
+. Therefore, 
+
+P w1 < γ  =
+
+R γ 
+
+> 0
+
+x−1/2(1 − x)(K−3) /2dx β   12 , K−12
+
+
+
+> (x≤1)
+
+≤
+
+R γ 
+
+> 0
+
+x−1/2dx 
+
+> √πΓ
+
+( K−12 )
+
+> Γ
+
+( K 
+
+> 2
+
+)
+
+> Gautschi’s inequality
+
+<
+
+r (K − 2) γπ . (84) Consequently, we have, 
+
+P w1 ≥ γ, w K ≥ γ ≥ 1 − 2
+
+r (K − 2) γπ . (85) Therefore, to ensure P w1 ≥ γ, w K ≥ γ ≥ 1 − δ for some 
+
+δ ∈ (0 , 1) , it is sufficient to choose γ = δ2π 
+
+> 4( K−2)
+
+. Consequently, with probability larger than 1−δ, we have, max {tan 2 ψ, (K −
+
+1) tan 2 ζ} ≤ (K − 1) 
+
+ 4( K−2)  
+
+> δ2π
+
+− 1
+
+
+
+≤ 4K2 
+
+> δ2π
+
+. Therefore, we have the desired result. APPENDIX ETherefore, we find, 
+
+1 + bβ − bμλ ⋆
+
+> 1
+
+2
+
+qbβ
+
+= L + l − 2λ⋆
+
+> 1
+
+L − l ≤ 2( L − λ⋆
+
+> 1
+
+)
+
+L − l ≤ 0,
+
+1 + bβ − bμλ ⋆K
+
+2
+
+qbβ
+
+= L + l − 2λ⋆K
+
+L − l ≥ 2( l − λ⋆K )
+
+L − l ≥ 0.
+
+(86) Consequently, it can be verified that, 
+
+max 
+
+ max 
+
+> 1≤i≤K
+
+1 + bβ − bμλ ⋆i
+
+2
+
+qbβ
+
+, 1
+
+
+
+= max 
+
+ 2λ⋆ 
+
+> 1
+
+− (L + l)
+
+L − l , L + l − 2λ⋆K
+
+L − l , 1
+
+
+
+. (87) Since 2λ⋆  
+
+> 1−(L+l)
+> L−l
+
+− 1 = 2( λ⋆  
+
+> 1−L)
+> L−l
+
+> 0, we further simplify that, 
+
+max 
+
+ max 
+
+> 1≤i≤K
+
+1 + bβ − bμλ ⋆i
+
+2
+
+qbβ
+
+, 1
+
+
+
+= max 
+
+ 2λ⋆ 
+
+> 1
+
+− (L + l)
+
+L − l , L + l − 2λ⋆K
+
+L − l
+
+
+
+= λ⋆ 
+
+> 1
+
+− λ⋆K + |λ⋆ 
+
+> 1
+
++ λ⋆K − (L + l)|
+
+L − l
+
+≤ λ⋆ 
+
+> 1
+
+− λ⋆K + ϵλ⋆ 
+
+> 1
+
+− λ⋆K − 2ϵ . (88) With ϵ = ϵ0(λ⋆ 
+
+> 1
+
+− λ⋆K ), and ϵ0 ≤ 18 , we obtain, 
+
+max 
+
+ max 
+
+> 1≤i≤K
+
+1 + bβ − bμλ ⋆i
+
+2
+
+qbβ
+
+, 1
+
+ ≤ 1 + 3ϵ0
+
+1 − 2ϵ0
+
+≤ 1 + 4 ϵ0.
+
+(89) Furthermore, as L/l ≤ λ⋆
+
+> 1
+
+/λ ⋆K ≤ 1+ δ3K 
+
+> 1−δ3K
+
+, and bβ is an increasing function of L/l , we have, 
+
+bβ ≤
+
+pλ⋆ 
+
+> 1
+
+− pλ⋆K
+
+pλ⋆ 
+
+> 1
+
++ pλ⋆K
+
+!2
+
+≤
+
+ √1 + δ3K − √1 − δ3K
+
+√1 + δ3K + √1 − δ3K
+
+2
+
+= δ23K
+
+
+
+1 + p1 − δ23K
+
+2 . (90) Consequently, with the choice of r as in Proposition 5, one gets a convergence rate of 
+
+δ3K
+
+r
+
+1 + 4ϵλ1−λK
+
+
+
+1 + p1 − δ23K
+
+≤
+
+δ3K
+
+
+
+1 + 2ϵλ1−λK
+
+
+
+1 + p1 − δ23K
+
+, (91) where the last line follows since √1 + x ≤ 1 + x 
+
+> 2
+
+, for any 
+
+x ∈.
