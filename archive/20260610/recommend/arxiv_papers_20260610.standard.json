@@ -1,0 +1,130 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-10T21:25:04.561375+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.08324v1",
+      "source": "arxiv",
+      "title": "Set-Based Transformer for Atmospheric Compensation in Standoff LWIR Hyperspectral Imaging",
+      "abstract": "Passive long-wave infrared (LWIR) hyperspectral imaging under a standoff geometry depends on atmospheric absorption and emission, as well as reflected radiance, thus making atmospheric compensation essential to get knowledge of a target of interest. Despite its importance, this compensation has been largely overlooked due to its practical and modeling difficulty. In this paper, we present a lightweight set-based deep learning framework that takes multiple radiance measurements, collected at different standoff ranges, as input and jointly estimates transmittance, atmospheric path radiance, and a shared downwelling spectrum. We analyze the learned representation with a sparse autoencoder and observe that several latent features do activate on geographically coherent subsets of the test data despite the absence of location supervision. Experiments on a MODTRAN generated standoff LWIR dataset demonstrate low spectral distortion across all estimated products. The dataset and code is publicly available at: https://factral.co/SAE-LWIR/",
+      "authors": [
+        "Fabian Perez",
+        "Nicolas Quintero",
+        "Jeferson Acevedo",
+        "Hoover Rueda-Chacon"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-06T20:25:30+00:00",
+      "link": "https://arxiv.org/pdf/2606.08324v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "atmospheric compensation for hyperspectral imaging",
+      "llm_evidence_cn": "高光谱成像大气补偿",
+      "llm_evidence": "高光谱成像大气补偿",
+      "canonical_evidence": "高光谱成像大气补偿",
+      "llm_tldr_en": "Proposes a set-based transformer for atmospheric compensation in LWIR hyperspectral imaging, jointly estimating transmittance and radiance from multiple standoff measurements.",
+      "llm_tldr_cn": "针对远距离长波红外高光谱成像中大气补偿的难题，提出了一种轻量级基于集合的深度学习框架。该框架利用多个不同距离的辐射测量值，联合估计透过率、大气路径辐射和共享下涌光谱。实验表明，该方法能有效补偿大气效应，为高光谱图像恢复提供关键预处理步骤。",
+      "llm_tldr": "针对远距离长波红外高光谱成像中大气补偿的难题，提出了一种轻量级基于集合的深度学习框架。该框架利用多个不同距离的辐射测量值，联合估计透过率、大气路径辐射和共享下涌光谱。实验表明，该方法能有效补偿大气效应，为高光谱图像恢复提供关键预处理步骤。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "relative radiometric correction for remote sensing images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.10350v1",
+      "source": "arxiv",
+      "title": "Multi-Angular Reflectance Anisotropy Observed from UAV Multispectral Imagery",
+      "abstract": "UAV multispectral imagery naturally contains multi-angular observations due to low flight altitude and wide field-of-view imaging, which may introduce geometry-driven radiometric variability. This study proposes a geometry-aware multi-angular observation extraction workflow to quantify observation-geometry effects from a BRDF perspective. Specifically, camera intrinsics and extrinsics are refined via structure-from-motion (SFM), and homogeneous regions annotated on an orthomosaic are reprojected onto multiple raw sub-images acquired from different viewpoints. This enables joint extraction of multi-band reflectance and observation geometry parameters for the same ground targets under varying viewing directions. The extracted observations are further analyzed using band-wise polar visualization in the (VZA, RAA) domain. Results on a grassland target show clear reflectance anisotropy across ten bands, with red-edge and nearinfrared bands exhibiting 119-137% variability between maximum and minimum reflectance, indicating non-negligible observation-geometry effects on radiometric consistency.",
+      "authors": [
+        "Zhenqiang Qin",
+        "Chenguang Dai",
+        "Min Wang",
+        "Xian Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-09T02:58:30+00:00",
+      "link": "https://arxiv.org/pdf/2606.10350v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "quantifies multi-angular reflectance anisotropy for radiometric correction",
+      "llm_evidence_cn": "量化多角度反射率各向异性，服务于辐射校正",
+      "llm_evidence": "量化多角度反射率各向异性，服务于辐射校正",
+      "canonical_evidence": "量化多角度反射率各向异性，服务于辐射校正",
+      "llm_tldr_en": "Proposes a geometry-aware workflow to extract multi-angular observations from UAV multispectral imagery, enabling quantification of BRDF effects critical for radiometric correction.",
+      "llm_tldr_cn": "针对无人机多光谱图像中固有的多角度观测导致的辐射变异性，该论文提出了一种几何感知的多角度观测提取工作流。通过结合运动恢复结构和正射影像标注，从不同视角提取同质区域的反射率及观测几何参数，进而从BRDF角度量化各向异性。该工作为遥感影像的相对辐射校正提供了关键分析和数据基础。",
+      "llm_tldr": "针对无人机多光谱图像中固有的多角度观测导致的辐射变异性，该论文提出了一种几何感知的多角度观测提取工作流。通过结合运动恢复结构和正射影像标注，从不同视角提取同质区域的反射率及观测几何参数，进而从BRDF角度量化各向异性。该工作为遥感影像的相对辐射校正提供了关键分析和数据基础。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "relative radiometric correction for remote sensing images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.08175v1",
+      "source": "arxiv",
+      "title": "Quaternion Maximum-Volume Submatrix Selection with Applications to Multichannel Imaging and Visual Data",
+      "abstract": "Low-rank approximation based on selected rows and columns is a useful alternative to singular value decompositions when the goal is an interpretable and compact matrix representation. A standard way to choose these rows and columns is the maximum-volume principle: it selects submatrices with large volume, which usually leads to stable interpolation coefficients and accurate CUR-type approximations. In this paper, we study this idea for quaternion matrices. This setting is natural for color images, three-dimensional motion data, and multi-channel signals, but requires care because quaternion multiplication is noncommutative. We define quaternion maximum-volume submatrix selection using quaternion singular values and the Study determinant. We then derive quaternion rank-one update formulas and use them to build two selection procedures: a greedy square-core method for row and column replacement, and a rectangular method that enlarges a selected row set until the interpolation coefficients are controlled. We prove that successful row and column swaps increase the quaternion volume of the selected square core when the exact quaternion inverse is used. We also connect the stopping criterion with quasi-dominance, prove an exact quaternion CUR identity in the full-rank case, and derive an interpolation stability bound. For the rectangular case, we derive an append-row pseudoinverse update and show how it gives a natural right preconditioner for overdetermined quaternion least-squares problems. Finally, we illustrate the methods on three applications: quaternion CUR approximation of RGB images, RectMaxVol-based preconditioning for ill-conditioned quaternion least-squares systems, and row selection in quaternion motion-capture data. The experiments show that the proposed quaternion MaxVol and RectMaxVol methods provide stable and efficient selection routines.",
+      "authors": [
+        "Vsevolod Kliushev",
+        "Junjun Pan",
+        "Valentin Leplat"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-06-06T13:42:19+00:00",
+      "link": "https://arxiv.org/pdf/2606.08175v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "low-rank submatrix selection using quaternion maximum-volume principle, applicable to multichannel imaging denoising",
+      "llm_evidence_cn": "四元数最大体积子矩阵选择方法，适用于多通道图像的低秩去噪",
+      "llm_evidence": "四元数最大体积子矩阵选择方法，适用于多通道图像的低秩去噪",
+      "canonical_evidence": "四元数最大体积子矩阵选择方法，适用于多通道图像的低秩去噪",
+      "llm_tldr_en": "Extends maximum-volume submatrix selection to quaternion matrices, enabling low-rank approximation for multichannel imaging data, which can be applied to low-rank denoising of hyperspectral images.",
+      "llm_tldr_cn": "低秩近似是去噪的重要手段，现有最大体积子矩阵方法限于实/复矩阵。本文将其推广到四元数矩阵，利用四元数奇异值定义体积，实现了适用于彩色图像和多光谱信号的低秩CUR分解，实验在彩色图像和多通道信号上展示了低秩近似的有效性，为高光谱图像的低秩去噪提供了新工具。",
+      "llm_tldr": "低秩近似是去噪的重要手段，现有最大体积子矩阵方法限于实/复矩阵。本文将其推广到四元数矩阵，利用四元数奇异值定义体积，实现了适用于彩色图像和多光谱信号的低秩CUR分解，实验在彩色图像和多通道信号上展示了低秩近似的有效性，为高光谱图像的低秩去噪提供了新工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

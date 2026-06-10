@@ -1,0 +1,1818 @@
+Title: Quaternion Maximum-Volume Submatrix Selection with Applications to Multichannel Imaging and Visual Data
+
+URL Source: https://arxiv.org/pdf/2606.08175v1
+
+Published Time: Tue, 09 Jun 2026 00:50:43 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+# Quaternion Maximum-Volume Submatrix Selection with Applications to Multichannel Imaging and Visual Data 
+
+Vsevolod Kliushev ∗1, Junjun Pan †2, and Valentin Leplat ‡11Institute of Data Science and Artificial Intelligence, Innopolis University 
+
+> 2
+
+Department of Mathematics, Faculty of Science, Hong Kong Baptist University, Hong Kong, China 
+
+Abstract 
+
+Low-rank approximation based on selected rows and columns is a useful alternative to singular value decompositions when the goal is to obtain an interpretable and compact representation of a matrix. A standard way to choose these rows and columns is the maximum-volume principle. It selects submatrices with large volume, which usually leads to stable interpolation coefficients and accurate CUR-type approximations. In this paper, we study this idea for quaternion matrices. This setting is natural for color images, three-dimensional motion data, and multi-channel signals, but it requires some care because quaternion multiplication is noncommutative. We define quaternion maximum-volume submatrix selection using quaternion singular values and the Study determinant. We then derive quaternion rank-one update formulas and use them to build two selection procedures: a greedy square-core method for row and column replacement, and a rectangular method that enlarges a selected row set until the interpolation coefficients are controlled. We prove that successful row and column swaps increase the quaternion volume of the selected square core when the exact quaternion inverse is used. We also connect the stopping criterion with quasi-dominance, prove an exact quaternion CUR identity in the full-rank case, and derive an interpolation stability bound for the associated CUR approximation. For the rectangular case, we derive an append-row pseudoinverse update and show how it leads to a natural right preconditioner for overdetermined quaternion least-squares problems. Finally, we illustrate the methods on three applications: quaternion CUR approximation of RGB images, RectMaxVol-based preconditioning for ill-conditioned quaternion least-squares systems, and row selection in quaternion motion-capture data. The experiments show that the proposed quaternion MaxVol and RectMaxVol methods provide stable and efficient selection routines. 
+
+Keywords. quaternion matrices, maximum volume submatrices, MaxVol, RectMaxVol, CUR approximation, quaternion least squares, motion capture 
+
+# 1 Introduction 
+
+Low-rank approximation is a basic tool in numerical linear algebra and data analysis. Given a large matrix, the goal is to replace it by a simpler object that keeps the main information. The singular value decomposition gives the best low-rank approximation in the spectral and Frobenius norms. However, it does not preserve the rows and columns of the original matrix, and it can be expensive when the matrix is large. 
+
+> ∗
+
+Email: kadaverciant@gmail.com 
+
+> †
+
+Email: junjpan@hkbu.edu.hk 
+
+> ‡
+
+Email: valentin.leplat@gmail.com 
+
+1
+
+> arXiv:2606.08175v1 [math.NA] 6 Jun 2026
+
+An alternative is to approximate a matrix using only selected rows and columns. This leads to CUR and cross approximation methods. If A ∈ Cm×n and if I and J are row and column index sets, one writes 
+
+A ≈ CU R, C = A[: , J ], R = A[I, :] ,
+
+where the small core matrix U is usually built from the intersection submatrix B = A[I, J ]. This type of approximation is attractive because it is interpolatory: it uses actual rows and columns of the input data. The quality of the approximation depends strongly on the selected submatrix 
+
+B.The maximum-volume principle is a classical way to choose such a submatrix. In the square case, it seeks a submatrix with large determinant in modulus. In the rectangular case, the volume is usually defined as the product of singular values. Large-volume submatrices tend to be well conditioned and to produce bounded interpolation coefficients. This is the main reason why MaxVol-type methods are useful in CUR decompositions, skeleton approximations, least-squares problems, and related selection tasks [1, 2, 3, 4, 5]. In this paper, we study maximum-volume submatrix selection for quaternion matrices. Quaternions are useful when each data entry has several coupled components. For example, an RGB image can be encoded as a pure quaternion matrix by assigning the red, green and blue channels to the three imaginary units. Three-dimensional motion data can also be represented by pure quaternions. In such applications, processing the data directly in the quaternion domain may preserve the coupling between channels more naturally than applying a real-valued method independently to each component. The quaternion setting is not a direct copy of the real or complex case. The main difficulty is noncommutativity. The order of factors in inverse formulas matters, and determinant-like quantities have to be chosen carefully. Moreover, when we update a selected core by replacing one row or one column, the usual Sherman–Morrison and Woodbury formulas must be written in an order that remains valid over H.Our goal is not to solve the globally optimal maximum-volume problem. This problem is already difficult in the real and complex cases. Instead, we focus on practical MaxVol-type algorithms which find locally dominant or near-dominant submatrices. This is the setting in which classical MaxVol methods are used in practice. 
+
+1.1 Contribution 
+
+The contributions of the paper are as follows. (i) We formulate square and rectangular maximum-volume submatrix selection for quaternion matrices using quaternion singular values and the Study determinant. (ii) We derive quaternion rank-one update formulas for row and column replacements. We also derive an append-row pseudoinverse update for the RectMaxVol procedure. (iii) We adapt Greedy MaxVol and RectMaxVol to quaternion matrices. The algorithms are written so that the multiplication order is explicit. (iv) We prove that, in exact arithmetic and for a nonsingular square core, every successful row or column swap increases the quaternion volume of the selected core. (v) We prove a simple interpolation stability bound for the quaternion CUR approximation associated with a selected core. This shows how the quasi-dominance condition controls the loss with respect to the best approximation using the selected columns. (vi) We show why RectMaxVol can be used as a right preconditioner for overdetermined quaternion least-squares problems. In particular, we derive a simple condition-number bound from the RectMaxVol coefficient control. 2(vii) We evaluate the methods on RGB image approximation, quaternion least-squares precon-ditioning, and motion-capture row selection. We also implemented quaternion adaptations of GMVA and adaptive Block DEIM. These methods are natural extensions of existing real-valued adaptive selection routines. However, in our current tests they did not give a clear advantage over the simpler Greedy MaxVol and RectMaxVol methods. For this reason, we keep the main paper focused on the two basic methods. The other adaptations are briefly discussed in Appendix B. 
+
+1.2 Related work 
+
+MaxVol ideas were introduced in the context of pseudo-skeleton approximations and low-rank approximation by Goreinov, Tyrtyshnikov, Zamarashkin and coauthors [1, 2, 3]. These works showed that submatrices with large volume lead to stable interpolation and useful error bounds. The rectangular MaxVol method of Mikhalev and Oseledets [4] extended this idea to tall submatrices and made it useful for least-squares preconditioning. More recent works studied structured matrices [6], image compression and least-squares applications [5], and adaptive or block variants of submatrix selection [7, 8]. Quaternion matrix computations have also received attention. Basic facts on quaternion matrices and the quaternion singular value decomposition can be found in [9, 10]. Structure-preserving QR methods were studied in [11], and large-scale QSVD algorithms were developed in [12]. Randomized quaternion low-rank approximation has also been considered in [13, 14]. Iterative methods for quaternion pseudoinverses were recently studied in [15]. To the best of our knowledge, MaxVol and RectMaxVol selection methods have not been developed systematically for quaternion matrices. Most of the MaxVol, RectMaxVol, DEIM, and CUR theory cited above is formulated over the real or complex field. Our contribution is not to replace this classical theory, but to extend its main local mechanisms to quaternion matrices in a form that is consistent with quaternion linear algebra. This requires some care. The usual determinant is not directly available over H,scalar factors do not commute, and inverse-update formulas have to be written with the correct multiplication order. We therefore use quaternion singular values, the Study determinant, and the complex embedding as proof tools, while the selection procedures themselves remain quaternion row and column selection procedures. In this sense, several results below are quaternion analogues of known real/complex MaxVol facts, but their validity over H has to be checked rather than assumed. 
+
+1.3 Organization 
+
+The paper is organized as follows. Section 2 recalls the quaternion notation, the volume definition, and the submatrix selection problem. Section 3 presents the quaternion Greedy MaxVol and RectMaxVol algorithms. Section 4 gives the theoretical guarantees. Section 5 presents the numerical experiments. Section 6 concludes the paper. Appendix B briefly describes the additional quaternion adaptations which were tested but are not central to the paper. 
+
+# 2 Quaternion preliminaries and problem setting 
+
+We recall only the notation needed in the paper. A quaternion has the form 
+
+q = q0 + q1i + q2j + q3k, 
+
+where q0, q 1, q 2, q 3 ∈ R and 
+
+i2 = j2 = k2 = ijk = −1.
+
+3The conjugate is q∗ = q0 − q1i − q2j − q3k, and the modulus is 
+
+|q| = ( q∗q)1/2 =
+
+> (
+
+q20 + q21 + q22 + q23
+
+> )1/2
+
+.
+
+If q̸ = 0 , then q−1 = q∗/|q|2. This inverse is two-sided. For matrices over H, we denote by A∗
+
+the conjugate transpose. A matrix Q is unitary if Q∗Q = I.Any quaternion matrix A ∈ Hm×n can be written as 
+
+A = A0 + A1i + A2j + A3k, 
+
+where A0, A 1, A 2, A 3 are real matrices. It can also be written as A = X +Y j , where X, Y ∈ Cm×n.We use the standard complex embedding 
+
+Φ( A) = 
+
+> [
+
+X Y
+
+−Y X
+
+> ]
+
+∈ C2m×2n. (1) This embedding is injective and multiplicative, that is, 
+
+Φ( AB ) = Φ( A)Φ( B)
+
+whenever the product is defined. The quaternion singular value decomposition states that any A ∈ Hm×n admits a factorization 
+
+A = U ΣV ∗,
+
+where U and V are quaternion unitary matrices and Σ is real diagonal, with nonnegative diagonal entries. These diagonal entries are the quaternion singular values of A [9, 10]. 
+
+2.1 Quaternion volume 
+
+For a tall matrix A ∈ Hm×n with m ≥ n, we define 
+
+vol( A) = 
+
+> n∏
+> i=1
+
+σi(A), (2) where σi(A) are the quaternion singular values. In the square case, this definition is consistent with determinant-based definitions. If B ∈ Hk×k, we use the Study determinant 
+
+Sdet( B) = | det(Φ( B)) |,
+
+see [16]. Then 
+
+vol( B) = 
+
+> √
+
+Sdet( B). (3) Equivalently, vol (B) is the product of the quaternion singular values of B. For Hermitian quaternion matrices, this is also related to the Moore determinant [17]. In particular, for a scalar quaternion q, one has 
+
+vol( q) = |q|.
+
+This definition is chosen so that the volume remains a real nonnegative quantity and agrees with the product of quaternion singular values. In the square case, the Study determinant provides the determinant-like object needed for volume comparisons. 42.2 Square and rectangular selection problems 
+
+Let A ∈ Hm×n. In the square case, we select row and column index sets I and J, with 
+
+|I| = |J| = k, and form the core 
+
+B = A[I, J ] ∈ Hk×k.
+
+The goal is to find a core with large volume. In practice, we seek a locally dominant core, not a globally optimal one. Assume that B is nonsingular. We define the two coefficient matrices 
+
+C = A[: , J ]B−1 ∈ Hm×k, C′ = B−1A[I, :] ∈ Hk×n. (4) A square core is locally dominant if all admissible row and column replacement coefficients have modulus at most one. In numerical algorithms, this is relaxed to a tolerance 1 + ε.For RectMaxVol, the column set J is fixed, with |J| = k, and the algorithm enlarges the row set I until the interpolation coefficients are controlled. If B = A[I, J ] ∈ Hr×k with r ≥ k and full column rank, the coefficient matrix is 
+
+F = A[: , J ]B†.
+
+Rows with large coefficient norms are appended to I. This produces a tall representative submatrix. 
+
+# 3 Quaternion MaxVol and RectMaxVol algorithms 
+
+We now present the two main algorithms. The formulas are close to the real and complex ones, but the order of multiplication has to be preserved. This is the main practical point in the quaternion case. 
+
+3.1 Rank-one inverse updates 
+
+The quaternion Sherman–Morrison formula follows from the Woodbury identity over H, whose proof is given in Appendix A. Let A ∈ Hk×k be invertible, and let u, v ∈ Hk. If 1 + v∗A−1u̸ = 0 ,then 
+
+(A + uv ∗)−1 = A−1 − A−1u
+
+> (
+
+1 + v∗A−1u
+
+> )−1
+
+v∗A−1. (5) The scalar inverse appears in the middle of the product. This position is important because quaternions do not commute. Thus the formulas are formally close to the real and complex Sherman–Morrison updates, but the order of the factors is part of the statement. Moving the scalar inverse to a different position would not be valid in general over H.If the qth column of A is replaced by a new column b, then 
+
+Anew = A + ( b − aq)e∗ 
+
+> q
+
+,
+
+where aq is the old qth column. Formula (5) gives 
+
+A−1new = A−1 − A−1(b − aq)
+
+> (
+
+1 + e∗ 
+
+> q
+
+A−1(b − aq)
+
+> )−1
+
+e∗ 
+
+> q
+
+A−1. (6) Similarly, if the qth row is replaced by a new row b∗, then 
+
+A−1new = A−1 − A−1eq
+
+> (
+
+1 + ( b∗ − a∗ 
+
+> q
+
+)A−1eq
+
+> )−1
+
+(b∗ − a∗ 
+
+> q
+
+)A−1. (7) These two updates are used in the square Greedy MaxVol routine. They are written separately because row and column replacements do not lead to the same multiplication order over H.53.2 Quaternion Greedy MaxVol 
+
+The Greedy MaxVol algorithm alternates between row and column phases. In the row phase, it computes C = A[: , J ]B−1 and looks for an entry Cpq with large modulus. If |Cpq | > 1 + ε, the qth selected row is replaced by row p. The column phase is the same idea applied to C′ = B−1A[I, :] .
+
+Algorithm 1 Quaternion Greedy MaxVol 
+
+Require: A ∈ Hm×n, core size k, tolerance ε, maximum number of sweeps smax 
+
+Ensure: row indices I, column indices J, core B = A[I, J ] 
+
+> 1:
+
+Initialize I and J by row/column norms or by quaternion QR pivots.  
+
+> 2:
+
+B ← A[I, J ] and compute B−1, for example via the complex embedding Φ. 
+
+> 3:
+
+for s = 1 , . . . , s max do  
+
+> 4:
+
+changed ← false  
+
+> 5:
+
+while true do  
+
+> 6:
+
+C ← A[: , J ]B−1 
+
+> 7:
+
+(p, q ) ← arg max i / ∈I, 1≤j≤k |Cij | 
+
+> 8:
+
+if |Cpq | ≤ 1 + ε then  
+
+> 9:
+
+break  
+
+> 10:
+
+end if  
+
+> 11:
+
+Replace the qth selected row by p. 
+
+> 12:
+
+Update B and B−1 using the row update (7).  
+
+> 13:
+
+changed ← true  
+
+> 14:
+
+end while  
+
+> 15:
+
+while true do  
+
+> 16:
+
+C′ ← B−1A[I, :]  
+
+> 17:
+
+(q, r ) ← arg max 1≤i≤k, j / ∈J |C′ 
+
+> ij
+
+| 
+
+> 18:
+
+if |C′
+
+> qr
+
+| ≤ 1 + ε then  
+
+> 19:
+
+break  
+
+> 20:
+
+end if  
+
+> 21:
+
+Replace the qth selected column by r. 
+
+> 22:
+
+Update B and B−1 using the column update (6).  
+
+> 23:
+
+changed ← true  
+
+> 24:
+
+end while  
+
+> 25:
+
+if changed = false then  
+
+> 26:
+
+break  
+
+> 27:
+
+end if  
+
+> 28:
+
+end for  
+
+> 29:
+
+return I, J, B 
+
+In exact arithmetic, Algorithm 1 is naturally written with the true inverse of B. In compu-tations, one may recompute the inverse through the complex embedding, or use a quaternion pseudoinverse when the core is close to singular. The monotonicity result of Section 4 applies to the exact inverse case. With approximate inverses, it should be interpreted as the principle guiding the algorithm. 
+
+3.3 Quaternion RectMaxVol 
+
+RectMaxVol starts from a square core and then adds rows. The goal is to build a tall submatrix whose interpolation coefficients are bounded. Let B ∈ Hr×k have full column rank and suppose we append a row a∗ ∈ H1×k. Then 
+
+Bnew =
+
+> [
+
+Ba∗
+
+> ]
+
+.
+
+6Since B has full column rank, 
+
+B† = ( B∗B)−1B∗.
+
+Let 
+
+G = B∗B, c = G−1a, d = 1 + a∗c, s = Bc. (8) Because G is Hermitian positive definite, d ∈ R>0. Hence d commutes with all quaternion quantities. The append-row update is 
+
+B† 
+
+> new
+
+=
+
+> [
+
+B† − cd −1s∗ cd −1]
+
+. (9) This update is cheap once G−1 or an equivalent representation is available. Its derivation is given in Proposition 4; it relies on the quaternion Woodbury identity, recalled in Appendix A. 
+
+Algorithm 2 Quaternion RectMaxVol 
+
+Require: A ∈ Hm×n, initial rows I, fixed columns J, threshold τ , maximum number of rows 
+
+rmax 
+
+Ensure: enlarged row set I and rectangular core B = A[I, J ] 
+
+> 1:
+
+B ← A[I, J ] and compute B†. 
+
+> 2:
+
+while |I| < r max do  
+
+> 3:
+
+F ← A[: , J ]B† 
+
+> 4:
+
+ℓi ← ∥ F [i, :] ∥2 for all i / ∈ I 
+
+> 5:
+
+p ← arg max i / ∈I ℓi 
+
+> 6:
+
+if ℓp ≤ τ then  
+
+> 7:
+
+break  
+
+> 8:
+
+end if  
+
+> 9:
+
+Append p to I and append A[p, J ] to B. 
+
+> 10:
+
+Update B† using (9).  
+
+> 11:
+
+end while  
+
+> 12:
+
+return I, B 
+
+RectMaxVol will also be used below to build preconditioners for overdetermined quaternion least-squares problems. If A ∈ Hm×n with m ≫ n, the square variant selects n rows and uses 
+
+T = B−1 as a right preconditioner. The rectangular variant selects r ≥ n rows, forms S = A[I, :] ,computes a quaternion QR factorization S = QR , and uses T = R−1. Then the selected rows of the preconditioned matrix satisfy 
+
+A[I, :] R−1 = Q, 
+
+so they have orthonormal columns. This is the stabilization mechanism used in the experiments, and it is made precise in Proposition 5. 
+
+# 4 Theoretical guarantees 
+
+This section gives the main theoretical properties used in the paper. The logic is the following. We first recall how the complex embedding allows us to define a two-sided inverse and a volume for quaternion matrices. We then prove that quaternion volume is multiplicative and that the volume of a rank-one update of the identity is controlled by a scalar quaternion. These facts imply that every successful row or column swap in the square MaxVol procedure increases the current core volume. After that, we connect the stopping criterion of the algorithm with the usual notion of dominance. This gives a simple interpretation of what the algorithm returns: not a globally maximal-volume submatrix, but a locally dominant or quasi-dominant core. We also record the 7exact quaternion CUR identity in the full-rank case, and prove a simple interpolation stability bound for the CUR approximation associated with a selected core. Finally, we discuss the rectangular case. We prove the append-row pseudoinverse update used by RectMaxVol, and then show why RectMaxVol gives a natural right preconditioner for quaternion least-squares problems. The last subsection explains how the exact theory should be interpreted when the inverse is computed approximately. The results in this section should therefore be read as quaternion counterparts of the local MaxVol and RectMaxVol mechanisms used in the real and complex literature. Some final identities have the same form as in the commutative setting. This similarity is useful, but it is not automatic. In the quaternion case, the proof has to account for noncommutativity, for the distinction between left and right multiplication, and for the absence of an ordinary determinant with all the usual properties. The complex embedding, the Study determinant, quaternion singular values, and Hermitian positivity are the tools that allow the classical MaxVol intuition to survive in the quaternion setting. 
+
+4.1 Quaternion inverse through the complex embedding 
+
+Lemma 1. Let B ∈ Hk×k. If Φ( B) is invertible, then there exists a unique matrix B−1 ∈ Hk×k
+
+such that 
+
+Φ( B−1) = Φ( B)−1.
+
+Moreover, B−1 is a two-sided inverse: BB −1 = B−1B = I.Proof. The complex embedding is injective and multiplicative. We first check that Φ( B)−1
+
+belongs to the range of Φ. A matrix in the range of Φ has the block form 
+
+M =
+
+> [
+
+X Y
+
+−Y X
+
+> ]
+
+.
+
+Equivalently, it is characterized by the symmetry associated with the standard complex repre-sentation of quaternion matrices. This symmetry is preserved under matrix inversion. Indeed, if 
+
+M satisfies it and is nonsingular, then the identity M M −1 = I implies that M −1 satisfies the same block relation. Hence there exist P, Q ∈ Ck×k such that 
+
+Φ( B)−1 =
+
+> [
+
+P Q
+
+−Q P
+
+> ]
+
+.
+
+Therefore Φ( B)−1 is the embedding of a unique quaternion matrix, which we denote by B−1.Using multiplicativity of Φ, we get 
+
+Φ( BB −1) = Φ( B)Φ( B−1) = Φ( B)Φ( B)−1 = I. 
+
+By injectivity, BB −1 = I. Similarly, 
+
+Φ( B−1B) = Φ( B)−1Φ( B) = I, 
+
+and therefore B−1B = I. Thus B−1 is a two-sided inverse. 
+
+4.2 Volume identities 
+
+Lemma 2 (Multiplicativity of the quaternion volume) . Let X, Y ∈ Hk×k. With the definition 
+
+vol( B) = √Sdet( B), one has 
+
+vol( XY ) = vol( X) vol( Y ).
+
+8Proof. Since Φ is multiplicative, 
+
+Φ( XY ) = Φ( X)Φ( Y ).
+
+Therefore 
+
+Sdet( XY ) = | det(Φ( XY )) | = | det(Φ( X)) | | det(Φ( Y )) | = Sdet( X) Sdet( Y ).
+
+Taking square roots gives the result. 
+
+Lemma 3 (Rank-one volume factor) . Let u ∈ Hk×1 and v∗ ∈ H1×k. Define 
+
+M = I + uv ∗, d = 1 + v∗u ∈ H.
+
+Then 
+
+vol( M ) = |d|.
+
+In particular, M is invertible if and only if d̸ = 0 .Proof. Using the complex embedding, 
+
+Φ( M ) = I2k + Φ( u)Φ( v∗).
+
+The matrices Φ( u) and Φ( v∗) have sizes 2k × 2 and 2 × 2k, respectively. By the Weinstein– Aronszajn identity, 
+
+det( I2k + Φ( u)Φ( v∗)) = det( I2 + Φ( v∗)Φ( u)) .
+
+Since Φ preserves multiplication, 
+
+I2 + Φ( v∗)Φ( u) = Φ(1 + v∗u) = Φ( d).
+
+For a scalar quaternion d, one has | det(Φ( d)) | = |d|2. Therefore 
+
+Sdet( M ) = |d|2,
+
+and the result follows by taking the square root. 
+
+4.3 Volume increase for row and column swaps 
+
+Let A ∈ Hm×n and let B = A[I, J ] ∈ Hk×k be nonsingular. Recall the coefficient matrices 
+
+C = A[: , J ]B−1, C′ = B−1A[I, :] .
+
+Lemma 4 (Row swap) . Fix J and replace the qth selected row of B by a row indexed by p / ∈ I.Let Bnew be the updated core. Then 
+
+vol( Bnew ) = |Cpq | vol( B).
+
+Hence, if |Cpq | > 1, the row swap strictly increases the volume. Proof. Let b = A[p, J ] be the new row restricted to the selected columns, and let Bq: be the old 
+
+qth row. Set δ = b − Bq:. Then 
+
+Bnew = B + eqδ = B(I + B−1eqδ).
+
+By Lemma 2, 
+
+vol( Bnew ) = vol( B) vol( I + B−1eqδ).
+
+Using Lemma 3 with u = B−1eq and v∗ = δ, we get 
+
+vol( I + B−1eqδ) = |1 + δB −1eq|.
+
+Now 
+
+1 + δB −1eq = 1 + ( b − Bq:)B−1eq = bB −1eq.
+
+The scalar bB −1eq is precisely the (p, q ) entry of C = A[: , J ]B−1. This proves the claim. 9Lemma 5 (Column swap) . Fix I and replace the qth selected column of B by a column indexed by r / ∈ J. Let Bnew be the updated core. Then 
+
+vol( Bnew ) = |C′
+
+> qr
+
+| vol( B).
+
+Hence, if |C′
+
+> qr
+
+| > 1, the column swap strictly increases the volume. Proof. Let a = A[I, r ] be the new column restricted to the selected rows, and let B:q be the old 
+
+qth column. Set ∆ = a − B:q. Then 
+
+Bnew = B + ∆ e∗ 
+
+> q
+
+= ( I + ∆ e∗ 
+
+> q
+
+B−1)B. 
+
+By Lemma 2, 
+
+vol( Bnew ) = vol( I + ∆ e∗ 
+
+> q
+
+B−1) vol( B).
+
+Using Lemma 3 with u = ∆ and v∗ = e∗ 
+
+> q
+
+B−1 gives 
+
+vol( I + ∆ e∗ 
+
+> q
+
+B−1) = |1 + e∗ 
+
+> q
+
+B−1∆|.
+
+Since 
+
+1 + e∗ 
+
+> q
+
+B−1(a − B:q) = e∗ 
+
+> q
+
+B−1a, 
+
+and e∗ 
+
+> q
+
+B−1a is the (q, r ) entry of C′ = B−1A[I, :] , the result follows. 
+
+Theorem 1 (Monotone growth under successful quaternion MaxVol swaps) . Let A ∈ Hm×n
+
+and let B = A[I, J ] be a nonsingular k × k core. Consider a two-sided MaxVol procedure that accepts a row swap only if |Cpq | > 1 and a column swap only if |C′
+
+> qr
+
+| > 1. Then every accepted swap strictly increases vol( B). More precisely, 
+
+vol( Bnew ) = 
+
+> 
+
+|Cpq | vol( B), for an accepted row swap ,
+
+|C′
+
+> qr
+
+| vol( B), for an accepted column swap .
+
+Proof. This is a direct consequence of Lemmas 4 and 5. This theorem is the quaternion analogue of the classical MaxVol swap property. The proof shows that, once volume is defined through the Study determinant and the coefficient matrices are formed with the correct right/left order, the volume multiplier is again the modulus of the corresponding quaternion interpolation coefficient. 
+
+Corollary 1 (No cycling in exact arithmetic) . Assume that the algorithm uses exact inverses and accepts only swaps satisfying |Cpq | > 1 or |C′
+
+> qr
+
+| > 1. Then the algorithm cannot revisit the same core after a successful swap. Proof. Every successful swap strictly increases the volume. Returning to a previous core would return to its previous volume, which is impossible. 
+
+4.4 Dominance and exact quaternion CUR recovery 
+
+The previous theorem shows that a successful row or column replacement increases the volume of the current square core. We now connect this local volume increase with the interpolation viewpoint behind CUR approximations. This also explains what the stopping criterion of the algorithm means. Let A ∈ Hm×n, and let I ⊂ { 1, . . . , m } and J ⊂ { 1, . . . , n } be two index sets of cardinality k.We denote 
+
+B = A[I, J ], C = A[: , J ], R = A[I, :] .
+
+When B is nonsingular, the associated skeleton approximation is 
+
+A ≈ CB −1R. 
+
+The following proposition is the quaternion analogue of the classical exact CUR identity. 10 Proposition 1 (Exact quaternion CUR recovery) . Let A ∈ Hm×n have rank k, and assume that 
+
+B = A[I, J ] ∈ Hk×k is nonsingular. Then 
+
+A = A[: , J ]B−1A[I, :] .
+
+Proof. Let C = A[: , J ]. Since B = C[I, :] is nonsingular, the selected columns of C are right-linearly independent. Since rank (A) = k, every column of A belongs to the right span of the columns of C. Hence there exists a matrix X ∈ Hk×n such that 
+
+A = CX. 
+
+Restricting this identity to the rows indexed by I gives 
+
+A[I, :] = C[I, :] X = BX. 
+
+Multiplying from the left by B−1, we obtain 
+
+X = B−1A[I, :] .
+
+Substituting this expression in A = CX gives 
+
+A = A[: , J ]B−1A[I, :] .
+
+This proves the identity. For a general matrix, the same formula gives an interpolation-based low-rank approximation. Its stability depends on the size of the interpolation coefficients. This motivates the following definition. 
+
+Definition 1 (Quaternion quasi-dominant core) . Let B = A[I, J ] ∈ Hk×k be nonsingular. Define 
+
+CB = A[: , J ]B−1 ∈ Hm×k, RB = B−1A[I, :] ∈ Hk×n.
+
+We say that B is ε-quasi-dominant if 
+
+max  
+
+> i,j
+
+|(CB )ij | ≤ 1 + ε, max  
+
+> i,j
+
+|(RB )ij | ≤ 1 + ε. 
+
+For ε = 0 , we say that B is dominant. This definition is the direct quaternion version of the classical MaxVol dominance condition. It is well-defined because the modulus of a quaternion coefficient is a nonnegative real number. 
+
+Proposition 2 (Termination implies quasi-dominance) . Assume that the two-sided quater-nion MaxVol algorithm uses exact inverses and terminates when no admissible row or column replacement coefficient has modulus larger than 1 + ε. Then the final core B = A[I, J ] is 
+
+ε-quasi-dominant. Proof. At termination of the row phase, no admissible entry of 
+
+CB = A[: , J ]B−1
+
+has modulus larger than 1 + ε. The rows indexed by I satisfy 
+
+CB [I, :] = A[I, J ]B−1 = BB −1 = Ik.
+
+Thus their entries have modulus at most one. Hence 
+
+max  
+
+> i,j
+
+|(CB )ij | ≤ 1 + ε. 
+
+11 The same argument applies to the column phase. At termination, no admissible entry of 
+
+RB = B−1A[I, :] 
+
+has modulus larger than 1 + ε. The columns indexed by J satisfy 
+
+RB [: , J ] = B−1A[I, J ] = B−1B = Ik.
+
+Thus 
+
+max  
+
+> i,j
+
+|(RB )ij | ≤ 1 + ε. 
+
+The two inequalities are exactly the definition of an ε-quasi-dominant core. This proposition is local. It does not imply that the selected core has globally maximal volume. It says that the algorithm has reached a state in which all one-row and one-column replacements are controlled. This is the property that is useful for interpolation and numerical stability. 
+
+4.5 Interpolation stability of the quaternion CUR approximation 
+
+The quasi-dominance condition has a direct interpretation in terms of interpolation stability. We now make this point explicit. This result is not a best rank-k error bound. It is a conditional bound: once the columns C = A[: , J ] have been selected, the CUR approximation is controlled by the best approximation of A using these columns and by the size of the interpolation coefficients. This is an interpolation stability statement for the selected columns and rows. It should not be interpreted as a global relative-error CUR guarantee with respect to the best rank-k approxi-mation. Such guarantees require additional assumptions or different sampling mechanisms. Let SI ∈ Rk×m be the row-selection matrix such that 
+
+SI A = A[I, :] .
+
+Let 
+
+C = A[: , J ], B = A[I, J ] = SI C, R = A[I, :] = SI A. 
+
+Assume that B is nonsingular and define 
+
+P = CB −1SI .
+
+Then the CUR approximation can be written as 
+
+CB −1R = CB −1SI A = P A. 
+
+Moreover, 
+
+P C = CB −1SI C = CB −1B = C, 
+
+so P interpolates the selected columns. 
+
+Proposition 3 (Interpolation stability) . Let A ∈ Hm×n, let C = A[: , J ] ∈ Hm×k, and let 
+
+B = A[I, J ] ∈ Hk×k be nonsingular. Define 
+
+P = CB −1SI , ACUR = CB −1A[I, :] = P A. 
+
+Then 
+
+∥A − ACUR ∥F ≤ (1 + ∥P ∥2) min  
+
+> X∈Hk×n
+
+∥A − CX ∥F .
+
+12 Proof. Let X ∈ Hk×n be arbitrary. Since P C = C, we have 
+
+(I − P )CX = 0 .
+
+Therefore 
+
+A − ACUR = A − P A = ( I − P )A = ( I − P )( A − CX ).
+
+Using the submultiplicativity of the spectral norm with the Frobenius norm gives 
+
+∥A − ACUR ∥F ≤ ∥ I − P ∥2 ∥A − CX ∥F .
+
+Finally, 
+
+∥I − P ∥2 ≤ 1 + ∥P ∥2.
+
+Since the inequality holds for every X, taking the minimum over X ∈ Hk×n proves the result. The proposition shows that the CUR error is small when two things happen: the selected columns span the matrix well, and the interpolation operator P is not too large. The second point is precisely where MaxVol enters. 
+
+Corollary 2 (Stability under quasi-dominance) . Assume that B = A[I, J ] is ε-quasi-dominant. Then 
+
+∥A − ACUR ∥F ≤
+
+> (
+
+1 + (1 + ε)√mk 
+
+> )
+
+min  
+
+> X∈Hk×n
+
+∥A − CX ∥F .
+
+Proof. By definition, 
+
+P = CB −1SI .
+
+Since SI is a row-selection matrix, ∥SI ∥2 = 1 . Hence 
+
+∥P ∥2 ≤ ∥ CB −1∥2.
+
+If B is ε-quasi-dominant, then all entries of CB −1 have modulus at most 1 + ε. Therefore 
+
+∥CB −1∥2 ≤ ∥ CB −1∥F ≤ (1 + ε)√mk. 
+
+Substituting this estimate in Proposition 3 gives the claim. This corollary is intentionally simple. The constant is not sharp, but the message is useful: quasi-dominance controls the stability of the interpolation operator. To obtain a bound directly in terms of the best rank-k approximation error, one would also need to control how well the selected columns C = A[: , J ] approximate the column space of A. This is a stronger classical MaxVol-type question and is left for future work. 
+
+4.6 Append-row pseudoinverse update for RectMaxVol 
+
+We now prove the append-row pseudoinverse update used by RectMaxVol. 
+
+Proposition 4 (Quaternion append-row pseudoinverse update) . Let B ∈ Hr×k have full column rank and let 
+
+Bnew =
+
+> [
+
+Ba∗
+
+> ]
+
+, a ∈ Hk.
+
+Let G = B∗B, c = G−1a, d = 1 + a∗c, and s = Bc . Then d ∈ R>0 and 
+
+B† 
+
+> new
+
+=
+
+> [
+
+B† − cd −1s∗ cd −1]
+
+.
+
+13 Proof. Since B has full column rank, G = B∗B is Hermitian positive definite. Thus G−1 is Hermitian positive definite, and 
+
+a∗G−1a ∈ R≥0.
+
+Hence 
+
+d = 1 + a∗G−1a = 1 + a∗c ∈ R>0.
+
+In particular, d commutes with all quaternionic quantities. We have 
+
+B∗
+
+> new
+
+Bnew = B∗B + aa ∗ = G + aa ∗.
+
+By the quaternion Woodbury identity, 
+
+(G + aa ∗)−1 = G−1 − G−1a(1 + a∗G−1a)−1a∗G−1.
+
+Using c = G−1a and d = 1 + a∗G−1a, this becomes 
+
+(G + aa ∗)−1 = G−1 − cd −1a∗G−1.
+
+Now 
+
+B† 
+
+> new
+
+= ( B∗
+
+> new
+
+Bnew )−1B∗ 
+
+> new
+
+= ( G + aa ∗)−1 [
+
+B∗ a
+
+]
+
+.
+
+We compute the two blocks separately. For the first block, 
+
+(G + aa ∗)−1B∗ = G−1B∗ − cd −1a∗G−1B∗
+
+= B† − cd −1(Bc )∗
+
+= B† − cd −1s∗.
+
+For the second block, 
+
+(G + aa ∗)−1a = G−1a − cd −1a∗G−1a
+
+= c − cd −1(a∗c)= c
+
+(
+
+1 − d−1(d − 1) 
+
+)
+
+= cd −1.
+
+Therefore 
+
+B† 
+
+> new
+
+=
+
+[
+
+B† − cd −1s∗ cd −1]
+
+.
+
+This proves the formula. 
+
+4.7 RectMaxVol and right preconditioning 
+
+We now explain why RectMaxVol gives a natural right preconditioner for overdetermined quaternion least-squares problems. This is the mechanism used in the numerical experiments. The argument parallels the real/complex RectMaxVol preconditioning mechanism, but it is stated for right quaternion least-squares preconditioning. The QR factorization, pseudoinverse, and row-norm identities are used in the quaternion sense. Let 
+
+A ∈ Hm×n, m ≥ n, 
+
+be full column rank. We consider 
+
+min  
+
+> x∈Hn
+
+∥Ax − b∥2.
+
+Assume that RectMaxVol selects a row set I and define 
+
+S = A[I, :] ∈ Hr×n, r ≥ n. 
+
+14 We assume that S has full column rank. Let 
+
+S = QR, Q∗Q = In,
+
+be a reduced quaternion QR factorization of S. We use the right preconditioner 
+
+T = R−1.
+
+The preconditioned least-squares problem is 
+
+min  
+
+> y∈Hn
+
+∥AT y − b∥2, x = T y. 
+
+The selected rows of the preconditioned matrix are 
+
+A[I, :] T = SR −1 = Q, 
+
+so they have orthonormal columns. Thus the preconditioned matrix contains a normalized representative subsystem. 
+
+Proposition 5 (Conditioning bound for RectMaxVol preconditioning) . Let A ∈ Hm×n be full column rank. Let S = A[I, :] ∈ Hr×n be full column rank, and let 
+
+S = QR, Q∗Q = In,
+
+be a reduced quaternion QR factorization. Set T = R−1.Assume that RectMaxVol returns S with the coefficient bound 
+
+∥A[i, :] S†∥2 ≤ τ for all i / ∈ I. 
+
+Then 
+
+σmin (AT ) ≥ 1,
+
+and 
+
+σmax (AT ) ≤
+
+√
+
+n + ( m − r)τ 2 .
+
+In particular, if τ ≥ 1, then 
+
+κ2(AT ) ≤
+
+√
+
+n + ( m − r)τ 2 ≤ √m τ. 
+
+Proof. Since S = QR and Q∗Q = In, the Moore–Penrose pseudoinverse of S is 
+
+S† = R−1Q∗.
+
+Indeed, 
+
+S† = ( S∗S)−1S∗ = ( R∗Q∗QR )−1R∗Q∗ = ( R∗R)−1R∗Q∗ = R−1Q∗.
+
+Let ai = A[i, :] be a row of A. Then 
+
+aiS† = aiR−1Q∗.
+
+Since Q∗Q = In, right multiplication by Q∗ preserves the Euclidean norm of row vectors in 
+
+H1×n. Hence 
+
+∥aiS†∥2 = ∥aiR−1Q∗∥2 = ∥aiR−1∥2 = ∥aiT ∥2.
+
+The RectMaxVol coefficient bound therefore implies 
+
+∥A[i, :] T ∥2 ≤ τ for all i / ∈ I. 
+
+15 Now reorder the rows of AT so that the selected rows come first. Then 
+
+AT =
+
+> [
+
+A[I, :] TA[Ic, :] T
+
+> ]
+
+=
+
+> [
+
+QE
+
+> ]
+
+,
+
+where E = A[Ic, :] T . Therefore 
+
+(AT )∗(AT ) = Q∗Q + E∗E = In + E∗E. 
+
+Since E∗E is Hermitian positive semidefinite, all eigenvalues of (AT )∗(AT ) are not less than one. Hence 
+
+σmin (AT ) ≥ 1.
+
+For the upper bound, we use the Frobenius norm: 
+
+∥AT ∥2 
+
+> F
+
+= ∥Q∥2 
+
+> F
+
++ ∥E∥2 
+
+> F
+
+.
+
+Since Q∗Q = In, we have ∥Q∥2 
+
+> F
+
+= n. Moreover, every non-selected row of E has Euclidean norm at most τ . Hence 
+
+∥E∥2 
+
+> F
+
+≤ (m − r)τ 2.
+
+Thus 
+
+σmax (AT ) ≤ ∥ AT ∥F ≤
+
+> √
+
+n + ( m − r)τ 2 .
+
+Combining this bound with σmin (AT ) ≥ 1 gives the condition-number estimate. If τ ≥ 1, then 
+
+n + ( m − r)τ 2 ≤ mτ 2,
+
+and therefore 
+
+κ2(AT ) ≤ √m τ. 
+
+The bound is simple and not meant to be sharp. Its role is to explain the stabilization mechanism. RectMaxVol selects a representative set of rows. The QR factorization normalizes this selected subsystem. The RectMaxVol stopping criterion controls the remaining rows of the preconditioned matrix. 
+
+4.8 On approximate inverses in the implementation 
+
+The monotonicity and dominance results above are stated for exact inverses. In practice, one may use an inverse computed through the complex embedding, an iterative inverse, or a quaternion pseudoinverse. It is therefore useful to record a simple perturbation observation. Let B ∈ Hk×k be nonsingular and let U be an approximation of B−1. Define the exact and computed row coefficient matrices by 
+
+C = A[: , J ]B−1, ˜C = A[: , J ]U. 
+
+Similarly, define 
+
+R = B−1A[I, :] , ˜R = U A [I, :] .
+
+Proposition 6 (Coefficient perturbation under an approximate inverse) . Assume that 
+
+∥U − B−1∥2 ≤ η. 
+
+Then 
+
+∥ ˜C − C∥F ≤ ∥ A[: , J ]∥F η, ∥ ˜R − R∥F ≤ η ∥A[I, :] ∥F .
+
+Moreover, for every entry, 
+
+| ˜Cij − Cij | ≤ ∥ A[i, J ]∥2 η, 
+
+and 
+
+| ˜Rij − Rij | ≤ η ∥A[I, j ]∥2.
+
+16 Proof. Let 
+
+E = U − B−1.
+
+Then ˜C − C = A[: , J ]E. 
+
+Hence 
+
+∥ ˜C − C∥F = ∥A[: , J ]E∥F ≤ ∥ A[: , J ]∥F ∥E∥2 ≤ ∥ A[: , J ]∥F η. 
+
+Similarly, ˜R − R = EA [I, :] ,
+
+and therefore 
+
+∥ ˜R − R∥F ≤ ∥ E∥2∥A[I, :] ∥F ≤ η∥A[I, :] ∥F .
+
+For the entrywise bounds, note that 
+
+> ˜
+
+Cij − Cij = A[i, J ]Ee j .
+
+Thus, by Cauchy–Schwarz, 
+
+| ˜Cij − Cij | ≤ ∥ A[i, J ]∥2∥Ee j ∥2 ≤ ∥ A[i, J ]∥2∥E∥2 ≤ ∥ A[i, J ]∥2η. 
+
+The proof for ˜R − R is the same. We have 
+
+> ˜
+
+Rij − Rij = e∗ 
+
+> i
+
+EA [I, j ],
+
+and hence 
+
+| ˜Rij − Rij | ≤ ∥ e∗ 
+
+> i
+
+E∥2∥A[I, j ]∥2 ≤ η∥A[I, j ]∥2.
+
+This proves the proposition. 
+
+Remark 1 (Numerical swap decisions) . Suppose that a row swap is accepted because the computed coefficient satisfies 
+
+| ˜Cpq | > 1 + ε. 
+
+If 
+
+| ˜Cpq − Cpq | ≤ δ, 
+
+then 
+
+|Cpq | ≥ | ˜Cpq | − δ > 1 + ε − δ. 
+
+Therefore, if ε > δ , the exact coefficient still satisfies 
+
+|Cpq | > 1,
+
+and the exact volume increases. The same argument applies to column swaps through ˜R.This observation does not replace the exact monotonicity theorem. It only explains why the exact theory remains relevant when the inverse is computed with sufficient accuracy. In practice, this also motivates monitoring the inverse residual or recomputing the inverse when rank-one updates become unstable. 17 5 Numerical experiments 
+
+We now illustrate the behavior of the proposed methods. The purpose is not to compare all possible quaternion low-rank approximation algorithms. Instead, we focus on three simple questions. First, does quaternion Greedy MaxVol give useful CUR approximations for RGB images? Second, can RectMaxVol be used as a preconditioner for ill-conditioned quaternion least-squares systems? Third, can RectMaxVol select representative rows in real quaternion-valued motion data? All experiments were run with the number of threads limited to 8. The image experiments use RGB images encoded as pure quaternion matrices, 
+
+Q = 0 + Ri + Gj + Bk, 
+
+where R, G and B are the red, green and blue channels. The reconstruction is converted back to RGB by extracting the imaginary components. The code used to generate the numerical experiments is available at our GitHub repository. All computations are performed with native quaternion arithmetic. In particular, the basic quaternion linear algebra routines used by the proposed algorithms, including the operations on quaternion bases and the auxiliary matrix routines, are provided by the QuatIca package [18]. 
+
+5.1 RGB image approximation 
+
+We first test quaternion CUR approximation on RGB images from the JPEG Happywhale dataset [19]. The goal is to check whether selected rows and columns can reconstruct the image with increasing accuracy as the core size grows. For the Greedy MaxVol experiment, we use QR initialization and compare two inverse strategies: the complex embedding inverse and the Newton–Schulz quaternion pseudoinverse. The selected indices were the same in the tested cases, so the reconstruction errors coincide. The main difference is the running time. Table 1: Greedy MaxVol with QR initialization on RGB images. The table reports mean values over the tested images. The Newton–Schulz variant is quaternion-native, while the Φ variant computes the inverse through the complex embedding. 
+
+k inverse strategy time (s) iterations relF PSNR 5 Φ + rank-one updates 0.027 7.5 0.296 17.004 5 NS + rank-one updates 0.036 7.5 0.296 17.004 10 Φ + rank-one updates 0.075 14.2 0.254 18.527 10 NS + rank-one updates 0.104 14.2 0.254 18.527 25 Φ + rank-one updates 0.132 28.0 0.204 20.921 25 NS + rank-one updates 0.177 28.0 0.204 20.921 50 Φ + rank-one updates 0.344 37.8 0.169 23.127 50 NS + rank-one updates 0.550 37.8 0.169 23.127 The expected behavior is observed. Increasing k improves the reconstruction quality. The relative Frobenius error decreases from 0.296 at k = 5 to 0.169 at k = 50 , while the PSNR increases from 17 .004 dB to 23 .127 dB. The Φ-based inverse is faster, while the Newton–Schulz version is closer to a quaternion-native implementation. We also tested a high-resolution image resized to 2000 × 2000 [20]. The reconstruction quality for different values of k is shown in Fig. 3. Table 2 reports the results for Greedy MaxVol only. This experiment mainly checks scalability of the basic method. 18 Original (img 1) k=5 k=10 k=25 k=50     
+
+> Original (img 2) k=5 k=10 k=25 k=50
+
+Greedy MaxVol (NS + rank-1 updates + qr init) Figure 1: Example of RGB reconstruction with quaternion Greedy MaxVol using Newton–Schulz pseudoinverse updates and QR initialization. C  
+
+> 2000 x 500
+> U
+> 500 x 500
+> R
+> 500 x 2000
+> A_rec
+> 2000 x 2000
+> ××=
+> Greedy MaxVol CUR decomposition, k=500
+
+Figure 2: Example of quaternion CUR decomposition for high resolution 2000 × 2000 RGB image with core size k = 500 .Table 2: Greedy MaxVol on a 2000 × 2000 RGB image. 
+
+k time (s) relF rel2 MSE RGB PSNR 500 235.136 0.853 0.394 0.067 11.751 1000 550.998 0.578 0.293 0.029 15.363 1500 1177.220 0.252 0.134 0.006 22.143 The quality improves significantly with k. This is especially visible between k = 1000 and 
+
+k = 1500 . The cost is also substantial, which is expected because the current implementation is not yet optimized for very large images. 19 Original k = 500 k = 1000 k = 1500 
+
+High resolution comparison: Greedy MaxVol Figure 3: Reconstruction demonstration for high resolution 2000 × 2000 image and core sizes 
+
+k ∈ [500 , 1000 , 1500] .
+
+5.1.1 Tensor-CUR comparison Original (img 1) k=5 k=10 k=25 k=50     
+
+> Original (img 2) k=5 k=10 k=25 k=50
+
+Demo for Tensor-CUR 
+
+Figure 4: Example of RGB reconstruction with Tensor-CUR. 10 20 30 40 50         
+
+> k
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> Relative Frobenius error
+> 10 20 30 40 50
+> k
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> Relative spectral error
+> 10 20 30 40 50
+> k
+> 10
+> 20
+> 30
+> PSNR (db)
+
+Tensor-CUR vs Greedy MaxVol on the image dataset  
+
+> Greedy MaxVol (NS + rank-1 updates + QR) Tensor-CUR
+
+Figure 5: Comparison between Greedy MaxVol and Tensor-CUR performance on Happywhale dataset. As an additional baseline, we also tested the Tensor-CUR sampling idea of Mahoney, Maggioni, and Drineas [21] on the same RGB data, using norm-proportional random sampling without replacement, and c = r = k. Greedy MaxVol outperforms Tensor-CUR across all metrics except execution time. Thus we can state that Tensor-CUR is useful as a very cheap tensor baseline, but the maximum-volume selection gives substantially better reconstructions in these tests. 20 Greedy MaxVol 
+
+Original k = 500 k = 1000 k = 1500 
+
+> Tensor-CUR
+
+High resolution comparison demo: Greedy MaxVol vs Tensor-CUR Figure 6: Reconstruction demonstration of Greedy MaxVol and Tensor-CUR for high resolution 
+
+2000 × 2000 image and core sizes k ∈ [500 , 1000 , 1500] .600 800 1000 1200 1400 
+
+> k
+> 0
+> 500
+> 1000
+
+Elapsed time (s)      
+
+> 600 800 1000 1200 1400
+> k
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+
+Relative Frobenius error     
+
+> 600 800 1000 1200 1400
+> k
+> 0.2
+> 0.4
+> 0.6
+
+Relative spectral error     
+
+> 600 800 1000 1200 1400
+> k
+> 10
+> 15
+> 20
+
+PSNR (db)     
+
+> 600 800 1000 1200 1400
+> k
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+
+MSE RGB      
+
+> 600 800 1000 1200 1400
+> k
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+
+Relative RGB Frobenius error 
+
+High resolution comparison metrics: Greedy MaxVol vs Tensor-CUR  
+
+> Greedy MaxVol Tensor-CUR
+
+Figure 7: Comparison between Greedy MaxVol and Tensor-CUR for high resolution 2000 × 2000 
+
+image and core sizes k ∈ [500 , 1000 , 1500] .
+
+5.2 RectMaxVol-based preconditioning for quaternion least squares 
+
+We next test RectMaxVol as a row-selection tool for preconditioning. Let 
+
+A ∈ Hm×n, m ≫ n, 
+
+be full column rank. We consider 
+
+min 
+
+x∈Hn ∥Ax − b∥2. (10) 21 For a right preconditioner T , we solve 
+
+min  
+
+> y∈Hn
+
+∥AT y − b∥2, x = T y. 
+
+Square MaxVol selects n rows and uses T = B−1. RectMaxVol selects r ≥ n rows, computes 
+
+S = A[I, :] = QR , and uses T = R−1. In the implementation used here, the iterative least-squares solve is applied to the real representation of the quaternion system, while the row selection and the preconditioners are built from quaternion operations. We generated synthetic quaternion matrices with prescribed singular values. The matrices were of sizes 150 × 10 , 300 × 20 , and 600 × 40 . The target condition number in the reported runs is 10 6, with singular values distributed logarithmically between 1 and 10 −6. For each size and noise level, we performed 100 independent trials. The right-hand side is 
+
+b = Ax true + η, 
+
+where η is a quaternion Gaussian noise vector. Table 3 reports median values for noise level 
+
+α = 10 −8.Table 3: Synthetic quaternion least-squares preconditioning results for noise level α = 10 −8.Median values over 100 trials are reported. Size Method κ2(Aprec ) Iter. Rel. residual Rel. sol. error Total time (s) small No preconditioner 1.000 · 10 6 27.0 1.947 · 10 −8 5.042 · 10 −4 0.005 small Random rows + QR 4.108 · 10 0 10.0 1.946 · 10 −8 5.260 · 10 −4 0.002 small Norm rows + QR 4.803 · 10 0 10.0 1.951 · 10 −8 5.214 · 10 −4 0.002 small Square MaxVol 4.972 · 10 0 10.0 1.951 · 10 −8 5.365 · 10 −4 0.006 small RectMaxVol + QR 2.616 · 10 0 10.0 1.944 · 10 −8 5.042 · 10 −4 0.028 medium No preconditioner 1.000 · 10 6 115.0 2.944 · 10 −7 3.306 · 10 −2 0.018 medium Random rows + QR 4.797 · 10 0 19.0 8.999 · 10 −8 4.101 · 10 −3 0.009 medium Norm rows + QR 5.088 · 10 0 19.0 9.388 · 10 −8 5.397 · 10 −3 0.010 medium Square MaxVol 8.401 · 10 0 23.0 2.349 · 10 −8 8.654 · 10 −4 0.018 medium RectMaxVol + QR 3.190 · 10 0 17.0 7.200 · 10 −8 3.342 · 10 −3 0.068 large No preconditioner 1.000 · 10 6 500.0 1.263 · 10 −6 1.861 · 10 −1 0.140 large Random rows + QR 5.049 · 10 0 26.0 1.523 · 10 −7 6.688 · 10 −3 0.032 large Norm rows + QR 5.312 · 10 0 26.0 1.662 · 10 −7 7.429 · 10 −3 0.034 large Square MaxVol 1.452 · 10 1 38.0 3.904 · 10 −7 1.844 · 10 −2 0.070 large RectMaxVol + QR 3.638 · 10 0 23.0 9.168 · 10 −8 4.358 · 10 −3 0.282 The effect of preconditioning is clear. Without preconditioning, the large problem reaches the iteration limit of 500 . With RectMaxVol, the median condition number is reduced to 3.638 ,and the median number of iterations decreases to 23 . RectMaxVol is more expensive to set up than the simple baselines, but it gives the best conditioning in these tests. 
+
+5.3 RectMaxVol row selection on motion-capture data 
+
+We now test RectMaxVol on real quaternion-valued data. The data source is the CMU Graphics Lab Motion Capture Database [22, 23]. We use the BVH conversion mirror [24]. For each BVH file, we parse the skeleton and keep 17 major joints. The three-dimensional position of a joint is encoded as a pure quaternion, 
+
+(x, y, z ) 7 → 0 + xi + yj + zk. 
+
+22 No preconditioner 
+
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 3
+> 10 6
+> 2(Aprec )
+
+small: 150 x 10  
+
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 3
+> 10 6
+
+medium: 300 x 20  
+
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 3
+> 10 6
+
+large: 600 x 40                  
+
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 7
+> 2 × 10 83 × 10 84 × 10 86 × 10 8
+> Ax comp  b 2/ b 2
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 7
+> 10 6
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 7
+> 10 6
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 4
+> 10 3
+> 10 2
+> xcomp  xtrue  2/ xtrue  2
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 3
+> 10 1
+> No preconditioner
+> Random rows + QR
+> Norm rows + QR
+> Square MaxVol
+> RectMaxVol + QR
+> 10 3
+> 10 2
+> 10 1
+
+LSQR metrics across all trials, noise=1e-08 Figure 8: Synthetic least-squares metrics for noise level α = 10 −8.For a motion clip with N frames, this gives a quaternion pose matrix P ∈ HN ×17 . Since we want to select important changes in motion, we use frame-to-frame differences, 
+
+At = Pt+1 ,: − Pt, :, t = 0 , . . . , N − 2.
+
+Thus each row of A ∈ H(N −1) ×17 corresponds to one motion change. After a method selects row indices I, we evaluate how well all motion changes can be reconstructed from the selected rows. The selection itself is quaternion-based for RectMaxVol, while the reconstruction error is evaluated after converting the quaternion change matrix to its complex Φ-representation 
+
+X = Φ( A) ∈ C2( N −1) ×34 .
+
+Each selected quaternion row corresponds to two rows in the complex embedding. If m = N − 1,we use the embedded row set 
+
+IΦ = I ∪ { i + m : i ∈ I}.
+
+With CΦ = X[IΦ, :] , we compute 
+
+W ⋆ = arg min 
+
+W
+
+∥W C Φ − X∥F ,̂ X = W ⋆CΦ,
+
+using a least-squares solve. The reported error is 
+
+∥X −̂ X∥F
+
+∥X∥F
+
+.
+
+We compare RectMaxVol with random rows, norm rows, KMeans centers [25], and leverage scores [26]. All methods select the same number of rows as RectMaxVol. The random baseline uses one random draw for each processed file. KMeans and leverage scores are computed on the complex embedded feature matrix used for the final reconstruction metric; KMeans is run with 
+
+10 initializations and each selected row is the nearest actual row to a cluster center. 23 Table 4: MoCap change-frame reconstruction for one representative BVH file. Method selected rows relative Frobenius error setup time (s) RectMaxVol 23 0.099553 0.199998 Random rows 23 0.165409 0.000138 Norm rows 23 0.124786 0.000487 KMeans centers 23 0.118046 1.666353 Leverage scores 23 0.123121 0.012411 0 500 1000 1500 2000 2500 
+
+> Original frame id
+> 0
+> 1
+> 2
+> 3
+> 4
+> Quaternion change magnitude  change magnitude
+> RectMaxVol selected frames
+> KMeans centers selected frames
+> Leverage scores selected frames
+> RectMaxVol, KMeans, and Leverage selected MoCap change frames
+
+Figure 9: Selected motion-change frames for RectMaxVol and the baseline methods on one representative BVH file. Table 5: Median MoCap reconstruction results over 1000 processed BVH records. Method median rows median error median setup time (s) RectMaxVol 21.0 0.048421 0.182165 Random rows 21.0 0.153034 0.001185 Norm rows 21.0 0.065842 0.001961 KMeans centers 21.0 0.049633 0.357306 Leverage scores 21.0 0.059677 0.009400 We also processed 1000 BVH records. Table 5 reports median results. RectMaxVol gives the smallest median reconstruction error, with a moderate advantage over KMeans centers. It is also faster than KMeans in setup time, but slower than norm rows and leverage scores. Fig. 11 summarizes how often each method gives the best reconstruction error. RectMaxVol is the best method for 50 .4% of the processed records. Fig. 12 provides a paired comparison for the same records by plotting err baseline −err RectMaxVol 
+
+for each baseline. The median paired difference is positive for all baselines: 0.001433 for KMeans centers, 0.008638 for leverage scores, 0.016495 for norm rows, and 0.083408 for random rows. Thus, RectMaxVol improves over KMeans only moderately in the median paired error, while the gaps to leverage scores, norm rows, and random rows are larger. Fig. 13 shows the corresponding paired win rates: RectMaxVol gives a smaller reconstruction error than KMeans centers for 58 .5% of the records, than leverage scores for 82 .6% , than norm rows for 89 .1% , and than random rows for 96 .6% .Overall, these experiments show that RectMaxVol can be used as a practical row-selection method for quaternion motion data. It selects a small number of informative motion-change frames and gives the best median reconstruction quality among the tested methods. The 24 files        
+
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> Relative reconstruction error
+> Method
+> Leverage scores
+> KMeans centers
+> Norm rows
+> Random rows
+> RectMaxVol
+> files
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> Setup time (s)
+
+MoCap change selection: RectMaxVol vs equal-size baselines Figure 10: MoCap reconstruction error and setup time over 1000 processed BVH records. Leverage scores  
+
+> KMeans centers
+> Norm rows
+> Random rows
+> RectMaxVol
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Best by error (%)
+> 10.4%
+> 34.7%
+> 3.6% 0.9%
+> 50.4%
+
+Best method frequency by reconstruction error 
+
+Figure 11: Percentage of BVH records where each method gives the best reconstruction error. RectMaxVol is the best method for 50 .4% of the processed records. main cost of this improvement is the setup time, because RectMaxVol performs an iterative row-selection procedure. 25 Random rows 
+
+> Norm rows
+> KMeans centers
+> Leverage scores
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> err baseline  err RectMaxVol
+
+Paired MoCap reconstruction-error differences Figure 12: Paired differences between each baseline reconstruction error and the RectMaxVol reconstruction error over 1000 processed BVH records. Positive values mean that RectMaxVol gives a smaller error for the same BVH file. KMeans centers 
+
+> Leverage scores
+> Norm rows
+> Random rows
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> RectMaxVol better by error (%)
+> 58.5%
+> 82.6%
+> 89.1%
+> 96.6%
+
+Paired win rate of RectMaxVol against each baseline 
+
+Figure 13: Percentage of BVH records where RectMaxVol gives a smaller reconstruction error than each baseline method in the paired comparison. 
+
+# 6 Conclusion and perspectives 
+
+We studied maximum-volume submatrix selection for quaternion matrices. The main point was to adapt the classical MaxVol and RectMaxVol ideas while keeping track of quaternion noncommutativity. We defined the quaternion volume using singular values and the Study determinant, derived the rank-one update formulas needed for row and column replacements, and proved that successful Greedy MaxVol swaps increase the quaternion volume when exact inverses are used. We also connected the stopping criterion with a quasi-dominance property, proved an exact quaternion CUR identity in the full-rank case, and derived an interpolation stability bound for the associated CUR approximation. For the rectangular case, we derived an append-row pseudoinverse update and showed how RectMaxVol leads to a natural right 26 preconditioner for overdetermined quaternion least-squares problems. The numerical experiments support this theoretical picture. Greedy MaxVol gives stable quaternion CUR approximations of RGB images, and the quality improves as the selected core grows. RectMaxVol gives strong preconditioners for ill-conditioned quaternion least-squares systems, reducing both the condition number and the number of iterations. It also provides an effective row-selection method for quaternion motion-capture data, where it selects representative motion changes and compares favorably with standard baselines. Several directions seem promising. A first one is to combine quaternion MaxVol selection with randomized quaternion low-rank approximation. In this setting, sketching could first build a small quaternion basis, while MaxVol would then extract actual rows and columns, leading to fast and interpretable CUR approximations. A second direction is to use MaxVol ideas inside structured constrained models. For example, in quaternion analogues of separable or coseparable models, the core is itself a submatrix of the data. This may lead to classes of selection problems that are easier than the general maximum-volume problem, and where exact or stable recovery can be proved under geometric assumptions. Finally, it would be interesting to extend the present framework beyond classical quaternions, for instance to matrices over split quaternions [27] and Clifford algebras [28], which naturally arise in signal processing and geometric computing. 
+
+# References 
+
+[1] Sergei A Goreinov, Nikolai Leonidovich Zamarashkin, and Evgenii Evgen’evich Tyrtysh-nikov. “Pseudo-skeleton approximations by matrices of maximal volume”. In: Mathematical Notes 62.4 (1997), pp. 515–519. [2] Sergei A Goreinov and Eugene E Tyrtyshnikov. “The maximal-volume concept in ap-proximation by low-rank matrices”. In: Contemporary Mathematics 280 (2001), pp. 47– 52. [3] Sergei A Goreinov, Ivan V Oseledets, Dimitry V Savostyanov, Eugene E Tyrtyshnikov, and Nikolay L Zamarashkin. “How to find a good submatrix”. In: Matrix Methods: Theory, Algorithms And Applications: Dedicated to the Memory of Gene Golub . World Scientific, 2010, pp. 247–256. [4] Aleksandr Mikhalev and Ivan V Oseledets. “Rectangular maximum-volume submatrices and their applications”. In: Linear Algebra and its Applications 538 (2018), pp. 187–211. [5] Kenneth Allen, Ming-Jun Lai, and Zhaiming Shen. “Maximal volume matrix cross approx-imation for image compression and least squares solution”. In: Advances in Computational Mathematics 50.5 (2024), p. 102. [6] Alice Cortinovis, Daniel Kressner, and Stefano Massei. “On maximum volume submatrices and cross approximation for symmetric semidefinite and diagonally dominant matrices”. In: Linear Algebra and its Applications 593 (2020), pp. 251–268. [7] Shusen Wang and Zhihua Zhang. “Improving CUR matrix decomposition and the Nyström approximation via adaptive sampling”. In: The Journal of Machine Learning Research 
+
+14.1 (2013), pp. 2729–2769. [8] Perfect Y Gidisu and Michiel E Hochstenbach. “Block discrete empirical interpolation methods”. In: Journal of Computational and Applied Mathematics 454 (2025), p. 116186. [9] Fuzhen Zhang. “Quaternions and matrices of quaternions”. In: Linear algebra and its applications 251 (1997), pp. 21–57. [10] Nicolas Le Bihan and Jérôme Mars. “Singular value decomposition of quaternion matrices: a new tool for vector-sensor signal processing”. In: Signal processing 84.7 (2004), pp. 1177– 1199. 27 [11] Zhigang Jia, Musheng Wei, Mei-Xiang Zhao, and Yong Chen. “A new real structure-preserving quaternion QR algorithm”. In: Journal of Computational and Applied Mathe-matics 343 (2018), pp. 26–48. [12] Zhigang Jia, Michael K Ng, and Guang-Jing Song. “Lanczos method for large-scale quaternion singular value decomposition”. In: Numerical Algorithms 82.2 (2019), pp. 699– 717. [13] Qiaohua Liu, Sitao Ling, and Zhigang Jia. “Randomized quaternion singular value decom-position for low-rank matrix approximation”. In: SIAM Journal on Scientific Computing 
+
+44.2 (2022), A870–A900. [14] Salman Ahmadi-Asl, Malihe Nobakht Kooshkghazi, and Valentin Leplat. “Pass-efficient Randomized Algorithms for Low-rank Approximation of Quaternion Matrices”. In: Nu-merical Algorithms (2026). [15] Valentin Leplat, Salman Ahmadi-Asl, Junjun Pan, and Ning Zheng. “Iterative Methods for Computing the Moore-Penrose Pseudoinverse of Quaternion Matrices, with Applications”. In: Journal of Scientific Computing 107.86 (2026). [16] Helmer Aslaksen. “Quaternionic Determinants”. In: The Mathematical Intelligencer 18 (June 1996), pp. 57–65. doi : 10.1007/BF03024312 .[17] N. Cohen and S. De Leo. “The quaternionic determinant”. In: Electronic Journal of Linear Algebra 7 (2000), pp. 100–111. [18] Valentin Leplat, Salman Ahmadi-Asl, Junjun Pan, Henni Ouerdane, and Michael Ng. 
+
+QuatIca: Advanced Numerical Linear Algebra and Optimization for Quaternionic Matrices in Python . 2026. arXiv: 2603.24074 [math.NA] . url : https://arxiv.org/abs/2603. 24074 .[19] JPEG Happywhale 256x256 . https : / / www . kaggle . com / datasets / rdizzl3 / jpeg -happywhale-256x256 . Accessed: 2025-02-24. [20] Forest Woods Autumn by jplenio . https://pixabay.com/photos/forest-woods-autumn-nature-3804001/ . Accessed: 2025-02-24. [21] Michael W Mahoney, Mauro Maggioni, and Petros Drineas. “Tensor-CUR decompositions for tensor-based data”. In: Proceedings of the 12th ACM SIGKDD international conference on Knowledge discovery and data mining . 2006, pp. 327–336. [22] CMU Graphics Lab Motion Capture Database . http://mocap.cs.cmu.edu/ . Accessed: 2026-05-19. [23] re3data.org. CMU Graphics Lab Motion Capture Database . https://doi.org/10.17616/ R3N35M . Accessed: 2026-05-19. [24] una-dinosauria. The CMU mocap dataset in BVH format . https://github.com/una-dinosauria/cmu-mocap . Accessed: 2026-05-19. [25] James B McQueen. “Some methods of classification and analysis of multivariate obser-vations”. In: Proc. of 5th Berkeley Symposium on Math. Stat. and Prob. 1967, pp. 281– 297. [26] Petros Drineas, Malik Magdon-Ismail, Michael W Mahoney, and David P Woodruff. “Fast approximation of matrix coherence and statistical leverage”. In: The Journal of Machine Learning Research 13.1 (2012), pp. 3475–3506. [27] Rafał Abłamowicz. “The Moore–Penrose inverse and singular value decomposition of split quaternions”. In: Advances in Applied Clifford Algebras 30.3 (2020), pp. 1–20. [28] Wei Cao, Rui Zheng, and Hongxing Cao. “The Moore–Penrose inverses of Clifford algebra Cl 1,2”. In: arXiv preprint arXiv:2204.11047 (2022). 28 A Quaternion Woodbury and rank-one update formulas 
+
+We include the main inverse-update identities used in the algorithms of Section 3. They are standard in the real and complex cases, but in the quaternion setting the order of multiplication has to be kept fixed. This appendix justifies the formulas stated in Section 3, in particular the row and column inverse updates used by Algorithm 1. 
+
+Proposition 7 (Woodbury identity over H). Let A ∈ Hn×n be invertible, and let U ∈ Hn×k,
+
+C ∈ Hk×k, and V ∈ Hk×n. Assume that C and 
+
+S = C−1 + V A −1U
+
+are invertible. Then 
+
+(A + U CV )−1 = A−1 − A−1U S −1V A −1.
+
+Proof. Let 
+
+X = A−1 − A−1U S −1V A −1.
+
+We prove both inverse identities. First, 
+
+(A + U CV )X = I − U S −1V A −1 + U CV A −1 − U CV A −1U S −1V A −1
+
+= I + U
+
+(
+
+C − S−1 − CV A −1U S −1)
+
+V A −1.
+
+Since 
+
+S = C−1 + V A −1U, 
+
+we have 
+
+CS = I + CV A −1U, 
+
+and therefore 
+
+CV A −1U S −1 = ( CS − I)S−1 = C − S−1.
+
+Thus (A + U CV )X = I.Similarly, 
+
+X(A + U CV ) = I − A−1U S −1V + A−1U CV − A−1U S −1V A −1U CV 
+
+= I + A−1U
+
+(
+
+C − S−1 − S−1V A −1U C 
+
+)
+
+V. 
+
+Since 
+
+SC = I + V A −1U C, 
+
+multiplying on the left by S−1 gives 
+
+C = S−1 + S−1V A −1U C. 
+
+Hence X(A + U CV ) = I. Thus X = ( A + U CV )−1.Taking C = 1 , U = u, and V = v∗, we obtain the quaternion Sherman–Morrison formula 
+
+(A + uv ∗)−1 = A−1 − A−1u(1 + v∗A−1u)−1v∗A−1.
+
+If the qth column of A is replaced by a new column b, then 
+
+Anew = A + ( b − aq)e∗ 
+
+> q
+
+,
+
+where aq is the old qth column. Hence 
+
+A−1new = A−1 − A−1(b − aq)
+
+(
+
+1 + e∗ 
+
+> q
+
+A−1(b − aq)
+
+)−1
+
+e∗ 
+
+> q
+
+A−1.
+
+29 If the qth row of A is replaced by a new row b∗, then 
+
+Anew = A + eq(b∗ − a∗ 
+
+> q
+
+),
+
+and 
+
+A−1new = A−1 − A−1eq
+
+> (
+
+1 + ( b∗ − a∗ 
+
+> q
+
+)A−1eq
+
+> )−1
+
+(b∗ − a∗ 
+
+> q
+
+)A−1.
+
+These are the update formulas used in Algorithm 1. 
+
+# B Other quaternion MaxVol-type adaptations 
+
+This appendix briefly describes two additional algorithms that were adapted to the quaternion setting during the project. They are not used as main contributions in the paper because they did not improve over the simpler methods in the current experiments. Still, they are useful to document, since they may become relevant after further implementation work. 
+
+B.1 Quaternion GMVA 
+
+The alternating h-greedy maximal-volume algorithm tests several candidate swaps in each row or column phase. In the quaternion version, candidate quality is evaluated with the quaternion volume. The procedure is close to Greedy MaxVol, except that several candidate entries are considered before accepting a swap. 
+
+Algorithm 3 Quaternion alternating h-greedy MaxVol 
+
+Require: A ∈ Hm×n, core size k, tolerance ε, number of candidates h
+
+Ensure: row indices I, column indices J, core B = A[I, J ] 
+
+> 1:
+
+Initialize I, J and set B = A[I, J ]. 
+
+> 2:
+
+for each sweep do  
+
+> 3:
+
+Compute a pseudoinverse or inverse of B. 
+
+> 4:
+
+Form R = A[: , J ]B† and set v0 = vol( B). 
+
+> 5:
+
+for t = 1 , . . . , h do  
+
+> 6:
+
+Choose the largest admissible entry Rpq not already excluded.  
+
+> 7:
+
+Form the trial core Btry obtained by replacing the qth row by row p. 
+
+> 8:
+
+if vol( Btry ) > v 0 then  
+
+> 9:
+
+Accept the row swap and update B. 
+
+> 10:
+
+break  
+
+> 11:
+
+end if  
+
+> 12:
+
+end for  
+
+> 13:
+
+Repeat the same procedure for columns using B†A[I, :] . 
+
+> 14:
+
+end for  
+
+> 15:
+
+return I, J, B 
+
+In our tests, increasing h did not provide a clear improvement. The selected cores were often the same as for h = 1 , while the method remained more expensive because it recomputed the core pseudoinverse more often. 
+
+B.2 Adaptive quaternion Block DEIM 
+
+Adaptive Block DEIM first computes a truncated QSVD and then selects row and column indices from the basis matrices. The quaternion version uses quaternion residualization and an internal one-sided quaternion MaxVol routine for block selection. 30 Algorithm 4 Adaptive quaternion Block DEIM 
+
+Require: A ∈ Hm×n, target rank k, block size b, parameter ρ, tolerance ε
+
+Ensure: row indices I, column indices J 
+
+> 1:
+
+Compute a truncated QSVD A ≈ U ΣV ∗ with U ∈ Hm×k and V ∈ Hn×k. 
+
+> 2:
+
+Apply the adaptive selection routine to U to obtain row indices I. 
+
+> 3:
+
+Apply the adaptive selection routine to V to obtain column indices J. 
+
+> 4:
+
+Return I, J .The method is sensitive to the block size. In the current implementation it can also become expensive for large matrices because it relies on a QSVD and repeated internal MaxVol calls. For this reason, it is kept as a possible future direction rather than as a main method in the paper. 31

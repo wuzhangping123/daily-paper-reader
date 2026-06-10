@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-10",
+  "date": "2026-06-10",
+  "generated_at": "2026-06-10T21:27:43",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/10/2606.08324v1-set-based-transformer-for-atmospheric-compensation-in-standoff-lwir-hyperspectral-imaging",
+      "section": "deep",
+      "title_en": "Set-Based Transformer for Atmospheric Compensation in Standoff LWIR Hyperspectral Imaging",
+      "authors": "Fabian Perez, Nicolas Quintero, Jeferson Acevedo, Hoover Rueda-Chacon",
+      "date": "2026-06-06",
+      "pdf": "https://arxiv.org/pdf/2606.08324v1",
+      "score": "8.0",
+      "evidence": "高光谱成像大气补偿",
+      "tldr": "被动长波红外超光谱成像受大气吸收、发射和反射辐射影响，大气补偿对于目标识别至关重要但因建模困难而被忽视。本文提出一种轻量级基于集合的Transformer框架，利用不同距离的多辐射测量联合估计透射率、大气路径辐射和共享下行辐射。在MODTRAN模拟数据集上验证了低光谱畸变，且自编码器分析显示潜在特征在无位置监督下激活地理一致子集。该方法首次将集合学习用于大气补偿，为实际远距探测提供了高效解决方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Passive long-wave infrared (LWIR) hyperspectral imaging under a standoff geometry depends on atmospheric absorption and emission, as well as reflected radiance, thus making atmospheric compensation essential to get knowledge of a target of interest. Despite its importance, this compensation has been largely overlooked due to its practical and modeling difficulty. In this paper, we present a lightweight set-based deep learning framework that takes multiple radiance measurements, collected at different standoff ranges, as input and jointly estimates transmittance, atmospheric path radiance, and a shared downwelling spectrum. We analyze the learned representation with a sparse autoencoder and observe that several latent features do activate on geographically coherent subsets of the test data despite the absence of location supervision. Experiments on a MODTRAN generated standoff LWIR dataset demonstrate low spectral distortion across all estimated products. The dataset and code is publicly available at: https://factral.co/SAE-LWIR/",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/10/2606.10350v1-multi-angular-reflectance-anisotropy-observed-from-uav-multispectral-imagery",
+      "section": "deep",
+      "title_en": "Multi-Angular Reflectance Anisotropy Observed from UAV Multispectral Imagery",
+      "authors": "Zhenqiang Qin, Chenguang Dai, Min Wang, Xian Li",
+      "date": "2026-06-09",
+      "pdf": "https://arxiv.org/pdf/2606.10350v1",
+      "score": "8.0",
+      "evidence": "量化多角度反射率各向异性，服务于辐射校正",
+      "tldr": "无人机低空宽视场成像自然引入多角度观测，导致几何驱动的辐射变异性。本文提出几何感知的多角度观测提取流程，通过SFM精化相机参数，将正射影像同质区重投影至多视角子图像，联合提取多波段反射率与观测几何，并在(VZA,RAA)域进行极坐标可视化分析。草地实验表明，十波段均存在明显反射率各向异性，红边和近红外波段最大最小反射率变异达119-137%，证实观测几何效应不可忽略，需校正以保证辐射一致性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "UAV multispectral imagery naturally contains multi-angular observations due to low flight altitude and wide field-of-view imaging, which may introduce geometry-driven radiometric variability. This study proposes a geometry-aware multi-angular observation extraction workflow to quantify observation-geometry effects from a BRDF perspective. Specifically, camera intrinsics and extrinsics are refined via structure-from-motion (SFM), and homogeneous regions annotated on an orthomosaic are reprojected onto multiple raw sub-images acquired from different viewpoints. This enables joint extraction of multi-band reflectance and observation geometry parameters for the same ground targets under varying viewing directions. The extracted observations are further analyzed using band-wise polar visualization in the (VZA, RAA) domain. Results on a grassland target show clear reflectance anisotropy across ten bands, with red-edge and nearinfrared bands exhibiting 119-137% variability between maximum and minimum reflectance, indicating non-negligible observation-geometry effects on radiometric consistency.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/10/2606.08175v1-quaternion-maximum-volume-submatrix-selection-with-applications-to-multichannel-imaging-and-visual-data",
+      "section": "quick",
+      "title_en": "Quaternion Maximum-Volume Submatrix Selection with Applications to Multichannel Imaging and Visual Data",
+      "authors": "Vsevolod Kliushev, Junjun Pan, Valentin Leplat",
+      "date": "2026-06-06",
+      "pdf": "https://arxiv.org/pdf/2606.08175v1",
+      "score": "6.0",
+      "evidence": "四元数最大体积子矩阵选择方法，适用于多通道图像的低秩去噪",
+      "tldr": "低秩矩阵近似中，最大体积子矩阵选择可生成稳定CUR分解。本文将这一原理拓展至非交换的四元数矩阵，针对彩色图像和多通道信号，定义了四元数体积，并提出了贪心平方核替换和RectMaxVol矩形选择两种算法。理论证明了行/列交换能增加体积，推导了精确CUR恒等式及稳定性界。实验在RGB图像近似、病态最小二乘预处理和运动捕捉数据行选择中验证了方法的有效性和稳定性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Low-rank approximation based on selected rows and columns is a useful alternative to singular value decompositions when the goal is an interpretable and compact matrix representation. A standard way to choose these rows and columns is the maximum-volume principle: it selects submatrices with large volume, which usually leads to stable interpolation coefficients and accurate CUR-type approximations. In this paper, we study this idea for quaternion matrices. This setting is natural for color images, three-dimensional motion data, and multi-channel signals, but requires care because quaternion multiplication is noncommutative. We define quaternion maximum-volume submatrix selection using quaternion singular values and the Study determinant. We then derive quaternion rank-one update formulas and use them to build two selection procedures: a greedy square-core method for row and column replacement, and a rectangular method that enlarges a selected row set until the interpolation coefficients are controlled. We prove that successful row and column swaps increase the quaternion volume of the selected square core when the exact quaternion inverse is used. We also connect the stopping criterion with quasi-dominance, prove an exact quaternion CUR identity in the full-rank case, and derive an interpolation stability bound. For the rectangular case, we derive an append-row pseudoinverse update and show how it gives a natural right preconditioner for overdetermined quaternion least-squares problems. Finally, we illustrate the methods on three applications: quaternion CUR approximation of RGB images, RectMaxVol-based preconditioning for ill-conditioned quaternion least-squares systems, and row selection in quaternion motion-capture data. The experiments show that the proposed quaternion MaxVol and RectMaxVol methods provide stable and efficient selection routines.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
