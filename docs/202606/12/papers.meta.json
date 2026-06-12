@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-12",
+  "date": "2026-06-12",
+  "generated_at": "2026-06-12T20:51:44",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/12/2606.10373v1-pf-trans-physics-embedded-frequency-aware-transformer-for-spectral-reconstruction",
+      "section": "quick",
+      "title_en": "PF-Trans: Physics-Embedded Frequency-Aware Transformer for Spectral Reconstruction",
+      "authors": "Yuzhe Gui, Tianzhu Liu, Yanfeng Gu, Xian Li",
+      "date": "2026-06-09",
+      "pdf": "https://arxiv.org/pdf/2606.10373v1",
+      "score": "7.0",
+      "evidence": "遥感光谱重建中的频率感知去噪",
+      "tldr": "快照宽带滤光片阵列成像因复杂调制导致严重光谱混叠，现有深度学习方法仅针对空间域去噪，无法处理掩膜结构引起的全局频率特定退化。本文提出物理嵌入的频率感知Transformer（PF-Trans），通过掩膜注入和灰度一致性损失显式集成物理传感模型，并引入双域并行FFT分支抑制频域伪影。在多个数据集上达到最先进性能，在GF-5上海数据集上PSNR达48.50 dB，显著优于对比方法。该工作为物理驱动深度学习光谱重建提供了新范式。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Snapshot Broadband Filter Array (BFA) imaging provides high light throughput for spectral reconstruction but introduces severe spectral aliasing due to complex modulation. Current deep learning approaches, limited to spatial denoising, often fail to address the global frequency-specific degradations caused by the mask structure. To address this, we propose a Physics-embedded Frequency-aware Transformer (PF-Trans) for high-fidelity remote sensing spectral reconstruction. Our method explicitly integrates the physical sensing model through mask injection and a gray-scale consistency loss to ensure physical fidelity. Furthermore, we introduce a Dual-domain Block with a parallel Fast Fourier Transform (FFT) branch, enabling the network to perceive and suppress aliasing artifacts in the frequency domain. Extensive experiments on multiple datasets demonstrate that PF-Trans achieves state-of-the-art performance, achieving a Peak Signal-to-Noise Ratio (PSNR) of up to 48.50 dB on the GF-5 Shanghai dataset, significantly outperforming comparison methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/12/2606.10975v1-learning-doubly-sparse-explicitly-conditioned-transforms",
+      "section": "quick",
+      "title_en": "Learning Doubly Sparse Explicitly Conditioned Transforms",
+      "authors": "Tudor Pistol",
+      "date": "2026-06-09",
+      "pdf": "https://arxiv.org/pdf/2606.10975v1",
+      "score": "7.0",
+      "evidence": "学习稀疏变换用于噪声抑制",
+      "tldr": "传统固定变换如DFT和DCT虽快速稳定，但对特定信号结构适应性差。现有学习变换虽可降低残差，但计算成本高且易过拟合。本文提出将变换分解为固定规范基与自适应稀疏组件的乘积，通过闭式投影算子显式约束条件数，在不精确近端方法下优化。实验表明，该方法在双重稀疏变换学习上达到最优精度，与密集变体性能相当，但计算成本更低、收敛更快且更好避免局部极小。该工作为数据自适应变换学习提供了高效可控的结构化方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Finding convenient spaces in which certain hypotheses regarding an assumed sparse structure of natural signals hold true has become a desirable result in recent research, its implications being reflected in areas such as data compression, noise reduction and feature extraction. While the extensively used analytical transforms, such as DFT or DCT, already provide efficient algorithms and robust sparse representations, they assume a fixed prior about the data, failing to accurately capture the specific structure of more restrictive classes of signals. To address this, the concept of a data-adaptive, learnt transform has been introduced in the literature, allowing for the reduction of a residual term in the transform domain. More recent studies have shown that the condition number serves as a good metric in this context, where the desired outcome alternates between a generalizing tendency and one that achieves minimal approximation error. Motivated by these considerations, we introduce the learning of a structured, explicitly conditioned transform formulated as the product of a fixed canonical matrix and a refining data-adaptive sparse component. This approach seeks to preserve the advantages of fast and stable analytical transforms, while introducing controllable adaptivity to the data. No references that concern this specific formulation have been identified so far, indicating its novelty. The proposed algorithm is motivated within the framework of inexact proximal methods, leveraging a newly derived closed-form projection operator. Empirical observations demonstrate state-of-the-art results on the doubly sparse transform learning problem and comparable performance with its dense variant at significantly lower computational costs and sometimes faster convergence and better avoidance of bad local minima.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

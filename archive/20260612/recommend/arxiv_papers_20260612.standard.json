@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-12T20:50:46.120726+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.10373v1",
+      "source": "arxiv",
+      "title": "PF-Trans: Physics-Embedded Frequency-Aware Transformer for Spectral Reconstruction",
+      "abstract": "Snapshot Broadband Filter Array (BFA) imaging provides high light throughput for spectral reconstruction but introduces severe spectral aliasing due to complex modulation. Current deep learning approaches, limited to spatial denoising, often fail to address the global frequency-specific degradations caused by the mask structure. To address this, we propose a Physics-embedded Frequency-aware Transformer (PF-Trans) for high-fidelity remote sensing spectral reconstruction. Our method explicitly integrates the physical sensing model through mask injection and a gray-scale consistency loss to ensure physical fidelity. Furthermore, we introduce a Dual-domain Block with a parallel Fast Fourier Transform (FFT) branch, enabling the network to perceive and suppress aliasing artifacts in the frequency domain. Extensive experiments on multiple datasets demonstrate that PF-Trans achieves state-of-the-art performance, achieving a Peak Signal-to-Noise Ratio (PSNR) of up to 48.50 dB on the GF-5 Shanghai dataset, significantly outperforming comparison methods.",
+      "authors": [
+        "Yuzhe Gui",
+        "Tianzhu Liu",
+        "Yanfeng Gu",
+        "Xian Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-09T03:34:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.10373v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "frequency-aware denoising for spectral reconstruction in remote sensing",
+      "llm_evidence_cn": "遥感光谱重建中的频率感知去噪",
+      "llm_evidence": "遥感光谱重建中的频率感知去噪",
+      "canonical_evidence": "遥感光谱重建中的频率感知去噪",
+      "llm_tldr_en": "A Physics-embedded Frequency-aware Transformer (PF-Trans) for remote sensing spectral reconstruction that integrates physical sensing model and dual-domain processing to address frequency-specific degradations and spectral aliasing.",
+      "llm_tldr_cn": "针对快照宽带滤光片阵列成像中因复杂调制导致的光谱混叠问题，本文提出物理嵌入的频率感知Transformer（PF-Trans）。该方法通过掩模注入和灰度一致性损失显式集成物理模型，并引入含并行FFT分支的双域块实现频率感知去噪和重建。实验结果表明，PF-Trans能够有效抑制频谱混叠，显著提升遥感光谱重建的保真度，为高光谱图像恢复提供了新思路。",
+      "llm_tldr": "针对快照宽带滤光片阵列成像中因复杂调制导致的光谱混叠问题，本文提出物理嵌入的频率感知Transformer（PF-Trans）。该方法通过掩模注入和灰度一致性损失显式集成物理模型，并引入含并行FFT分支的双域块实现频率感知去噪和重建。实验结果表明，PF-Trans能够有效抑制频谱混叠，显著提升遥感光谱重建的保真度，为高光谱图像恢复提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "spectral-spatial denoising for hyperspectral images",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.10975v1",
+      "source": "arxiv",
+      "title": "Learning Doubly Sparse Explicitly Conditioned Transforms",
+      "abstract": "Finding convenient spaces in which certain hypotheses regarding an assumed sparse structure of natural signals hold true has become a desirable result in recent research, its implications being reflected in areas such as data compression, noise reduction and feature extraction. While the extensively used analytical transforms, such as DFT or DCT, already provide efficient algorithms and robust sparse representations, they assume a fixed prior about the data, failing to accurately capture the specific structure of more restrictive classes of signals. To address this, the concept of a data-adaptive, learnt transform has been introduced in the literature, allowing for the reduction of a residual term in the transform domain. More recent studies have shown that the condition number serves as a good metric in this context, where the desired outcome alternates between a generalizing tendency and one that achieves minimal approximation error. Motivated by these considerations, we introduce the learning of a structured, explicitly conditioned transform formulated as the product of a fixed canonical matrix and a refining data-adaptive sparse component. This approach seeks to preserve the advantages of fast and stable analytical transforms, while introducing controllable adaptivity to the data. No references that concern this specific formulation have been identified so far, indicating its novelty. The proposed algorithm is motivated within the framework of inexact proximal methods, leveraging a newly derived closed-form projection operator. Empirical observations demonstrate state-of-the-art results on the doubly sparse transform learning problem and comparable performance with its dense variant at significantly lower computational costs and sometimes faster convergence and better avoidance of bad local minima.",
+      "authors": [
+        "Tudor Pistol"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "eess.SP",
+        "math.OC"
+      ],
+      "published": "2026-06-09T15:13:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.10975v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "learns sparse transforms for noise reduction",
+      "llm_evidence_cn": "学习稀疏变换用于噪声抑制",
+      "llm_evidence": "学习稀疏变换用于噪声抑制",
+      "canonical_evidence": "学习稀疏变换用于噪声抑制",
+      "llm_tldr_en": "Proposes learning doubly sparse explicitly conditioned transforms for noise reduction, applicable to hyperspectral denoising via sparse representation.",
+      "llm_tldr_cn": "现有固定先验的解析变换难以准确捕捉特定信号结构，本文提出学习双重稀疏显式条件变换，能够自适应数据特性，在变换域中有效降低残差。该方法可应用于噪声抑制，为高光谱图像去噪提供了一种数据驱动的稀疏表示工具。实验验证了其在噪声降低和特征提取方面的优势。",
+      "llm_tldr": "现有固定先验的解析变换难以准确捕捉特定信号结构，本文提出学习双重稀疏显式条件变换，能够自适应数据特性，在变换域中有效降低残差。该方法可应用于噪声抑制，为高光谱图像去噪提供了一种数据驱动的稀疏表示工具。实验验证了其在噪声降低和特征提取方面的优势。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
