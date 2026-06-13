@@ -1,0 +1,94 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-13T20:53:29.397748+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.11183v1",
+      "source": "arxiv",
+      "title": "Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds",
+      "abstract": "We initiate the study of nonparametric empirical Bayes denoising methods in the setting where both the latent variables and their measurements lie on a compact Riemannian manifold, and where the likelihood is a Riemannian Gaussian distribution. Our starting point is a novel Tweedie-Eddington formula for Riemannian Gaussian mixture models which identifies a certain surrogate oracle denoiser in terms of the marginal distribution of the measurements; it avoids the explicit computation of the posterior Fréchet mean (as required by the Bayes denoiser) via a first-order approximation, hence we refer to it as the \"tangential\" Bayes denoiser. We show that this surrogate oracle achieves nearly the Bayes risk in a low-noise regime, we construct a fully data-driven approximation of it using the spectral theory of the Laplace-Beltrami operator, and we establish finite-sample rates of convergence for the distance between the the surrogate oracle and its approximation. Contrasting the nearly-parametric rates from the Euclidean setting, the rates in the Riemannian setting are slower due to the singularities of the Riemannian Gaussian density at the cut locus of its Fréchet mean; in the special case of the circle we establish matching lower bounds which show that our proposed denoiser is minimax-optimal, and that the denoising problem exhibits a genuinely nonparametric rate of convergence. Lastly, we implement our methodology in two scientific applications: in astronomy, the sphere-valued problem of denoising the locations of gamma ray bursts; in structural biology, the torus-valued problem of denoising pairs of torsion angles of adjacent amino acids in a protein (i.e., the Ramachandran plot).",
+      "authors": [
+        "Adam Quinn Jaffe",
+        "Leonardo V. Santoro",
+        "Bodhisattva Sen"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "math.DG",
+        "stat.ME"
+      ],
+      "published": "2026-06-09T17:58:07+00:00",
+      "link": "https://arxiv.org/pdf/2606.11183v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "denoising measurements on manifolds",
+      "llm_evidence_cn": "流形上的测量去噪",
+      "llm_evidence": "流形上的测量去噪",
+      "canonical_evidence": "流形上的测量去噪",
+      "llm_tldr_en": "Proposes nonparametric empirical Bayes denoising on Riemannian manifolds, deriving a tangential Bayes denoiser that avoids posterior Frechet mean computation, achieving near-optimal risk in low-noise regime.",
+      "llm_tldr_cn": "本文针对紧致黎曼流形上的测量去噪问题，首次提出非参数经验贝叶斯方法。基于Tweedie-Eddington公式推导了切向贝叶斯去噪器，避免了后验弗雷歇均值的显式计算。理论证明该代理去噪器在低噪声下接近贝叶斯风险，并构建了实际可用的经验版本。该方法为流形数据去噪提供了新的理论框架，有望应用于高光谱图像等复杂数据结构的去噪任务。",
+      "llm_tldr": "本文针对紧致黎曼流形上的测量去噪问题，首次提出非参数经验贝叶斯方法。基于Tweedie-Eddington公式推导了切向贝叶斯去噪器，避免了后验弗雷歇均值的显式计算。理论证明该代理去噪器在低噪声下接近贝叶斯风险，并构建了实际可用的经验版本。该方法为流形数据去噪提供了新的理论框架，有望应用于高光谱图像等复杂数据结构的去噪任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.11603v1",
+      "source": "arxiv",
+      "title": "A Two-Sided Sketching Algorithm for Low-rank Tensor Train Approximation",
+      "abstract": "Tensor train (TT) decomposition is a powerful method to acquire low-rank tensors. However, the computational process is frequently obstructed by the large-scale matrix singular value decomposition (SVD). The sketching algorithm serves as an efficient data compression technique that can quickly derive low-rank matrix approximations. In this paper, we propose a randomized algorithm to obtain the TT approximation of tensors using a one-pass sketching algorithm and subspace iteration, and offer thorough error-bound and robustness analysis. Numerical experiments on synthetic and real-world datasets demonstrate the effectiveness and efficiency of the proposed algorithm.",
+      "authors": [
+        "Gaohang Yu",
+        "Yihao Pan",
+        "Ailun Jian",
+        "Xiaohao Cai"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-06-10T03:00:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.11603v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "low-rank tensor train approximation algorithm for high-dimensional data",
+      "llm_evidence_cn": "用于高维数据的低秩张量列近似算法",
+      "llm_evidence": "用于高维数据的低秩张量列近似算法",
+      "canonical_evidence": "用于高维数据的低秩张量列近似算法",
+      "llm_tldr_en": "Proposes a two-sided sketching algorithm for low-rank tensor train approximation, offering efficiency and robustness, applicable to high-dimensional tensor data recovery like hyperspectral images.",
+      "llm_tldr_cn": "本文针对高维张量数据恢复问题，提出了一种基于双边随机素描的低秩张量列近似算法。该方法通过一次素描和子空间迭代高效计算TT分解，克服了大规模SVD的计算瓶颈。实验在合成和真实数据集上验证了算法的有效性和鲁棒性。该工作为高光谱图像等张量数据的低秩恢复提供了高效工具。",
+      "llm_tldr": "本文针对高维张量数据恢复问题，提出了一种基于双边随机素描的低秩张量列近似算法。该方法通过一次素描和子空间迭代高效计算TT分解，克服了大规模SVD的计算瓶颈。实验在合成和真实数据集上验证了算法的有效性和鲁棒性。该工作为高光谱图像等张量数据的低秩恢复提供了高效工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

@@ -1,0 +1,6857 @@
+Title: Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds
+
+URL Source: https://arxiv.org/pdf/2606.11183v1
+
+Published Time: Wed, 10 Jun 2026 01:28:14 GMT
+
+Number of Pages: 56
+
+Markdown Content:
+# Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds 
+
+Adam Quinn Jaffe 1 Leonardo V. Santoro 2 Bodhisattva Sen 1
+
+> 1
+
+Department of Statistics, Columbia University, New York, NY, USA, e-mail: a.q.jaffe@columbia.edu ; b.sen@columbia.edu 
+
+> 2
+
+Institut de Math´ ematiques, ´Ecole Polytechnique F´ ed´ erale de Lausanne, CH, e-mail: leonardo.santoro@epfl.ch 
+
+Abstract: We initiate the study of nonparametric empirical Bayes denoising methods in the setting where both the latent variables and their measurements lie on a compact Riemannian manifold, and where the likelihood is a Riemannian Gaussian distribution. Our starting point is a novel Tweedie-Eddington formula for Riemannian Gaussian mixture models which identifies a certain surrogate oracle denoiser in terms of the marginal distribution of the measurements; it avoids the explicit computation of the posterior Fr´ echet mean (as required by the Bayes denoiser) via a first-order approximation, hence we refer to it as the “tangential” Bayes denoiser. We show that this surrogate oracle achieves nearly the Bayes risk in a low-noise regime, we construct a fully data-driven approximation of it using the spectral theory of the Laplace-Beltrami operator, and we establish finite-sample rates of convergence for the distance between the the surrogate oracle and its approximation. Contrasting the nearly-parametric rates from the Euclidean setting, the rates in the Riemannian setting are slower due to the singular-ities of the Riemannian Gaussian density at the cut locus of its Fr´ echet mean; in the special case of the circle we establish matching lower bounds which show that our proposed denoiser is minimax-optimal, and that the denoising problem exhibits a genuinely nonparametric rate of convergence. Our theory and simulations reveal that pooling information across different measurements—namely, by shrinking towards high-density regions and stretching away from low-density regions—can substan-tially outperform the na¨ ıve denoiser that treats each measurement separately. Lastly, we implement our methodology in two scientific applications: in astronomy, the sphere-valued problem of denoising the locations of gamma ray bursts; in structural biology, the torus-valued problem of denoising pairs of torsion angles of adjacent amino acids in a protein (i.e., the Ramachandran plot). 
+
+MSC2020 subject classifications: 62C12, 62G05, 62H11, 62R30. 
+
+Keywords and phrases: density and score estimation, directional statistics, empirical Bayes and 
+
+f -modeling, Fr´ echet means, latent variable model, Lie groups, Riemannian Gaussian mixture model, Riemannian optimization, smeariness, spectral theory of Laplace-Beltrami operator. 
+
+Contents 
+
+1 Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12 Geometric Background . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 73 Statistical Theory . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10 4 Numerical Simulations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 5 Scientific Applications . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21 6 Future Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23 Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24 References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24 A Proofs of Results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 B Implementation Details . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51 C Additional Figures . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 54 
+
+1. Introduction 
+
+Let M be a compact connected Riemannian manifold with geodesic distance d, and consider the problem of estimating a latent variable Θ ∈ M given a measurement X ∈ M thereof. This problem arises naturally in many scientific settings, and in this paper we are particularly motivated by two applications: the first takes place on the sphere M := S2 and requires denoising the positions of a catalog of observed gamma ray 
+
+1
+
+> arXiv:2606.11183v1 [math.ST] 9 Jun 2026
+
+bursts, which is a long-standing problem in astronomy known as gamma-ray burst localization [41, 18, 8]; the second takes place on the torus M := S1 × S1 and requires denoising the pairs of torsion angles formed by adjacent amino acids along a protein, usually referred to as a Ramachandran plot [69, 36, 64, 60]. We are also motivated by potential applications to the orientation estimation problem from cryogenic electron microscopy [32, 58, 86] which takes place on the Lie group of rotations, M = SO(3). To formulate our problem more precisely, suppose that G is a fixed but unknown probability distribution on M, and consider the following model for a pair of random variables (Θ , X ) ∈ M × M :Θ ∼ G, and (X | Θ = θ) ∼ Pθ,σ 2 . (1) Here, {Pθ,σ 2 }θ∈M is the family of Riemannian Gaussian distributions [62] on M, defined so that Pθ,σ 2 has a density with respect to the volume form d x of M given by 
+
+pθ,σ 2 (x) ∝ exp 
+
+
+
+− d2(x, θ )2σ2
+
+
+
+(2) for all θ, x ∈ M , where σ2 > 0 is a fixed and known quantity representing the scale of the noise of the measurement X of Θ. We emphasize that both Θ and X are elements of the Riemannian manifold M. We also write 
+
+f (x) := 
+
+Z
+
+> M
+
+pθ,σ 2 (x) d G(θ), for x ∈ M 
+
+for the marginal density of X. Further, we consider the setting that (Θ 1, X 1), . . . , (Θ n, X n) are i.i.d. from model (1), meaning Θ 1, . . . , Θn is an ensemble of unobserved latent variables and X1, . . . , X n are measure-ments thereof. Our goal is to estimate (or predict) the latent variables Θ 1, . . . , Θn from the measurements 
+
+X1, . . . , X n, which can be seen as the analog of a standard denoising problem but for data living on a Riemannian manifold. Mathematically, we pose the denoising problem as aiming to find a function δ : M → M , called a denoiser ,achieving a small value of the following risk, which is the average expected squared geodesic distance when integrated over the joint distribution of (Θ 1, X 1), . . . , (Θ n, X n): 
+
+(
+
+minimize E  1
+
+> n
+
+Pni=1 d2(δ(Xi), Θi)
+
+over δ : M → M . (3) By exchangeability, problem (3) is equivalent to the following, in which we integrate over the joint distribution of (Θ , X ): (
+
+minimize E[d2(δ(X), Θ)] over δ : M → M , (4) and standard Bayesian arguments show that the solution to (4) is the minimizer of the posterior loss, namely the posterior Fr´ echet mean 
+
+δB(x) ∈ arg min 
+
+> ϑ∈M
+
+E[d2(ϑ, Θ) | X = x]. (5) (In fact, δB is also optimal in a generalization of problem (3) in which a different denoiser δi can be applied to each coordinate and each δi can depend on all of X1, . . . , X n.) We refer to δB as the oracle Bayes denoiser ,since it depends on the unknown distribution G of Θ and hence cannot be implemented in most statistical settings. Nonetheless, the empirical Bayes approach to denoising is a collection of methods for constructing a fully data-driven denoiser ˆδ which achieves nearly the same risk as the oracle denoiser δB; such ˆδ often have a substantially smaller risk than the na¨ ıve denoiser 
+
+δN (x) := x (6) which is implicitly used in works that do not employ techniques from empirical Bayes. In the standard Euclidean setting, there is a large literature on statistical theory and methodology for empirical Bayes approaches to denoising, e.g., [89, 47, 73, 78, 70, 71, 22, 23, 24]. 2In this paper, we develop a nonparametric empirical Bayes approach to denoising on compact Riemannian manifolds. For the Riemannian Gaussian mixture model in (1) and (2), we derive an intrinsic version of the Tweedie-Eddington formula [20, 71, 43] which does not directly characterize the oracle Bayes denoiser δB but rather characterizes a surrogate denoiser that we call the oracle tangential Bayes denoiser δT . This suggests denoising by a plug-in procedure, leading to a fully data-driven denoiser that we call the empirical tangential Bayes denoiser ˆδT : first, estimate the marginal density f of X by ˆfn, then compute its score ∇ log ˆfn, and finally adjust each data point along the resulting vector field (hence shrinking the data towards high-density regions and stretching the data away from low-density regions). In the terminology of [23, 24], this is an instance of f -modeling , and the resulting estimator is simple to implement and computationally tractable. It turns out that δT is provably close to δB when σ2 is small, and that ˆδT is provably close to δT when n is large, so our proposed denoiser can achieve nearly the Bayes risk in the asymptotic regime of interest. There are two reasons for using δT instead of δB in this work. The first is that δT is directly identifiable in terms of the marginal density f of X via our Tweedie-Eddington formula (see Lemma 3.1), while δB
+
+is not. The second is that δT is much easier to compute than δB, which typically must be numerically approximated using iterative procedures from Riemannian optimization (e.g., [13, 14, 15, 26, 59, 77]); even worse, such computations must be performed separately for each evaluation δB(X1), . . . , δ B(Xn), which can be expensive in practice. However, in order to reasonably change our target from δB to δT , we must establish that δB and δT are indeed close in some sense, and this is a technical challenge; the oracle Bayes denoiser 
+
+δB is exactly a (posterior) Fr´ echet mean, and existing analyses of Fr´ echet means require strict assumptions that exclude our setting of interest. For example, some results (e.g., [10, 75, 88]) restrict to nonpositively curved Riemannian manifolds M, but this excludes the basic setting of the sphere S2 which is fundamental in applications of directional statistics. Other results (e.g., [29, 11, 28, 40, 74]) allow general Riemannian manifolds M and instead require the distribution of the data to satisfy some small-support condition, with respect to the curvature of M; however, this excludes the empirical Bayes setting when G can be fully-supported. Thus, in order to establish quantitative results on the closeness of δB and δT for general compact Riemannian manifolds, we develop a new technique for analyzing the posterior Fre´ chet mean in the small-noise asymptotic regime, σ2 → 0. Another technical difficulty in this work is that Riemannian Gaussian mixture densities have worse smooth-ness than Euclidean Gaussian mixture densities, owing to the fact that the squared geodesic distance in (2) can be nonsmooth at its cut locus. Thus, in the Riemannian setting our denoiser ˆδT exhibits genuinely nonparametric rates of convergence depending on the smoothness of the density g of G, rather than the nearly-parametric behavior familiar from Euclidean empirical Bayes [47, 9, 73]. While we can explicitly de-scribe these rates of convergence in several special cases of interest (and provide matching lower bounds in the case of the circle M = S1), a complete analysis would require precise quantitative control on the smoothing properties of Riemannian Gaussian mixture densities and their singular behavior near cut loci. Such a theory is not yet available in full generality, except in some special cases. As a preview of our methodology, we show Figure 1 depicting a simulation with n = 5000 points on the sphere, M = S2. Here, G is a mixture of 5 Riemannian Gaussian distributions, at roughly equally-spaced positions where the squared scale parameter of each component is τ 2 = 0 .05, and the likelihood is Riemannian Gaussian with squared scale parameter equal to σ2 = 0 .25. Concretely, we note that the Bayes risk is 0 .211 while our empirical Bayes denoiser ˆδT achieves a risk of 0 .216 and the na¨ ıve denoiser δN achieves a risk of 0.288; in other words, the risk of ˆδT is only 2.4% larger than the Bayes risk, and it is 25.0% smaller than the risk of the denoiser that treats each measurement separately and does not use ideas from empirical Bayes. In this work we chose the likelihood (2) to be a particular generalization of Gaussian distributions to Riemannian manifolds that is often attributed to Pennec [62], but it is worth noting that there are multiple possible generalizations, e.g., wrapped Gaussians [17] and the heat-kernel Gaussians [38]. Our choice of Pen-nec’s Riemannian Gaussian (2) is precisely because it admits a Tweedie-Eddington formula (see Lemma 3.1) which is the starting point of all empirical Bayes analysis, as it connects the unknown G with the observable 
+
+f . An interesting avenue for future work is to study denoising problems with these other likelihoods, but we do not know whether they are amenable to empirical Bayes analysis. 3i
+
+> risk : 0.211
+> B
+
+(Xi)
+
+> risk : 0.212
+
+(Xi)
+
+> risk : 0.288
+
+Xi log fn
+
+> risk : 0.216
+
+(Xi)Fig 1 . An illustration of the oracle and empirical denoisers, in the sphere S2. The latent variables Θ1, . . . , Θn (top left) come from a five-component Riemannian Gaussian mixture model, and the measurements X1, . . . , X n (bottom left) come from a Riemannian Gaussian likelihood. The oracle Bayes denoiser δB (X1), . . . , δ B (Xn) (top center) and the oracle tangen-tial Bayes denoiser δT (X1), . . . , δ T (Xn) (top right) recover the latent structure. The empirical tangential Bayes denoiser        
+
+> ˆδT(X1), . . . , ˆδT(Xn)(bottom right) achieves nearly the Bayes risk by adjusting each measurement along an estimated score field ∇log ˆfn(bottom center). Below the plot of each denoiser, we display a Monte Carlo estimation of its risk.
+
+1.1. Summary of Results 
+
+We recall some basic elements of Riemannian manifolds needed to state our results, but we direct the reader to Section 2 for further detail. Recall that each x ∈ M admits a Hilbert space Tan x(M) called the tangent space of M at x which represents the best linear approximation of M, and Tan x(M) is endowed with an inner product ⟨· , ·⟩ x and a norm ∥ · ∥ x. Further, the exponential map Exp x : Tan x(M) → M for each x ∈ M 
+
+is a smooth map sending each tangent vector v ∈ Tan x(M) to the point on M which results from “shooting” distance ∥v∥x in the direction v/ ∥v∥x from x. Conversely, the logarithmic map Log x : M → Tan x(M) for each x ∈ M sends a point θ ∈ M to a vector v ∈ Tan x(M) satisfying Exp x(v) = θ; in other words, Log x is a smooth right inverse of Exp x, wherever it is well-defined. When M = Rm, the exponential and logarithmic maps are simply given by Exp x(v) = v + x and Log x θ = θ − x, hence Log x θ can be regarded as a natural, intrinsic notion of displacement of θ from x in M.The first main result of this paper, as is common in most works on nonparametric empirical Bayes [20, 71, 43], is to establish a Tweedie-Eddington formula which identifies a suitable oracle denoiser in terms of the marginal density f of X. In the Riemannian setting, we use the simple geometric fact ∇xd2(x, θ ) = 
+
+−2 Log x θ to derive (Lemma 3.1) the following Tweedie-Eddington formula 
+
+E[Log x Θ | X = x] = σ2∇x log f (x). (7) While this does not directly characterize the Bayes denoiser δB in terms of f , it suggests considering the following oracle-level denoiser as a surrogate: 
+
+δT (x) := Exp x
+
+ σ2∇x log f (x) = Exp x (E[Log x Θ | X = x]) . (8) To gain some intuition for this denoiser, note for each x ∈ M that δT (x) is precisely the result of ap-proximately solving the optimization problem (5) with a single step of Riemannian gradient descent, with stepsize 1 /2 and with initialization δN (x) = x. Indeed, at the point ϑ ∈ M, the objective function Φx(ϑ) := E[d2(ϑ, Θ) | X = x] satisfies ∇ϑΦx(ϑ) = −2E[Log ϑ Θ | X = x], hence we have 
+
+δT (x) = Exp x
+
+
+
+− 12 ∇ϑΦx(x)
+
+
+
+. (9) 4(As explained in [62, Section 4.6] on general numerical algorithms for Fr´ echet means, this can also be seen as a single step of an approximate Riemannian Newton’s method, where the Hessian of Φ x is approximated by ignoring certain curvature effects.) Since δT is thus a first-order approximation of δB, we refer to δT as the 
+
+oracle tangential Bayes denoiser . Note in the Euclidean case of M = Rm that (8) coincides with the usual Tweedie-Eddington formula and yields δT = δB.The second main result of the paper establishes that δT has nearly the same risk as δB as σ2 → 0, which is the regime of interest in our scientific applications where σ2 > 0 is known to be small. (The regime σ2 → 0has been studied in some recent empirical Bayes works, e.g., [52, 53].) To state this, let us define the risk of any denoiser δ : M → M as 
+
+R(δ) = R(δ, σ 2) := E d2(δ(X), Θ)  =
+
+Z
+
+> M
+
+Z
+
+> M
+
+d2(δ(x), θ )pθ,σ 2 (x)d x dG(θ) (10) where we emphasize the (squared) scale σ2 > 0 of the likelihood in (2) when necessary. Then, our main oracle-level result (Theorem 3.8) states that for any compact Riemannian manifold M we have 0 ≤ R(δT , σ 2) − R(δB, σ 2) ≤ O(σ5), (11) meaning δB and δT have approximately the same risk as each other (relative to the usual scaling of σ2). This result may be expected in a heuristic sense since, if σ2 > 0 is small enough so that the conditional distribution of Θ given {X = x} is highly concentrated near x where M is well-approximated by Tan x(M), then we have 
+
+δT (x) = Exp x(E[Log x Θ | X = x]) ≈ E[Exp x(Log x Θ) | X = x]) = E[Θ | X = x] ≈ δB(x). (12) However, rigorously establishing (11) is difficult, because existing techniques for quantitatively analyzing Fr´ echet means do not apply in our setting where the conditional distribution of Θ given {X = x} has full support for every σ2 > 0. To resolve this, we introduce a new technique which uses the fixed-point equation for Fr´ echet means (i.e., the first-order optimality conditions for (5)) to recursively bound Log x(δT (x)) −
+
+Log x(δB(x)) in terms of Log x(δB(x)); in order to prevent this recursive bound from diverging, we need very sharp quantitative control on Log x(δT (x)) and related quantities, uniformly in x ∈ M . We also point out that, in the simulation studies of Section 4, the denoisers δB and δT have extremely close risks for even moderate values of σ2 > 0, to the point that the resulting curves are nearly indistinguishable. Our last contribution is to develop an empirical Bayes approximation ˆδT of δT and provide statistical guarantees for it; the approximation is based on an estimate ˆfn of the density f which we then plug-in for f in expression (8). Following the works [34, 49], we form a density estimate by utilizing the eigendecomposition of the Laplace-Beltrami operator ∆ : L2(M) → L2(M), which is a useful method for adapting Fourier analysis to Riemannian manifolds. More precisely, we consider the density estimator defined, for {ϕj }∞
+
+> j=0
+
+being a countable basis of eigenfunctions of ∆, via ˆfn(x) := 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+K(x, X i, ℓ n), where K(x, y, ℓ ) = 
+
+> ℓ
+
+X
+
+> j=0
+
+ϕj (x)ϕj (y) (13) for all x ∈ M . Then, we define the empirical tangential Bayes denoiser as ˆδT (x) := Exp x
+
+σ2∇x ˆfn(x)max { ˆfn(x), ρ }
+
+!
+
+(14) for some carefully chosen ℓn ≥ 0 and ρ > 0. We emphasize that ˆδT (x) is very easy to compute; after computing the density estimate ˆfn and its gradient ∇x ˆfn(x), all subsequent evaluations of ˆδT (x) require only computing the exponential map Exp x(·), which relies on the local geometry of M near x.We establish explicit rates of convergence for the empirical tangential Bayes denoiser ˆδT . To state this, let us define the distance of an arbitrary denoiser δ : M → M from δT as 
+
+DT (δ) := E d2(δ(X), δ T (X))  =
+
+Z
+
+> M
+
+d2(δ(x), δ T (x)) f (x)d x. (15) 5While in the Euclidean setting of M = Rm we have that DT (δ) exactly equals the excess risk relative to the tangential Bayes (equivalently, Bayes) denoiser, i.e., R(δ) = R(δT ) + DT (δ), in the Riemannian setting we have only R(δ) ≤ (1 + ε)R(δT ) + CεDT (δ) for all ε > 0 (Lemma 3.18); as such, bounding DT leads to a non-sharp oracle inequality for the risk, but which can be made arbitrarily close to sharp. Using this natural notion of distance, we show (Theorem 3.17) that, under suitable conditions, there exists 0 < γ < 1, such that choosing ℓn and ρ appropriately leads to the bound 
+
+E
+
+h
+
+DT
+
+ˆδT
+
+i 
+
+= E
+
+Z 
+
+> M
+
+d2 ˆδT (x), δ T (x)
+
+
+
+f (x)d x
+
+
+
+≲M,G,σ 2,γ 
+
+1
+
+nγ (16) with constants that do not depend on n. Along the way, we also develop (Proposition 3.16) some results on the rate of convergence of density estimation and gradient density estimation for Riemannian Gaussian mixtures, which slightly extend and sharpen some results from the earlier work [34]. It turns out that the rate of convergence of ˆδT (i.e., the exponent 0 < γ < 1 above) depends directly on the smoothness of the marginal density f of X, which can suffer from the fact that the squared geodesic distance functional is not globally smooth and its Hessian exhibits singular behaviors near the cut locus (Example 3.11). This is a phenomenon not seen in the Euclidean setting, where the density of a Euclidean Gaussian mixture is always infinitely differentiable (in fact, analytic) irrespective of the regularity of the mixing measure. So, while our theory holds under direct assumptions on the smoothness of f , it is natural to ask whether smoothness of f can be instead guaranteed from suitable smoothness of g. It turns out that this is a hard question which depends on the geometry of M and must be worked out on a case-by-case basis; we address this problem in detail (Subsection 3.3) for several geometries of interest (e.g., S1, S2, S1 × S1, and SO(3)). Consequently, our rates of convergence for ˆδT are polynomial but slower than parametric. In the case of the circle M = S1, we show (Example 3.21 and Theorem 3.22) matching upper and lower bounds; if 
+
+Gs(α, β, L ) denotes the set of densities g : S1 → R with α ≤ g ≤ β and ∥g(s)∥L2(S1) ≤ L and we infimize over all measurable functions ˆδ : S1 × (S1)n → S1, then (including the dependence on g for emphasis) we have inf 
+
+> ˆδ
+
+sup 
+
+> g∈G s(α,β,L )
+
+Eg
+
+Z 
+
+> S1
+
+d2 ˆδ(x; X1, . . . , X n), δ T ,g (x)
+
+
+
+fg (x)d x
+
+
+
+≍σ2,s,α,β,L 
+
+1
+
+n 2s+2 2s+5 
+
+(17) with constants that do not depend on n, and where ˆδT achieves the infimal rate up to constants. In other words, our proposed empirical tangential Bayes denoiser is minimax-optimal (with no additional logarithmic factors), and the minimax rate is genuinely nonparametric. The rate should be understood as n−2p/ (2 p+1) for 
+
+p = ( s + 2) − 1 which reflects the fact that the difficulty of denoising reduces to the difficulty of estimating the gradient of f , which is ( s + 2)-smooth whenever g is s-smooth (see Lemma 3.14); our precise control of this smoothing effect in the special case of M = S1 comes from the fact that f is given by a convolution of 
+
+g with a kernel that is differentiable but not continuously differentiable. These main results highlight the practical value of the Riemannian empirical Bayes approach to denoising. That is, we have shown δT has comparable risk to δB when σ2 is small and that ˆδT has comparable risk to δT
+
+when n is large; hence, we conclude that ˆδT has comparable risk to δB when both σ2 is small and n is large. Moreover, the empirical Bayes denoiser ˆδT is easy to compute. While our theory determines an oracle choice of the hyperparameters ℓn and ρ, we also emphasize that they can be selected in a fully data-driven way via cross-validation with an adaptation of Hyv¨ arinen’s score-matching objective [42, 84] to the Riemannian setting [19]. We further explore these practical considerations in several detailed simulations in Section 4, and in two scientific applications in Section 5, which highlight the remarkable ability of empirical Bayes denoisers to adapt to latent structure in the data. The proofs of all results (and the statements and proofs of some auxiliary results) are given in Appendix A, detail on the implementation of our denoisers is given in Appendix B, and additional figures are given in Appendix C. All figures in this paper can be reproduced with the code available at https://github.com/aqjaffe/RiemannianEB , which also contains an easy-to-use Python package integrated with the Geomstats paradigm [59]. 61.2. Related Literature 
+
+The primary context for our work is the large and growing literature on nonparametric empirical Bayes, which has been summarized in the recent tutorials [43, 50]. In particular, we provide the first extension to the Riemannian setting of the principle that there exist fully data-driven denoisers that can be computed efficiently and achieve a risk that is nearly equal to the Bayes risk, even in the setting where the distribution of the latent variables is not assumed to have any particular parametric form; analogous results in the Euclidean setting have been established for Gaussian [89, 47, 73, 78] and Poisson [46, 76] likelihoods. Such empirical Bayes methods are often traced back to the work of Robbins [71], although they are known to have a longer history in astronomy [20, 21]; recent interest in nonparametric empirical Bayes (and much of our modern terminology) was popularized by Efron [22, 23, 24]. There is also a large literature on parametric empirical Bayes methods, where, typically, the assumption of a conjugate prior allows one to directly approximate the Bayes denoiser by generalized method of moments. In the Euclidean case, this was initiated by the empirical Bayes interpretation of the James-Stein shrinkage estimator due to Efron and Morris [25], and the very many subsequent developments can be found in textbook treatments [12, 55]. In the Riemannian case, we are only aware of one previous work developing empirical Bayes methodology, namely [87] which provides an empirical Bayes interpretation for a particular shrinkage estimator on the manifold of positive semi-definite matrices. There is also the closely-related is work [56] which shows, in the setting of metric spaces with non-positive (Alexandrov) curvature, that a certain geodesic James-Stein estimator strictly dominates the Fr´ echet mean, although without utilizing any conjugate prior structure directly. Another context for our work is the field of statistics on Riemannian manifolds, which includes theory and methodology in the general setting [5, 6, 59] and in specific geometries of interest; of particular importance are the Riemannian manifolds studied in directional statistics, outlined in [54]. The phenomena in this work that the singularity of a Riemannian Gaussian density at the cut locus of its Fr´ echet mean can deteriorate the rate of convergence of empirical Bayes denoising is closely related to the “smeariness” for Fr´ echet mean estimation (which has been established in spheres [37] and in other geometries, e.g., [28, 40]). There is some literature on Bayesian statistics on Riemannian manifolds [4, 3, 51], which is typically focused on particular models tailored to each geometry of interest. Overall, we emphasize that our assumptions on the geometry of 
+
+M are much more general than what is typically assumed in this field; we require only that M is a compact connected Riemannian manifold, while other works occasionally require much further structure that can be limiting in some applications (e.g., non-positive curvature, constant curvature, homogeneity, Lie group structure). Many aspects of this paper are closely related to existing literature on density estimation, deconvolution, and score matching on Riemannian manifolds. Regarding density estimation, two popular methods are based on kernel smoothing using kernels that are made either from the geodesic distance [61, 35] or the eigenfunc-tions of Laplace-Beltrami operator [34]. Regarding deconvolution, a few methods have been developed in particular geometries of interest, e.g., hyperspheres [33], the special orthogonal group [48], and the hyper-bolic plane [39] (but all with likelihoods that are not Riemannian Gaussian); these works develop methods based on Fourier analysis (or generalization thereof), and they exhibit slow rates of convergence also seen in the Euclidean setting [31]. There is also a recent interest in score-matching on Riemannian manifolds [19] which studies Riemannian versions of the generative modeling procedures that have become popular in the Euclidean setting [84, 42]. 
+
+2. Geometric Background 
+
+In this section we collect the basic geometric notions required throughout the paper. We will provide refer-ences to specialized results along the way, but we direct the reader to standard sources like [1, 16, 65] for further details; for a particularly accessible introduction to these ideas, we recommend consulting [79, 7]. It may be helpful for the reader to keep in mind a few concrete examples in order to build intuition throughout this section. Towards this end, we will occasionally remark on examples like the usual Euclidean space M = Rm, the circle M = S1 (which may be parameterized either as R/2πZ or as {x ∈ R2 : ∥x∥ = 1 }), the two-dimensional sphere M = S2 := {x ∈ R3 : ∥x∥ = 1 }, and the space of 3 × 3 special orthogonal 7M     
+
+> x
+> v
+> Tan x(M)
+> Exp x(v)
+> y
+> x
+> Log xyγ1
+> γ2Cx
+> x
+> Fig 2 . Cartoon of some elements of the geometric background from Section 2. For a compact Riemannian manifold Mof dimension m= 2 , we show the exponential map (left), the logarithmic map (center), and the cut locus (right).
+
+matrices M = SO(3) := {X ∈ R3×3 : XX ⊤ = X⊤X = I3 and det( X) = 1 }. We also include in Figure 2 a cartoon of a compact Riemannian manifold of dimension m = 2 in order to visualize these notions. 
+
+Basics. Throughout, we assume that M is a Riemannian manifold of dimension m ∈ N = {1, 2, . . . }.This means each point x ∈ M has a tangent space Tan x(M), which is an m-dimensional vector space representing the best linear approximation of M near x, as well as an inner product ⟨ · , · ⟩ x (hence also a norm ∥ · ∥ x) on Tan x(M); we refer to {Tan x(M)}x∈M as the tangent bundle of M and {⟨ · , · ⟩ x}x∈M 
+
+as the metric tensor of M. There also exists a σ-finite measure on M called the volume form which is a generalization of the Lebesgue measure on Rm, and we write d x for integration against the volume form (e.g., R 
+
+> M
+
+h(x)d x for any bounded, measurable function h : M → R). When M = Rm the tangent bundle is Tan x(M) = Rm and the volume form is just the Lebesgue measure on Rm; when M = S2 the tangent bundle is Tan x(M) = (span( x)) ⊥ and the volume form is the uniform measure on S2; when M = SO(3), the tangent bundle is Tan X (M) = {XA ∈ R3×3 : A = −A⊤} is the space of 3 × 3 antisymmetric matrices multiplied on the left by X, the metric tensor is ⟨V, W ⟩X = − 12 Tr( X−1V X −1W ), and the volume form is the Haar measure. 
+
+Metric. One may also view M as a metric space ( M, d ), where d is a metric on M called the geodesic distance 
+
+defined as d(x, y ) := inf γ(0)= x,γ (1)= y L(γ) where the infimum is taken over all curves γ : [0 , 1] → M which are infinitely differentiable in the locally Euclidean structure of M and where L(γ) := R 10 ∥γ′(t)∥γ(t)dt; we always have γ′(0) ∈ Tan x(M), and Tan x(M) can in fact be defined as the closure of the span of all γ′(0), i.e., tangent vectors at x exactly correspond to velocities of curves starting at x. Note that L(γ) is the length of the curve 
+
+γ, so that the geodesic distance d(x, y ) is just the length of the shortest smooth curve connecting x to y. A curve γ : [0 , 1] → M is called a constant-speed geodesic if it satisfies d(γ(s), γ (t)) = ( t − s)d(γ(0) , γ (1)) for all 0 ≤ s ≤ t ≤ 1; if γ is a constant-speed geodesic then it is infinitely differentiable and we have ∥γ′(t)∥γ(t) =
+
+d(γ(0) , γ (1)), for all t ∈ [0 , 1]. We say that M is compact if the metric space ( M, d ) is compact, and that M
+
+is connected if ( M, d ) is connected. We define the diameter of M as diam( M) := sup x,y ∈M d(x, y ). 
+
+Exponential and Logarithm. For each point x ∈ M , there is a natural correspondence between M and its tangent bundle given as follows. The exponential map Exp x : Tan x(M) → M is defined via Exp x(v) := γ(1) for sufficiently small ∥v∥x where γ is the unique constant-speed geodesic with γ(0) = x and γ′(0) = v (which is guaranteed to exist and be unique under suitable assumptions on M, e.g. compactness) and then extended to all v ∈ Tan x(M); in other words, Exp x(v) is the result of “shooting” from x in direction v/ ∥v∥x for length 
+
+∥v∥x. The logarithmic map is defined as Log x(y) = γ′(0) where γ is the constant-speed geodesic with γ(0) = x
+
+and γ(1) = y, if it exists and is unique; consequently, we have ∥ Log x(y)∥x = d(x, y ) whenever the left side is well-defined. Also, it is known that the exponential map is infinitely-differentiable on all of Tan x(M); in fact the map ( x, v ) 7 → Exp x(v) is smooth (i.e., infinitely-differentiable) as a function of both arguments [65, Chapter 5.5.1]. In the Euclidean case M = Rm, we simply have Log x(y) = y − x and Exp x(v) = v + x, so the logarithmic map in general provides a natural notion of displacement in M; in M = SO(3) we have Exp X (V ) = X exp( X−1V ) where exp( ·) denotes the matrix exponential (defined via the usual power series) which explains the notation. See Figure 2 for an illustration of the logarithmic and exponential maps. 8Cut Locus. For x ∈ M , the cut locus of x, denoted Cx ⊆ M , is (roughly speaking) given by the closure of the set of all y ∈ M such that there is more than one constant-speed geodesic from x to y; see [1, Definition 1.3.9] for a precise definition. Then, we may view the logarithmic map as a function Log x : M \ Cx → Tan x(M), and this is in fact its maximal domain of well-definition. It is also known that the cut locus Cx has measure zero under the volume form, for each x ∈ M . If M is compact, then the cut locus Cx is non-empty for all 
+
+x ∈ M . For example, if M = Sm is a hypersphere then the cut locus of any point x is exactly the antipode of x. See Figure 2 for an illustration of the cut locus, which need not be a single point. 
+
+Gradients. If h : M → R is a sufficiently regular function, its gradient ∇h is a vector field on M, meaning it assigns a vector ∇h(x) ∈ Tan x(M) for each x ∈ M . More precisely, we say that h is differentiable if we have h(γ(t)) − h(γ(0)) 
+
+t → ⟨∇ h(x), γ ′(0) ⟩x (18) as t → 0, for all sufficiently regular paths γ with γ(0) = x. For example, it is known that the squared-distance function has gradient 
+
+∇xd2(x, y ) = −2 Log x(y) (19) for all x ∈ M \ Cy ; additionally, it is known that x 7 → d(x, y ) is Lipschitz on all M, but it may fail to be differentiable on Cy ∪ { y}. Higher-order derivatives of h are defined similarly, namely for r ∈ N the derivative 
+
+∇r h(x) is an r-linear function from Tan x(M) to R, meaning it is a linear functional of r many vectors in Tan x(M); the space of all r-linear functions is a finite-dimensional vector space that can be endowed with the norm ∥H∥x,r := max ∥v1∥x=··· =∥vr ∥x=1 |H(v1, . . . , v r )| (or, alternatively, many other norms since they are all equivalent up to constants). 
+
+Fr´ echet Means. For a probability measure P on a Riemannian manifold M, its Fr´ echet variance is the infimal value of the functional y 7 → R 
+
+> M
+
+d2(x, y )d P (x), and a Fr´ echet mean is any minimizer, if it exists. It is known [30, Lemma 2.13] that a Fr´ echet mean always exists if R 
+
+> M
+
+d2(x, y )d P (x) < ∞ for some (equivalently, all) y ∈ M (but it may be non-unique if P is not sufficiently concentrated); in particular, on a compact and connected Riemannian manifold M, every probability measure admits a Fr´ echet mean. If P possesses a density with respect to the volume form, then the first-order optimality conditions for y to be a Fr´ echet mean of P are exactly R 
+
+> M
+
+Log y (x)d P (x) = 0, but this condition is not sufficient in general. If M = Rm,then the Fr´ echet mean of P is unique and equals the expectation R 
+
+> Rm
+
+xdP (x) of P , but in general there is no closed-form expression for Fr´ echet means. 
+
+Laplace-Beltrami Operator. We write L2(M) for the space of square-integrable (complex) functions with respect to the volume form of M, and write L∞(M) for the space of essentially bounded functions with respect to the volume form of M. There exists a unique nonnegative linear operator ∆ : L2(M) → L2(M)called the Laplace-Beltrami operator which acts like a second-order differential operator when restricted to smooth functions; in other words, it is a generalization of the usual Laplace operator ∆ = −(∂2/∂x 21 + · · · +
+
+∂2/∂x 2
+
+> m
+
+) from Rm, where, for smooth f , the value ∆ f (x) represents the difference between the value of f (x)compared to the average value of f on infinitesimally small balls around x. If M is compact, then L2(M)admits a countable basis of eigenfunctions {ϕj }∞ 
+
+> j=0
+
+of ∆ and corresponding eigenvalues {λj }∞
+
+> j=0
+
+, which are infinitely-differentiable functions. The smallest eigenvalue is always λ0 = 0 and corresponds to a (suitably normalized) constant function ϕ0. As j → ∞ , it is known (see [16, Section VI.4]) that the eigenvalues satisfy Weyl’s law λj ∼ 4π2(ωmvol( M)) −2/m j2/m where ωm denotes the Lebesgue measure of the unit ball in Rm,and vol( M) := R 
+
+> M
+
+1d x denotes the volume of M; in particular, the asymptotic behavior of the eigenvalues depends only on coarse geometric features of M, namely its dimension and volume. The spectral theory of the Laplace-Beltrami operator provides a natural generalization of Fourier analysis to functions on compact Riemannian manifolds; for example, if M = S1 then {ϕj }∞ 
+
+> j=0
+
+are the complex exponentials and the resulting basis is the Fourier series, and if M = S2 then {ϕj }∞ 
+
+> j=0
+
+are the spherical harmonics. 
+
+Homogeneity. An isometry of a Riemannian manifold is a map ψ : M → M such that for all x, y ∈ M we have d(ψ(x), ψ (y)) = d(x, y ), and the set of all isometries of M is a group under composition denoted Iso( M)9and called the isometry group . We say that a Riemannian manifold is homogeneous if for all x, x ′ ∈ M 
+
+there exists ψ ∈ Iso( M) such that ψ(x) = x′ (i.e., the natural action of Iso( M) on M is transitive). None of the results in this paper require homogeneity; however, most examples in applications are indeed homogeneous (e.g., S1, S1 × S1, S2, SO(3)) and many of our proofs could be slightly simplified under the additional assumption of homogeneity. 
+
+Lie Groups. Many of the Riemannian manifolds in this paper can also be endowed with a group structure so that the multiplication map M × M → M and inversion map M → M are smooth; examples include S1,
+
+S1 × S1, and SO(3), but not S2. When a Lie group is equipped with a bi-invariant Riemannian metric tensor, many of these geometric notions simplify; the Riemannian volume form is proportional to Haar measure and is invariant under left and right translations, the tangent space Tan x(M) can be identified with the Lie algebra Tan e(M) by left or right translation where e is the identity element of M, and the geodesic distance between 
+
+x, y ∈ M can be written as a function of the group-theoretic difference d(x, y ) = d(e, x −1y) = d(e, y −1x). In general there are many possible Riemannian metric tensors on a Lie group; whenever we use Lie-group structure in this paper, we assume that the group has been equipped with a fixed bi-invariant Riemannian metric tensor. In particular, such a Lie group is homogeneous. 
+
+3. Statistical Theory 
+
+In this section we state and prove the main results of the paper. Subsection 3.1 contains preliminary results on Riemannian Gaussian mixture models (including our version of the Tweedie-Eddington formula), Subsec-tion 3.2 provides a comparison of the risks of δN , δ B and δT at the oracle level, Subsection 3.3 introduces some bounds on the Sobolev norms of densities of Riemannian Gaussian mixtures, and Subsection 3.4 provides a comparison of the risks of ˆδT with δT at the empirical level. 
+
+3.1. Riemannian Gaussian Mixtures 
+
+We first give some introductory results related to Riemannian Gaussian distributions and mixtures of Rie-mannian Gaussian distributions. The proofs of all results in this subsection appear in Appendix A.1, except that we give a sketch of proof of the Tweedie-Eddington formula (Lemma 3.1) since it is simple and instruc-tive. Throughout this section we will assume that M is a compact connected Riemannian manifold. We begin by defining a particular notion of Gaussian distributions on Riemannian manifolds, which is usually attributed to Pennec [62]. That is, for θ ∈ M and σ2 > 0, the Riemannian Gaussian distribution with location parameter θ and scale parameter σ is the probability measure Pθ,σ 2 on M whose density with respect to the volume form d x is 
+
+pθ,σ 2 (x) := exp 
+
+
+
+− d2(x, θ )2σ2 − A(σ2, θ )
+
+
+
+where A(σ2, θ ) := log 
+
+Z
+
+> M
+
+exp 
+
+
+
+− d2(x, θ )2σ2
+
+
+
+dx. (20) As explained in [62], the Riemannian Gaussian distribution Pθ,σ 2 is centered in the sense that θ is always a local minimizer (but not necessarily a global minimizer) of the Fr´ echet functional y 7 → R 
+
+> M
+
+d2(x, y )d Pθ,σ 2 (x). If M is homogeneous, then (see [57, Theorem 2]) the point θ is the unique global minimizer (i.e, the Fr´ echet mean) of Pθ,σ 2 , and A does not depend on θ. We also emphasize that it is not a restriction to assume that 
+
+M is connected; Pθ,σ 2 assigns zero probability to all connected components of M which do not contain θ.Now we recall the setting from the Introduction, where Θ is an M-valued random variable with distribution 
+
+G, and the conditional distribution of X given {Θ = θ} is Pθ,σ 2 ; in this setting, the marginal distribution of X is a mixture of Riemannian Gaussian distributions, hence its density is f (x) = R 
+
+> M
+
+pθ,σ 2 (x)d G(θ), for 
+
+x ∈ M . The starting point for this entire paper is the following version of a Tweedie-Eddington formula for Riemannian Gaussian mixture models. 
+
+Lemma 3.1. If M is a compact connected Riemannian manifold and the cut locus Cx of x ∈ M satisfies 
+
+G(Cx) = 0 , then f is differentiable at x ∈ M and we have 
+
+E[Log x Θ | X = x] = σ2∇x log f (x). (21) 10 Consequently, if G has a density with respect to the volume form, then G(Cx) = 0 for every x ∈ M , hence 
+
+f is differentiable, and (21) holds for all x ∈ M .Sketch of proof of Lemma 3.1. For any constant-speed geodesic γ : [0 , 1] → M with γ(0) = x and γ′(0) = v,differentiate under the integral and use the chain rule to obtain (see (18) and (19)) lim 
+
+> t→0
+
+f (γ(t)) − f (x)
+
+t = lim 
+
+> t→0
+
+Z
+
+> M
+
+pθ,σ 2 (γ(t)) − pθ,σ 2 (x)
+
+t dG(θ)=
+
+Z
+
+> M
+
+σ−2 Log x(θ) pθ,σ 2 (x), v x dG(θ)=
+
+
+
+σ−2
+
+Z
+
+> M
+
+Log x(θ) pθ,σ 2 (x) d G(θ), v 
+
+
+
+> x
+
+.
+
+As this holds for all v ∈ Tan x(M), we see that f is differentiable at x, with gradient equal to 
+
+∇f (x) = σ−2
+
+Z
+
+> M
+
+Log x(θ) pθ,σ 2 (x) d G(θ).
+
+Multiplying this expression by σ2/f (x) gives 
+
+σ2∇x log f (x) = 
+
+R 
+
+> M
+
+Log x(θ) pθ,σ 2 (x) d G(θ)
+
+f (x) ,
+
+and we recognize on the right side that qx(θ) := pθ,σ 2 (x)/f (x) is the density, with respect to G, of the conditional distribution of Θ given {X = x}; this finishes the proof. Although M = Rm is non-compact and hence does not satisfy our hypotheses, it is useful to note that the conclusion of Lemma 3.1 in this Euclidean setting coincides with the usual Tweedie-Eddington formula 
+
+E[Θ | X = x] = x + σ2∇x log f (x),
+
+since we have Log x(θ) = θ − x.One key difference between Riemannian Gaussian mixture densities and Euclidean Gaussian mixture densities is that the former can be uniformly lower bounded; we show this in the following result, where ess inf and ess sup denote the essential infimum and essential supremum, with respect to the volume form of 
+
+M, respectively. 
+
+Lemma 3.2. If M is a compact connected Riemannian manifold and G has a density g with respect to the volume form, then we have 
+
+inf  
+
+> x∈M
+
+f (x) ≥ cM ess inf  
+
+> θ∈M
+
+g(θ) and sup 
+
+> x∈M
+
+f (x) ≤ CM ess sup 
+
+> θ∈M
+
+g(θ)
+
+for all σ2 ≤ (diam( M)) 2, where cM, C M > 0 are constants depending only on M.
+
+We will also need the following uniform bound on the gradient of a Riemannian mixture density. 
+
+Lemma 3.3. If M is a compact connected Riemannian manifold and G has a density g with respect to the volume form, we have 
+
+sup 
+
+> x∈M
+
+∥∇ f (x)∥x ≤ CMσ−1∥g∥L∞(M)
+
+for all σ2 ≤ (diam( M)) 2, where CM > 0 depends only on M.
+
+3.2. Oracle-Level Denoising 
+
+In this subsection we analyze the risks of the oracle-level denoisers δN , δ B, and δT , in the asymptotic regime where σ2 → 0, for any compact connected Riemannian manifold. Our main results show (Proposition 3.4) 11 that the risk of δN is asymptotically equivalent to mσ 2, and (Theorem 3.8) that the risks of δB and δT differ by at most O(σ5). The proofs of all results (and some auxiliary results needed along the way) are provided in Appendix A.2. To begin, we consider the na¨ ıve denoiser δN (x) = x which is implicitly used in works that do not use techniques from empirical Bayes. In the general setting, we can describe the risk of δN as follows. 
+
+Proposition 3.4. If M is a compact connected Riemannian manifold, then R(δN , σ 2) ∼ mσ 2 as σ2 → 0.
+
+The preceding result shows that the risk of δN is equivalent to its risk in the Euclidean setting Rm;intuitively speaking, this comes from the fact that, for small σ2 > 0, a Riemannian Gaussian distribution is well-approximated by a Euclidean Gaussian distribution in the tangent space. Next we introduce the oracle-level denoisers of interest whose analysis will occupy the remainder of this subsection. That is, we define the oracle Bayes denoiser as 
+
+δB(x) ∈ arg min 
+
+> ϑ∈M
+
+E[d2(ϑ, Θ) | X = x] (22) and the oracle tangential Bayes denoiser as 
+
+δT (x) := Exp x (E[Log x Θ | X = x]) (23) for all x ∈ M . As we explained in the Introduction, one can view δT (x) as a one-step approximation of 
+
+δB(x), by initializing Riemannian gradient descent at the output of the na¨ ıve denoiser δN (x) = x; also, by Lemma 3.1, the oracle tangential Bayes denoiser can be written as δT (x) = Exp x(σ2∇x log f (x)), which depends only on the marginal density of X and hence can be approximated in a fully data-driven manner. 
+
+Example 3.5 (homogeneous M, uniform G). If M is a compact connected homogeneous Riemannian manifold and G is proportional to the volume form (i.e., the uniform distribution), then the denoisers 
+
+δN , δ B, and δT are all equal. To see δB = δN , note that the conditional distribution of Θ given {X = x} is a Riemannian Gaussian distribution with location parameter x and scale parameter σ, hence δB(x) = x by definition. To see δT = δN , note that the marginal distribution of X is uniform, hence δT (x) = Exp x(σ2 ·0) = 
+
+x. This behavior is distinct from the Euclidean case, where the na¨ ıve denoiser cannot be written as the Bayes denoiser with respect to any G. In fact, this argument shows that δN , being the minimizer of a posterior expected loss, is admissible; this somewhat contrasts the recent work [56] on the James-Stein estimator in spaces of non-positive curvature. Next we turn to a comparison of the risks of δT and δB, in the regime where σ2 → 0. Since δT directly involves the random variable E[Log X Θ | X], we must first develop some auxiliary results for conditional distributions of this random variable and some related quantities. 
+
+Proposition 3.6. Suppose that M is a compact connected Riemannian manifold and that G has a strictly positive, continuously differentiable density with respect to the volume form. Then we have 
+
+sup 
+
+> x∈M
+
+E [Log x Θ | X = x] x = O(σ2) and sup 
+
+> x∈M
+
+Cov (Log x Θ | X = x) x, 2 = O(σ2)
+
+as σ2 → 0.
+
+Although M = R is non-compact and hence does not satisfy our hypotheses, it is useful to note that we can do explicit calculations in this Euclidean setting in order to confirm that the rates in Proposition 3.6 are correct. That is, suppose M = R and G = N (0 , τ 2), so that the conjugate prior structure allows us to directly calculate 
+
+E[Θ − x | X = x] = − σ2
+
+τ 2 + σ2 x = O(σ2) and Cov(Θ − x | X = x) = τ 2σ2
+
+τ 2 + σ2 = O(σ2).
+
+If we restrict M to be a bounded subset of R, then these bounds also hold uniformly over x.In the previous result we established that E[Log X Θ | X] is of order O(σ2); the next result shows that Log X (δB(X)) is also of order O(σ2), but that the difference E[Log X Θ | X] − Log X (δB(X)) is of the smaller order O(σ4). 12 Proposition 3.7. Suppose that M is a compact connected Riemannian manifold and that G has a strictly positive, continuously differentiable density with respect to the volume form. Then we have 
+
+sup 
+
+> x∈M
+
+Log x(δB(x)) x = O(σ2) and sup 
+
+> x∈M
+
+E[Log x Θ | X = x] − Log x(δB(x)) x = O(σ4)
+
+as σ2 → 0.
+
+While Proposition 3.6 is a relatively straightforward calculation using normal coordinates (see (32) in Appendix A.2), Proposition 3.7 is more difficult because δB(x), for x ∈ M , is only implicitly defined via (22). Nonetheless, the proof proceeds by observing that the first-order optimality conditions for δB(x) provide a recursive bound on the distance between Log x(δB(x)) and E[Log x Θ | X = x], which upon iterating and combining with Proposition 3.6 implies the desired estimates. Now we combine Proposition 3.6 and Proposition 3.7 to prove the following, which is our main result comparing the risks of δB and δT . The proof (given in Appendix A.2) reveals that the Taylor expansions of the squared geodesic distances d2(θ, δ B(x)) and d2(θ, δ T (x)) agree up to second-order, i.e., the denoiser δT
+
+captures precisely the impact of the sectional curvature of M on δB.
+
+Theorem 3.8. Suppose that M is a compact connected Riemannian manifold and that G has a strictly positive, continuously differentiable density with respect to the volume form. Then we have 0 ≤ R(δT , σ 2) −
+
+R(δB, σ 2) = O(σ5) as σ2 → 0.
+
+3.3. Sobolev Norm Bounds 
+
+In the Euclidean setting, the key to the fast rates of convergence of empirical Bayes denoising is that the density f of a Gaussian mixture is always infinitely differentiable (in fact, analytic), regardless of G. In the Riemannian setting, it turns out that smoothness of the density f of a Riemannian Gaussian mixture is more delicate. In this subsection, we will develop some sufficient conditions on the geometry of M and the density 
+
+g of G which imply a bound on a suitable Sobolev norm of f . The proofs of all results in this subsection are contained in Appendix A.3. To state the desired estimates precisely, let {ϕj }∞ 
+
+> j=0
+
+and {λj }∞ 
+
+> j=0
+
+denote the eigenfunctions and eigenvalues of the Laplace-Beltrami operator ∆ on M. For any function h : M → C, we define h∗(j) := R 
+
+> M
+
+h(x)ϕj (x)d x
+
+for all j = 0 , 1, . . . , which are just its coefficients in the basis {ϕj }∞
+
+> j=0
+
+, i.e., we have h = P∞ 
+
+> j=0
+
+h∗(j)ϕj with the sum convergent in L2(M). For r ≥ 0, we also define 
+
+∥h∥2  
+
+> Hr(M)
+
+:= 
+
+> ∞
+
+X
+
+> j=0
+
+(1 + λj )r |h∗(j)|2, (24) called the Sobolev norm of order r of h.To understand these Sobolev norms, it is helpful to consider some special cases. For example, for r = 0 we see from Parseval’s identity that ∥h∥H0(M) = ∥h∥L2(M). A more interesting example is r = 1, where integration by parts allows us to compute 
+
+Z
+
+> M
+
+∥∇ h(x)∥2
+
+> x
+
+dx =
+
+Z
+
+> M
+
+h(x)∆ h(x)d x
+
+=
+
+Z
+
+> M
+
+
+
+> ∞
+
+X
+
+> j=0
+
+h∗(j) ϕj (x)
+
+
+
+> ∞
+
+X
+
+> j=0
+
+h∗(j)λj ϕj (x)
+
+ dx =
+
+> ∞
+
+X
+
+> j=0
+
+λj |h∗(j)|2;hence 
+
+∥h∥2 
+
+> H1(M)
+
+= ∥h∥2 
+
+> L2(M)
+
++
+
+Z
+
+> M
+
+∥∇ h(x)∥2
+
+> x
+
+dx. (25) More generally, for integer r, the spectral norm in (24) is equivalent to the usual Sobolev norm involving weak derivatives up to order r; in particular, ∥h∥Hr (M) < ∞ if and only if all weak derivatives of h up to 13 order r belong to the corresponding tensor-valued L2 spaces. The definition in (24), however, makes sense for all r ≥ 0, including non-integer values; see [1, Chapter 2]. Our empirical Bayes results will require the assumption that we have finite Sobolev norm ∥f ∥Hr (M) < ∞
+
+for some r > 1, and the resulting rates of convergence will depend explicitly on ∥f ∥Hr (M) and r; we will see that large values of r are desirable, since the resulting rates approach the parametric rate of convergence n−1
+
+as r → ∞ . To understand the assumption ∥f ∥Hr (M) < ∞ for some r > 1, we give the following result (which is an immediate consequence of Lemma 3.3) that states that this condition is nearly satisfied in general. 
+
+Lemma 3.9. If M is a compact connected Riemannian manifold and G has a density g ∈ L∞(M) with respect to the volume form, then we have ∥f ∥H1(M) ≤ CMσ−1∥g∥L∞(M), for all σ2 ≤ (diam( M)) 2, where 
+
+CM > 0 is a constant depending only on M.
+
+In the Riemannian setting, we will require further assumptions on M and g in order to upgrade the finite Sobolev norm of order 1 into a finite Sobolev norm of order r > 1. This is a distinct behavior from the Euclidean setting, where Gaussian location mixture models always have finite Sobolev norms of all orders. For instance, we give the following result in the Euclidean setting which implies that f has finite Sobolev norms of all orders, although where the Sobolev space Hr (Rm) needs to be defined slightly differently since 
+
+M = Rm is non-compact (and its Laplace-Beltrami operator does not have a discrete spectrum). 
+
+Lemma 3.10. If M = Rm and G has a density g ∈ L∞(Rm) with respect to Lebesgue measure, then for all 
+
+r ∈ N we have 
+
+sup 
+
+> x∈Rm
+
+∥∇ r f (x)∥r ≤ Cm,r σ−r ∥g∥L∞(Rm)
+
+for all σ2 > 0 where Cm,r > 0 is a constant that depends only on m and r.
+
+The crucial aspect of Euclidean spaces M = Rm which permits a straightforward argument for the preceding result is that the functional x 7 → ∥ x − θ∥2 has uniformly bounded rth order derivatives for all 
+
+r ≥ 2. In the Riemannian setting such bounds can fail dramatically, because the rth order derivatives of the functional x 7 → d2(x, θ ) for r ≥ 2 may explode as x approaches the cut locus Cθ of θ. We illustrate this with the following basic calculation. 
+
+Example 3.11 (Hessian of distance squared on S2). Fix θ ∈ S2 and σ2 = 1 and use [63] to calculate 
+
+∇2
+
+> x
+
+d2(x, θ ), (where we emphasize the differentiation with respect to the x variable); to write the expression explicitly, we represent S2 = {x ∈ R3 : ∥x∥ = 1 } and we have 12 ∇2
+
+> x
+
+d2(x, θ ) = Log x θ(Log x θ)⊤
+
+d2(x, θ ) + h(d(x, θ )) 
+
+
+
+I − xx ⊤ − Log x θ(Log x θ)⊤
+
+d2(x, θ )
+
+
+
+(26) where h(t) = t cos( t)/ sin( t) for 0 < t ≤ π with h(0) := 1 by continuity. Observe that, as x → Cθ = {− θ},we have h(d(x, θ )) → −∞ and hence ∥∇ 2
+
+> x
+
+d2(x, θ )∥x, 2 → ∞ .Consequently, in the Riemannian setting, the Sobolev smoothness of f relies more delicately on both the geometry of M and the properties of g; in the rest of this subsection we give some results of this form. For instance, most of the examples of interest in this work are Lie groups (e.g., S1, S1 × S1, and SO(3)), where the convolution structure allows us to differentiate f without directly differentiating the Riemannian logarithm. This allows us to show the following, namely that f inherits the same smoothness as g; we write 
+
+Cr (M) for the set of real functions on M which are r-times continuously differentiable. 
+
+Lemma 3.12. If M is a compact connected Lie group and G possesses a density g ∈ Cr (M) with respect to the volume form, then we have ∥f ∥Hr (M) ≤ CM,r (∥g∥L∞(M) + sup θ∈M ∥∇ r g(θ)∥θ,r ) for all σ2 > 0, where 
+
+CM,r > 0 is a constant depending only on M and r.
+
+The sphere S2 is not a Lie group so the previous result does not apply, but we can nonetheless use the explicit calculations from Example 3.11 to say something general in the following. 
+
+Lemma 3.13. If M = S2 and G possesses a density g ∈ L∞(S2) with respect to the volume form, then 
+
+∥f ∥H2(M) ≤ CMσ−2∥g∥L∞(M) for all σ2 ≤ (diam( M)) 2, where CM > 0 is a constant depending only on 
+
+M.
+
+14 Note the qualitative difference between Lemma 3.12 and Lemma 3.13. In Lemma 3.12 we show that f is at least as smooth as g, while in Lemma 3.13 we show that f gains some smoothness over that of g. We do not expect either of these results to be sharp, as we show next in the special case of the circle M = S1. In this special case, we show that f gains two derivatives over that of g, which can be understood via standard Fourier analysis since the density f of the Riemannian Gaussian mixture is exactly a convolution of g with a kernel that is differentiable but not continuously differentiable (because of its behavior at the cut locus). 
+
+Lemma 3.14. If M = S1 and G possesses a density g ∈ H s(S1) with respect to the volume form, then we have cσ2 ∥g∥Hs(S1) ≤ ∥ f ∥Hs+2 (S1) ≤ Cσ −2∥g∥Hs(S1) for all s ≥ 0, where C > 0 is a universal constant and 
+
+cσ2 > 0 is a constant depending only on σ2.
+
+Another special case where we can make our results precise is the following. 
+
+Lemma 3.15. If M is a compact connected homogeneous Riemannian manifold and G is proportional to the volume form (i.e., G is the uniform distribution), then ∥f ∥Hr (M) = (vol( M)) −1/2 for all r ≥ 1.
+
+As the preceding examples show, obtaining sharp Sobolev regularity bounds for the marginal density 
+
+f in terms of the Sobolev regularity of the mixing density g is a difficult problem which depends on the geometry of M. One obstruction is the behavior of higher-order derivatives of the squared-distance function 
+
+x 7 → d2(x, θ ) near the cut locus Cθ ; already at second order, the Hessian ∇2
+
+> x
+
+d2(x, θ ) can exhibit singular behavior near Cθ (cf. Example 3.11). Furthermore, the integrability of these singularities also depends on the (co)dimension and local structure of the cut loci Cθ themselves (cf. the proof of Lemma 3.13). In the case of compact Lie groups, the convolution structure allows us to avoid differentiating the Riemannian logarithm directly and gives partial results in this direction (cf. Lemma 3.12), but a sharp analysis appears to require further tools from representation theory. A detailed study of Sobolev bounds for densities of Riemannian Gaussian mixtures is therefore an interesting direction for future work, and lies beyond the scope of this paper. 
+
+3.4. Empirical-Level Denoising 
+
+In this final subsection we establish (Theorem 3.17) a rate of convergence for the empirical tangential Bayes denoiser ˆδT to the oracle tangential Bayes denoiser δT . The proofs of all results in this section are given in Appendix A.4. Combined with the results of Subsection 3.2, this shows that the empirical tangential Bayes denoiser ˆδT can achieve nearly the same risk as the oracle Bayes denoiser δB, when σ2 is small and n is large. To begin, let {λj }∞ 
+
+> j=0
+
+and {ϕj }∞ 
+
+> j=0
+
+denote the eigenvalues and eigenfunctions of the Laplace-Beltrami operator ∆ on L2(M), and define 
+
+K(x, y, ℓ ) := 
+
+> ℓ
+
+X
+
+> j=0
+
+ϕj (x)ϕj (y),
+
+for x, y ∈ M , which is just a finite-rank projection of the identity operator, with respect to the basis {ϕj }∞
+
+> j=0
+
+of L2(M). The function K plays the role of the kernel in our methodology, in the sense that we define our estimator of the density f of X to be ˆfn(x) := 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+K(x, X i, ℓ n), (27) where ℓn is some sequence that will be determined later. Before we use this density estimator in our empirical Bayes approximation of δT , we give the following result which provides simultaneous control on the L2(M) estimation error of ˆfn and its gradient ∇x ˆfn.
+
+Proposition 3.16. Suppose that M is a compact connected Riemannian manifold, that G has a density 
+
+g ∈ L∞(M) with respect to the volume form, and that we have ∥f ∥Hr (M) < ∞ for some r > 0. Then setting 
+
+ℓn := 
+
+
+
+n∥f ∥2 
+
+> Hr(M)
+
+∥g∥L∞(M)
+
+! m
+
+> 2r+m
+
+
+
+15 yields 
+
+E
+
+Z 
+
+> M
+
+ˆfn(x) − f (x) 2
+
+dx
+
+
+
+≤ CM,r ∥f ∥ 2m 
+
+> 2r+m
+> Hr(M)
+
+∥g∥ 2r
+
+> 2r+m
+> L∞(M)
+
+n 2r
+
+> 2r+m
+
+and, for r > 1,
+
+E
+
+Z 
+
+> M
+
+∇x ˆfn(x) − ∇ xf (x) 2
+
+> x
+
+dx
+
+
+
+≤ CM,r ∥f ∥ 2m+4 2r+m 
+
+> Hr(M)
+
+∥g∥ 2r−22r+m
+
+> L∞(M)
+
+n 2r−22r+m
+
+,
+
+for all n and σ2 ≤ (diam( M)) 2, where CM,r > 0 is a constant depending only on M and r.
+
+The work [34] initiated the study of estimating a nonparametric density f from a sample of i.i.d. random variables X1, . . . , X n on a compact Riemannian manifold M, using a kernel made from the eigenfunctions of the Laplace-Beltrami operator; our Proposition 3.16 is limited to the setting that f is the density of a Riemannian Gaussian mixture, but our results are more precise in that the rate of convergence is more explicit and that we also establish a rate of convergence for the estimation of the gradient ∇f . These minor extensions are needed for the analysis of our empirical Bayes denoiser in Subsection 3.4, but the proofs are conceptually similar to the methods used in [34]; see also the discussion in [34, Section 4.6]. Nonetheless, they may be of independent interest in the literature on density estimation on Riemannian manifolds. Also, note that this result provides a non-trivial rate of convergence for estimating ∇f only if r > 1; this is precisely what requires us to develop the finer results of Subsection 3.3. Now we define the denoiser of interest, namely ˆδT (x) := Exp x σ2 ∇x ˆfn(x)max { ˆfn(x), ρ }
+
+!
+
+, (28) where ˆfn is chosen with ℓn according to the previous result and ρ > 0 will be chosen later. By comparing with (8), we see that this is like a plug-in form of δT , unless ˆfn(x) provides a very low estimate for f (x) in which case we regularize by replacing ˆfn(x) with ρ.Our main result on the empirical Bayes denoiser ˆδT is the following, which provides an explicit rate of convergence for the expected distance E[DT (ˆδT )] defined in (15). 
+
+Theorem 3.17. Suppose that M is a compact connected Riemannian manifold, that G has a density g ∈
+
+L∞(M) with respect to the volume form, and that we have ∥f ∥Hr (M) < ∞ for some r > 1. Then setting 
+
+0 < ρ ≤ min x∈M f (x) and 
+
+ℓn := 
+
+
+
+n∥f ∥2 
+
+> Hr(M)
+
+∥g∥L∞(M)
+
+! m
+
+> 2r+m
+
+
+
+yields 
+
+E
+
+h
+
+DT (ˆδT )
+
+i
+
+= E
+
+Z 
+
+> M
+
+d2 ˆδT (x), δ T (x)
+
+
+
+f (x)d x
+
+
+
+≤ CM,r σ2∥f ∥ 2m+4 2r+m 
+
+> Hr(M)
+
+∥g∥ 8r+3 m
+
+> 2r+m
+> L∞(M)
+
+ρ4n 2r−22r+m
+
+for all n and σ2 ≤ (diam( M)) 2, where CM,r > 0 is a constant depending only on M and r.
+
+It is easy to upgrade this result to a bound on the expected risk of ˆδT , although we obtain a non-sharp oracle inequality rather than a sharp one. 
+
+Lemma 3.18. For any ε > 0 there exists Cε > 0 such that we have R(δ) ≤ (1 + ε)R(δT ) + CεDT (δ) for all denoisers δ : M → M , where Cε → ∞ as ε → 0.
+
+The above result, combined with Theorem 3.17, immediately yields 
+
+E
+
+h
+
+R
+
+ˆδT , σ 2i 
+
+≤ (1 + ε)R(δT , σ 2) + CM,r,ε σ2∥f ∥ 2m+4 2r+m 
+
+> Hr(M)
+
+∥g∥ 8r+3 m
+
+> 2r+m
+> L∞(M)
+
+ρ4n 2r−22r+m
+
+16 for all n and σ2 ≤ (diam( M)) 2, where CM,r,ε > 0 is a constant depending only on M, r, and ε.In the remainder of this subsection, we interpret the rate of convergence appearing in the previous result, in terms of n. We note that g is unknown but appears only in the constant, and that by Lemma 3.2 we can choose ρ to depend only on M and g, provided that g has a strictly positive lower bound. In some cases it is also desirable to understand the dependence of the rate on σ2, since the oracle-level results from Subsection 3.2 are asymptotic results in the regime where σ2 → 0; however, this is a hard problem even in the Euclidean setting, and most existing rates of convergence for nonparametric empirical Bayes (e.g., [89, 73, 78]) either do not depend explicitly on σ2 or in fact deteriorate as σ2 → 0. In the following, we use results of Subsection 3.3 to explicitly describe the resulting rates of convergence in various settings. First we consider Lie groups, where the rate of convergence depends explicitly on the smoothness of g.
+
+Example 3.19 (Lie group M, smooth G). Suppose M is a compact connected Lie group (e.g., the circle S1,the torus S1 × S1, or the space of orientation-preserving rotations SO(3)) and that the density g of G satisfies 
+
+g ∈ Cr (M). Then, Lemma 3.12 implies ∥f ∥Hr (M) < ∞. If r ≥ 2, then, in terms of constants depending only on M, g , and σ2, we can set ℓn ≍ nm/ (2 r+m) and achieve the rate of convergence n−(2 r−2) /(2 r+m). Note that this can be made arbitrarily close to the parametric rate n−1 as r → ∞ , although the pre-factor may explode. To be concrete, consider the case that g is twice-continuously differentiable so that we take r = 2 above; if m = 1 (e.g., the circle S1) then setting ℓn ≍ n1/5 leads to the rate of convergence n−2/5, if m = 2 (e.g., the torus S1 × S1) then setting ℓn ≍ n1/3 leads to the rate of convergence n−1/3, and if m = 3 (e.g., rotations SO(3)) then setting ℓn ≍ n3/7 leads to the rate of convergence n−2/7.Second, we consider the sphere, where our result holds for all g but with a slower rate of convergence. 
+
+Example 3.20 (M = S2, general G). If M is the sphere S2 and g ∈ L∞(S2) has a strictly positive lower bound, then Lemma 3.13 guarantees ∥f ∥H2(M) ≲ σ−2∥g∥L∞(M) hence we can take r = m = 2 in the main result. Consequently, and again ignoring constants that depend on M, g , and σ2, we see that setting 
+
+ℓn ≍ n1/3 leads to the rate of convergence n−1/3.Last is the case of the circle, in which we can precisely identify the smoothness of f in terms of the smoothness of g; note that the following result is sharper than what we get by treating S1 as a Lie group above. 
+
+Example 3.21 (M = S1, smooth G). If M = S1 and G has a density g with some smoothness, then we can obtain an explicit rate of convergence in terms of σ2 and n. Indeed, if we have ∥g∥Hs(M) < ∞
+
+for some s ≥ 0, then Lemma 3.14 shows that we may apply Theorem 3.17 for r = s + 2; then, ignoring factors that depend only on M and g, it follows that setting ℓn ≍ σ−4/(2 s+5) n1/(2 s+5) leads to a rate of convergence of σ(4 s−2) /(2 s+5) n−(2 s+2) /(2 s+5) . We can understand this rate of convergence in a few cases of interest. For s = 0, it coincides with the rate σ−2/5n−2/5 in Example 3.19, but with an explicit dependence on σ2 > 0 which deteriorates as σ2 → 0. For s = 1, the rate is σ2/7n−4/7 which is faster in n and vanishes as σ2 → 0. (More generally, with respect to σ2 → 0, the rate is non-deteriorating if and only if s ≥ 1/2and vanishing if and only if s > 1/2.) Lastly, we note that the rate can be made arbitrarily close to parametric rate σ2n−1 if ∥g∥Hs(M) < ∞ for all s ≥ 0; indeed, for any 0 < ε ≤ 1, set s := (3 − 5ε)/(2 ε)and ℓn ≍ σ−4/(2 s+5) n1/(2 s+5) ≈ σ−4ε/ 3nε/ 3 to achieve the rate of convergence σ2−4εn−(1 −ε). (However, the constant prefactor may explode as ε → 0.) In the special case of the circle M = S1, we complement the rate of convergence in Example 3.21 by providing the following matching lower bound, uniformly over all densities g in a suitable subset of a Sobolev ball of order s ≥ 0. In particular, this establishes that ˆδT is minimax-optimal and that the minimax rate is nonparametric, n−(2 s+2) /(2 s+5) . For convenience, we emphasize the dependence of E, f , and δT on g by writing Eg , f g , and δT ,g , respectively. 
+
+Theorem 3.22. Suppose M = S1, fix 0 < α < (2 π)−1 < β , s ≥ 0, and L > (2 π)−1/2, and define 
+
+Gs(α, β, L ) := 
+
+
+
+g : S1 → R :
+
+Z
+
+> S1
+
+g(θ)d θ = 1 , α ≤ g(θ) ≤ β for all θ ∈ S1, and ∥g∥Hs(S1) ≤ L
+
+
+
+.
+
+17 Then, for all 0 < σ 2 < π 2, we have 
+
+inf 
+
+> ˆδ
+
+sup 
+
+> g∈G s(α,β,L )
+
+Eg
+
+Z 
+
+> S1
+
+d2 ˆδ(x; X1, . . . , X n), δ T ,g (x)
+
+
+
+fg (x)d x
+
+
+
+≥ Cσ2,s,α,β,L 
+
+n 2s+2 2s+5 
+
+for all n, where Cσ2,s,α,β,L > 0 is a constant depending only on σ2, s, α, β , and L, and the infimum is taken over all measurable functions ˆδ : S1 × (S1)n → S1.
+
+The proof of this result reveals that the hardness of denoising coincides with the hardness of estimating the derivative of f , and the rate of convergence reflects the fact that f inherits 2 more degrees of smoothness than 
+
+g because of the convolution structure; indeed, the rate of convergence should be understood as n−2p/ (2 p+1) 
+
+for p = ( s + 2) − 1. The obstruction to extending this analysis to general M is that we do not have a precise understanding of the smoothing properties of Riemannian Gaussian mixture models in cases other than 
+
+M = S1, which is the same difficulty we encountered in Subsection 3.3. In some sense, these non-parametric rates are a manifestation of the well-known “smeariness” phenomenon in non-Euclidean statistics, whereby the rates of convergence can suffer in problems where the likelihood is not differentiable at the cut locus of its Fr´ echet mean [37, 28, 27, 40]. 
+
+4. Numerical Simulations 
+
+In this section we give some numerical simulations to illustrate the theory of Section 3, and discuss some computational aspects of the denoising procedures that will be used in the applications of Section 5. The simulations are designed with two goals in mind. First, we are interested in comparing the risks of δT with those of δN and δB as σ2 → 0 (as in Subsection 3.2). Second, we are interested in comparing the distance between ˆδT and δT (as in Subsection 3.4). As in the rest of the paper, the latent variables Θ 1, . . . , Θn are i.i.d. samples from some distribution G,and the measurements X1, . . . , X n are conditionally independent Riemannian Gaussian random variables given {Θ1 = θ1, . . . , Θn = θn} where Xi has location parameter θi and some scale parameter σ > 0, for all 1 ≤ i ≤ n. Also recall that for any denoiser δ we define the risk R(δ, σ 2) via (10) and the distance DT (δ)from the oracle δT via (15). In Appendix B we give a detailed description of the implementation of our denoisers and our simulations, but we briefly summarize a few important points here. First, we note that, even with oracle knowledge of the latent variable distribution G, evaluating the oracle tangential Bayes denoiser δT requires numerical integration because evaluating the marginal density f (x) = R 
+
+> M
+
+pθ,σ 2 (x)d G(θ) already requires numerical integration; indeed, we use a Monte Carlo approximation of f by drawing additional oracle samples of Θ from G, and then we use the identity δT (x) = Exp x(σ2∇xf (x)/f (x)). Second, we compute the oracle Bayes denoiser δB by first approximating the conditional Fr´ echet mean of Θ given {X = x} via Nadaraya-Watson smoothing (see (5) and Appendix B) using additional oracle samples of (Θ , X ) from (1), and then by numerically computing the Fr´ echet mean of the resulting distribution using the built-in methods from 
+
+Geomstats [59]. Lastly, we note that choosing the optimal parameters ℓn and ρ (recall (27) and (28)) requires some oracle knowledge of G; for ℓn, in this section we follow the oracle choices suggested in Subsection 3.4, since our goal is simply to verify our theoretical developments, while ρ is set to the 1st percentile of the positive values taken on by the density ˆfn. Later, in the applications section, we will choose both parameters in a fully data-driven way with cross-validation of the Riemannian version of Hyv¨ arinen’s score-matching objective [42, 84, 19]. All of our simulations have the same form. That is, for various structured distributions G on a Riemannian manifold M, we compute the following. First, we compute the oracle-level na¨ ıve, Bayes, and tangential Bayes denoisers on the basis of 10,000 oracle samples and we let σ2 vary over the interval (0 , 0.25] in 6 linearly-spaced increments, then we plot the risks R(δN , σ 2), R(δB, σ 2) and R(δT , σ 2) as a function of σ2. Second, we fix σ2 = 0 .15 and we let n vary over the interval {100 , . . . , 10 , 000 } in 5 logarithmically-spaced increments, then we plot E[DT (ˆδT )] as a function of n, on a log-log scale; in this way, the slope of the resulting line reflects the rate of convergence of the empirical tangential Bayes denoiser ˆδT , as predicted by Theorem 3.17. In the rest of this section, we discuss several simulations in the circle S1 and the sphere S2.18 4.1. Circle, S1
+
+The first setting of interest is the circle, M = S1, in which our methodology and results already reveal some interesting new phenomena. Throughout this subsection, we represent S1 = R/2πZ for convenience in some expressions. In order to compute the empirical Bayes denoiser ˆδT , we need to be able to compute sums of eigenfunctions of the Laplace-Beltrami operator ∆, and derivatives thereof. To do this, we recall from standard Fourier analysis that the eigenvalue λ0 = 0 occurs with multiplicity 1 and that λm = m2 occurs with multiplicity 2 for m ≥ 1. As such, it is natural to index our eigenfunctions by integers k ∈ Z, so that the eigenvalue 
+
+λk = k2 has corresponding eigenfunction ϕk(x) = (2 π)−1/2eikx , where we recall that we have chosen to represent S1 = R/2πZ. Thus if we construct the kernel K by fixing M > 0 and summing over |k| ≤ M , we have 
+
+K(x, y, M ) = X
+
+> |k|≤ M
+
+12π eik (x−y) := 12π DM (x − y)where {DM }M ∈N is the Dirichlet kernel (see [81, p. 206]) defined by 
+
+DM (z) := sin    M + 12
+
+ z
+
+sin   12 z , (29) for z̸ = 0, and DM (0) = 2 M +1 by continuity. Recall that the Dirichlet kernel is responsible for the “ringing” phenomenon whereby high-density regions close to low-density regions can create the appearance of waves (e.g., in the density estimate) which are not truly present in the data; this phenomenon will be seen in the application to protein structure in Subsection 5.2. Note that M is related to ℓn via ℓn = 2 M +1, i.e., M ≍ ℓn.We consider the following examples for the latent variable distribution G and corresponding hyperpa-rameter choices. The first is the uniform distribution (i.e., d G(θ) ∝ dθ), in which we set M ∝ log n. The second is the uniform distribution on a cap (i.e., d G(θ) ∝ 1{a ≤ θ ≤ b}dθ), in which (Example 3.21) we set 
+
+M ≍ n1/6 since direct calculation reveals ∥g∥Hs(S1) < ∞ if and only if s < 1/2. The remaining distributions are themselves Riemannian Gaussian mixture models with varying numbers of equally-spaced components and varying component scale parameters τ > 0, i.e., in the 2-mode case (i.e., antipodal components) as 
+
+τ 2 = 0 .1, in the 3-mode case as τ 2 = 0 .05, and in the 5-mode case as τ 2 = 0 .0005; in these cases, we set (Example 3.21) M ≍ log n since the theory suggests letting M grow slower than nε for all 0 < ε < 1. We always set ρ > 0 to the first percentile of the empirical density ˆfn.The results of these simulations are shown in Figure 3, in which the top row shows the 5 different choices of G, the middle row shows the risks of the oracle denoisers δN , δ T , and δB, and the bottom row shows the distance DT (ˆδT ) of the empirical tangential Bayes denoiser from the oracle tangential Bayes denoiser. Next we make some remarks about these plots and their relationship with the theory of Section 3. At the oracle level, we observe that the risks of δB and δT are nearly indistinguishable (Theorem 3.8) while the risk of δN
+
+is approximately equal to σ2 (Proposition 3.4); the only exception is the uniform distribution in which case all of the risks coincide (Example 3.5). At the empirical level, we note that the slope of the line in the case of the cap example is −0.5 which corresponds to a rate of convergence of n−1/2 (Example 3.21), and in all other cases the slope is approximately −1 which corresponds to the nearly-parametric rate of convergence 
+
+n−1 (Example 3.21). 
+
+4.2. Sphere, S2
+
+In this next example, we consider the sphere, M = S2. This is one of the fundamental examples in directional statistics, and will be the focus of our application to astronomy in Subsection 5.1. We emphasize that visualizing data on the sphere requires choosing a particular two-dimensional projection of S2 onto the plane; in this work we always use the Mollweide projection , which is an equal-area projection, hence it is well-suited to visualizing scatter plots and other statistical objects, and is commonly used in astronomy [82]. However, we emphasize that our denoising procedure takes place in the intrinsic geometry of S2, not in the projected geometry; in this regard, other projections can be chosen for the visualization step without changing the underlying methodology. 19 0.00 0.05 0.10 0.15 0.20 0.25                                                   
+
+> 2
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> R( ,  2)
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25 N
+> 10 210 3
+> n
+> 10 3
+> 10 2
+> 10 1
+> [D ( )]
+> Mlog n
+> slope -1.01
+> 10 210 3
+> n
+> 10 3
+> 10 2
+> 10 1
+> Mn1/6
+> slope -0.51
+> 10 210 3
+> n
+> 10 3
+> 10 2
+> 10 1
+> Mlog n
+> slope -0.75
+> 10 210 3
+> n
+> 10 3
+> 10 2
+> 10 1
+> Mlog n
+> slope -0.95
+> 10 210 3
+> n
+> 10 3
+> 10 2
+> 10 1
+> Mlog n
+> slope -1.03
+> 0°
+> 45°
+> 90°
+> 135°
+> 180°
+> 225°
+> 270°
+> 315°
+
+'uniform' 
+
+> 0°
+> 45°
+> 90°
+> 135°
+> 180°
+> 225°
+> 270°
+> 315°
+
+'cap' 
+
+> 0°
+> 45°
+> 90°
+> 135°
+> 180°
+> 225°
+> 270°
+> 315°
+
+'2-modal' 
+
+> 0°
+> 45°
+> 90°
+> 135°
+> 180°
+> 225°
+> 270°
+> 315°
+
+'3-modal' 
+
+> 0°
+> 45°
+> 90°
+> 135°
+> 180°
+> 225°
+> 270°
+> 315°
+
+'5-modal' Fig 3 . A simulation of the risks of the oracle and empirical denoisers in the circle S1. We show the latent variable distribution 
+
+G (top row), the risks of the oracle-level denoisers δN , δT , and δB when n is fixed and σ2 decreases (middle row), and the distance between the empirical-level and oracle-level denoisers ˆδT and δT when σ2 is fixed and n increases (bottom row). 
+
+In order to apply our method we need to recall some aspects of the eigendecomposition of the Laplace-Beltrami operator on S2. It turns out that the eigenvalues occur with multiplicities, so the eigendecomposition can be conveniently parameterized by integer pairs ( m, k ) with |k| ≤ m; more precisely, the eigenvalue 
+
+λm = m(m + 1) occurs with multiplicity 2 m + 1, and its corresponding eigenfunctions are the so-called 
+
+spherical harmonics ϕm, −m, . . . , ϕ m,m : S2 → C. We can also simplify the calculation of our kernel by choosing coordinates for S2 by representing it as {x ∈ R3 : ∥x∥ = 1 }; then, by fixing M and summing over all ( m, k ) with m ≤ M , the addition formula for spherical harmonics yields 
+
+K(x, y, M ) := 
+
+MX
+
+m=0 
+
+X
+
+|k|≤ m
+
+ϕm,k (x)ϕm,k (y) = 
+
+MX
+
+m=0 
+
+2m + 1 4π Pm
+
+ x⊤y
+
+where {Pm}m∈N are the so-called Legendre polynomials . Note that M is related to ℓn via ℓn = PMm=0 (2 m +1) = ( M + 1) 2, i.e., M ≍ ℓ1/2
+
+n .The examples of our latent variable distribution G and hyperparameter choices are as follows. As before, we consider 5 choices for G; the first is the uniform distribution (i.e., d G(θ) ∝ dθ), and the second is the uniform distribution on a cap (i.e., d G(θ) ∝ 1{θ ∈ C}dθ for suitable C ⊆ S2). The third is approximately supported on the equator; more precisely it has a density given by g(θ) = R
+
+M pη,τ 2 (θ)d ν(η) where ν is the uniform distribution on the equator and τ 2 = 0 .0001. The remaining are Riemannian Gaussian mixture models with varying numbers of components and varying component scale parameters τ 2 > 0. While the locations of the components cannot be exactly equally-spaced in this setting, we make them approximately so by placing them at the locations of a Fibonacci spiral. The component scale parameters are chosen in the 5-mode case as τ 2 = 0 .05, and in the 10-mode case as τ 2 = 0 .001. In all cases we set M according to the conservative estimate M ≍ n1/6, i.e., ℓn = n1/3 (Example 3.20). We show the results of these simulations in Figure 4, where the top row shows the 5 different choices of G,the middle row shows the risks of the oracle denoisers, and the bottom row shows the distance between the 20 0.00 0.05 0.10 0.15 0.20 0.25                                          
+
+> 2
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> R( ,  2)
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 2
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4 N
+> 10 310 4
+> n
+> 10 2
+> 10 1
+> [D ( )]
+> Mn1/3
+> slope -0.38
+> 10 310 4
+> n
+> 10 2
+> 10 1
+> Mn1/3
+> slope -0.43
+> 10 310 4
+> n
+> 10 2
+> 10 1
+> Mn1/3
+> slope -0.48
+> 10 310 4
+> n
+> 10 2
+> 10 1
+> Mn1/3
+> slope -0.56
+> 10 310 4
+> n
+> 10 2
+> 10 1
+> Mn1/3
+> slope -0.49
+
+'uniform' 'cap' 'equator' '5-modal' '10-modal' Fig 4 . A simulation of the risks of the oracle and empirical denoisers in the sphere S2. We show the latent variable distribution 
+
+G (top row), the risks of the oracle-level denoisers δN , δT , and δB when n is fixed and σ2 decreases (middle row), and the distance between the empirical-level and oracle-level denoisers ˆδT and δT when σ2 is fixed and n increases (bottom row). 
+
+oracle and empirical tangential Bayes denoisers, and we make some comments. At the oracle level, we note as before that δB and δT have nearly equal risks (Theorem 3.8), and that the risk of δN is approximately equal to 2 σ2 (Proposition 3.4); we emphasize in the equator example that the risks of δB and δT are approximately σ2, which reflects the fact that the latent variable distribution is approximately supported on a one-dimensional submanifold. At the empirical level, we observe slopes approximately equal to, or steeper than, −1/3, corresponding to convergence at least as fast as n−1/3 in these simulations (Example 3.20). Also note in the 10-modal example that the our approximation of the oracle Bayes denoiser δB has larger risk than the oracle tangential Bayes denoiser δT , and the difference is due both to Monte Carlo error and to numerical precision of the approximation; this highlights that both denoisers have essentially the same risk in this regime. 
+
+5. Scientific Applications 
+
+In this section we apply our methodology to two denoising problems from concrete scientific applications, where the goal is to estimate some latent manifold-valued random variables Θ 1, . . . , Θn from noisy manifold-valued measurements X1, . . . , X n thereof; that is, we compute the empirical tangential Bayes denoiser ˆδT and then the denoised data set ˆδT (X1), . . . , ˆδT (Xn). In each application we also display our estimate 
+
+∇ ˆfn/ max {ρ, ˆfn} of the score field, which (by slight abuse of notation) we denote ∇ log ˆfn; this helps to visualize the fine properties of the empirical tangential Bayes denoiser. Since the distribution G is not known in practice, we cannot use the oracle choice of M and ρ described in Theorem 3.17 for hyperparameter selection; instead, we use cross-validation of the Riemannian version of Hyv¨ arinen’s score-matching objective [19], i.e. for a candidate density ˜f : M → R computed on some training data we compute ˆJ ( ˜f ) = 1
+
+n
+
+nX
+
+i=1 
+
+
+
+∥∇ log ˜f (Xi)∥2
+
+Xi + 2 ∆ log ˜f (Xi)
+
+
+
+(30) 21 120° 60° 0° 60° 120° 
+
+> 90°
+> 45°
+> 0°
+> 45°
+> 90°
+
+Xi    
+
+> 120° 60° 0° 60° 120°
+> 90°
+> 45°
+> 0°
+> 45°
+> 90°
+
+log fn    
+
+> 120° 60° 0° 60° 120°
+> 90°
+> 45°
+> 0°
+> 45°
+> 90°
+
+(Xi)Fig 5 . Denoising the locations of a catalog of gamma ray bursts, visualized with the Mollweide projection of the sphere          
+
+> S2. We plot the measurements X1, . . . , X n(left), the estimated score field ∇log ˆfn(center), and the denoised data set
+> ˆδT(X1), . . . , ˆδT(Xn)(right).
+
+on a test set of hold-out data. We also use an Akaike Information Criterion (AIC) penalty to prevent over-fitting. See Appendix B for further detail on computation and implementation. (Recall the sign convention for ∆ in the Riemannian setting, which may cause confusion about the + sign in (30).) 
+
+5.1. Localization of Gamma Ray Bursts 
+
+Our first application concerns denoising the locations of a catalog of gamma ray bursts (GRBs), which are short-lived celestial objects consisting of an extremely powerful emission of light; see [66] for a detailed introduction. Because of their transient nature, estimating the positions of GRBs, a task referred to as 
+
+localization , is known to be difficult and has attracted a great deal of research attention [41, 18, 8]. Moreover, GRBs are situated at an extremely large distance away from Earth, so their positions are often recorded as points on a sphere, in the so-called celestial coordinates of declination and right-ascension. Thus, we naturally regard GRB localization as a sphere-valued denoising problem. We use the data from the BATSE-4Br catalog 1, which includes the positions of GRBs observed during 1991-1996. To cast this problem in our framework, we set M := S2 to be the two-dimensional sphere, we write Θ1, . . . , Θn for the latent positions of n = 2702 GRBs, which we assume are i.i.d. samples from some G ∈P(S2) which possesses a density with respect to the volume form, and we write X1, . . . , X n for measurements of Θ 1, . . . , Θn, respectively. We follow the conservative estimates from [8] that the error of the measurements is roughly 10 degrees, yielding σ2 = (10 π/ 180) 2 ≈ 3.046 × 10 −2.Implementing the empirical tangential Bayes denoiser ˆδT requires some computations with the eigenfunc-tions of the Laplace-Beltrami operator, which in this case are the spherical harmonics; to this end, we follow the set-up in Subsection 4.2. We also note that the positions of GRBs are not typically modeled with Riemannian Gaussian distributions but rather with von Mises-Fisher distributions [18, Section 5], but that these distributions share many qualitative features (unimodality, squared-exponential decay away from the location parameter, etc.) and are extremely similar when σ2 is small. The results are shown in Figure 5. As in Section 4, we use the Mollweide projection to visualize the data, but the denoising takes place in the intrinsic geometry of the sphere and hence does not rely on this choice of visualization. The selected hyperparameters are ℓn = 576 (i.e., M = 23) and ρ ≈ 0.017. While the marginal distribution of the measurements appears to be close to uniform, we observe that the denoised data set has many small clusters which themselves seem to be approximately uniformly distributed over the sphere. 
+
+5.2. Protein Structure from Ramachandran Plots 
+
+Our second application concerns denoising the pairs of torsion angles formed by adjacent amino acids along the backbone of a given protein; the plot of all such pairs, referred to as a Ramachandran plot , is a scatter plot on the torus which contains a great deal of information regarding the structure of a protein [69, 36, 64, 60].  
+
+> 1Available at https://gammaray.nsstc.nasa.gov/batse/grb/catalog/4b/4br_basic.html
+
+22 We focus on the ten enzymes of the glycolytic pathway (hexokinase, phosphoglucose isomerase, phosphofruc-tokinase, aldolase, triosephosphate isomerase, GAPDH, phosphoglycerate kinase, phosphoglycerate mutase, enolase, and pyruvate kinase), obtained from the Protein Data Bank (PDB) 2. Analyzing a functionally re-lated set of enzymes from the same metabolic pathway allows us to study shared structural features in the Ramachandran plot across proteins with diverse sequences. To put this in the framework above, we set M := S1 ×S1 to be the two-dimensional flat torus, and for each enzyme 1 ≤ j ≤ 10 we write Θ 1, . . . , Θnj for the pairs of latent adjacent torsion angles, which we assume are i.i.d. samples from some G ∈ P (S1×S1) possessing a density with respect to the volume form, and X1, . . . , X nj
+
+for measurements thereof. We pool all n = P 
+
+> j
+
+nj torsion-angle pairs and fit a single density ˆfn to the pooled data, then apply the resulting denoiser to each enzyme separately. In order to determine σ2, we note that dihedral angles are not measured directly but rather are computed from measurements of atomic positions; as such, we take, as a crude estimate, σ := arctan( τ /b ) where τ 2 = ¯B/ (8 π2) is the mean-square atomic displacement derived from the pooled mean B-factor ¯B ≈ 26 .42˚ A2 (as in [72, 80]) and b ≈ 1.5˚ A is a typical bond length, leading to the pooled estimate σ2 ≈ 0.136. Although our assumptions of independence need not hold in this setting, we believe that correlations among Θ 1, . . . , Θn (and conditional correlations among 
+
+X1, . . . , X n given Θ 1, . . . , Θn) are weak and hence the methodology still provides a reasonable application of the method in practice. Implementing our results requires an explicit form of the eigendecomposition of the Laplace-Beltrami operator on S1 × S1; this is easy since we studied the eigendecomposition of ∆ on S1 in Subsection 4.1, and the Laplace-Beltrami operator tensorizes on product manifolds. More precisely, if we coordinatize S1 × S1 by representing x ∈ S1 × S1 as x = ( x1, x 2) ∈ (R/2πZ) × (R/2πZ), we may fix M > 0 and take our kernel to be 
+
+K(x, y, M ) = X
+
+> |k1|,|k2|≤ M
+
+1(2 π)2 eik 1(x1−y1)+ ik 2(x2−y2) = 1(2 π)2 DM (x1 − y1)DM (x2 − y2)where {DM }M ∈N is the Dirichlet kernel defined in (29). We show the results in Figures 6 (and Figure 11 in Appendix C), where the selected hyperparameters are ℓ = 38 (i.e., M = 2) and ρ ≈ 0.006. We observe that the denoiser exhibits some shrinkage near the upper-left, center-left, and center-right regions of the torus, which are known to correspond to the so-called 
+
+β-sheets , right-handed α-helices , and left-handed α-helices , respectively. Overall, the empirical Bayes denoiser exhibits the same qualitative behavior as in the Euclidean setting: shrinkage towards high-density regions and stretching away from low-density regions of ˆfn. However, we notice some “ringing” phenomenon near the coordinates ( π 
+
+> 2
+
+, − π 
+
+> 4
+
+), whereby the shrinkage is not due to concentration of left-handed α-helix torsion angles but rather due to nearby concentration of β-sheet torsion angles. We make one last remark on the statistical interpretation of the denoised Ramachandran plot. In many settings the Ramachandran plot is meant to be compared with a known decomposition of the torus S1 × S1
+
+into “favorable”, “allowed”, and “disallowed” regions, in which case the denoised data set may not be a good surrogate for the latent variables; indeed, it is a manifestation of the shrinkage phenomenon that ˆδT (X1), . . . , ˆδT (Xn) and Θ 1, . . . , Θn can be close in the sense that their mean squared error is small while being far in the sense that their distributions differ. Performing empirical Bayes denoising subject to some constraints that the distributions match, would require adapting methodologies like those in [45] to data on the torus or more general Riemannian manifolds. 
+
+6. Future Work 
+
+In this paper we have developed an empirical Bayes methodology for denoising, which (in the terminology of Efron [23]) is based on f -modeling, but it is natural to also consider strategies based on g-modeling. That is, we may first estimate the density g of the distribution of Θ (or, we may estimate the distribution G
+
+itself), and then we plug this into the definition of δT or δB to form our empirical Bayes denoiser. Although 
+
+g-modeling does not involve the Tweedie-Eddington formula in the construction of the denoiser, it is still used crucially in the development of statistical theory; as such, our Tweedie-Eddington formula (Lemma 3.1)   
+
+> 2Available at: https://www.rcsb.org/ via 1HKG, 1IRI, 1PFK, 1ADO, 2YPI, 1GD1, 3PGK, 1E58, 1ENO, and 1A3W
+
+23 /2 0 /2                    
+
+> /2
+> 0
+> /2
+> Xi
+> /2 0/2
+> /2
+> 0
+> /2
+> log fn
+> /2 0/2
+> /2
+> 0
+> /2
+> (Xi)Fig 6 . Denoising the Ramachandran plot of pairs of torsion angles (ϕ, ψ )∈S1×S1of adjacent amino acids across ten glycolytic enzymes. We plot the measurements X1, . . . , X n(left), the estimated score field ∇log ˆfn(center), and the denoised data set
+> ˆδT(X1), . . . , ˆδT(Xn)(right).
+
+can provide the first step in future work on g-modeling approaches to nonparametric Riemannian empirical Bayes. It is generally known that g-modeling is preferable to f -modeling (see [76] for a detailed discussion), and allows one to accommodate heteroskedasticity in the likelihood, as in our applications in Section 5. Another direction for future work is to extend our theory from the empirical Bayes setting to the compound decisions setting, namely the setting where Θ 1, . . . , Θn ∈ M are fixed (i.e., non-random) but unknown [89, 78, 67]. This is closely related to our empirical Bayes setting but where the distribution G is replaced by the empirical measure of Θ 1, . . . , Θn, denoted ¯Gn, which does not even have a density. While our Tweedie-Eddington formula (Lemma 3.1) fails at some points since ¯Gn has atoms, it is still well-defined almost everywhere (with respect to the volume form). The compound decisions setting thus introduces further technical difficulties beyond what we have addressed in this work. Lastly, we discuss the potential application of the methodology in this work to the mathematical theory of cryogenic electron microscopy (cryo-EM). In cryo-EM, many identical copies of a particle of interest are suspended in an aqueous solution, rapidly frozen, and then imaged with an electron microscope; in this process, each particle leads to exactly one image since the imaging procedure destroys the particle. While the random orientations are sometimes viewed as a nuisance parameter, several recent works [32, 58, 86] have argued that the subroutine of estimating the latent orientations is of independent interest, e.g., since it is known empirically that particles do not experience re-orientations uniformly at random. The work [86] proposes a Bayesian methodology for the orientation estimation problem, where priors are carefully designed to reflect expected symmetries in the unknown molecule. However, as the molecule and its symmetries are unknown in practice, it is of interest to develop methods that can borrow strength across particles while making minimal assumptions about the structure of the latent rotations; we believe that our empirical Bayes methodology balances these practical considerations. We view this as an interesting future direction. 
+
+Acknowledgments 
+
+We thank Nikolaos Ignatiadis for many useful conversations about empirical Bayes, and we thank Philip H. Woods for recommending the application to Ramachandran plots. LS gratefully acknowledges support from SNSF grant 10001283 to Victor M. Panaretos. BS gratefully acknowledges support from NSF (DMS-2311062 and DMS-2515520). 
+
+References 
+
+[1] Aubin, T. (1998). Some nonlinear problems in Riemannian geometry . Springer Monographs in Mathe-matics . Springer-Verlag, Berlin. MR1636569 24 [2] Baldi, P. , Kerkyacharian, G. , Marinucci, D. and Picard, D. (2009). Adaptive density estimation for directional data using needlets. The Annals of Statistics 37 3362 – 3395. [3] Bhattacharya, A. and Dunson, D. (2012). Nonparametric Bayes classification and hypothesis testing on manifolds. J. Multivariate Anal. 111 1–19. MR2944402 [4] Bhattacharya, A. and Dunson, D. B. (2010). Nonparametric Bayesian density estimation on man-ifolds with applications to planar shapes. Biometrika 97 851–865. MR2746156 [5] Bhattacharya, R. and Patrangenaru, V. (2003). Large sample theory of intrinsic and extrinsic sample means on manifolds. I. Ann. Statist. 31 1–29. MR1962498 [6] Bhattacharya, R. and Patrangenaru, V. (2005). Large sample theory of intrinsic and extrinsic sample means on manifolds. II. Ann. Statist. 33 1225–1259. MR2195634 [7] Boumal, N. (2023). An introduction to optimization on smooth manifolds . Cambridge University Press, Cambridge. MR4533407 [8] Briggs, M. S. et al. (1999). The Error Distribution of BATSE Gamma-Ray Burst Locations. Astrophys. J. Suppl. Ser. 122 503. [9] Brown, L. D. and Greenshtein, E. (2009). Nonparametric empirical Bayes and compound decision approaches to estimation of a high-dimensional vector of normal means. Ann. Statist. 37 1685–1704. MR2533468 [10] Brunel, V.-E. and Serres, J. (2024). Concentration of empirical barycenters in metric spaces. In 
+
+Proceedings of The 35th International Conference on Algorithmic Learning Theory (C. Vernade and 
+
+D. Hsu , eds.). Proceedings of Machine Learning Research 237 337–361. PMLR. [11] Brunel, V.-E. and Serres, J. (2025). Finite sample bounds for barycenter estimation in geodesic spaces. [12] Carlin, B. P. and Louis, T. A. (1996). Bayes and empirical Bayes methods for data analysis . Mono-graphs on Statistics and Applied Probability 69 . Chapman & Hall, London. MR1427749 [13] Cazals, F. , Delmas, B. and O’Donnell, T. (2021). Fr´ echet mean and p-mean on the unit circle: decidability, algorithm, and applications to clustering on the flat torus. In 19th International Symposium on Experimental Algorithms , 190 Art. No. 15, 16. Schloss Dagstuhl. Leibniz-Zent. Inform., Wadern. MR4288694 [14] Chakraborty, R. and Vemuri, B. C. (2015). Recursive Fr´ echet mean computation on the Grass-mannian and its applications to computer vision. In Proceedings of the IEEE International Conference on Computer Vision (ICCV) .[15] Chakraborty, R. and Vemuri, B. C. (2019). Statistics on the Stiefel manifold: theory and applica-tions. Ann. Statist. 47 415–438. [16] Chavel, I. (1984). Eigenvalues in Riemannian geometry . Pure and Applied Mathematics 115 . Academic Press, Inc., Orlando, FL. MR768584 [17] Chevallier, E. , Li, D. , Lu, Y. and Dunson, D. (2022). Exponential-wrapped distributions on sym-metric spaces. SIAM J. Math. Data Sci. 4 1347–1368. MR4522875 [18] Connaughton, V. et al. (2015). LOCALIZATION OF GAMMA-RAY BURSTS USING THE FERMI GAMMA-RAY BURST MONITOR. Astrophys. J. Suppl. Ser. 216 32. [19] De Bortoli, V. , Mathieu, E. , Hutchinson, M. , Thornton, J. , Teh, Y. W. and Doucet, A. 
+
+(2022). Riemannian Score-Based Generative Modelling. In Advances in Neural Information Processing Systems 35 2406–2422. [20] Dyson, F. (1926). A Method for Correcting Series of Parallax Observations. Mon. Not. R. Astron. Soc. 
+
+86 686. [21] Eddington, A. S. (1940). The correction of statistics for accidental error. Monthly Not. Roy. Astr. Soc. 100 354–361. MR3528 [22] Efron, B. (2011). Tweedie’s formula and selection bias. J. Amer. Statist. Assoc. 106 1602–1614. MR2896860 [23] Efron, B. (2014). Two modeling strategies for empirical Bayes estimation. Statist. Sci. 29 285–301. MR3264543 [24] Efron, B. (2019). Bayes, oracle Bayes and empirical Bayes. Statist. Sci. 34 177–201. MR3983318 [25] Efron, B. and Morris, C. (1973). Stein’s estimation rule and its competitors—an empirical Bayes approach. J. Amer. Statist. Assoc. 68 117–130. MR388597 25 [26] Eichfelder, G. , Hotz, T. and Wieditz, J. (2019). An algorithm for computing Fr´ echet means on the sphere. Optim. Lett. 13 1523–1533. MR4002314 [27] Eltzner, B. (2022). Geometrical smeariness – a new phenomenon of Fr´ echet means. Bernoulli 28 239 – 254. [28] Eltzner, B. and Huckemann, S. F. (2019). A smeary central limit theorem for manifolds with application to high-dimensional spheres. Ann. Statist. 47 3360 – 3381. [29] Escande, P. (2024). On the Concentration of the Minimizers of Empirical Risks. Journal of Machine Learning Research 25 1–53. [30] Evans, S. N. and Jaffe, A. Q. (2024). Limit theorems for Fr´ echet mean sets. Bernoulli 30 419–447. MR4665584 [31] Fan, J. (1991). On the optimal rates of convergence for nonparametric deconvolution problems. Ann. Statist. 19 1257–1272. MR1126324 [32] Harpaz, Y. and Shkolnisky, Y. (2023). Three-dimensional alignment of density maps in cryo-electron microscopy. Biol. Imaging 3 e8. [33] Healy, D. M. Jr. and Kim, P. T. (1996). An empirical Bayes approach to directional data and efficient computation on the sphere. Ann. Statist. 24 232–254. MR1389889 [34] Hendriks, H. (1990). Nonparametric estimation of a probability density on a Riemannian manifold using Fourier expansions. Ann. Statist. 18 832–849. MR1056339 [35] Henry, G. and Rodriguez, D. (2009). Kernel density estimation on Riemannian manifolds: asymptotic results. J. Math. Imaging Vision 34 235–239. MR2515446 [36] Hollingsworth, S. A. and Karplus, P. A. (2010). A fresh look at the Ramachandran plot and the occurrence of standard structures in proteins. Biomol. Concepts. 1 271–283. [37] Hotz, T. and Huckemann, S. (2015). Intrinsic means on the circle: uniqueness, locus and asymptotics. 
+
+Ann. Inst. Stat. Math. 67 177–193. [38] Hsu, E. P. (2002). Stochastic analysis on manifolds . Graduate Studies in Mathematics 38 . American Mathematical Society, Providence, RI. MR1882015 [39] Huckemann, S. F. , Kim, P. T. , Koo, J.-Y. and Munk, A. (2010). M¨ obius deconvolution on the hyperbolic plane with application to impedance density estimation. Ann. Statist. 38 2465–2498. MR2676895 [40] Hundrieser, S. , Eltzner, B. and Huckemann, S. (2024). Finite sample smeariness of Fr´ echet means with application to climate. Electron. J. Stat. 18 3274 – 3309. [41] Hurley, K. , Sommer, M. , Cline, T. , Boer, M. and Niel, M. (1995). Ulysses observations of cosmic gamma-ray bursts. Astrophys. Space Sci. 231 227–230. [42] Hyv¨ arinen, A. and Dayan, P. (2005). Estimation of non-normalized statistical models by score match-ing. J. Mach. Learn. Res. 6.[43] Ignatiadis, N. and Sen, B. (2025). Empirical Bayes: From Herbert Robbins to Modern Theory and Applications. [44] Jaffe, A. Q. (2024). Fr´ echet means in infinite dimensions. arXiv preprint arXiv:2410.17214. [45] Jaffe, A. Q. , Ignatiadis, N. and Sen, B. (2025). Constrained Denoising, Empirical Bayes, and Optimal Transport. arXiv preprint arXiv:2506.09986. [46] Jana, S. , Polyanskiy, Y. and Wu, Y. (2025). Optimal empirical Bayes estimation for the Poisson model via minimum-distance methods. Inf. Inference 14 . MR4968757 [47] Jiang, W. and Zhang, C.-H. (2009). General maximum likelihood empirical Bayes estimation of normal means. Ann. Statist. 37 1647–1684. MR2533467 [48] Kim, P. T. (1998). Deconvolution density estimation on SO( N ). Ann. Statist. 26 1083–1102. [49] Kim, P. T. and Koo, J.-Y. (2005). Statistical inverse problems on manifolds. J. Fourier Anal. Appl. 
+
+11 639–653. MR2190676 [50] Koenker, R. and Gu, J. (2026). Empirical Bayes: Some Tools, Rules, and Duals . Econometric Society Monographs . Cambridge University Press. [51] Krajsek, K. , Menzel, M. I. and Scharr, H. (2016). A Riemannian Bayesian framework for esti-mating diffusion tensor images. Int. J. Comput. Vis. 120 272–299. MR3544093 [52] Liang, T. (2025). Distributional Shrinkage I: Universal Denoiser Beyond Tweedie’s Formula. [53] Liang, T. (2025). Distributional Shrinkage II: Higher-Order Scores Encode Brenier Map. 26 [54] Mardia, K. V. and Jupp, P. E. (2000). Directional statistics . Wiley Series in Probability and Statistics .John Wiley & Sons, Ltd., Chichester. [55] Maritz, J. S. and Lwin, T. (1989). Empirical Bayes methods , second ed. Monographs on Statistics and Applied Probability 35 . Chapman & Hall, London. MR1019835 [56] McCormack, A. and Hoff, P. (2022). The Stein effect for Fr´ echet means. Ann. Statist. 50 3647–3676. MR4524511 [57] McCormack, A. and Hoff, P. D. (2023). Equivariant estimation of Fr´ echet means. Biometrika 110 
+
+1055–1076. MR4667440 [58] M´ endez, J. , Gardu˜ no, E. , Carazo, J. M. and S. Sorzano, C. O. (2021). Identification of incor-rectly oriented particles in cryo-EM single particle analysis. J. Struct. Biol. 213 107771. [59] Miolane, N. , Guigui, N. , Le Brigant, A. and et al. (2020). Geomstats: a Python package for Riemannian geometry in machine learning. J. Mach. Learn. Res. 21 . MR4209509 [60] Park, S. W. , Lee, B. H. , Song, S. H. and Kim, M. K. (2023). Revisiting the Ramachandran plot based on statistical analysis of static and dynamic characteristics of protein structures. J. Struct. Biol. 
+
+215 107939. [61] Pelletier, B. (2005). Kernel density estimation on Riemannian manifolds. Statist. Probab. Lett. 73 
+
+297–304. MR2179289 [62] Pennec, X. (2006). Intrinsic statistics on Riemannian manifolds: basic tools for geometric measure-ments. J. Math. Imaging Vision 25 127–154. MR2254442 [63] Pennec, X. (2018). Supplement A: Hessian of the Riemannian squared distance. Ann. Statist. 46 .[64] Pertsemlidis, A. , Zelinka, J. , Fondon, J. W. , Henderson, R. K. and Otwinowski, Z. (2005). Bayesian statistical studies of the Ramachandran distribution. Stat. Appl. Genet. Mol. Biol. 4 Art. 35, 18. MR2183945 [65] Petersen, P. (2016). Riemannian geometry , 3rd ed. Graduate Texts in Mathematics 171 . Springer, Cham. MR3469435 [66] Piran, T. (1999). Gamma-ray bursts and the fireball model. Phys. Rep. 314 575-667. [67] Polyanskiy, Y. and Wu, Y. (2021). Sharp regret bounds for empirical Bayes and compound decision problems. arXiv preprint arXiv:2109.03943. [68] Polyanskiy, Y. and Wu, Y. (2025). Information Theory: From Coding to Learning . Cambridge Uni-versity Press. [69] Ramachandran, G. N. , Ramakrishnan, C. and Sasisekharan, V. (1963). Stereochemistry of polypeptide chain configurations. J. Mol. Biol. 7 95-99. [70] Robbins, H. (1951). Asymptotically subminimax solutions of compound statistical decision problems. In Proceedings of the Second Berkeley Symposium on Mathematical Statistics and Probability 131–148. MR44803 [71] Robbins, H. (1956). An empirical Bayes approach to statistics. In Proceedings of the Third Berkeley Symposium on Mathematical Statistics and Probability 157–163. MR84919 [72] Rupp, B. (2009). Biomolecular Crystallography: Principles, Practice, and Application to Structural Biology , 1st ed. Garland Science, New York. [73] Saha, S. and Guntuboyina, A. (2020). On the nonparametric maximum likelihood estimator for Gaussian location mixture densities with application to Gaussian denoising. Ann. Statist. 48 738–762. MR4102674 [74] Sch¨ otz, C. (2019). Convergence rates for the generalized Fr´ echet mean via the quadruple inequality. 
+
+Electronic Journal of Statistics 13 4280 – 4345. [75] Sch¨ otz, C. (2025). Variance inequalities for transformed Fr´ echet means in Hadamard spaces. Electronic Journal of Probability 30 1 – 48. [76] Shen, Y. and Wu, Y. (2026). Poisson empirical Bayes estimation: When does g-modeling beat f-modeling in theory (and in practice)? Ann. Statist. 54 146 – 175. [77] Skwerer, S. , Provan, S. and Marron, J. S. (2018). Relative optimality conditions and algorithms for treespace Fr´ echet means. SIAM J. Optim. 28 959–988. MR3782405 [78] Soloff, J. A. , Guntuboyina, A. and Sen, B. (2025). Multivariate, heteroscedastic empirical Bayes via nonparametric maximum likelihood. J. R. Stat. Soc. Ser. B. Stat. Methodol. 87 1–32. MR4896644 [79] Sommer, S. , Fletcher, T. and Pennec, X. (2020). Introduction to differential and Riemannian geom-27 etry. In Riemannian geometric statistics in medical image analysis 3–37. Elsevier, London. MR4254212 [80] Sun, Z. , Liu, Q. , Qu, G. , Feng, Y. and Reetz, M. T. (2019). Utility of B-Factors in Protein Science: Interpreting Rigidity, Flexibility, and Internal Motion and Engineering Thermostability. Chem. Revi. 
+
+119 1626–1665. [81] Taylor, M. E. (1996). Partial differential equations . Texts in Applied Mathematics 23 . Springer-Verlag, New York Basic theory. MR1395147 [82] Tirion, W. (2011). All-sky maps In The Cambridge Star Atlas 80–87. Cambridge University Press. [83] Villani, C. (2009). Optimal transport: Old and New . Grundlehren der mathematischen Wissenschaften 
+
+338 . Springer-Verlag, Berlin. [84] Vincent, P. (2011). A connection between score matching and denoising autoencoders. Neural Comput. 
+
+23 1661–1674. [85] Walter, G. G. and Shen, X. (2001). Wavelets and other orthogonal systems , second ed. Studies in Advanced Mathematics . Chapman & Hall/CRC, Boca Raton, FL. MR1887929 [86] Xu, S. , Balanov, A. , Singer, A. and Bendory, T. (2026). Bayesian perspective for orientation determination in cryo-EM with application to structural heterogeneity analysis. Acta Crystallographica Section D 82 274–294. [87] Yang, C.-H. , Doss, H. and Vemuri, B. C. (2024). An empirical Bayes approach to shrinkage esti-mation on the manifold of symmetric positive-definite matrices. J. Amer. Statist. Assoc. 119 259–272. MR4713890 [88] Yun, H. and Park, B. U. (2023). Exponential concentration for geometric-median-of-means in non-positive curvature spaces. Bernoulli 29 2927 – 2960. [89] Zhang, C.-H. (1997). Empirical Bayes and compound estimation of normal means. Statist. Sinica 7
+
+181–193. MR1441153 
+
+Appendix A: Proofs of Results 
+
+In this appendix we prove the main results from Section 3 of the paper, as well as some useful auxiliary results that are needed along the way. 
+
+A.1. Proofs from Subsection 3.1 
+
+First we give proofs of our results on Riemannian Gaussian mixture models. 
+
+Proof of Lemma 3.1. The second claim follows from the first, since the cut locus of each point has measure zero under the volume form; see [16, p. 64]. To prove the first claim, fix x ∈ M such that G(Cx) = 0. The compactness of M implies that there exists L > 0 such that for every θ ∈ M the map y 7 → d2(y, θ ) is 
+
+L-Lipschitz on M, and that we have exp( −A(σ2, θ )) ≤ 1
+
+R 
+
+> M
+
+exp 
+
+
+
+− (diam( M)) 2
+
+> 2σ2
+
+
+
+dx
+
+=exp 
+
+ (diam( M)) 2
+
+> 2σ2
+
+R 
+
+> M
+
+1d x =: R
+
+for all θ ∈ M .Now we let γ : [0 , 1] → M be a constant-speed geodesic with γ(0) = x and v := γ′(0) ∈ Tan x(M), and we justify applying dominated convergence in order to differentiate f under the integral along γ. Note that, if θ / ∈ Cx, then y 7 → d2(y, θ ) is differentiable at x and satisfies 
+
+∇xd2(x, θ ) = −2 Log x(θ)28 hence lim 
+
+> t→0
+
+pθ,σ 2 (γ(t)) − pθ,σ 2 (x)
+
+t = ∇xpθ,σ 2 (x), v x
+
+=
+
+
+
+− 12σ2 ∇xd2(x, θ ) pθ,σ 2 (x), v 
+
+
+
+> x
+
+= σ−2 Log x(θ) pθ,σ 2 (x), v x
+
+by the chain rule. Also, use that a 7 → e−a is 1-Lipschitz on [0 , ∞) to get 
+
+pθ,σ 2 (γ(t)) − pθ,σ 2 (x)
+
+t = exp( −A(σ2, θ )) 
+
+t exp 
+
+
+
+− d2(γ(t), θ )2σ2
+
+
+
+− exp 
+
+
+
+− d2(x, θ )2σ2
+
+
+
+≤ exp( −A(σ2, θ )) 2σ2 t d2(γ(t), θ ) − d2(x, θ )
+
+≤ LR 
+
+2σ2 t d(γ(t), x )
+
+≤ LR ∥v∥x
+
+2σ2 ,
+
+(31) for all 0 < t ≤ 1. The preceding paragraph shows that the difference quotients are dominated by an integrable constant independent of θ, and that they converge for G-almost every θ because G(Cx) = 0. Therefore, we can differentiate under the integral to obtain 
+
+⟨∇ f (x), v ⟩x = lim 
+
+> t→0
+
+f (γ(t)) − f (x)
+
+t
+
+= lim 
+
+> t→0
+
+Z
+
+> M
+
+pθ,σ 2 (γ(t)) − pθ,σ 2 (x)
+
+t dG(θ)=
+
+Z
+
+> M
+
+σ−2 Log x(θ) pθ,σ 2 (x), v x dG(θ)=
+
+
+
+σ−2
+
+Z
+
+> M
+
+Log x(θ) pθ,σ 2 (x) d G(θ), v 
+
+
+
+> x
+
+.
+
+Since this holds for every v ∈ Tan x(M), we conclude that f is differentiable at x, and 
+
+∇f (x) = σ−2
+
+Z
+
+> M
+
+Log x(θ) pθ,σ 2 (x) d G(θ).
+
+Dividing by f (x) gives 
+
+∇x log f (x) = σ−2 R 
+
+> M
+
+Log x(θ) pθ,σ 2 (x) d G(θ)
+
+f (x) .
+
+Lastly, note that qx(θ) := pθ,σ 2 (x)/f (x) is the density, with respect to G, of the conditional distribution of Θ given {X = x}; so, rearranging this yields (21). The rest of the results in this subsection rely on some technical preliminaries that we now develop. First, it will be convenient to parameterize M by coordinates which are centered at x ∈ M , usually called normal coordinates . That is, we fix an open domain Dx ⊆ Tan x(M) such that Exp x : Dx → M is a smooth bijection, possibly up to sets of zero volume form and we parameterize M by Dx; we refer to Dx as an 
+
+exponential domain . Since M is compact, there exist 0 < r < R (depending only on M) such that we have 
+
+Br (0) ⊆ Dx ⊆ BR(0) for all x ∈ M , where Br (0) , B R(0) denote the open balls of radii r, R , respectively, in Tan x(M). When we wish to integrate a function h : M → R using normal coordinates at x ∈ M , we write 
+
+Z
+
+> M
+
+h(y)d y =
+
+Z
+
+> Dx
+
+h(Exp x(v)) jx(v)d v (32) 29 where jx : Tan x(M) → R is the Jacobian determinant of the map Exp x : Dx → M ; it is known that (x, v ) 7 → jx(v) is smooth (since ( x, v ) 7 → Exp x(v) is smooth, e.g., [65, Chapter 5.5.1]) and that x 7 → jx(v)satisfies lim v→0 sup x∈M |jx(v) − 1| = 0 for M compact [62, Appendix B]. (Also note that d y represents the volume form of M on the left side of (32), whereas d v represents the Lebesgue measure of Tan x(M) on the right side.) First, we show in the following that the Jacobian determinant is uniformly bounded. 
+
+Lemma A.1. If M is a compact connected Riemannian manifold, then sup y∈M sup v∈Dy jy (v) < ∞.Proof. Recall that the exponential domains can be assumed to satisfy the property that there exists R > 0such that Dx ⊆ BR(0) for all x ∈ M . Then, just use the fact that {(x, v ) : x ∈ M , v ∈ Dx} is pre-compact and ( x, v ) 7 → jx(v) is globally smooth hence uniformly bounded. Second, we use normal coordinates to show that the normalizing constant of the Riemannian Gaussian distributions is comparable to the analogous normalizing constant for Euclidean Gaussian distributions. 
+
+Lemma A.2. If M is a compact connected Riemannian manifold, then there exist constants cM, C M, ε M >
+
+0 such that we have 
+
+cMP(∥N (0 , σ 2Im)∥ ≤ εM) ≤ exp( A(σ2, θ )) (√2πσ )m ≤ CM
+
+for all θ ∈ M and σ2 > 0. Consequently, we have 
+
+exp( A(σ2, θ )) (√2πσ )m = Θ(1) as σ2 → 0,
+
+uniformly in θ ∈ M and 
+
+c′M ≤ exp( A(σ2, θ )) (√2πσ )m ≤ CM for all σ2 ≤ (diam( M)) 2
+
+for all θ ∈ M , where c′M := cMP(∥N (0 , (diam( M)) 2Im)∥ ≤ εM) > 0.Proof. First, use normal coordinates (32) and ∥ Log x θ∥x = d(x, θ ) to write exp( A(σ2, θ )) = 
+
+Z
+
+> M
+
+exp 
+
+
+
+− d2(x, θ )2σ2
+
+
+
+dx =
+
+Z
+
+> Dθ
+
+exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v. 
+
+Then, for the upper bound, use Lemma A.1 to get C := sup θ∈M sup v∈Dθ jθ (v) < ∞, hence exp( A(σ2, θ )) = 
+
+Z
+
+> Dθ
+
+exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+≤ C
+
+Z
+
+> Dθ
+
+exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+≤ C
+
+Z 
+
+> Tan θ(M)
+
+exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+= C(√2πσ )m.
+
+For the lower bound, get some sufficiently small ε > 0 such that we have Bε(0) ⊆ Dθ for all θ ∈ M and, using continuity of ( θ, v ) 7 → jθ (v), also c := inf θ∈M inf v∈Bε(0) jθ (v) > 0; thus we can bound exp( A(σ2, θ )) = 
+
+Z
+
+> Dθ
+
+exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+≥
+
+Z
+
+> Bε(0)
+
+exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+≥ c
+
+Z
+
+> Bε(0)
+
+exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+= c(√2πσ )mP(∥N (0 , σ 2Im)∥ ≤ ε),
+
+30 and this establishes the first claim. To obtain the second claim, note that 
+
+P(∥N (0 , σ 2Im)∥ ≤ ε) → 1 as σ2 → 0,
+
+and, to obtain the third claim, note that 
+
+P(∥N (0 , σ 2Im)∥ ≤ ε) ≥ P(∥N (0 , (diam( M)) 2Im)∥ ≤ ε) for σ2 ≤ (diam( M)) 2,
+
+This finishes the proof. Now we prove the results stated in the main body. 
+
+Proof of Lemma 3.2. The proof is similar to that of Lemma A.2. Use normal coordinates (32) and ∥ Log x θ∥x =
+
+d(x, θ ) to rewrite the integral expression for f (x), then Lemma A.2 to bound 
+
+f (x) = 
+
+Z
+
+> M
+
+pθ,σ 2 (x)g(θ)d θ
+
+=
+
+Z
+
+> M
+
+exp 
+
+
+
+− d2(x, θ )2σ2 − A(σ2, θ )
+
+
+
+g(θ)d θ
+
+=
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2 − A(σ2, Exp x(v)) 
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≍M
+
+1(√2πσ )m
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v, 
+
+where ≍M denotes equality up to constants that depend only on M, and jx is the usual Jacobian determinant. For the upper bound, use Lemma A.1 to get C := sup x∈M sup v∈Dx jx(v) < ∞, hence 
+
+f (x) ≍M
+
+1(√2πσ )m
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≲M
+
+
+
+ess sup 
+
+> θ∈M
+
+g(θ)
+
+ 1(√2πσ )m
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+jx(v)d v
+
+≤ C
+
+
+
+ess sup 
+
+> θ∈M
+
+g(θ)
+
+ 1(√2πσ )m
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≤ C
+
+
+
+ess sup 
+
+> θ∈M
+
+g(θ)
+
+ 1(√2πσ )m
+
+Z
+
+> Tan x(M)
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≤ C ess sup 
+
+> θ∈M
+
+g(θ).
+
+For the lower bound, get some sufficiently small ε > 0 such that we have Bε(0) ⊆ Dx for all x ∈ M and, using continuity of ( x, v ) 7 → jx(v), also c := inf x∈M inf v∈Bε(0) jx(v) > 0; then, 
+
+f (x) ≍M
+
+1(√2πσ )m
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≳M
+
+
+
+ess inf  
+
+> θ∈M
+
+g(θ)
+
+ 1(√2πσ )m
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+jx(v)d v
+
+≥
+
+
+
+ess inf  
+
+> θ∈M
+
+g(θ)
+
+ 1(√2πσ )m
+
+Z
+
+> Bε(0)
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+jx(v)d v
+
+≥ c
+
+
+
+ess inf  
+
+> θ∈M
+
+g(θ)
+
+ 1(√2πσ )m
+
+Z
+
+> Bε(0)
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≥ c
+
+
+
+ess inf  
+
+> θ∈M
+
+g(θ)
+
+
+
+P(∥N (0 , σ 2Im)∥ ≤ ε)
+
+≥ c
+
+
+
+ess inf  
+
+> θ∈M
+
+g(θ)
+
+
+
+P(∥N (0 , (diam( M)) 2Im)∥ ≤ ε)
+
+≳M ess inf θ∈M g(θ).
+
+31 This completes the proof. 
+
+Proof of Lemma 3.3. By Lemma 3.1, f is differentiable and we may differentiate under the integral once to compute 
+
+∇f (x) = σ−2
+
+Z
+
+> M
+
+Log x θ p θ,σ 2 (x)g(θ)d θ. 
+
+Now use normal coordinates (32), ∥ Log x θ∥x = d(x, θ ), Lemma A.2, and C := sup x∈M sup v∈Dx jx(v) < ∞
+
+from Lemma A.1 to get: 
+
+∥∇ f (x)∥x = σ−2
+
+Z
+
+> M
+
+Log x θ p θ,σ 2 (x)g(θ)d θ x
+
+≤ σ−2
+
+Z
+
+> M
+
+∥ Log x θ∥x pθ,σ 2 (x)g(θ)d θ
+
+= σ−2
+
+Z
+
+> Dx
+
+∥v∥x exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2 − A(σ2, Exp x(v)) 
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≲M
+
+σ−2
+
+(√2πσ )m
+
+Z
+
+> Dx
+
+∥v∥x exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≤ C∥g∥L∞(M)σ−2
+
+(√2πσ )m
+
+Z
+
+> Dx
+
+∥v∥x exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≤ C∥g∥L∞(M)σ−2
+
+(√2πσ )m
+
+Z
+
+> Tan x(M)
+
+∥v∥x exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv. 
+
+Lastly, note that, if Z denotes a standard Gaussian random variable in Rm (i.e., with mean 0 and covariance matrix Im), then we have 1(√2πσ )m
+
+Z
+
+> Tan x(M)
+
+∥v∥x exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv = σ E [∥Z∥]where the expectation depends only on m. This finishes the proof. 
+
+A.2. Proofs from Subsection 3.2 
+
+Next we give proofs for our results concerning the risks of the oracle denoisers δN , δ B, and δT .Our first goal is to establish the risk of the na¨ ıve denoiser δN . This requires the following general result that, in the limit σ2 → 0, many functions of the geodesic distance can be calculated by expectations of a corresponding Euclidean Gaussian distribution. We remind the reader that the symbol ∼ refers to the statement that the ratio of expressions converges to one in the limit. 
+
+Lemma A.3. If M is a compact connected Riemannian manifold, then for any k ∈ N we have 
+
+Z
+
+> M
+
+dk(x, θ ) pθ,σ 2 (x)d x ∼ E[∥Z∥k]
+
+as σ2 → 0, uniformly in θ ∈ M , where Z ∼ N (0 , σ 2Im).Proof. First, recall from [62, Theorem 5] that we have lim  
+
+> σ2→0
+
+sup 
+
+> θ∈M
+
+exp( A(σ2, θ )) (√2πσ )m = 1 , (33) which is similar to Lemma A.2 with the sharp constant 1, but only asymptotically as σ2 → 0. Now fix 0 < ε < 1, and use the uniform convergence lim v→0 sup θ∈M |jθ (v) − 1| = 0 to get some r > 0 such that we have |jθ (v) − 1| < ε for all θ ∈ M and v ∈ Br (0) ⊆ Tan θ (M); by taking r > 0 smaller if necessary, using 32 the fact that M being compact implies a positive injectivity radius, we may also assume Br (0) ⊆ Dθ for all 
+
+θ ∈ M . Now, convert to normal coordinates (32) at θ and use d(x, θ ) = ∥ Log x θ∥x to get 
+
+Z
+
+> M
+
+dk(x, θ )pθ,σ 2 (x)d x =
+
+Z
+
+> M
+
+dk(x, θ ) exp 
+
+
+
+− d2(x, θ )2σ2 − A(σ2, θ )
+
+
+
+dx
+
+∼ 1(√2πσ )m
+
+Z
+
+> M
+
+dk(x, θ ) exp 
+
+
+
+− d2(x, θ )2σ2
+
+
+
+dx
+
+= 1(√2πσ )m
+
+Z
+
+> Dθ
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+= 1(√2πσ )m
+
+Z 
+
+> Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
++ 1(√2πσ )m
+
+Z  
+
+> Dθ\Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+(34) uniformly in θ. Next, note 1(√2πσ )m
+
+Z  
+
+> Tan θ(M)\Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv ≲ exp 
+
+
+
+− r2
+
+2σ2
+
+
+
+which vanishes as σ2 → 0. In particular, combining with Lemma A.1 implies that the second term of (34) vanishes, i.e. 1(√2πσ )m
+
+Z  
+
+> Dθ\Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+≲M
+
+1(√2πσ )m
+
+Z  
+
+> Tan θ(M)\Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+For the first term of (34), note that we have the upper bound 1(√2πσ )m
+
+Z 
+
+> Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+≤ 1 + ε
+
+(√2πσ )m
+
+Z 
+
+> Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+= 1 + ε
+
+(√2πσ )m
+
+Z 
+
+> Tan θ(M)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+− 1 + ε
+
+(√2πσ )m
+
+Z  
+
+> Tan θ(M)\Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+= (1 + ε)E ∥Z∥k − (1 + ε)E ∥Z∥k1{∥ Z∥ ≥ r} .
+
+Since E[∥Z∥k1{∥ Z∥ ≥ r}] = o(E[∥Z∥k]) as σ2 → 0, we have shown lim sup 
+
+> σ2→01(√2πσ )m
+
+R  
+
+> Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+> 2σ2
+
+
+
+jθ (v)d v
+
+E[∥Z∥k] ≤ 1 + ε. 
+
+33 Similarly, the first term of (34) satisfies the lower bound 1(√2πσ )m
+
+Z 
+
+> Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+jθ (v)d v
+
+≥ 1 − ε
+
+(√2πσ )m
+
+Z 
+
+> Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+= 1 − ε
+
+(√2πσ )m
+
+Z 
+
+> Tan θ(M)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+− 1 − ε
+
+(√2πσ )m
+
+Z  
+
+> Tan θ(M)\Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+
+2σ2
+
+
+
+dv
+
+= (1 − ε)E ∥Z∥k − (1 − ε)E ∥Z∥k1{∥ Z∥ ≥ r} .
+
+hence lim inf 
+
+> σ2→01(√2πσ )m
+
+R  
+
+> Br(0)
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+> 2σ2
+
+
+
+jθ (v)d v
+
+E[∥Z∥k] ≥ 1 − ε. 
+
+As 0 < ε < 1 was arbitrary, we have shown lim 
+
+> σ2→01(√2πσ )m
+
+R 
+
+> Dθ
+
+∥v∥kθ exp 
+
+
+
+− ∥v∥2
+
+> θ
+> 2σ2
+
+
+
+jθ (v)d v
+
+E[∥Z∥k] = 1 ,
+
+as claimed. Next, we use this to calculate the risk of δN , as follows. 
+
+Proof of Proposition 3.4. Immediate from Lemma A.3 with k = 2. Next we turn to the comparisons of the oracle risks of δB and δT . As we discussed in the main body, this requires some auxiliary results that we now prove. 
+
+Proof of Proposition 3.6. For convenience, we introduce the notation 
+
+Vx := Log x Θ, μx := E[Vx | X = x], Σx := Cov( Vx | X = x), (35) for all x ∈ M . Also, we introduce normal coordinates in order to make some explicit calculations. Let us write Dx for an exponential domain at x ∈ M , and recall that the compactness of M implies that there exists r > 0 such that we have Br (0) ⊆ Dx for all x ∈ M .First, let us rewrite the integral expression for μx in normal coordinates using (32) and ∥ Log x θ∥x =
+
+d(x, θ ), then use Lemma A.2 to bound: 
+
+μx =
+
+R 
+
+> M
+
+Log x θ p θ,σ 2 (x)d G(θ)
+
+R 
+
+> M
+
+pθ,σ 2 (x)d G(θ)=
+
+R 
+
+> Dx
+
+v exp 
+
+
+
+− ∥v∥2 
+
+> x
+> 2σ2
+
+− A(σ2, Exp x(v)) 
+
+
+
+g(Exp x(v)) jx(v)d v
+
+R 
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2 
+
+> x
+> 2σ2
+
+− A(σ2, Exp x(v)) 
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≍M
+
+(√2πσ )−m R 
+
+> Dx
+
+v exp 
+
+
+
+− ∥v∥2
+
+> x
+> 2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+(√2πσ )−m R 
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+> 2σ2
+
+
+
+g(Exp x(v)) jx(v)d v,
+
+(36) where ≍M denotes equality up to constants that depend only on M and where jx is the usual Jacobian determinant. Now let us control the numerator and denominator of the right side separately. 34 For the numerator, the idea is that the fast decay of the integrand allows us to replace the domain Dx
+
+with the smaller domain Br (0) while only incurring an exponentially small error. More precisely, we write (√2πσ )−m
+
+Z
+
+> Dx
+
+v exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+= ( √2πσ )−m
+
+Z 
+
+> Br(0)
+
+v exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
++ ( √2πσ )−m
+
+Z 
+
+> Dx\Br(0)
+
+v exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v, 
+
+(37) and we will show that the first term is O(σ2) and the second term is exponentially small hence also O(σ2). For the first term, develop a Taylor expansion with a first-order remainder 
+
+g(Exp x(v)) jx(v) = g(x) + r(x, v ),
+
+where r is continuous and satisfies the uniform bound sup 
+
+> x∈M
+
+sup 
+
+> ∥v∥x≤r
+
+|r(x, v )|∥v∥x
+
+< ∞,
+
+which holds since g is continuously differentiable, jx is smooth in ( x, v ) on {∥ v∥x ≤ r}, and M is compact. Then compute: (√2πσ )−m
+
+Z 
+
+> Br(0)
+
+v exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+= g(x)( √2πσ )−m
+
+Z 
+
+> Br(0)
+
+v exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv + ( √2πσ )−m
+
+Z 
+
+> Br(0)
+
+vr (x, v ) exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv. 
+
+Note that the first term vanishes by symmetry while the second term is O(σ2) uniformly in x ∈ M . For the second term of (37), use compactness of M, uniform boundedness of the exponential domains, and continuity of ( x, v ) 7 → g(Exp x(v)) jx(v) to get C := sup x∈M sup v∈Dx g(Exp x(v)) jx(v) < ∞, then use this to bound (√2πσ )−m
+
+Z 
+
+> Dx\Br(0)
+
+v exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≤ (√2πσ )−m
+
+Z 
+
+> Dx\Br(0)
+
+∥v∥x exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≤ C(√2πσ )−m
+
+Z 
+
+> Tan x(M)\Br(0)
+
+∥v∥x exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≲ C(√2πσ )−mσ exp 
+
+
+
+− r2
+
+σ2
+
+
+
+,
+
+(38) which is certainly O(σ2), uniformly in x ∈ M .Lastly, we turn to the denominator of (36). To control this, use continuity of ( x, v ) 7 → g(Exp x(v)) jx(v) to get some sufficiently small 0 < ε < r such that we have 
+
+c := inf  
+
+> x∈M
+
+inf  
+
+> v∈Bε(0)
+
+g(Exp x(v)) jx(v) > 0.
+
+Then, compute: (√2πσ )−m
+
+Z
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v ≥ c(√2πσ )−m
+
+Z
+
+> Bε(0)
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+= c · P(∥N (0 , σ 2Im)∥ ≤ ε).
+
+(39) 35 Note that the probability converges to 1 as σ2 → 0, hence the right hand side is Ω(1), uniformly in x ∈ M .By combining this calculation with that of the numerator, we have shown sup 
+
+> x∈M
+
+∥μx∥ = O(σ2)Ω(1) = O(σ2), (40) as claimed. Now we turn to the second claim. To prove it, again use normal coordinates (32) and ∥ Log x θ∥x = d(x, θ )to write Σx =
+
+R 
+
+> M
+
+Log x θ(Log x θ)⊤ pθ,σ 2 (x)d G(θ)
+
+R 
+
+> M
+
+pθ,σ 2 (x)d G(θ) − μxμ⊤
+
+> x
+
+=(√2πσ )−m R 
+
+> Dx
+
+vv ⊤ exp 
+
+
+
+− ∥v∥2
+
+> x
+> 2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+(√2πσ )−m R 
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+> 2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+− μxμ⊤ 
+
+> x
+
+.
+
+(41) Note that (40) establishes that the subtracted term is O(σ4), so it suffices to show (√2πσ )−m R 
+
+> Dx
+
+vv ⊤ exp 
+
+
+
+− ∥v∥2
+
+> x
+> 2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+(√2πσ )−m R 
+
+> Dx
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+> 2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+= O(σ2).
+
+We already have (39) showing that the denominator is Ω(1), so it suffices to focus on the numerator. As before, we use the constant C to bound: 
+
+(√2πσ )−m
+
+Z
+
+> Dx
+
+vv ⊤ exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≤ (√2πσ )−m
+
+Z
+
+> Dx
+
+∥v∥2 
+
+> x
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≤ C(√2πσ )−m
+
+Z
+
+> Dx
+
+∥v∥2 
+
+> x
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≤ C(√2πσ )−m
+
+Z
+
+> Tan x(M)
+
+∥v∥2 
+
+> x
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≤ Cmσ 2.
+
+Thus, we have shown sup 
+
+> x∈M
+
+∥Σx∥ ≤ O(σ2)Ω(1) + O(σ4) = O(σ2) (42) as claimed. Our next result involves a Taylor expansion of the squared geodesic distance, which requires us to introduce some concepts related to the curvature of M. Recall (see [83, equation (14.1)]) that if Kx(v, w ) ∈ R denotes the sectional curvature of the plane spanned by v, w ∈ Tan x(M) at the point x ∈ M and, then we have 
+
+d2(Exp x(v), Exp x(w)) = ∥v − w∥2 
+
+> x
+
+− 13 Kx(v, w )( ∥v∥2
+
+> x
+
+∥w∥2 
+
+> x
+
+− ⟨ v, w ⟩2
+
+> x
+
+) + O(∥v∥5 
+
+> x
+
++ ∥w∥5
+
+> x
+
+) (43) as ∥v∥x, ∥w∥x → 0, where the remainder is a continuous function of x ∈ M .
+
+Proof of Proposition 3.7. Let us write W for the vector space of all vector fields {wx}x∈M on M (i.e., 
+
+wx ∈ Tan x(M) for all x ∈ M ) satisfying R 
+
+> M
+
+∥wx∥2
+
+> x
+
+dx < ∞, which is a Hilbert space when endowed with the inner product ⟨w, w ′⟩ := R
+
+> M
+
+⟨wx, w ′
+
+> x
+
+⟩xdx. We observe that any denoiser δ : M → M satisfying δ(x) /∈ Cx
+
+for all x ∈ M can be written as δ = δw for some {wx}x∈M ∈ W , where δw(x) := Exp x(wx); indeed, just set 36 wx := Log x(δ(x)). Consequently, we may parameterize all such denoisers by elements of W. In fact, if we write R > 0 for a constant depending only on M such that we have Dx ⊆ BR(0) for all x ∈ M , then all such denoisers δ can be represented by some w ∈ W satisfying the stronger condition sup x∈M ∥wx∥x ≤ R.Now let wB ∈ W denote the vector field corresponding to the Bayes denoiser δB, and let us explore the first-order optimality conditions for wB. For convenience, we adopt the notation from the proof of Proposition 3.6. Recall that wB is, by definition a minimizer of the conditional risk which we can easily calculate; fix x ∈ M ,and use the Taylor series (43) to get the following, where we write ∥ · ∥ in place of ∥ · ∥ x in order to keep the notation simpler: 
+
+E[d2(Θ , δ w(X)) | X = x]= E d2(Exp x(Vx), Exp X (wx)) | X = x
+
+= E
+
+
+
+∥Vx − wx∥2 − Kx(Vx, w x)3
+
+ ∥Vx∥2∥wx∥2 − ⟨ Vx, w x⟩2
+
+> x
+
+ + O ∥Vx∥5 + ∥wx∥5 | X = x
+
+
+
+= Tr(Σ x) + ∥μx − wx∥2
+
+− E[Kx(Vx, w x) | X = x]3
+
+ ∥wx∥2 Tr(Σ x) − ⟨ wx, Σxwx⟩ + ∥wx∥2∥μx∥2 − ⟨ wx, μ x⟩2
+
++ E[O ∥Vx∥5 + ∥wx∥5 | X = x].
+
+(44) In the last equality, we simply expanded all squared norms and plugged in the definitions in (35). Because on a Riemannian manifold all squared distances and Taylor expansions thereof are smooth away from their cut loci, we can take the gradient of the expression above with respect to w, and the result must vanish at 
+
+w = wB. Thus we obtain 0 = 2( wBx − μx) − 2E[Kx(Vx, w Bx) | X = x]3
+
+ wBx Tr(Σ x) − ΣxwBx + wBx∥μx∥2 − μx⟨wBx, μ x⟩
+
++ O ∥wBx∥4 − 2E[∇Kx(Vx, w Bx) | X = x]3
+
+ ∥wx∥2 Tr(Σ x) − ⟨ wx, Σxwx⟩ + ∥wx∥2∥μx∥2 − ⟨ wx, μ x⟩2 ,
+
+where ∇Kx(v, w ) denotes the gradient of the sectional curvature as a function of its second argument. Now apply the elementary bounds 
+
+wx Tr(Σ x) − Σxwx ≲ ∥wx∥∥ Σx∥,
+
+wx∥μx∥2 − μx⟨wx, μ x⟩ ≲ ∥wx∥∥ μx∥∥ wx − μx∥,
+
+∥wx∥2 Tr(Σ x) − ⟨ wx, Σxwx⟩ ≲ ∥wx∥2∥Σx∥ ≤ R∥wx∥∥ Σx∥,
+
+∥wx∥2∥μ∥2 − ⟨ wx, μ x⟩2 ≲ ∥wx∥2∥μx∥∥ wx − μx∥ ≤ R∥wx∥∥ μx∥∥ wx − μx∥
+
+along with the fact that M being compact implies that sup 
+
+> x∈M
+
+sup 
+
+> v,w ∈Tan x(M)
+
+(|Kx(v, w )| + ∥∇ Kx(v, w )∥x) < ∞
+
+to see that there exists a constant C, depending only on M, such that we have 
+
+∥wBx − μx∥ ≤ C  ∥wBx∥∥ Σx∥ + ∥wBx∥∥ μx∥∥ wBx − μx∥ + ∥wBx∥4 . (45) Now plug in the left side of (45) into the right side of itself, and iterate to get 
+
+∥wBx − μx∥≤ C  ∥wBx∥∥ Σx∥ + ∥wBx∥4 kX
+
+> j=0
+
+Cj ∥wBx∥j ∥μx∥j + Ck+1 ∥wBx∥k+1 ∥μx∥k+1 ∥wBx − μx∥k+1 (46) 37 for all k ∈ N. Since Proposition 3.6 shows that the value ∥μx∥ is strictly less than ( C sup x∈M ∥wBx∥)−1 for sufficiently small σ2, we see that (46) converges as k → ∞ , yielding 
+
+∥wBx − μx∥ ≤ C  ∥wBx∥∥ Σx∥ + ∥wBx∥4
+
+1 − C∥wBx∥∥ μx∥ .
+
+Thus, we get 
+
+∥wBx − μx∥ ≲ ∥wBx∥σ2 + ∥wBx∥4, (47) by applying the estimates of Proposition 3.6. Next, we use this to control the size of ∥wBx∥. First, we show the qualitative statement that ∥wBx∥ → 0 as 
+
+σ2 → 0. To see this, note that δB(x) is the Fr´ echet mean of the conditional distribution of Θ given {X = x},and this converges weakly to δx as σ2 → 0 due to the assumption that Θ has full support. Since M is compact, weak convergence implies W2 convergence, hence standard continuity results for Fr´ echet means (e.g., [30, 44]) imply that δ(x) converges to x as σ2 > 0. Thus, the continuity of the logarithm gives the desired result. Second, we use (47) to upgrade this to the quantitative statement that ∥wBx∥ = O(σ2) as 
+
+σ2 → 0, as follows. By combining (47), the triangle inequality, and ∥μx∥ = O(σ2), we obtain 
+
+∥wBx∥ ≲ σ2 + ∥wBx∥σ2 + ∥wBx∥4.
+
+Now write C for the constant on the right side, which depends only on M, and use ∥wBx∥ = o(1) to get 
+
+∥wBx∥4 ≤ 12C ∥wBx∥ for sufficiently small σ2. Then the rearranging the previous display shows 
+
+ 12C − σ2
+
+
+
+∥wBx∥ ≤ σ2
+
+for sufficiently small σ2, hence ∥wBx∥ = O(σ2). Finally, plugging the first claim into (47) gives the second claim. In fact, all of the estimates above hold uniformly over x ∈ M since M is compact. 
+
+Proof of Theorem 3.8. We adopt the notation Vx, μ x, and Σ x from the proof of Proposition 3.6, and we write 
+
+∥ · ∥ for all norms (i.e., dropping subscripts) for the sake of simplicity. We recall μx = Log x(δT (x)) from Lemma 3.1, and we use (43) to see that we have the following Taylor expansion of the conditional risk of δT :
+
+E[d2(Θ , δ T (X)) | X = x]= Tr(Σ x) − E[Kx(Vx, μ x) | X = x]3
+
+ ∥μx∥2 Tr(Σ x) − ⟨ μx, Σxμx⟩
+
++ E O ∥Vx∥5 + ∥μx∥5 | X = x .
+
+Now recall that M being compact implies sup x∈M sup v,w ∈Tan x(M) |Kx(v, w )| < ∞, and also that we have the elementary inequality 
+
+∥μ∥2 Tr(Σ) − ⟨ μ, Σμ⟩ ≲ ∥μ∥2∥Σ∥.
+
+Therefore, combining the previous displays with the estimates of Proposition 3.6 and Proposition 3.7 shows 
+
+E[d2(Θ , δ T (X)) | X = x] = Tr(Σ x) + O(σ6) + O(σ6) + E O ∥Vx∥5 | X = x + O(σ10 ) (48) We follow a similar approach for δB, where we define wBx := Log x(δB(x)) and use (43) to obtain: 
+
+E[d2(Θ , δ B(X)) | X = x]= Tr(Σ x) + ∥μx − wBx∥2
+
+− E[Kx(Vx, w Bx) | X = x]3
+
+ ∥wBx∥2 Tr(Σ x) − ⟨ wBx, ΣxwBx⟩ + ∥wBx∥2∥μx∥2 − ⟨ wBx, μ x⟩2
+
++ E O ∥Vx∥5 + ∥wBx∥5 | X = x .
+
+Then use the estimates of Proposition 3.6 and Proposition 3.7 along with the elementary inequalities 
+
+∥w∥2 Tr(Σ) − ⟨ w, Σw⟩ ≲ ∥w∥2∥Σ∥
+
+∥w∥2∥μ∥2 − ⟨ w, μ ⟩2 ≲ ∥w∥2∥μ∥ ∥ μ − w∥
+
+38 to obtain 
+
+E[d2(Θ , δ B(X)) | X = x] = Tr(Σ x) + O(σ8) + O(σ6)+ O(σ10 ) + O(σ6) + E O ∥Vx∥5 | X = x + O(σ10 ) (49) By subtracting (49) from (48), we get 
+
+E[d2(Θ , δ T (X)) | X = x] − E[d2(Θ , δ B(X)) | X = x] = O(σ6) + E O ∥Vx∥5 | X = x
+
+so taking the expectation yields 
+
+R(δT , σ 2) − R(δB, σ 2) = O(σ6) + E O ∥VX ∥5 .
+
+Finally, use Lemma A.3 with k = 5 to get 
+
+E[∥VX ∥5] = E[d5(X, Θ)] ∼ cmσ5
+
+where cm > 0 depends only on the dimension m of M.
+
+A.3. Proofs from Subsection 3.3 
+
+In this subsection, we prove some results establishing Sobolev bounds on the density of Riemannian Gaussian mixtures. In some cases we bound the Sobolev norm of a function by first uniformly bounding its derivatives, and then using the following result to upgrade this to a bound on the Sobolev norm. 
+
+Lemma A.4. For integer r ≥ 1 and sufficiently smooth h : M → R, we have 
+
+∥h∥2  
+
+> Hr(M)
+
+≍M,r ∥h∥2 
+
+> L2(M)
+
++
+
+Z
+
+> M
+
+∥∇ r h(x)∥2 
+
+> x,r
+
+dx
+
+Proof. It is standard (see [1, Chapter 2]) that we have 
+
+∥h∥Hr (M) ≍M,r ∥h∥L2(M) + ∥∆r/ 2h∥L2(M)
+
+so it suffices to show Z
+
+> M
+
+∥∇ r h(x)∥2 
+
+> x,r
+
+dx ≍M,r ∥∆r/ 2h∥2
+
+> L2(M)
+
+.
+
+To do this, note that if r is even then we can iteratively apply the following elliptic regularity bound (which follows, e.g., from G˚ arding’s inequality [81, Chapter 7.6, Vol II]): 
+
+∥∇ 2h∥L2(M) ≲M ∥h∥L2(M) + ∥∆h∥L2(M).
+
+If r is odd, then we combine this with the identity in (25). Now we turn to the proofs of the main results from the body. 
+
+Proof of Lemma 3.9. By (25), 
+
+∥f ∥2 
+
+> H1(M)
+
+= ∥f ∥2 
+
+> L2(M)
+
++
+
+Z
+
+> M
+
+∥∇ f (x)∥2
+
+> x
+
+dx. 
+
+By Lemma 3.2, we have 
+
+∥f ∥2 
+
+> L2(M)
+
+≤ vol( M)∥f ∥2 
+
+> L∞(M)
+
+≲M ∥g∥2
+
+> L∞(M)
+
+.
+
+By Lemma 3.3, Z
+
+> M
+
+∥∇ f (x)∥2
+
+> x
+
+dx ≤ vol( M) sup 
+
+> x∈M
+
+∥∇ f (x)∥2 
+
+> x
+
+≲M σ−2∥g∥2
+
+> L∞(M)
+
+.
+
+Since σ2 ≤ (diam( M)) 2, the first term is absorbed into the second term, up to a constant depending only on M. Taking square roots gives the result. 39 Proof of Lemma 3.10. Write Hr for the rth multivariate Hermite polynomial in Rm, i.e., the r-linear form defined by the relation 
+
+∇r exp 
+
+
+
+− ∥x∥2
+
+2
+
+
+
+= ( −1) r Hr (x) exp 
+
+
+
+− ∥x∥2
+
+2
+
+
+
+.
+
+Then we can compute ∇r f (x) by differentiating under the integral r times to obtain the following, where 
+
+∥ · ∥ r denotes any norm on the finite-dimensional vector space of r-linear forms: 
+
+∥∇ r f (x)∥r = 1(√2πσ )m
+
+Z
+
+> Rm
+
+∇r exp 
+
+
+
+− ∥x − θ∥2
+
+2σ2
+
+
+
+g(θ)d θ
+
+> r
+
+= σ−r
+
+(√2πσ )m
+
+Z
+
+> Rm
+
+Hr
+
+ x − θσ
+
+
+
+exp 
+
+
+
+− ∥x − θ∥2
+
+2σ2
+
+
+
+g(θ)d θ
+
+> r
+
+= σ−r
+
+(√2πσ )m
+
+Z
+
+> Rm
+
+Hr
+
+
+
+− vσ
+
+
+
+exp 
+
+
+
+− ∥v∥2
+
+2σ2
+
+
+
+g(x + v)d v
+
+> r
+
+≤ σ−r
+
+(√2πσ )m
+
+Z
+
+> Rm
+
+Hr
+
+
+
+− vσ
+
+
+
+> r
+
+exp 
+
+
+
+− ∥v∥2
+
+2σ2
+
+
+
+g(x + v)d v
+
+≤ σ−r ∥g∥L∞(Rm)
+
+(√2πσ )m
+
+Z
+
+> Rm
+
+Hr
+
+ vσ
+
+
+
+> r
+
+exp 
+
+
+
+− ∥v∥2
+
+2σ2
+
+
+
+dv. 
+
+Now write Z for a standard Gaussian random variable in Rm (i.e., with mean 0 and covariance matrix Im), so that the expression above is just 
+
+∥∇ r f (x)∥r ≤ σ−r ∥g∥L∞(Rm)E [∥Hr (Z)∥r ] .
+
+Since the expectation depends only on m and r, this finishes the proof. 
+
+Proof of Lemma 3.12. Define d0 : M → [0 , ∞) so that d0(y) ≥ 0 equals the distance from y ∈ M to the identity element. Then we have 
+
+pθ,σ 2 (x) = exp 
+
+
+
+− d20(x−1θ)2σ2 − A(σ2)
+
+
+
+hence, by changing variables and using the invariance of the volume form: 
+
+f (x) = 
+
+Z
+
+> M
+
+exp 
+
+
+
+− d20(x−1θ)2σ2 − A(σ2)
+
+
+
+g(θ)d θ
+
+=
+
+Z
+
+> M
+
+exp 
+
+
+
+− d20(θ)2σ2 − A(σ2)
+
+
+
+g(xθ )d θ. 
+
+Now write Rθ : M → M for the operator of right multiplication by θ, which is an isometry and is infinitely-differentiable since M is a Lie group endowed with a bi-invariant metric tensor. Consequently, 
+
+x 7 → g(xθ ) = ( g ◦ Rθ )( x) is infinitely differentiable, and we can differentiate it by the chain rule, yielding 
+
+∇r (g ◦ Rθ )( x) = R∗ 
+
+> θ
+
+(∇r g(xθ )) where R∗ 
+
+> θ
+
+is the isometry of r-linear forms on Tan x(M) which is induced by 
+
+Rθ . Thus, differentiating r times under the integral (which is valid because M is compact and all derivatives 
+
+∇kg for k ≤ r are uniformly bounded) yields 
+
+∇r f (x) = 
+
+Z
+
+> M
+
+exp 
+
+
+
+− d20(θ)2σ2 − A(σ2)
+
+
+
+R∗ 
+
+> θ
+
+(∇r g(x))d θ
+
+40 hence 
+
+∥∇ r f (x)∥x,r =
+
+Z
+
+> M
+
+exp 
+
+
+
+− d20(θ)2σ2 − A(σ2)
+
+
+
+R∗ 
+
+> θ
+
+(∇r g(x))d θ
+
+> x,r
+
+≤
+
+Z
+
+> M
+
+exp 
+
+
+
+− d20(θ)2σ2 − A(σ2)
+
+
+
+∥R∗ 
+
+> θ
+
+(∇r g(x)) ∥x,r dθ
+
+≤
+
+Z
+
+> M
+
+exp 
+
+
+
+− d20(θ)2σ2 − A(σ2)
+
+
+
+dθ · sup 
+
+> θ∈M
+
+∥∇ r g(θ)∥θ,r 
+
+= sup 
+
+> θ∈M
+
+∥∇ r g(θ)∥θ,r .
+
+Now, use Lemma A.4 and Lemma 3.2 to get 
+
+∥f ∥2  
+
+> Hr(M)
+
+≲M,r ∥f ∥2 
+
+> L2(M)
+
++
+
+Z
+
+> M
+
+∥∇ r f (x)∥2 
+
+> x,r
+
+dx
+
+≤ ∥ f ∥2 
+
+> L2(M)
+
++ vol( M) sup 
+
+> x∈M
+
+∥∇ r f (x)∥2
+
+> x,r
+
+≲M vol( M)∥g∥2 
+
+> L∞(M)
+
++ vol( M) sup 
+
+> θ∈M
+
+∥∇ r g(θ)∥2
+
+> θ,r
+
+and conclude. 
+
+Proof of Lemma 3.13. Recall from Example 3.11 that [63] allows us to compute the Hessian of the squared distance functional, by representing S2 = {x ∈ R3 : ∥x∥ = 1 }; combining this with the chain rule, we can directly calculate 
+
+∇2
+
+> x
+
+pθ,σ 2 (x) = − 1
+
+σ2
+
+ Log x θ(Log x θ)⊤
+
+d2(x, θ ) + h(d(x, θ )) 
+
+
+
+I − xx ⊤ − Log x θ(Log x θ)⊤
+
+d2(x, θ )
+
+ 
+
+pθ,σ 2 (x)+ Log x θ(Log x θ)⊤
+
+σ4 pθ,σ 2 (x)hence 
+
+∥∇ 2
+
+> x
+
+pθ,σ 2 (x)∥x, 2 ≤
+
+ 1
+
+σ2
+
+ 1 + |h(d(x, θ )) |  ∥I − xx ⊤∥x, 2 + 1  + d2(x, θ )
+
+σ4
+
+
+
+pθ,σ 2 (x),
+
+where h(t) = t cos( t)/ sin( t) for 0 ≤ t ≤ π. In particular, we have 
+
+∥∇ 2f (x)∥x, 2
+
+≤
+
+Z
+
+> M
+
+∥∇ 2
+
+> x
+
+pθ,σ 2 (x)∥x, 2 dG(θ)
+
+≤
+
+Z
+
+> M
+
+ 1
+
+σ2 + d2(x, θ )
+
+σ4
+
+
+
+pθ,σ 2 (x)d G(θ) +  ∥I − xx ⊤∥x, 2 + 1  1
+
+σ2
+
+Z
+
+> M
+
+|h(d(x, θ )) |pθ,σ 2 (x)d G(θ),
+
+and we can control these two terms separately. For the first term, use Lemma A.2, the normal coordinates (32), the identity d(x, y ) = ∥ Log x θ∥x, and 41 Lemma A.1 to get: 
+
+Z
+
+> M
+
+ 1
+
+σ2 + d2(x, θ )
+
+σ4
+
+
+
+pθ,σ 2 (x)d G(θ)
+
+≲M
+
+1(√2πσ )m
+
+Z
+
+> M
+
+ 1
+
+σ2 + d2(x, θ )
+
+σ4
+
+
+
+exp 
+
+
+
+− d2(x, θ )2σ2
+
+
+
+dG(θ)= 1(√2πσ )m
+
+Z
+
+> Dx
+
+ 1
+
+σ2 + ∥v∥2
+
+> x
+
+σ4
+
+
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+g(Exp x(v)) jx(v)d v
+
+≲M
+
+∥g∥L∞(M)
+
+(√2πσ )m
+
+Z
+
+> Dx
+
+ 1
+
+σ2 + ∥v∥2
+
+> x
+
+σ4
+
+
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+≤ ∥g∥L∞(M)
+
+(√2πσ )m
+
+Z
+
+> Tan x(M)
+
+ 1
+
+σ2 + ∥v∥2
+
+> x
+
+σ4
+
+
+
+exp 
+
+
+
+− ∥v∥2
+
+> x
+
+2σ2
+
+
+
+dv
+
+= ∥g∥L∞(M)
+
+ 1
+
+σ2 + mσ 2
+
+σ4
+
+
+
+≲M σ−2∥g∥L∞(M).
+
+For the second term, use Lemma A.2, write the integral in spherical polar coordinates centered at x, and define t = d(x, θ ), to compute 1
+
+σ2
+
+Z
+
+> S2
+
+|h(d(x, θ )) |pθ,σ 2 (x)g(θ)d θ
+
+≲M
+
+∥g∥L∞
+
+σ2(√2πσ )2
+
+Z π
+
+> 0
+
+t cos t
+
+sin t exp 
+
+
+
+− t2
+
+2σ2
+
+
+
+sin t dt
+
+= ∥g∥L∞
+
+σ2(√2πσ )2
+
+Z π
+
+> 0
+
+t| cos t| exp 
+
+
+
+− t2
+
+2σ2
+
+
+
+dt
+
+≲ ∥g∥L∞
+
+σ2σ2
+
+Z ∞
+
+> 0
+
+t exp 
+
+
+
+− t2
+
+2σ2
+
+
+
+dt
+
+≲ σ−2∥g∥L∞
+
+as needed. Finally, combine these two bounds with Lemma 3.2 and Lemma A.4 to get 
+
+∥f ∥2 
+
+> H2(M)
+
+≲ ∥f ∥2 
+
+> L∞(M)
+
++ vol( M) sup 
+
+> x∈M
+
+∥∇ 2f (x)∥2 
+
+> x, 2
+
+≲M ∥g∥2 
+
+> L∞(M)
+
++ σ−4∥g∥2
+
+> L∞(M)
+
+,
+
+and use σ2 ≤ (diam( M)) 2 to conclude. 
+
+Proof of Lemma 3.15. Directly compute f ∗(0) = (vol( M)) −1/2 and f ∗(j) = 0 for all j ≥ 1. 
+
+Proof of Lemma 3.14. First, we define the kernel Kσ : S1 → R by 
+
+Kσ (x) := exp 
+
+
+
+− d2(x, 0) 2σ2 − A(σ2)
+
+
+
+,
+
+which, by representing S1 = R/2πZ can be written as 
+
+Kσ (t) := exp 
+
+
+
+− t2
+
+2σ2 − A(σ2)
+
+
+
+which extending periodically from t ∈ [−π, π ] to t ∈ R. Note that A(σ2) does not depend on θ since M is homogeneous. Then note that 
+
+f (x) = 
+
+Z
+
+> S1
+
+Kσ (x − θ) g(θ) d θ, 
+
+42 which is exactly the convolution of Kσ and g on S1.Next we bound the Fourier series coefficients of Kσ . For convenience, we index the eigenvalues as λk = k2
+
+for k ∈ Z, and we claim that 
+
+|K∗ 
+
+> σ
+
+(k)| ≍ σ−2(1 + k2)−1 (50) holds uniformly over k ∈ Z and 0 < σ 2 ≤ π2. The claim is obvious for k = 0, since Kσ being a probability density implies K∗ 
+
+> σ
+
+(0) ≲ 1 ≲ σ−2 for σ2 ≤ π2. So, fix k̸ = 0, and use integration by parts to get 
+
+K∗ 
+
+> σ
+
+(k) = 12πik 
+
+Z π
+
+> −π
+
+K′ 
+
+> σ
+
+(t)e−ikt dt. 
+
+For −π < t < π we have 
+
+K′ 
+
+> σ
+
+(t) = − tσ2 Kσ (t),
+
+so K′ 
+
+> σ
+
+is piecewise continuous and has a jump at ±π. Integrating by parts again gives 
+
+K∗ 
+
+> σ
+
+(k) ≤ 12πk 2
+
+
+
+K′ 
+
+> σ
+
+(π−) − K′ 
+
+> σ
+
+(−π+) +
+
+Z π
+
+> −π
+
+|K′′  
+
+> σ
+
+(t)| dt
+
+
+
+, (51) and we can analyze the two terms in parentheses separately. The first term of (51) is exactly 
+
+|K′ 
+
+> σ
+
+(π−) − K′ 
+
+> σ
+
+(−π+)| = 2 πσ −2Kσ (π) = 2 πσ −2 exp 
+
+
+
+− π2
+
+2σ2 − A(σ2)
+
+
+
+,
+
+and Lemma A.2 implies exp( −A(σ2)) ≲ σ−1 for 0 < σ 2 ≤ π2, hence |K′ 
+
+> σ
+
+(π−)−K′ 
+
+> σ
+
+(−π+)| ≲ σ−3 exp( − π2 
+
+> 2σ2
+
+) ≲
+
+σ−2. For the second term of (51), we compute K′′  
+
+> σ
+
+(t) = ( σ−4t2 − σ−2)Kσ (t) for −π < t < π , hence 
+
+Z π
+
+> −π
+
+|K′′  
+
+> σ
+
+(t)| dt ≤ σ−4
+
+Z π
+
+> −π
+
+t2Kσ (t) d t + σ−2
+
+Z π
+
+> −π
+
+Kσ (t) d t. 
+
+The second integral is exactly 1, and the first integral is bounded by σ−2, which follows from Lemma A.2 and the Gaussian moment bound R π 
+
+> −π
+
+t2e−t2/(2 σ2) dt ≲ σ3, hence we have shown R π 
+
+> −π
+
+|K′′  
+
+> σ
+
+(t)| dt ≍ σ−2.
+
+Substituting these bounds into (51) establishes 
+
+|K∗ 
+
+> σ
+
+(k)| ≍ σ−2k−2
+
+for all k̸ = 0, whence (50). Lastly, we use the convolution identity for Fourier coefficients, the bound (50), and the definition of Sobolev norms to obtain 
+
+∥f ∥2 
+
+> Hs+2 (S1)
+
+= X
+
+> k∈Z
+
+(1 + k2)s+2 |f ∗(k)|2
+
+= X
+
+> k∈Z
+
+(1 + k2)s+2 |K∗ 
+
+> σ
+
+(k)|2|g∗(k)|2
+
+≍ σ−4 X
+
+> k∈Z
+
+(1 + k2)s|g∗(k)|2
+
+= σ−4∥g∥2
+
+> Hs(S1)
+
+.
+
+Taking square roots completes the proof. 
+
+A.4. Proofs from Subsection 3.4 
+
+Lastly, we give the proofs for our results concerning our empirical Bayes approximation ˆδT of δT .43 Proof of Proposition 3.16. First, note that we have f ∈ L2(M) because of ∥f ∥Hr (M) < ∞ for some r > 0, and also that ˆfn ∈ L2(M) because it is written as a finite linear combination of {ϕj }∞ 
+
+> j=0
+
+⊆ L2(M). Now observe that f ∗, ˆf ∗ 
+
+> n
+
+: {0, 1, . . . , } → C are given by 
+
+f ∗(j) := 
+
+Z
+
+> M
+
+f (x)ϕj (x)d x
+
+and ˆf ∗ 
+
+> n
+
+(j) := 
+
+( 1
+
+> n
+
+Pni=1 ϕj (Xi) if j ≤ ℓ
+
+0 if j > ℓ, 
+
+so that we have ˆfn(x) = 
+
+> ℓ
+
+X
+
+> j=0
+
+ˆf ∗ 
+
+> n
+
+(j)ϕj (x)and also that ˆf ∗ 
+
+> n
+
+(j) is an unbiased estimator of f ∗(j) for all 0 ≤ j ≤ ℓ.The first claim is based on the following calculations. First, expand 
+
+Z
+
+> M
+
+ˆfn(x) − f (x) 2
+
+dx =
+
+> ℓ
+
+X
+
+> j=0
+
+ˆf ∗ 
+
+> n
+
+(j) − f ∗(j) 2
+
++
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+|f ∗(j)|2
+
+=
+
+> ℓ
+
+X
+
+> j=0
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ϕj (Xi) − f ∗(j)
+
+> 2
+
++
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+|f ∗(j)|2.
+
+(52) and let us now handle the two terms on the right side separately. For the first term (which represents the variance), we take the expectation over X1, . . . , X n then use Lemma 3.2 to get: 
+
+E
+
+
+
+> ℓ
+
+X
+
+> j=0
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ϕj (Xi) − f ∗(j)
+
+> 2
+
+ = 1
+
+n
+
+> ℓ
+
+X
+
+> j=0
+
+Var( ϕj (X1)) 
+
+≤ 1
+
+n
+
+> ℓ
+
+X
+
+> j=0
+
+Z
+
+> M
+
+|ϕj (x)|2f (x)d x
+
+≤ ∥ f ∥L∞(M)
+
+ℓn
+
+≲M ∥g∥L∞(M)
+
+ℓn
+
+(53) for all ℓ ∈ N. For the second term (which is non-random, and can be interpreted as the squared bias), use the assumption of ∥f ∥Hr (M) < ∞, and Weyl’s law [16, Section VI.4], to get 
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+|f ∗(j)|2 ≤ λ−rℓ
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+λrj |f ∗(j)|2
+
+≤ λ−rℓ
+
+> ∞
+
+X
+
+> j=0
+
+λrj |f ∗(j)|2
+
+≤ λ−rℓ
+
+> ∞
+
+X
+
+> j=0
+
+(1 + λj )r |f ∗(j)|2
+
+= λ−rℓ ∥f ∥2 
+
+> Hr(M)
+
+≲M,r ℓ− 2rm ∥f ∥2 
+
+> Hr(M)
+
+(54) 44 for all ℓ ∈ N. Consequently, plugging in (54) and (53) into (52) yields 
+
+E
+
+Z 
+
+> M
+
+ˆfn(x) − f (x) 2
+
+dx
+
+
+
+≲M ∥g∥L∞(M)
+
+ℓn + ℓ− 2rm ∥f ∥2  
+
+> Hr(M)
+
+(55) for all ℓ ∈ N.The second claim is based on similar calculations, as follows. First, use (25) to expand 
+
+Z
+
+> M
+
+∇ ˆfn(x) − ∇ f (x) 2
+
+> x
+
+dx =
+
+> ℓ
+
+X
+
+> j=0
+
+λj ˆf ∗ 
+
+> n
+
+(j) − f ∗(j) 2
+
++
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+λj |f ∗(j)|2
+
+=
+
+> ℓ
+
+X
+
+> j=0
+
+λj
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ϕj (Xi) − f ∗(j)
+
+> 2
+
++
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+λj |f ∗(j)|2,
+
+(56) and we control these terms as before. For the first term, take expectation and use Lemma 3.2 and Weyl’s law: 
+
+E
+
+
+
+> ℓ
+
+X
+
+> j=0
+
+λj
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ϕj (Xi) − f ∗(j)
+
+> 2
+
+ =
+
+> ℓ
+
+X
+
+> j=0
+
+λj E
+
+ 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ϕj (Xi) − f ∗(j)
+
+> 2
+
+
+
+= 1
+
+n
+
+> ℓ
+
+X
+
+> j=0
+
+λj Var( ϕj (X1)) 
+
+≤ 1
+
+n
+
+> ℓ
+
+X
+
+> j=0
+
+λj
+
+Z
+
+> M
+
+|ϕj (x)|2f (x)d x
+
+≤ ∥f ∥L∞(M)
+
+n
+
+> ℓ
+
+X
+
+> j=0
+
+λj
+
+≲M
+
+∥g∥L∞(M)
+
+n
+
+> ℓ
+
+X
+
+> j=0
+
+λj
+
+≤ ∥g∥L∞(M)
+
+n ℓλ ℓ
+
+≲M
+
+∥g∥L∞(M)
+
+n ℓ1+ 2
+
+> m
+
+(57) for all ℓ ∈ N. For the second term, use ∥f ∥Hr (M) < ∞, and Weyl’s law: 
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+λj |f ∗(j)|2 =
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+λ1−rj λrj |f ∗(j)|2
+
+≤ λ1−rℓ
+
+> ∞
+
+X
+
+> j=ℓ+1
+
+λrj |f ∗(j)|2
+
+≤ λ1−rℓ
+
+> ∞
+
+X
+
+> j=0
+
+λrj |f ∗(j)|2
+
+≤ λ1−rℓ
+
+> ∞
+
+X
+
+> j=0
+
+(1 + λj )r |f ∗(j)|2
+
+= λ1−rℓ ∥f ∥2 
+
+> Hr(M)
+
+≲M,r ℓ 2(1 −r) 
+
+> m
+
+∥f ∥2 
+
+> Hr(M)
+
+(58) 45 for all ℓ ∈ N. Now plug (58) and (57) into (56) to obtain 
+
+E
+
+Z 
+
+> M
+
+∇ ˆfn(x) − ∇ f (x) 2
+
+> x
+
+dx
+
+
+
+≲M ∥g∥L∞(M)
+
+ℓ1+ 2
+
+> m
+
+n + ℓ 2(1 −r) 
+
+> m
+
+∥f ∥2  
+
+> Hr(M)
+
+(59) for all ℓ ∈ N.Note that we can capture both (55) and (59) in the following expression for k ∈ { 0, 1}, where we use the norm ∥ · ∥ to denote | · | in the k = 0 case and to denote ∥ · ∥ x in the k = 1 case: 
+
+E
+
+Z 
+
+> M
+
+∇k ˆfn(x) − ∇ kf (x) 2
+
+dx
+
+
+
+≲M ∥g∥L∞(M)
+
+ℓ1+ 2km
+
+n + ℓ 2( k−r) 
+
+> m
+
+∥f ∥2 
+
+> Hr(M)
+
+.
+
+Thus, we complete the proof by plugging in the given form of ℓn to obtain 
+
+Z
+
+> M
+
+E
+
+
+
+∇k ˆfn(x) − ∇ kf (x) 2
+
+dx ≲M,r 
+
+∥g∥L∞(M)ℓ1+ 2km
+
+n + ℓ 2( k−r) 
+
+> m
+
+∥f ∥2 
+
+> Hr(M)
+
+= ∥g∥L∞(M)ℓn + ∥f ∥2 
+
+> Hr(M)
+
+ℓ 2rm
+
+!
+
+ℓ 2km
+
+≍ ∥f ∥ 2m 
+
+> 2r+m
+> Hr(M)
+
+∥g∥ 2r
+
+> 2r+m
+> L∞(M)
+
+n 2r
+
+> 2r+m
+
+ℓ 2km
+
+= ∥f ∥ 2m+4 k 
+
+> 2r+m
+> Hr(M)
+
+∥g∥ 2r−2k
+
+> 2r+m
+> L∞(M)
+
+n 2r−2k
+
+> 2r+m
+
+.
+
+(60) This implies both claims by taking k = 0 and k = 1, respectively. 
+
+Proof of Theorem 3.17. For convenience, write wT x := σ2∇ log f (x) and ˆ wT x := σ2∇x ˆfn(x)/ max { ˆfn(x), ρ },and note that Lemma 3.1 implies 
+
+∥wT x∥x = ∥E[Log x Θ | X = x]∥x ≤ E[∥ Log x Θ∥x | X = x] ≤ diam( M).
+
+We claim that there exists a constant CM > 0 such that, for every x ∈ M and every v ∈ Tan x(M), 
+
+d2 (Exp x(wT x), Exp x(v)) ≤ CM∥wT x − v∥2
+
+> x
+
+.
+
+Indeed, if ∥v∥x ≤ 2 diam( M), this follows from smoothness of ( x, v ) 7 → Exp x(v) on the compact set 
+
+{(x, v ) : x ∈ M , ∥v∥x ≤ 2 diam( M)}; otherwise ∥v∥x > 2 diam( M) hence ∥wT x − v∥x ≥ diam( M) and 
+
+d(Exp x(wT x), Exp x(v)) ≤ diam( M), so the bound holds after increasing CM if necessary. Applying this with v := ˆ wT x gives 
+
+E
+
+Z 
+
+> M
+
+d2 ˆδT (x), δ T (x)
+
+
+
+f (x)d x
+
+
+
+≤ CMσ4E
+
+Z
+
+> M
+
+∇x ˆfn(x)max { ˆfn(x), ρ } − ∇xf (x)
+
+f (x)
+
+> 2
+> x
+
+f (x)d x
+
+ (61) for all n ∈ N. Now we write 
+
+∇x ˆfn(x)max { ˆfn(x), ρ } − ∇xf (x)
+
+f (x) = ∇x ˆfn(x) − ∇ xf (x)max { ˆfn(x), ρ } + ∇xf (x)
+
+f (x) · f (x) − max { ˆfn(x), ρ }
+
+max { ˆfn(x), ρ } ,
+
+so that we can expand the norm appearing on the right side above as 
+
+∇x ˆfn(x)max { ˆfn(x), ρ } − ∇xf (x)
+
+f (x)
+
+> 2
+> x
+
+≲ ∇x ˆfn(x) − ∇ xf (x)max { ˆfn(x), ρ }
+
+> 2
+> x
+
++ ∇xf (x)
+
+f (x) 
+
+> 2
+
+f (x) − max { ˆfn(x), ρ }
+
+max { ˆfn(x), ρ }
+
+> 2
+
+.
+
+46 Next we will take the expectation and integral and bound these terms separately. The first term can be bounded directly by Lemma 3.2 and Proposition 3.16, as 
+
+E
+
+Z
+
+M
+
+∇x ˆfn(x) − ∇ xf (x)max { ˆfn(x), ρ }
+
+2
+
+x
+
+f (x)d x
+
+ ≤ ∥f ∥L∞(M)
+
+ρ2 E
+
+Z 
+
+M
+
+∇x ˆfn(x) − ∇ xf (x) 2
+
+x
+
+dx
+
+
+
+≲M,r 
+
+∥g∥L∞(M)
+
+ρ2 · ∥f ∥ 2m+4 2r+m
+
+Hr (M)∥g∥ 2r−22r+m
+
+L∞(M)
+
+n 2r−22r+m
+
+= ∥f ∥ 2m+4 2r+m
+
+Hr (M)∥g∥ 4r+m−22r+m
+
+L∞(M)
+
+ρ2n 2r−22r+m
+
+.
+
+(62) For the second term, use |f (x) − max { ˆfn(x), ρ }| ≤ | f (x) − ˆfn(x)|, then Lemma 3.3 and Lemma 3.2 to get 
+
+∇xf (x)
+
+f (x)
+
+2 f (x) − max { ˆfn(x), ρ }
+
+max { ˆfn(x), ρ }
+
+2
+
+f (x) ≲M
+
+∥g∥3
+
+L∞(M)
+
+ρ4σ2 |f (x) − ˆfn(x)|2.
+
+Therefore, we can use Proposition 3.16 to further bound: 
+
+E
+
+Z
+
+M
+
+∇xf (x)
+
+f (x)
+
+2 f (x) − max { ˆfn(x), ρ }
+
+max { ˆfn(x), ρ }
+
+2
+
+x
+
+f (x)d x
+
+
+
+≲M
+
+∥g∥3
+
+L∞(M)
+
+ρ4σ2 E
+
+Z 
+
+M
+
+|f (x) − ˆfn(x)|2dx
+
+
+
+≲M,r 
+
+∥g∥3
+
+L∞(M)
+
+ρ4σ2 · ∥f ∥ 2m
+
+> 2r+m
+
+Hr (M)∥g∥ 2r
+
+> 2r+m
+
+L∞(M)
+
+n 2r
+
+> 2r+m
+
+= ∥f ∥ 2m
+
+> 2r+m
+
+Hr (M)∥g∥ 8r+3 m
+
+> 2r+m
+
+L∞(M)
+
+ρ4σ2n 2r
+
+> 2r+m
+
+.
+
+(63) Combining (62) and (63) with (61), we obtain 
+
+E
+
+Z 
+
+M
+
+d2 ˆδT (x), δ T (x)
+
+
+
+f (x)d x
+
+
+
+≲M,r σ4 ∥f ∥ 2m+4 2r+m
+
+Hr (M)∥g∥ 4r+m−22r+m
+
+L∞(M)
+
+ρ2n 2r−22r+m
+
++ σ2 ∥f ∥ 2m
+
+> 2r+m
+
+Hr (M)∥g∥ 8r+3 m
+
+> 2r+m
+
+L∞(M)
+
+ρ4n 2r
+
+> 2r+m
+
+.
+
+In order to take the worst-case behavior on the right side in all variables, note that we have: 
+
+σ2 ≤ (diam( M)) 2
+
+n ≥ 1
+
+∥g∥L∞(M) ≥ (vol( M)) −1
+
+∥f ∥Hr (M) ≥ ∥ f ∥L2(M) ≥ (vol( M)) −1/2
+
+ρ ≤ min 
+
+x∈M f (x) ≤ (vol( M)) −1,
+
+hence we obtain the upper bound 
+
+E
+
+Z 
+
+M
+
+d2 ˆδT (x), δ T (x)
+
+
+
+f (x)d x
+
+
+
+≲M,r 
+
+σ2∥f ∥ 2m+4 2r+m
+
+Hr (M)∥g∥ 8r+3 m
+
+> 2r+m
+
+L∞(M)
+
+ρ4n 2r−22r+m
+
+as claimed. 47 Proof of Theorem 3.22. Before the main part of the proof, we briefly introduce, for each p ∈ N, a collection of functions ψp, 0, . . . , ψ p, 2p−1 : S1 → R that will feature in our construction. The existence of these functions involves standard properties of wavelets on S1 which can be found in [85, Theorem 7.2] or [2, Section 2]. Specifically, we may construct such functions so that, for all a0, . . . a 2p−1 ∈ R, we have 
+
+> 2p−1
+
+X
+
+> z=0
+
+az ψp,z 
+
+> 2
+> L2(S1)
+
+≍
+
+> 2p−1
+
+X
+
+> z=0
+
+a2 
+
+> z
+
+(64) and, for all ε0, . . . ε 2p−1 ∈ { 0, 1}, we have 
+
+> 2p−1
+
+X
+
+> z=0
+
+εz ψp,z 
+
+> L∞(S1)
+
+≲ 2p/ 2. (65) In fact, we further have the property that, for all z we have ψ∗ 
+
+> p,z
+
+(k)̸ = 0 only if |k| ≍ 2p, which allows us to generalize (64) as follows; for all r ∈ R and all a0, . . . a 2p−1 ∈ R, we have 
+
+> 2p−1
+
+X
+
+> z=0
+
+az ψp,z  
+
+> 2
+> Hr(S1)
+
+= X
+
+> k∈Z
+
+(1 + k2)r
+
+> 2p−1
+
+X
+
+> z=0
+
+az ψ∗ 
+
+> p,z
+
+(k)
+
+> 2
+
+≍r 22pr X
+
+> k∈Z
+> 2p−1
+
+X
+
+> z=0
+
+az ψ∗ 
+
+> p,z
+
+(k)
+
+> 2
+
+= 2 2pr 
+
+> 2p−1
+
+X
+
+> z=0
+
+az ψp,z 
+
+> 2
+> L2(S1)
+
+≍ 22pr 
+
+> 2p−1
+
+X
+
+> z=0
+
+a2 
+
+> z
+
+,
+
+(66) for all p.Next we define the functions ζp, 0, . . . , ζ p, 2p−1 : S1 → R as follows, for each z:
+
+ζp,z (x) = 
+
+Z
+
+> S1
+
+pθ,σ 2 (x)ψp,z (θ)d θ =
+
+Z
+
+> S1
+
+exp 
+
+
+
+− d2(x, θ )2σ2 − A(σ2)
+
+
+
+ψp,z (θ)d θ. 
+
+Note that ζp,z has the interpretation of the “density” of X when ψp,z is the “density” of Θ in (1), al-though these functions can take negative values so are not bona fide densities. As we showed in the proof of Lemma 3.14, we have ζ∗ 
+
+> p,z
+
+(k) ≍σ2 (1 + k2)−1ψ∗ 
+
+> p,z
+
+(k) for all |k| ≍ 2p, from which we can deduce bounds similar to (66). Indeed, just compute 
+
+> 2p−1
+
+X
+
+> z=0
+
+az ζp,z 
+
+> 2
+> L2(S1)
+
+=
+
+> 2p−1
+
+X
+
+> z=0
+
+az ζp,z 
+
+> 2
+> H0(S1)
+
+≍σ2
+
+> 2p−1
+
+X
+
+> z=0
+
+az ψp,z 
+
+> 2
+> H−2(S1)
+
+≍ 2−4p
+
+> 2p−1
+
+X
+
+> z=0
+
+a2 
+
+> z
+
+(67) and 
+
+> 2p−1
+
+X
+
+> z=0
+
+az ∇ζp,z 
+
+> 2
+> L2(S1)
+
+= X
+
+> k∈Z
+
+k2
+
+> 2p−1
+
+X
+
+> z=0
+
+az ζ∗ 
+
+> p,z
+
+(k)
+
+> 2
+
+≍ 22p X
+
+> k∈Z
+> 2p−1
+
+X
+
+> z=0
+
+az ζ∗ 
+
+> p,z
+
+(k)
+
+> 2
+
+= 2 2p
+
+> 2p−1
+
+X
+
+> z=0
+
+az ζp,z 
+
+> 2
+> L2(S1)
+
+≍ 2−2p
+
+> 2p−1
+
+X
+
+> z=0
+
+a2
+
+> z
+
+(68) for all p.Now we set up the proof using Assouad’s method. To do this, fix p ∈ N such that 2 p ≍ n1/(2 s+5) and fix 
+
+γ > 0 such that γ ≍ L2−p(s+ 12 ) = Ln −(s+ 12 )/(2 s+5) . Then, for each ε = ( ε0, . . . , ε 2p−1) ∈ { 0, 1}2p
+
+, set 
+
+gε(θ) := 12π + γ
+
+> 2p−1
+
+X
+
+> z=0
+
+εz ψp,z (θ).
+
+48 In order to make sure that gε ∈ G s(α, β, L ) for all ε ∈ { 0, 1}2p
+
+, note from (65) and γ ≲ L2−p(s+ 12 ) ≲ 2−p/ 2
+
+that we have α ≤ gε(θ) ≤ β for all θ ∈ S1, and similarly that from (66) and γ ≤ L2−p(s+ 12 ) we have 
+
+∥gε∥Hs(S1) ≤ L. Now for convenience, write fε for the marginal density of X when Θ has density gε in (1), so that fε = (2 π)−1 + γ P2p−1 
+
+> z=0
+
+εz ζp,z . The core of the rest of the proof is to show that {fε : ε ∈ { 0, 1}2p
+
+} are close in terms of their KL divergence but far in terms of the displacement of their denoisers. Throughout the rest of the proof, we write dH(ε, ε ′) for the Hamming distance between ε, ε ′ ∈ { 0, 1}2p
+
+.For the KL computation, suppose dH(ε, ε ′) = 1, hence without loss of generality fε − fε′ = γζ p,z 0 for some 
+
+z0. Then, use Lemma 3.2 to get fε′ (x) ≳ α for all x ∈ S1, and use (67) to compute DKL (fε | fε′ ) ≲α ∥fε − fε′ ∥2 
+
+> L2(S1)
+
+= γ2 ∥ζp,z 0 ∥2 
+
+> L2(S1)
+
+≍ γ22−4p
+
+Further, if we let Pε be the joint distribution of i.i.d. samples X1, . . . , X n from fε, and similarly for Pε′ , we have DKL (Pε | Pε′ ) = n DKL (fε | fε′ ) ≲α nγ 22−4p (69) for all n. (Note that we chose γ ≍ L2−p(s+ 12 ) and 2 p ≍ n1/(2 s+5) precisely to guarantee that these KL divergences on adjacent hypothesis are bounded by a small universal constant). For the displacement computation, we claim 
+
+Z
+
+> S1
+
+d2(δT ε(x), δ T ε′ (x))d x ≳σ2,α,β γ22−2pdH(ε, ε ′) (70) for all ε, ε ′ ∈ { 0, 1}2p
+
+, where δT ε(x) = Exp x(σ2∇ log fε(x)) and δT ε′ (x) = Exp x(σ2∇ log fε′ (x)) denote the oracle tangential Bayes denoisers when Θ has distribution with density given by gε and gε′ , respectively. To do this, we first show that for all 0 < σ 2 < π 2 there exists a constant 0 < C α,σ 2 < π such that we have sup 
+
+> ε∈{ 0,1}2p
+
+sup 
+
+> x∈S1
+
+∥ Log x(δT ε(x)) ∥x ≤ Cα,σ 2 (71) To see this, use the Tweedie-Eddington formula (Lemma 3.1), Jensen’s inequality, and the identity, ∥ Log x θ∥x =
+
+d(x, θ ) to obtain 
+
+∥ Log x(δT ε(x)) ∥x = ∥E[Log x Θ | X = x]∥x ≤ E[∥ Log x Θ∥x | X = x]= E[d(x, Θ) | X = x]=
+
+R π 
+
+> −π
+
+d(x, θ ) exp 
+
+
+
+− d2(x,θ )2σ2
+
+
+
+gε(θ)d θ
+
+R π 
+
+> −π
+
+exp 
+
+
+
+− d2(x,θ )2σ2
+
+
+
+gε(θ)d θ
+
+≤ π − (π − σ)2 ασ exp 
+
+
+
+− α2
+
+2σ2
+
+
+
+=: Cα,σ 2 ,
+
+where the last line follows by direct calculation after splitting the integral into [ −σ, σ ] and its complement [−π, π ] \ [−σ, σ ]. Next note that (71) implies that there exists a constant cα,σ 2 > 0 such that we have 
+
+d (δT ε(x), δ T ε′ (x)) ≥ cα,σ 2 ∥∇ log fε(x) − ∇ log fε′ (x)∥x,
+
+for all x ∈ S1, hence 
+
+E
+
+Z 
+
+> S1
+
+d2(δT ε(x), δ T ε′ (x))d x
+
+
+
+≳α,σ 2 E
+
+Z 
+
+> S1
+
+∥∇ log fε(x) − ∇ log fε′ (x)∥2
+
+> x
+
+dx
+
+
+
+.
+
+49 To further this lower bound, use Lemma 3.2 to get α ≲ fε(x) ≲ β for all x ∈ S1 and all ε, ε ′ ∈ { 0, 1}2p
+
+, hence 
+
+∥∇ log fε − ∇ log fε′ ∥2
+
+> L2(S1)
+
+= fε∇fε′ − fε′ ∇fε
+
+fεfε′
+
+> 2
+> L2(S1)
+
+≳β ∥fε∇fε′ − fε′ ∇fε∥2
+
+> L2(S1)
+
+= fε ∇fε + γ
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )∇ζp,z 
+
+!
+
+− fε + γ
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )ζp,z 
+
+!
+
+∇fε
+
+> 2
+> L2(S1)
+
+= γ2 fε
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )∇ζp,z −
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )ζp,z 
+
+!
+
+∇fε
+
+> 2
+> L2(S1)
+
+≥ γ2
+
+ fε
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )∇ζp,z 
+
+> L2(S1)
+
+−
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )ζp,z 
+
+!
+
+∇fε
+
+> L2(S1)
+
+
+
+> 2
+
+.
+
+Now bound both of the terms on the right side as follows. For the first term, use fε(x) ≳ α then (68) to obtain 
+
+fε
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )∇ζp,z 
+
+> L2(S1)
+
+≳α
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )∇ζp,z 
+
+> L2(S1)
+
+≍ 2−2p
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )2.
+
+For the second term, use Lemma 3.3 and (67) to get 
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )ζp,z 
+
+!
+
+∇fε
+
+> 2
+> L2(S1)
+
+≤
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )ζp,z 
+
+> 2
+> L2(S1)
+
+∥∇ fε∥2
+
+> L∞(S1)
+
+≲σ2
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )ζp,z 
+
+> 2
+> L2(S1)
+
+∥gε∥2
+
+> L∞(S1)
+
+≍β 2−4p
+
+> 2p−1
+
+X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )2.
+
+Now combine these displays and note that p → ∞ , so the dominant term between 2 −2p and 2 −4p is the slower one, i.e., 2 −2p. Thus, 
+
+∥∇ log fε − ∇ log fε′ ∥2 
+
+> L2(S1)
+
+≳σ2,α,β γ22p−1X
+
+> z=0
+
+(ε′ 
+
+> z
+
+− εz )2  2−2p − 2−4p2 ≳ γ22−2pdH(ε, ε ′)for all ε, ε ′ ∈ { 0, 1}2p
+
+, which is exactly (70). To put the pieces together, we use Assouad’s lemma (e.g., [68, Theorem 31.2]) and Pinsker’s inequality. Using the bounds in (69) and (70) and the specification γ ≍ L2−p(s+ 12 ) and 2 p ≍ n1/(2 s+5) , we obtain inf 
+
+> ˆδ
+
+sup 
+
+> g∈G s(α,β,L )
+
+E
+
+Z 
+
+> S1
+
+d2(ˆδ(x), δ T (x))d x
+
+
+
+≳σ2,α,β γ22−2p · 2p
+
+
+
+1 − max 
+
+> dH(ε,ε ′)=1
+
+pDKL (Pε|Pε′ )
+
+
+
+≍L n− 2s+1 2s+5 2−p 
+
+1 − n1/2γ2−2p
+
+≍ n− 2s+2 2s+5 .
+
+50 Finally, use Lemma 3.2 to get f (x) ≳ α for all x ∈ S1 and all g ∈ G s(α, β, L ), hence inf 
+
+> ˆδ
+
+sup 
+
+> g∈G s(α,β,L )
+
+E
+
+Z 
+
+> S1
+
+d2(ˆδ(x), δ T (x)) f (x)d x
+
+
+
+≳α inf 
+
+> ˆδ
+
+sup 
+
+> g∈G s(α,β,L )
+
+E
+
+Z 
+
+> S1
+
+d2(ˆδ(x), δ T (x))d x
+
+
+
+≳σ2,α,β,L n− 2s+2 2s+5 .
+
+This finishes the proof. 
+
+Proof of Lemma 3.18. Recall [30, Lemma 2.3] that for each ε > 0 there exists a constant Cε > 0 such that we have d2(x, z ) ≤ (1 + ε)d2(x, y ) + Cεd2(y, z ) for all x, y, z ∈ M . Thus, for each x, θ ∈ M we have 
+
+d2 (δ(x), θ ) ≤ (1 + ε)d2(δT (x), θ ) + Cεd2 (δ(x), δ T (x)) .
+
+Now integrate this over the joint distribution of (Θ , X ) to get the result. 
+
+Appendix B: Implementation Details 
+
+In this section, we describe the details of implementing our denoising procedures. Specifically, in Subsec-tion B.1 we discuss approximately computing the oracle denoisers δB and δT , in Subsection B.2 we discuss computing the empirical tangential Bayes denoiser ˆδT , and in Subsection B.3 we discuss the hyperparameter selection via the Riemannian score-matching objective. 
+
+B.1. Approximating the Oracle Denoisers 
+
+In the simulations of the main body, both oracle denoisers δB and δT are approximated by utilizing additional oracle samples from G. In this subsection we explain this approximation and its computation in more detail. 
+
+B.1.1. Oracle Bayes Denoiser 
+
+First, we consider computing the oracle Bayes denoiser δB(x) for fixed x ∈ M , defined implicitly via the optimization problem in (22). To approximate it, we sample i.i.d pairs (Θ 1, X 1), . . . , (Θ n, X n) from the model (1), and we estimate the conditional Fr´ echet mean of Θ given {X = x} via Fr´ echet Nadaraya-Watson regression; that is, we use Geomstats to compute the Fr´ echet mean of the probability distribution 
+
+> n
+
+X
+
+> i=1
+
+wi(x)δΘi
+
+where 
+
+wi(x) = exp 
+
+
+
+− d2(Xi, x )2h2
+
+
+
+, (72) for some bandwidth parameter h > 0 selected by cross-validation. 
+
+B.1.2. Oracle Tangential Bayes Denoiser 
+
+Second, we consider computing the oracle tangential Bayes denoiser δT (x) for fixed x ∈ M , defined in (23). Since Lemma 3.1 allows us to write 
+
+δT (x) = Exp x
+
+
+
+σ2 ∇f (x)
+
+f (x)
+
+
+
+,
+
+51 it follows that a straightforward approximation of δT (x) is given as follows; sample i.i.d random variables Θ1, . . . , Θn from G, and then compute Exp x
+
+ 1
+
+> n
+
+Pni=1 Log x(Θ i)pΘi,σ 2 (x)
+
+> 1
+> n
+
+Pni=1 pΘi,σ 2 (x)
+
+
+
+.
+
+If M is homogeneous, then the normalizing constants above all cancel and we can simply compute Exp x
+
+
+
+> 1
+> n
+
+Pni=1 Log x(Θ i) exp 
+
+
+
+− d2(Θ i,x )2σ2
+
+
+
+> 1
+> n
+
+Pni=1 exp 
+
+
+
+− d2(Θ i,x )2σ2
+
+
+
+In order to reduce the variance of this approximation in practice (recall that all our applications in practice are homogeneous), we fix a fine grid S ⊆ M and we compute Exp x
+
+ P  
+
+> θ∈S
+
+Log x(θ)w(θ)
+
+P 
+
+> θ∈S
+
+w(θ)
+
+
+
+where 
+
+w(θ) := 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+exp 
+
+
+
+− d2(θ, x )2σ2
+
+
+
+.
+
+B.2. Computing Empirical Tangential Bayes Denoiser 
+
+Even computing the empirical tangential Bayes denoiser ˆδT , as in the simulations and applications in the main body, requires some work. The complication is that the expression (28) for ˆδT involves gradients of ˆfn
+
+which by (27) involve gradients of the eigenfunctions {ϕj }∞ 
+
+> j=0
+
+of the Laplace-Beltrami operator ∆. While there is no closed-form expression for such gradients in general, they can be computed by embedding M into 
+
+Rk for some k and then applying the well-known result (see [7, Chapter 3]) that the Riemannian gradient of a function h : M → R at x ∈ M ⊆ Rk is just the projection of the ambient (Euclidean) gradient ∇h(x) ∈ Rk
+
+onto the (affine) tangent space x + Tan x(M) ⊆ Rk.In the case of the circle M = S1, we may directly differentiate the Dirichlet kernel (29), which is equivalent to embedding S1 ⊆ C as the unit circle. In the case of the sphere M = S2, we embed S2 ⊆ R3 via S2 = {x ∈ R3 : ∥x∥ = 1 }. Then use the summation formula to get that suitable sums of eigenfunctions are equal to suitable Legendre polynomials; we then differentiate these polynomials and multiply the result by the matrix I3 − xx ⊤ which corresponds to the projection onto Tan x(S2). 
+
+B.3. Hyperparameter Selection 
+
+In the applications of Section 5 where we do not have oracle information to guide our choices of ℓn and 
+
+ρ, we instead selected these hyperparameters with the data-driven method of cross-validation, where the objective is an adaptation of Hyv¨ arinen’s score matching objective [42] to the Riemannian setting [19]. In this subsection we explain this in further detail. 
+
+B.3.1. Derivation of Riemannian Score Matching 
+
+First, we explain how to derive the objective ˆJ from (30). Note that our empirical tangential Bayes denoiser directly involves the vector field ∇ log f (x) on M, where f : M → R is the marginal density of X, hence a natural loss function for a candidate density ˜f : M → R is 
+
+L( ˜f ) = E∥∇ log ˜f (X) − ∇ log f (X)∥2
+
+> X
+
+. (73) 52 Of course, this cannot be computed in practice since it involves the unknown f . Nonetheless, we can expand the square and then use integration by parts to get 
+
+L( ˜f ) = E∥∇ log ˜f (X)∥2
+
+> X
+
+ − 2 E⟨∇ log ˜f (X), ∇ log f (X)⟩X
+
+ + E∥∇ log f (X)∥2
+
+> X
+
+
+
+= E∥∇ log ˜f (X)∥2
+
+> X
+
+ + 2 E∆ log ˜f (X) + E∥∇ log f (X)∥2
+
+> X
+
+.
+
+Notice that the last term does not depend on ˜f , hence optimizing L is equivalent to optimizing J .Next note that J ( ˜f ) still depends on f , but only implicitly through the integral over the marginal distri-bution of X. By estimating this integral via the natural Monte Carlo estimate built from the measurements 
+
+X1, . . . , X n, we are led to consider ˆJ ( ˜f ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+
+
+∥∇ log ˜f (Xi)∥2 
+
+> Xi
+
++ 2∆ log ˜f (Xi)
+
+
+
+,
+
+which is an unbiased estimator of J ( ˜f ) for each fixed ˜f . This is precisely the objective we defined in (30) in the main body. 
+
+B.3.2. Computing Riemannian Score Matching Objective 
+
+For general ˜f : M → R we cannot easily compute ˆJ ( ˜f ), but it turns out that the specific form (27) of our candidate densities ˆfn allows us to do this computation exactly. First, we re-write the objective in terms of ˜f instead of log ˜f :ˆJ ( ˜f ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+
+
+∥∇ log ˜f (Xi)∥2 
+
+> Xi
+
++ 2∆ log ˜f (Xi)
+
+
+
+= 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+∥∇ ˜f (Xi)∥2
+
+> Xi
+
+˜f (Xi) + 2∆ ˜f (Xi)˜f (Xi)
+
+!
+
+,
+
+As such, we need to evaluate derivatives of ˜f of order up to 2. Now consider ˜f = ˆfn. We know that computing ˆfn only requires computing sums of eigenfunctions of ∆, and we showed in Subsection B.2 that in concrete cases of interest one can also exactly compute gradients of sums of eigenfunctions of ∆. In order to compute the second derivative, we simply note that ∆ acts diagonally on the span of {ϕj }∞
+
+> j=0
+
+, i.e., we have ∆xK(x, y, ℓ ) = X
+
+> j≤ℓ
+
+λj ϕj (x)ϕj (y),
+
+hence ∆ ˆf (x) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+X
+
+> j≤ℓ
+
+λj ϕj (x)ϕj (Xi).
+
+B.3.3. Cross-Validation 
+
+We perform K-fold cross-validation of the Riemannian score-matching objective in the usual way, namely by splitting the data into K folds and for each fold computing the density estimate on the resulting training set and evaluating the score-matching objective ˆJ ( ˆfn) on the complementary test set. In the applications of Section 5 we chose K = 5. We also include a penalty in our cross-validation procedure, in order to prevent over-fitting. We follow the usual Akaike information criterion (AIC) where we penalize proportional to the effective dimension of the model, which in our setting corresponds to the number of eigenfunctions of the Laplace-Beltrami operator. More precisely, we minimize ˆJ ( ˆfn) + 2ℓn
+
+which encourages more parsimonious models. Lastly, we comment on the hyperparameter ranges over which we search. For ℓ, we set its upper bound for ℓ to be equal to the conservative oracle choice from Theorem 3.17. For ρ, we parameterize it in terms of a percentile of the positive values taken by the density ˆfn, and we set its upper bound as the 10 percentile. 53 Appendix C: Additional Figures 
+
+In this section we include some further figures that were omitted from the main body for the sake of brevity. 
+
+C.1. Visualizations from Subsection 4.2 
+
+First, we provide visualizations of the denoising procedure for the examples of Subsection 4.2 on the sphere 
+
+M = S2; more precisely we show versions of Figure 1 (i.e., the latent variables, their measurements, the oracle and empirical denoisers, and the estimated score field.) when the latent variable distribution G is taken to be uniform, supported on a cap, or supported on the equator. In Figure 7 we show the uniform example. As discussed in Example 3.5, the oracle denoisers δN , δ B, and 
+
+δT are all equal, and the score field ∇ log ˆfn is approximately identically zero. In this particular simulation (and some of the simulations below) we see that our approximation of δB achieves a worse risk than all of 
+
+δN , δ T , and ˆδT , which is because its numerical optimization is more difficult and can lead to sub-optimal denoising in practice. i    
+
+> risk : 0.298
+> B(Xi)
+> risk : 0.291
+> (Xi)
+> risk : 0.291
+> Xilog fn
+> risk : 0.291
+> (Xi)
+> Fig 7 .Illustration of the ‘uniform’ example in the sphere S2.
+
+In Figure 8 we show the cap example. We observe that the estimated score field ∇ log ˆfn is strongest near the boundary of the support of G, and that it is approximately identically zero away from the boundary; this is what allows ˆδT to exhibit a sharp boundary in the denoised data set. In Figure 9 we show the equator example. Since the support S ⊆ S2 of G is geodesically convex, we see that δB(Xi) is contained in S almost surely, meaning δB exactly matches this latent one-dimensional sub-manifold structure. The denoisers δT and ˆδT approximately recover this structure, and have comparable risk. In Figure 10 we show the 10-mode example. Note that the measurements appear to be nearly uniformly-distributed on the sphere, but the denoisers recover the latent structure. Also observe that δB(Xi) is con-centrated on the union of the components of G and the geodesics between them; this is reflected in δT and ˆδT as well. 
+
+C.2. Stratified Ramachandran Plots from Subsection 5.2 
+
+Second, we provide versions of Figure 6 where each enzyme is plotted separately. We emphasize that the denoising still utilizes the full pooled data set; but, viewing the denoised data in a stratified way allows one to understand the effect of shrinkage on each individual enzyme. 54 i
+
+> risk : 0.267
+> B
+
+(Xi)
+
+> risk : 0.263
+
+(Xi)
+
+> risk : 0.287
+
+Xi log fn
+
+> risk : 0.267
+
+(Xi)Fig 8 . Illustration of the ‘cap’ example in the sphere S2.i
+
+> risk : 0.163
+> B
+
+(Xi)
+
+> risk : 0.172
+
+(Xi)
+
+> risk : 0.287
+
+Xi log fn
+
+> risk : 0.184
+
+(Xi)
+
+Fig 9 . Illustration of the ‘equator’ example in the sphere S2.i
+
+> risk : 0.258
+> B
+
+(Xi)
+
+> risk : 0.252
+
+(Xi)
+
+> risk : 0.288
+
+Xi log fn
+
+> risk : 0.258
+
+(Xi)
+
+Fig 10 . Illustration of the ‘10-modal’ example in the sphere S2.
+
+55 /2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+Hexokinase 
+
+(1HKG) 
+
+Xi
+
+/2 0 /2 
+
+Hexokinase 
+
+(1HKG) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+PGI 
+
+(1IRI) 
+
+Xi
+
+/2 0 /2 
+
+PGI 
+
+(1IRI) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+PFK 
+
+(1PFK) 
+
+Xi
+
+/2 0 /2 
+
+PFK 
+
+(1PFK) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+Aldolase 
+
+(1ADO) 
+
+Xi
+
+/2 0 /2 
+
+Aldolase 
+
+(1ADO) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+TIM 
+
+(2YPI) 
+
+Xi
+
+/2 0 /2 
+
+TIM 
+
+(2YPI) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+GAPDH 
+
+(1GD1) 
+
+Xi
+
+/2 0 /2 
+
+GAPDH 
+
+(1GD1) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+PGK 
+
+(3PGK) 
+
+Xi
+
+/2 0 /2 
+
+PGK 
+
+(3PGK) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+PGM 
+
+(1E58) 
+
+Xi
+
+/2 0 /2 
+
+PGM 
+
+(1E58) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+Enolase 
+
+(1ENO) 
+
+Xi
+
+/2 0 /2 
+
+Enolase 
+
+(1ENO) 
+
+(Xi)
+
+/2 0 /2 
+
+/2 
+
+0
+
+/2 
+
+Pyruvate K. 
+
+(1A3W) 
+
+Xi
+
+/2 0 /2 
+
+Pyruvate K. 
+
+(1A3W) 
+
+(Xi)Fig 11 . Visualizing the denoised Ramachandran plots for the ten glycolytic enzymes of Subsection 5.2. For each enzyme 
+
+1 ≤ j ≤ 10 , we show the measurements X1, . . . , X nj (first column, third column) and the denoised data set ˆδT (X1), . . . , ˆδT (Xnj )
+
+(second column, fourth column). 
+
+56

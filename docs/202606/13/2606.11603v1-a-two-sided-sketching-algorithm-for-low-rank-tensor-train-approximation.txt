@@ -1,0 +1,1467 @@
+Title: A Two-Sided Sketching Algorithm for Low-rank Tensor Train Approximation
+
+URL Source: https://arxiv.org/pdf/2606.11603v1
+
+Published Time: Thu, 11 Jun 2026 00:27:36 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+A TWO-SIDED SKETCHING ALGORITHM FOR LOW-RANK TENSOR-TRAIN APPROXIMATION ∗
+
+GAOHANG YU † , YIHAO PAN ‡ , AILUN JIAN § , AND XIAOHAO CAI ¶
+
+Abstract. Tensor train (TT) decomposition is a powerful method to acquire low-rank tensors. However, the computational process is frequently obstructed by the large-scale matrix singular value decomposition (SVD). The sketching algorithm serves as an efficient data compression technique that can quickly derive low-rank matrix approximations. In this paper, we propose a randomized algorithm to obtain the TT approximation of tensors using a one-pass sketching algorithm and subspace iteration, and offer thorough error-bound and robustness analysis. Numerical experiments on synthetic and real-world datasets demonstrate the effectiveness and efficiency of the proposed algorithm. 
+
+Key words. Tensor train, subspace iteration, double sketch, singular value decomposition, robustness analysis 
+
+MSC codes. 68Q25, 68R10, 68U05 
+
+1. Introduction. In real-world scenarios, large high-dimensional datasets can often be naturally expressed as tensors, frequently showing a low-rank structure that can be described with significantly fewer parameters. As a result, low-rank tensor approximations have been widely used in various areas, including machine learning, graph analysis, and signal processing, among others [21][9][14]. Traditional tensor decomposition techniques encompass canonical (CP) decomposition [8], Tucker de-composition [11], tensor singular value decomposition (t-SVD)[20], tensor train (TT) decomposition [25], tensor ring (TR) decomposition [36], and others. CP decompo-sition can effectively break down a tensor into the sum of multiple rank-1 tensors. However, determining the exact CP rank is challenging. Although Tucker decomposi-tion provides enhanced stability over CP decomposition, it is plagued by the curse of dimensionality. In contrast, TT decomposition overcomes the curse of dimensionality and is more dependable. This paper primarily focuses on TT decomposition, which is gaining popularity due to its robustness and efficiency. TT decomposition involves breaking down large-scale tensors into several third-order tensors. One straightforward method is TT-SVD [25], which utilizes auxiliary unfolding matrices for SVD. Nonetheless, conducting SVD on large-scale matrices is highly time-intensive. There are various methods to make the computation both efficient and accurate. One particular category is randomized methods [34, 3, 30, 23], which have shown outstanding efficiency and reliability with large-scale data. Halko et al. [16] introduced a randomized SVD (R-SVD) technique that effectively computes low-rank approximations of large-scale matrices. When the original data is so vast that it can only be read once by the core memory, so one-pass algorithms become essential. Tropp et al. [29] proposed a one-pass sketching algorithm for streaming data, which can create low-rank approximations of input matrices from random linear sketches of 
+
+> ∗
+
+Submitted to the editors DATE. 
+
+Funding: This work was funded by the 
+
+> †
+
+School of Science, Zhejiang University of Science and Technology, Hangzhou, China. (maghyu@163.com). 
+
+> ‡
+
+School of Science, Hangzhou Dianzi University, Hangzhou, China. (294002507@qq.com) 
+
+> §
+
+School of Science, Hangzhou Dianzi University, Hangzhou, China. (allenjian805@163.com) 
+
+> ¶
+
+School of Electronics and Computer Science, University of Southampton, Southampton, UK. (x.cai@soton.ac.uk). 1
+
+> arXiv:2606.11603v1 [math.NA] 10 Jun 2026
+
+2 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+the matrix and also provide error bounds. In recent years, many scholars have extended matrix random methods to tensors, yielding promising results [27, 24, 7, 5, 10]. Based on R-SVD, Huber et al. [19] proposed a randomized TT decomposition that is dramatically faster than TT-SVD. Che et al. [4] provided an adaptive random algorithm to compute a low multilinear rank approximation of tensors with unknown multilinear rank. Shi et al. [26] proposed parallelizable algorithms to compute the decomposition of the TT with theoretical guarantees of precision. Ma et al. [22] recovered a low-rank matrix and low-tubal-rank tensor from a noisy sketch with rigorous theoretical guarantees. Power iteration can improve the accuracy of approximations by reducing tail en-ergy, making it more accurate than simple random projection algorithms. Vogel et al. [32] introduced the subspace iteration method and considered the efficient iterative computation of partial SVDs. Gu [15] presented a novel error analysis considering randomized algorithms within the subspace iteration framework. Yu et al. [33] pro-posed a randomized algorithm for low-rank TT approximation based on randomized block Krylov subspace iteration. Dong et al. [12] combined subspace power iteration with two-sided sketching algorithms and applied it to compute the Tucker approxi-mation of tensors. Zhang et al. [35] proposed a method that extended a well-known randomized matrix SVD method to the t-SVD, and presented an improved analysis of the randomized simultaneous iteration for matrices. In this paper, we propose a randomized algorithm named TT-subSKETCH for TT approximations of tensors. This algorithm utilizes two-sided sketching for low-rank matrix approximation to enhance its efficiency. By integrating the sketching method with the power iteration approach, we can obtain higher quality TT approximations and deliver thorough error analysis. Additionally, we address low-rank approxima-tions in noisy conditions and expand upon the findings of [22] in the context of TT decomposition. The rest of this paper is organized as follows. We recall some background and related methods on TT decomposition in Section 2. In Section 3, we extend the error bounds of the subspace power iteration with two-sided sketching to the ℓ2-norm and provide our proposed algorithm TT-subSKETCH with error analysis; moreover, we also provide error bounds for noisy sketch of tensor. Thorough numerical experiments on synthetic and real-world data tensor are given in Section 4, verifying the effective-ness and robustness of the proposed algorithm. Finally, we conclude in Section 5. 
+
+2. Background. 2.1. Notations and basic operations. In this paper, matrices are denoted by capital letters like A, tensors by Euler script letters like A, and R represents the real number space. For a d-th order tensor A ∈ Rn1×n2×···× nd , its ( i1, i 2, · · · , i d)-th element is represented by A(i1, i 2, · · · , i d). For matrix A with orthogonal columns, the notation A⊥ represents the orthogonal complement of A, which means that the column vectors of A and A⊥ form a complete orthogonal basis. Define the Frobenius norm of A as (2.1) ∥A∥ F := p⟨A , A⟩ =
+
+q
+
+Σi1,i 2,··· ,i d A(i1, i 2, · · · , i d)2.
+
+The mode-α product of tensor A ∈ Rn1×n2×···× nd by matrix B ∈ RM ×nα is designated as A × α B = C ∈ Rn1×···× nα−1×M ×nα+1 ×···× nd , with entries (2.2) C(i1, · · · , i α−1, m, i α+1 , · · · , i d) = 
+
+> nα
+
+X 
+
+> ij=1
+
+A(i1, · · · , i α−1, i j , i α+1 , · · · , i d)B(m, i j ).LOW-RANK TENSOR-TRAIN APPROXIMATION 3The tensor-tensor product of two tensors A ∈ Rn1×···× nd and B ∈ Rm1×···× me with equal the size of the α-mode of the tensors nα = mβ produces a ( d + e − 2)-th order tensor C, i.e., (2.3) C = A × βα B.
+
+where C ∈ Rn1×···× nα−1×nα+1 ×···× nd×m1×···× mβ−1×mβ+1 ×···× me .
+
+Symbol Description 
+
+R real number space 
+
+p oversampling parameter 
+
+q the number of power iterations 
+
+A matrix 
+
+A tensor 
+
+σi(A) the ( i)th singular value of AAT the transpose of AA† the pseudoinverse of A
+
+ˆA the approximation tensor of AA⊥ the orthogonal complement of A
+
+∥ · ∥ 2 Spectral norm 
+
+∥ · ∥ F Frobenius norm 
+
+> Table 1
+> Symbol description
+
+Definition 1. (Mode-(1 , 2, · · · , k ) regular matricization [21]). The mode-(1 , 2, · · · , k ) regular matricization of a tensor A is denoted by A[k] ∈
+
+RQkn=1 In×QNn=k+1 In . It can be implemented by calling the reshape function in Matlab: 
+
+A[k] = reshape (A,
+
+> k
+
+Y
+
+> n=1
+
+In,
+
+> N
+
+Y
+
+> n=k+1
+
+In),
+
+where the inverse operator of reshape is denoted by “unreshape”, i.e., A = unreshape (A[k]).
+
+Definition 2. (Tensor train format [25]). Let A ∈ Rn1×n2×···× nd be a tensor of order d. A factorization 
+
+(2.4) A = G1 ×13 G2 ×13 · · · × 13 Gd
+
+of A, into core tensors Gi ∈ Rri−1×ni×ri (r0 = rd = 1) , is called a TT decomposition of A. The array of the dimensions r = ( r1, · · · , r d−1) is the TT-rank of A defined as 
+
+(2.5) rank TT (A) = ( r1, r 2, . . . , r d−1) =  rank (A[1] ), rank (A[2] ), . . . , rank (A[d−1] ) .
+
+Definition 3. (Tail Energy [18]). The j-th tail energy of matrix A is defined as 
+
+(2.6) τ 2 
+
+> j
+
+(A) = min 
+
+> rank( B)<j
+
+∥A − B∥2 
+
+> F
+
+= X
+
+> i≥j
+
+σ2 
+
+> i
+
+(A),
+
+where σi(A) is the i-th singular value of A.4 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+2.2. TT-SVD. The TT low-rank approximation model for solving the tensor A
+
+can be expressed as[6] (2.7) min  
+
+> G1,G2,··· ,Gd
+
+∥A − G 1 ×13 G2 ×13 · · · × 13 Gd∥F ,
+
+where Gi ∈ Rri−1×ni×ri (r0 = rd = 1 , i ∈ [1 , d ]) for i = 1 , 2, · · · , d − 1, the TT core Gi
+
+satisfy 
+
+G⊤ 
+
+> i
+
+Gi = Iri , G i = reshape (Gi, [ri−1ni, r i]) .
+
+Assume T1, T2, · · · , Td form a solution of (2.7). Let Ti = reshape (Ti, [ri−1ni, r i]) (i = 1 , 2, · · · , d − 1). Define 
+
+
+
+A0 = A,
+
+A1 = T1 ×11 A0 ∈ Rr1×n2×···× nd ,
+
+Ai = Ti ×1,21,2 Ai−1 ∈ Rri×ni+1 ×···× nd , i = 2 , 3, · · · , d − 1,A(i) = reshape (Ai, [ri−1ni, n i+1 · · · nd]) , i = 1 , 2, · · · , d − 1.
+
+We have (2.8) ∥A − T 1 ×13 T2 ×13 · · · × 13 Td∥F ≤
+
+> d−1
+
+X
+
+> i=1
+
+A(i) − TiT ⊤ 
+
+> i
+
+A(i)
+
+> F
+
+.
+
+An approximate solution can be obtained by solving the following d-1 subproblem for 
+
+i = 1 , 2, · · · , d − 1, when ri ≤ min {ri−1ni, n i+1 , · · · , n d}(r0 = 1), the goal is to find an orthogonal matrix Ti ∈ Rri−1ni×ri that satisfies (2.9) Ti = arg min 
+
+> Qi
+
+A(i) − QiQ⊤ 
+
+> i
+
+A(i)
+
+> F
+
+,
+
+where Qi ∈ Rri−1ni×ri is orthogonal. TT-SVD [25] stands as a classical algorithm for TT decomposition. Its essence lies in the intuition that at each step, an SVD of the auxiliary unfolding matrix is executed. The detailed TT-SVD algorithm is provided in Algorithm 2.1. The numel 
+
+function in MATLAB returns the total number of elements in an array, while the 
+
+reshape function changes the size of an array without changing the data itself. 
+
+Algorithm 2.1 TT-SVD [25] 
+
+Input: Tensor A ∈ Rn1×n2×···× nd , and prescribed accuracy ε
+
+Output: Cores G1, · · · , Gd of the TT-approximation B to A in the TT-format satis-fying ∥A − B∥ F ≤ ε∥A∥ F 
+
+> 1:
+
+Compute truncation parameter δ = ε√d−1 ∥A∥ F 
+
+> 2:
+
+C = A, r 0 = 1  
+
+> 3:
+
+for k = 1 to d − 1 do  
+
+> 4:
+
+C := reshape (C, [rk−1nk, numel (A) 
+
+> rk−1nk
+
+])  
+
+> 5:
+
+Compute δ-truncated SVD: C = U SV + E, ∥E∥F ≤ δ, r k = rank δ (C) 
+
+> 6:
+
+New core: Gk = reshape (U, [rk−1, n k, r k])  
+
+> 7:
+
+C = SV ⊤ 
+
+> 8:
+
+end for  
+
+> 9:
+
+Gd = C 
+
+> 10:
+
+return G1, G2, · · · , Gd
+
+The computational complexity of the TT-SVD is controlled by the ( d − 1) ma-trix SVDs. Let n := max( n1, · · · , n d), r := max( r1, · · · , r d), and the cost scales be LOW-RANK TENSOR-TRAIN APPROXIMATION 5
+
+O(nd+1 +Pd−2 
+
+> i=1
+
+nd+1 −i). Due to the structural nature of tensor data universally being disrupted after the initial SVD, sparse or structured tensors do not lead to significant computational efficiency improvements. The following theorem shows the error bound for TT-SVD. 
+
+Theorem 2.1. ([25], Theorem 2.2). Suppose that the k-matricization A[k] of ten-sor A satisfies 
+
+(2.10) A[k] = Rk + Ek, rank( Rk) = rk, ∥Ek∥F = εk, k = 1 , · · · , d − 1.
+
+TT-SVD computes a tensor B in the TT-format with TT-rank r = ( r1, · · · , r d − 1) 
+
+and 
+
+(2.11) ∥A − B∥ F ≤
+
+vuutd−1X
+
+> k=1
+
+ε2 
+
+> k
+
+.
+
+2.3. Randomized TT-SVD. When dealing with large-scale data, the compu-tational cost of deterministic SVD is excessively expensive, rendering classical TT-SVD algorithms time-consuming. Randomized low-rank matrix approximation algo-rithms can approximate large-scale matrices with low-rank matrices while preserving most of the original information. This approach can significantly reduce the process-ing time of large-scale matrices and enhance computational efficiency. Halko et al. [16] proposed R-SVD for matrices, with arithmetic cost O(rmn + r2(m + n)). The procedures of R-SVD are summarized in Algorithm 2.2. 
+
+Algorithm 2.2 R-SVD 
+
+Input: Matrix A ∈ Rm×n, target rank r, and the oversampling parameter p > 0
+
+Output: Low-rank approximation matrix ˆA = ˆU ˆS ˆV ⊤ of A 
+
+> 1:
+
+Create random Gaussian matrices Ω ∈ Rn×(r+p) 
+
+> 2:
+
+Calculate Y = AΩ 
+
+> 3:
+
+[Q, ∽] = qr (Y, 0)  
+
+> 4:
+
+B = Q⊤A 
+
+> 5:
+
+(U, S, V ⊤) = svd (B) 
+
+> 6:
+
+ˆU = QU (: , 1 : r), ˆS = S(1 : r, 1 : r), ˆV = V (: , 1 : r) 
+
+> 7:
+
+return ˆA = ˆU ˆS ˆV ⊤
+
+For a rank-k matrix A ∈ Rm×n, its thin-QR decomposition is defined as [Q, R] = qr (A),
+
+where Q ∈ Rm×k and R ∈ Rk×n. The matrix Q is column-orthogonal and constitutes an orthonormal basis for the column space of A.Huber et al. [19] applied the R-SVD algorithm directly to the TT-SVD algorithm, introducing a randomized version of TT-SVD, i.e., TT-rSVD, see Algorithm 2.3. The main idea is to enhance computational efficiency by utilizing low-rank approximations of auxiliary unfolding matrices, with arithmetic cost O(r2 Pd−1 
+
+> i=1
+
+nd−i+1 ). The error bound is demonstrated in Theorem 2.2 below. 
+
+Theorem 2.2. ([19], Theorem 2). Given A ∈ Rn1×n2×···× nd and s = r + p with 
+
+p ≥ 4. For every u, t ≥ 1, the error of the TT-rSVD satisfies 
+
+(2.12) ∥A − G 1 ×13 G2 ×13 · · · × 13 Gd∥2 ≤ √d − 1η(r, p ) min  
+
+> rank TT (B)≤(r1,··· ,r d−1)
+
+∥A − B∥ 2,6 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+with probability at least (1 − 5t−p − 2e−u2/2)d−1. The parameter η is given as 
+
+(2.13) η = 1 + t
+
+r 12 rp + ut e√r + pp + 1 .
+
+Algorithm 2.3 TT-rSVD 
+
+Input: Tensor A ∈ Rn1×n2×···× nd , target rank r = ( r1, · · · , r d−1), oversampling pa-rameter p > 0, and r0 = 1 
+
+Output: Cores G1, · · · , Gd 
+
+> 1:
+
+A := reshape (A, [r0n1, numel (A) 
+
+> r0n1
+
+])  
+
+> 2:
+
+for k = 1 to d − 1 do  
+
+> 3:
+
+Create random Gaussian matrix Ω ∈ R(nk+1 ··· nd)×(rk +p) 
+
+> 4:
+
+Calculate Y = AΩ 
+
+> 5:
+
+[Q, ∽] = qr (Y, 0)  
+
+> 6:
+
+Q = Q(: , 1 : rk) 
+
+> 7:
+
+New core Gk = reshape (Q, [rk−1, n k, r k])  
+
+> 8:
+
+Update A = A × 1 Q⊤ 
+
+> 9:
+
+end for  
+
+> 10:
+
+Gd =reshape( A, [rd−1, n d, r d])  
+
+> 11:
+
+return G1, G2, · · · , Gd
+
+3. A two-sided sketching algorithm for TT approximation. As depicted in Algorithm 2.2, although R-SVD can effectively obtain low-rank approximations of matrices, it requires us to revisit the original data matrix. Assuming A represents an enormous matrix, too large to be stored solely within the core memory. The expense associated with data transmission might be so substantial that we are constrained to loading the matrix into the core memory only once. Tropp et al. [29] introduced a two-sided sketching algorithm for matrices, which can efficiently obtain low-rank approximations of matrices while reading the original data only once. Randomized algorithms have proven effective in swiftly obtaining low-rank ap-proximations. However, their efficacy diminishes when faced with matrices exhibiting slow singular value decay, yielding suboptimal results. Power iteration can enhance the rate of decay of singular values, thereby reducing the tail energy and improving the accuracy. From [29], it can be inferred that the error of the two-sided sketch-ing algorithm depends on the tail energy of the matrix. Dong et al. [12] proposed an algorithm that combines the subspace power iteration technique with two-sided sketching, i.e., sub-SKETCH, see Algorithm 3.1. When A is dense, the arithmetic cost of Algorithm 3.1 is O(( q + 1)( k + l)mn + kl (m + n)) flops. We first present the following theorem characterizing the error of Algorithm 3.1 in the spectral norm. Rather than a probabilistic bound with a free confidence parameter 
+
+δ, we establish an expected error bound, which yields a cleaner constant that directly reflects the average-case performance of the algorithm. 
+
+Theorem 3.1. (Average spectral error for Algorithm 3.1). For A ∈ Rm×n, as-sume that m > n and the sketch size parameter satisfies l > k + 1 . Draw random test matrices Ω ∈ Rn×k and Ψ ∈ Rl×m independently of the standard normal distribution. LOW-RANK TENSOR-TRAIN APPROXIMATION 7
+
+Algorithm 3.1 sub-SKETCH 
+
+Input: Matrix A ∈ Rm×n, sketch size parameters k, l , oversampling parameter p > 0, and the power iteration q > 0
+
+Output: Rank-k approximation ˆA = QX of A 
+
+> 1:
+
+Create random Gaussian matrices Ω ∈ Rn×(k+p) and Ψ ∈ Rl×m 
+
+> 2:
+
+Y = AΩ, W = Ψ A 
+
+> 3:
+
+[Q0, ∽] = qr (Y, 0)  
+
+> 4:
+
+for j = 1 to q do  
+
+> 5:
+
+ˆYj = A⊤Qj−1 
+
+> 6:
+
+( ˆQj , ∼) = qr ( ˆYj , 0)  
+
+> 7:
+
+Yj = A ˆQj 
+
+> 8:
+
+( ˆQj , ∼) = qr (Yj , 0)  
+
+> 9:
+
+end for  
+
+> 10:
+
+Q = Qq (: , 1 : k) 
+
+> 11:
+
+X = (Ψ Q)\W 
+
+> 12:
+
+return ˆA = QX 
+
+The rank-k approximation ˆA obtained from Algorithm 3.1 satisfies 
+
+E∥A − ˆA∥22 ≤
+
+h
+
+1 + e2l
+
+(l − k)2
+
+ √l + √n − k2ih
+
+1 + 
+
+r kl − k − 1 + e√ll − k
+
+√n − k
+
+i2/(2 q+1) 
+
+σ2
+
+> k+1
+
+(A) .
+
+(3.1) 
+
+Proof. We decompose the approximation error into two distinct components via the triangle inequality, i.e., 
+
+∥A − ˆA∥22 =∥(A − QQ ⊤A) + ( QQ ⊤A − QX )∥22
+
+≤ ∥ A − QQ ⊤A∥22 + ∥X − Q⊤A∥22 .
+
+(3.2) Using Q computed from Algorithm 3.1, construct a matrix P ∈ Rn×(n−k) with or-thonormal columns satisfying (3.3) P P ⊤ = I − QQ ⊤.
+
+Define matrices (3.4) Ψ1 := Ψ P ∈ Rl×(n−k), Ψ2 := Ψ Q ∈ Rl×k.
+
+From Lemma A.2, we have (3.5) X − Q⊤A = Ψ †
+
+> 2
+
+Ψ1(P ⊤A) .
+
+Therefore, 
+
+E∥X − Q⊤A∥22 =E∥Ψ†
+
+> 2
+
+Ψ1(P ⊤A)∥22
+
+≤E∥Ψ†
+
+> 2
+
+∥22 · E∥Ψ1∥22 · E∥P ⊤A∥22 .
+
+(3.6) Since Ψ 1 and Ψ 2 are Gaussian random matrices, by [16] (Proposition A.4), we have (3.7) E∥Ψ†
+
+> 2
+
+∥2 < e√ll − k .8 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+Furthermore, since P and Q have mutually orthogonal column spaces (i.e., P ⊤Q = 0), the Gaussian random matrices Ψ 1 = Ψ P and Ψ 2 = Ψ Q are statistically indepen-dent. Following [31](Theorem 5.32), the expected spectral norm of Ψ 1 ∈ Rl×(n−k) is bounded by (3.8) E∥Ψ1∥2 ≤ √n − k + √l . 
+
+Combining (3.3), (3.6), (3.7) and (3.8), and utilizing the independence of Ψ 1 and Ψ2, it can be shown that 
+
+E∥X − Q⊤A∥22 ≤ e2l
+
+(l − k)2
+
+ √l + √n − k2E∥P ⊤A∥22
+
+≤ e2l
+
+(l − k)2
+
+ √l + √n − k2E∥A − QQ ⊤A∥22
+
+≤ e2l
+
+(l − k)2
+
+ √l + √n − k2
+
+h
+
+1 + 
+
+r kl − k − 1 + e√ll − k · √n − k
+
+i2/(2 q+1) 
+
+σ2
+
+> k+1
+
+(A) .
+
+(3.9) The last inequality holds due to the average spectral error for the power scheme [16] (Corollary 10.10). Combining this result with Eq. (3.2), we complete the proof. 
+
+3.1. Subspace power iteration for TT approximation. By integrating the sub-SKETCH (Algorithm 3.1) with the TT-rSVD (Algorithm 2.3), we propose an effective sketch TT algorithm, referred to as TT-subSKETCH. The detailed procedure of this algorithm is delineated in Algorithm 3.2, accompanied by its error analysis in Theorem 3.2. 
+
+Remark . When q = 0, i.e., without power iteration, our TT-subSKETCH algo-rithm reduces to a one-pass sketching algorithm, which only accesses the original data once and thus avoids excessive data transmission costs. 
+
+Theorem 3.2. Let ˆA be the TT approximation of a tensor A ∈ Rn1×n2×···× nd
+
+by TT-subSKETCH (i.e., Algorithm 3.2) with the target TT-rank r = ( r1, · · · , r d−1),
+
+(r0 = rd = 1) , sketch size l = ( l1, · · · , l d−1), and the power iteration q satisfied 
+
+E∥A − ˆA∥ 22 ≤
+
+> d−1
+
+X
+
+> k=1
+
+h
+
+1 + e2lk
+
+(lk − rk)2
+
+ p lk + pmin( rknk+1 , n k+2 · · · nd) − rk
+
+ih
+
+1 + 
+
+r rk
+
+lk − rk − 1 + e√lk
+
+lk − rk
+
+pmin( rknk+1 , n k+2 · · · nd) − rk
+
+i2/(2 q+1) 
+
+σ2 
+
+> rk+1
+
+(A(k)).
+
+(3.10) 
+
+Proof. Since X(k)(k ∈ [1 , · · · , d − 1]) is naturally associated with A(k+1) , it will continue to decompose further in the Algorithm 3.2, which means that X(k) is ap-proximated by some matrix ˆX(k). Let ˆA(k) = Q(k) ˆX(k) be an approximated matrix LOW-RANK TENSOR-TRAIN APPROXIMATION 9
+
+Algorithm 3.2 TT-subSKETCH 
+
+Input: Tensor A ∈ Rn1×···× nd , target rank r = ( r1, . . . , r d−1), sketch size l = ( l1, . . . , l d−1), 
+
+r0 = 1, oversampling p > 0, power iteration q ≥ 0
+
+Output: Cores G1, . . . , Gd of the TT-approximation 
+
+1: A(1) := reshape (A, [r0n1, numel (A) 
+
+> r0n1
+
+]) 
+
+2: for k = 1 to d − 1 do 
+
+3: Create random Gaussian matrices: 
+
+4: Ω(k) ∈ R(nk+1 ··· nd)×(rk +p)
+
+5: Ψ(k) ∈ Rlk ×(rk−1nk )
+
+6: Y (k) = A(k)Ω(k), W (k) = Ψ (k)A(k)
+
+7: [Q(k)0 , ·] = qr (Y (k), 0) 
+
+8: for j = 1 to q do 
+
+9: ˆY (k) 
+
+> j
+
+= ( A(k))⊤Q(k)
+
+> j−1
+
+10: ( ˆQ(k) 
+
+> j
+
+, ·) = qr ( ˆY (k) 
+
+> j
+
+, 0) 
+
+11: Y (k) 
+
+> j
+
+= A(k) ˆQ(k)
+
+> j
+
+12: (Q(k) 
+
+> j
+
+, ·) = qr (Y (k) 
+
+> j
+
+, 0) 
+
+13: end for 
+
+14: Q(k) = Q(k) 
+
+> q
+
+(: , 1 : rk )
+
+15: X(k) = (Ψ (k)Q(k))\W (k)
+
+16: Gk = reshape (Q(k), [rk−1, n k , r k ]) 
+
+17: A(k+1) = reshape (X(k), [rk nk+1 , numel (X(k))  
+
+> rknk+1
+
+]) 
+
+18: end for 
+
+19: Gd = X(d−1) 
+
+20: return G1, . . . , Gd
+
+of A(k).
+
+E∥A − ˆA∥ 2 =E∥A(1) − ˆA(1) ∥2
+
+=E∥A(1) − Q(1) ˆX(1) ∥2
+
+=E∥A(1) − Q(1) X(1) + Q(1) (X(1) − ˆX(1) )∥2
+
+≤E∥A(1) − Q(1) X(1) ∥2 + E∥Q(1) (X(1) − ˆX(1) )∥2
+
+=E∥A(1) − Q(1) X(1) ∥2 + E∥X(1) − ˆX(1) ∥2 .
+
+(3.11) The last relation holds due to the unitary invariance of the spectral-norm, since 
+
+Q(k), k ∈ [1 , · · · , d − 1], has orthonormal columns. Moreover, ∀k ∈ [1 , · · · , d − 1], there holds 
+
+E∥X(k) − ˆX(k)∥2 =E∥A(k+1) − Q(k+1) ˆX(k+1) ∥2
+
+≤E∥A(k+1) − Q(k+1) X(k+1) ∥2 + E∥X(k+1) − ˆX(k+1) ∥2 .
+
+(3.12) Inserting this iteratively into (3.11) gives 
+
+E∥A − ˆA∥ 2 ≤
+
+> d−1
+
+X
+
+> k=1
+
+E∥A(k) − ˆA(k)∥2 .(3.13) Combining with Theorem 3.1, we complete the proof. Furthermore, the computational cost of TT-subSKETCH is dominated by the two-sided sketching and the q subspace power iterations at the first unfolding step. 10 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+Assuming ni ≈ n and ri ≈ r, the overall arithmetic cost scales as O(( q + 1) r2nd). Compared to the O(nd+1 ) complexity of the deterministic TT-SVD, our algorithm provides a substantial theoretical speedup since ( q + 1) r2 ≪ n strictly holds in typical low-rank scenarios. This theoretically justifies the dramatic reduction in CPU time observed in our numerical experiments. 
+
+3.2. Robustness analysis. In practical applications, we may only have access to data that are corrupted with noise. Unlike the noise-free setting in Theorems 3.1 and 3.2, where the randomness stems solely from the Gaussian sketch matrices Ω(k) and Ψ (k) with known distributional properties, the noise matrices Z(k) and eZ(k)
+
+here are treated as arbitrary deterministic perturbations with unknown distributions. Consequently, an expected error bound is no longer attainable, and the approxima-tion error must instead be controlled in a high-probability sense with respect to the randomness of the sketch matrices alone. In this scenario, Ma et al. [22] conducted a robustness analysis for the recovery of low-rank matrices and low-tubal-rank ten-sors from noisy sketches. We generalize the result from t-product to TT format in Theorem 3.3 below. 
+
+Theorem 3.3. Let A ∈ Rn1×n2×···× nd be an initial tensor. For each k we have 
+
+rk < l k, and consider the sketches in Algorithm 3.2, i.e., 
+
+(3.14) Y (k) = A(k)Ω(k) + Z(k), W (k) = Ψ (k)A(k) + eZ(k),
+
+where Ψ(k) ∈ Rlk ×(rk−1nk ) and Ω(k) ∈ R(nk+1 ··· nd)×rk are independent Gaussian ran-dom matrices, and Z(k) and eZ(k) are noise matrices originated from k sketching. For any δ1, δ 2, δ 3 > 0, with probability at least 1 − δ1 − δ2 − δ3, the TT approximation ˆA
+
+obtained by TT-subSKETCH (i.e., Algorithm 3.2) satisfies 
+
+∥A − ˆA∥ 2 ≤
+
+> d−1
+
+X
+
+> k=1
+
+h rk
+
+p(rk−1nk − rk)∥Z(k)∥2
+
+p2δ1 log(1 /(1 − δ2)) + δ1 − √δ1
+
++ ∥( eZ(k))∥2
+
+√lk − √rk − p2 log(2 /δ 3)
+
+i
+
+.
+
+(3.15) 
+
+Proof. From Theorem 3.2, we know that the TT approximation error originates from the sketching error of the auxiliary unfolding matrices. Therefore, we first con-sider the k − th sketching of the unfolding matrix, i.e., ˆA(k) = Y (k)(Ψ (k)Y (k))\W (k)
+
+= eA(k) + Y (k)(Ψ (k)Y (k))†( eZ(k)) ,
+
+(3.16) where eA(k) := Y (k)(Ψ (k)Y (k))†(Ψ (k)A(k)). Denote the SVD of Y (k) as 
+
+Y (k) = U (k) 
+
+> Y
+
+Σ(k) 
+
+> Y
+
+V (k)
+
+> Y
+> ⊤
+
+,(3.17) where U (k) 
+
+> Y
+
+∈ R(rk−1nk )×rk , Σ(k) 
+
+> Y
+
+∈ Rrk ×rk , and V (k)
+
+> Y
+> ⊤
+
+∈ Rrk ×rk . Since Ψ (k)U (k) 
+
+> Y
+
+has linearly independent columns [22], 
+
+Y (k)(Ψ (k)Y (k))† = UY ΣY V ⊤ 
+
+> Y
+
+(Ψ (k)UY ΣY V ⊤ 
+
+> Y
+
+)†
+
+= U (k) 
+
+> Y
+
+Σ(k) 
+
+> Y
+
+V (k)
+
+> Y
+> ⊤
+
+V (k) 
+
+> Y
+
+Σ(k)
+
+> Y
+> −1
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†
+
+= U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)† .
+
+(3.18) LOW-RANK TENSOR-TRAIN APPROXIMATION 11 Thus, Eq. (3.16) can be simplified to ˆA(k) = eA(k) + U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†( eZ(k)) .(3.19) Our goal is to bound the approximation error, i.e., 
+
+∥ ˆA(k) − A(k)∥2 = ∥ eA(k) − A + U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†( eZ(k))∥2
+
+≤ ∥ eA(k) − A∥2+∥U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†( eZ(k))∥2.
+
+(3.20) For the first term, let P (k) := I − U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†Ψ(k), and then we have 
+
+eA(k) − A = U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†Ψ(k)A(k) − A(k)
+
+= −[I − U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†Ψ(k)]A(k)
+
+= −P (k)A(k) .
+
+(3.21) We also observe that P (k) is a projection, i.e., P (k)2 = P (k), satisfying ker P (k) = U (k) 
+
+> Y
+
+, Im P (k) := S(k).(3.22) From Lemma A.4 in the Appendix, we have 
+
+P (k)A(k) = S(k)(T (k)S(k))−1T (k)A(k),(3.23) where T (k) := U (k) 
+
+> Y
+> ⊤⊥
+
+represents the transpose of the orthogonal complement of U (k) 
+
+> Y
+
+.With the SVD of A(k) being A(k) = U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+V (k)
+
+> A
+> ⊤
+
+, we then can bound 
+
+∥ eA(k) − A∥ = ∥P (k)A(k)∥2
+
+= ∥S(k)(T (k)S(k)
+
+)−1T (k)U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+V (k)
+
+> A
+> ⊤
+
+∥2
+
+≤ ∥ (T (k)S(k))−1∥2∥T (k)U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+V (k)
+
+> A
+> ⊤
+
+∥2 .
+
+(3.24) Since Y (k) = A(k)Ω(k) + Z(k) = U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+V (k)
+
+> A
+> ⊤
+
+Ω(k) + Z(k), we have 
+
+U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+V (k)
+
+> A
+> ⊤
+
+Ω(k) = Y (k) − Z(k).(3.25) where V (k) 
+
+> A
+
+has orthonormal columns and Ω (k) is Gaussian matrix. With probability 1, 
+
+V (k)
+
+> A
+> ⊤
+
+Ω(k) has linearly independent rows [22], i.e., (V (k)
+
+> A
+> ⊤
+
+Ω(k))( V (k)
+
+> A
+> ⊤
+
+Ω(k))† = I . (3.26) Combining (3.25) and (3.26) yields 
+
+U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+= ( Y (k) − Z(k))( V (k)
+
+> A
+> ⊤
+
+Ω(k))†.(3.27) 12 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+Simplify the second term of the right hand side of (3.24), Since T (k) := U (k) 
+
+> Y⊥⊤
+
+and 
+
+Y (k) = U (k) 
+
+> Y
+
+Σ(k) 
+
+> Y
+
+V (k)
+
+> Y
+> ⊤
+
+, we know that T (k)Y (k) = 0. 
+
+∥T (k)U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+V (k)
+
+> A
+> ⊤
+
+∥2 = ∥T (k)U (k) 
+
+> A
+
+Σ(k) 
+
+> A
+
+∥2
+
+= ∥T (k)(Y (k) − Z(k))( V (k)
+
+> A
+> ⊤
+
+Ω(k))†∥2
+
+= ∥T (k)Z(k)(V (k)
+
+> A
+> ⊤
+
+Ω(k))†∥2
+
+≤ ∥ T (k)Z(k)∥2∥(V (k)
+
+> A
+> ⊤
+
+Ω(k))†∥2
+
+= ∥T (k)Z(k)∥2
+
+σmin (V (k)
+
+> A
+> ⊤
+
+Ω(k))= ∥Z(k)∥2
+
+σmin (V (k)
+
+> A
+> ⊤
+
+Ω(k))
+
+.
+
+(3.28) The above first and last equations are derived from the unitary invariance property. Using the fact that ∥(T (k)S(k))−1∥2= 1 /σ min (T (k)S(k)) for the first term of (3.24), we obtain the following bound 
+
+∥ eA(k) − A∥≤ ∥Z(k)∥2
+
+σmin (T (k)S(k))σmin (V (k)
+
+> A
+> ⊤
+
+Ω(k))
+
+.(3.29) We now derive a probabilistic bound from (3.28) using concentration inequalities from random matrix theory. Since S(k) can be seen as the ( rk−1nk) × (rk−1nk − rk)submatrix of a Haar unitary matrix ( S(k), S (k) 
+
+> ⊥
+
+), by unitary invariance property, we have (3.30) M (k) := 
+
+h T (k) 
+
+> U(k)
+> Y
+> ⊤
+
+i
+
+(S(k), S (k) 
+
+> ⊥
+
+),
+
+where M (k) is also a Haar unitary matrix [22], and T (k)S(k) is exactly the upper left (rk−1nk − rk) × (rk−1nk − rk) corner of M (k). Applying Lemma A.5 in the Appendix, we have (3.31) P σmin (T (k)S(k)) ≥√δ1
+
+prk(rk−1nk − rk)
+
+ ≥ 1 − δ1 ,
+
+for ∀δ1 > 0. Since V (k)
+
+> A
+> ⊤
+
+Σ(k) is distributed as an rk × rk Gaussian random matrix, by Lemma A.6 in the Appendix, for any 0 < δ 2 < 1, (3.32) P σmin (V (k)
+
+> A
+> ⊤
+
+Σ(k)) ≥
+
+p2 log(1 /(1 − δ2)) + 1 − 1
+
+√rk
+
+ = 1 − δ2 .
+
+Combining the two probability estimates, with probability at least 1 − δ1 − δ2,
+
+∥ eA(k) − A∥≤ rk
+
+p(rk−1nk − rk)∥Z(k)∥2
+
+p2δ1 log(1 /(1 − δ2)) + δ1 − √δ1
+
+.(3.33) For the second term of (3.20), note that Ψ (k)U (k) 
+
+> Y
+
+is distributed as an lk × rk
+
+Gaussian random matrix. Since lk > r k, by Lemma A.7 in the Appendix, ∀δ3 ∈ (0 , 1], with probability at least 1 − δ3,
+
+σmin (Ψ (k)U (k) 
+
+> Y
+
+) ≥ plk − √rk − p2 log(2 /δ 3).(3.34) LOW-RANK TENSOR-TRAIN APPROXIMATION 13 Thus, with probability at least 1 − δ3,
+
+∥U (k) 
+
+> Y
+
+(Ψ (k)U (k) 
+
+> Y
+
+)†( eZ(k))∥2 = ∥(Ψ (k)U (k) 
+
+> Y
+
+)†( eZ(k))∥2
+
+≤ ∥( eZ(k))∥2
+
+σmin (Ψ (k)U (k) 
+
+> Y
+
+)
+
+≤ ∥( eZ(k))∥2
+
+√lk − √rk − p2 log(2 /δ 3) .
+
+(3.35) Combining (3.33) and (3.35), we finally get the error of the k-th sketching of unfolding matrix with probability at least 1 − δ1 − δ2 − δ3, i.e., 
+
+∥ ˆA(k) − A(k)∥2≤ rk
+
+p(rk−1nk − rk)∥Z(k)∥2
+
+p2δ1 log(1 /(1 − δ2)) + δ1 − √δ1
+
++ ∥( eZ(k))∥2
+
+√lk − √rk − p2 log(2 /δ 3) .
+
+(3.36) Finally, by applying the triangle inequality to the tensor unfolding operations (3.37) ∥A − ˆA∥ 2 ≤
+
+> d−1
+
+X
+
+> k=1
+
+∥ ˆA(k) − A(k)∥2 ,
+
+we complete the proof. 
+
+4. Numerical Experiments. To test the effectiveness of the proposed TT-subSKETCH algorithm, we compare it with the most related state-of-the-art algo-rithms TT-SVD and TT-rSVD. For ease of comparison, we set the power iteration parameter q to 0, 1, and 2 in Algorithm 3.2 and name them TT-SKETCH, TT-subSKETCH1, and TT-subSKETCH2, respectively. The data used for validation include synthetic data and real-world data with and without noise. Regarding the numerical settings, the sketch parameter ln = 2 rn, n =1, · · · , d . The quality of the reconstructed tensor is measured by the peak signal-to-noise ratio (PSNR), say ρ, and the relative error ϵ. For tensor A ∈ Rn1×n2×n3 and its low-rank TT approximation ˆA, the PSNR is defined as (4.1) ρ = 10 log 10 
+
+n1n2n3∥ ˆA∥ 2
+
+> ∞
+
+∥A − ˆA∥ 2
+
+> F
+
+.
+
+The relative error ϵ of the low-rank reconstruction tensor is defined as (4.2) ϵ = ∥A − ˆA∥ F /∥A∥ F .
+
+All experiments were run on a laptop with 2.4 GHz Intel Core i7-8700T CPU and 16GB of RAM. The MATLAB Tensor Toolbox [1] is utilized to perform the experi-ments. 
+
+4.1. Power function tensor. We first evaluate the performance of different algorithms on power function tensor data. The power function tensor can be defined entry-wise as (4.3) xi1i2,··· ,i n = 1
+
+> h
+
+pih 
+
+> 1
+
++ · · · ihn
+
+, n = 1 , 2, · · · , N. 14 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI              
+
+> Fig. 1 .Results comparison on the power function tensor with a size of 45 ×45 ×45 ×45 ×45
+> in terms of the CPU time (left) and relative error (right) dependency on the target rank. The oversampling parameter pis fixed at 2.
+
+We fix N = 5, h = 5, and the size of data to be 45 × 45 × 45 × 45 × 45, and the equal target rank ( r, r, r, r ) with r ∈ [2 , 11]. The results on the power function tensor are given in Figure 1 in terms of the CPU time and relative error corresponding to different target ranks. It indicates that random algorithms consume significantly less CPU time compared to deterministic ones, and the CPU time increases with the power iteration parameter becoming large, especially for larger target ranks. For the relative error shown in the right panel of Figure 1, we see that when the target rank is relatively low, the power iteration method significantly reduces the error. In particular, the relative errors of algorithms TT-subSKETCH1 and TT-subSKETCH2 are very close to TT-SVD and are signifi-cantly lower than TT-rSVD, demonstrating the excellent performance of the proposed algorithms. 
+
+4.2. Real-world data. We now evaluate the performance of different algorithms on a hyperspectral image named PaviaU 1 with a size of 610 × 340 × 103 and a color video named Driving 2 with a size of 360 × 640 × 3 × 100. The oversampling parameter 
+
+p is fixed to 5. The results are given in Figure 2 on the hyperspectral image and in Figure 3 on the color video in terms of the CPU time, relative error, and PSNR corresponding to different target ranks. In particular, Figure 4 and Figure 5 give the qualitative results of the low-rank approximation of one spectral channel of the hyperspectral image and one frame of the color video, respectively, by different methods in terms of CPU time and PSNR. The results show that the relative error and PSNR of TT-subSKETCH2 and TT-SVD are very similar, with our TT-subSKETCH2 being far more efficient in terms of CPU time. Although TT-rSVD and TT-SKETCH take less CPU time, their relative error and PSNR are not comparable to TT-subSKETCH2. Furthermore, comparing TT-subSKETCH1 with TT-subSKETCH2, we can see that  
+
+> 1https://ehu.eus/ccwintco/index.php?title=Hyperspectral Remote Sensing Scenes
+> 2https://pixabay.com/videos/mercedes-glk-car-test-offroad-suv-1406/ LOW-RANK TENSOR-TRAIN APPROXIMATION
+
+15                  
+
+> Fig. 2 .Results comparison on the hyperspectral image with a size of 610 ×340 ×103 in terms of CPU time (left), relative error (middle), and PSNR (right) dependency on the target rank. The oversampling parameter p is fixed at 5.
+> Fig. 3 .Results comparison on the color video with a size of 360 ×640 ×3×100 in terms of CPU time (left), relative error (middle), and PSNR (right) dependency on the target rank. The oversampling parameter p is fixed at 5.
+
+increasing the number of power iterations can achieve better approximation result at the expense of slightly higher computation time. 
+
+4.3. Noisy data. We finally consider the performance of different algorithms on synthetic and real-world data with noise, i.e., Gaussian white noise. The MATLAB built-in function awgn (·, SNR) is used to generate noise. For the results on synthetic data, we keep the parameters the same as the settings in Section 4.1 and fix the noise level at 2dB. Figure 6 gives the results on the power function tensor of different algorithms in terms of the CPU time and relative error corresponding to different target ranks. Moreover, to further demonstrate the impact of noise on individual methods, we maintain the target rank constant and system-atically change the noise level, see the results in Figure 7. Note that a higher SNR 16 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+Given spectral channel      
+
+> TT-SVD PSNR: 25.7822 CPU time: 2.58 TT-rSVD PSNR: 21.8958 CPU time: 0.15 TT-SKETCH PSNR: 21.8784 CPU time: 0.21 TT-subSKETCH1 PSNR: 25.0553 CPU time: 0.31 TT-subSKETCH2 PSNR: 25.5393 CPU time: 0.41
+
+Fig. 4 . Low-rank approximation of one spectral channel of the hyperspectral image by different methods in terms of CPU time and PSNR.       
+
+> Given original frame TT-SVD PSNR: 28.4385; CPU time: 11.52
+> TT-rSVD PSNR: 25.0779; CPU time: 0.56
+> TT-SKETCH PSNR: 24.4960; CPU time: 0.84
+> TT-subSKETCH1 PSNR: 27.6399; CPU time: 1.16
+> TT-subSKETCH2 PSNR: 28.1249; CPU time: 1.61
+
+Fig. 5 . Low-rank approximation of one frame of the color video clip by different methods in terms of CPU time and PSNR. 
+
+Fig. 6 . Results comparison on the noisy power function tensor with a size of 45 × 45 × 45 ×
+
+45 × 45 in terms of CPU time (left) and relative error (right) dependency on the target rank. The oversampling parameter p is fixed at 2, and the noise level is fixed at 2dB. LOW-RANK TENSOR-TRAIN APPROXIMATION 17            
+
+> Fig. 7 .Results comparison on the noisy power function tensor with a size of 45 ×45 ×45 ×45 ×45
+> in terms of CPU time (left) and relative error (right) dependency on the SNR. The oversampling parameter p is fixed at 2, and the target rank is fixed at (5,5,5,5).
+> Fig. 8 .Results comparison on the noisy color video with a size of 360 ×640 ×3×100 in terms of CPU time (left), relative error (middle), and PSNR (right) dependency on the target rank. The oversampling parameter p is fixed at 5, and the noise level is fixed at 5dB.
+
+indicates lower noise levels, implying that with lower noise levels, the approximation error of different algorithms is lower. Among random algorithms, the results show that our TT-subSKETCH2 achieves the highest approximation quality; in particular, it requires much less time compared to TT-SVD. For the results on real-world data, the color video data is used with parameters the same as that of Section 4.2. The quantitative and qualitative experimental results are shown in Figure 8 and Figure 9, respectively, in terms of CPU time, relative error, and PSNR. The results show that our TT-subSKETCH2 again achieves the approximation quality closest to TT-SVD in the presence of noise, demonstrating the superiority and robustness of the proposed algorithm. Figure 10 gives the results of 18 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI      
+
+> Given original noisy frame PSNR: 12.9600
+> TT-SVD PSNR: 27.0549; CPU time: 11.27
+> TT-rSVD PSNR: 20.5302; CPU time: 0.55
+> TT-SKETCH PSNR: 20.8679; CPU time: 0.77
+> TT-subSKETCH1 PSNR: 24.5788; CPU time: 1.23
+> TT-subSKETCH2 PSNR: 25.7598; CPU time: 1.64
+
+Fig. 9 . Low-rank approximation of one frame of the color video clip with noise level fixed at 5dB by different methods in terms of CPU time and PSNR. 
+
+Fig. 10 . Results comparison on the noisy color video with a size of 360 × 640 × 3 × 100 in terms of CPU time (left), relative error (middle) and PSNR (right) dependency on the noise level. The oversampling parameter p is fixed at 5, and the target rank is fixed at (30,30). 
+
+different methods on the color video data with different level of noise under fixed rank. Consistent results are obtained, similar to those on the synthetic data, further demonstrating the great performance of our proposed algorithm. 
+
+5. Conclusion. In this paper, we proposed a two-sided sketching algorithm, named TT-subSKETCH, for TT approximation. Detailed error analysis and robust-ness analysis for the proposed algorithm TT-subSKETCH were conducted. Thorough experimental results on both synthetic and real-world data demonstrate that the pro-posed algorithm achieves superior accuracy and robustness compared to the related state-of-the-art random algorithms, while requiring significantly less time compared to deterministic algorithms. 
+
+Appendix A. Technical lemmas. Here we compile the essential technical lemmas that are pivotal in the proof of the proposed theorems. 
+
+Lemma A.1. ([12], Lemma 4). Assume that the sketch size parameter satisfies LOW-RANK TENSOR-TRAIN APPROXIMATION 19 
+
+l > k + 1 . Draw random test matrices Ω ∈ Rn×k and Φ ∈ Rl×m independently of the standard normal distribution. Then the rank-k approximation ˆA obtained from Algorithm 3.1 satisfies 
+
+(A.1) E∥A − ˆA∥2 
+
+> F
+
+≤ (1 + f (k, l )) min 
+
+> ϱ<k −1
+
+(1 + f (ϱ, k )ϖ4qk ) · τ 2
+
+> ϱ+1
+
+(A) ,
+
+where ϖk = σk+1 /σ k is the singular value gap, and f (s, t ) := s/ (t − s − 1) .
+
+Lemma A.2. (Presenting the explicit expression of X − Q⊤A in [29], Lemma A.4). Construct a matrix P ∈ Rn×(n−k) with orthonormal columns satisfying 
+
+(A.2) P P ⊤ = I − QQ ⊤.
+
+Introduce the matrices 
+
+(A.3) Ψ1 := Ψ P ∈ Rl×(n−k), Ψ2 := Ψ Q ∈ Rl×k.
+
+Assume that the matrix Ψ2 has full column rank. Then 
+
+(A.4) X − Q⊤A = Ψ †
+
+> 2
+
+Ψ1(P ⊤A) .
+
+Lemma A.3. (Pseudo-inverse properties, see e.g. [13]). The following properties hold for the pseudo-inverse. 
+
+1. If A has linearly independent columns, then A†A = I. If B has linearly independent rows, then BB † = I.
+
+2. ( AB )† = B†A† if A has orthonormal columns or B has orthonormal rows. 
+
+3. ( AB )† = B†A† if A has linearly independent columns. 
+
+4. If A has orthonormal columns or orthonormal rows, then A† = A⊤.
+
+Lemma A.4. ([17], Theorem 2.1). Let P ∈ Rn×n be a projection matrix, i.e., 
+
+P 2 = P . We observe that P is distinctively defined by the subspaces V1 and V2, i.e., 
+
+(A.5) V1 := Im P, V2 := Ker P, 
+
+and dim V1 +dim V2 = n. We denote by V1 a matrix with orthonormal columns, whose column span is equal to the subspace V1. Analogously, we denote by V2 a matrix with orthonormal columns, whose column span is equal to the subspace V2. It holds that 
+
+(A.6) P = V1(V ⊤
+
+> 2,⊥
+
+V1)−1V ⊤ 
+
+> 2,⊥
+
+.
+
+Lemma A.5. ([2], Proposition C.3). Let A be the upper left (n − r) × (n − r)
+
+corner of a Haar unitary matrix U ∈ Rn×n. Then ∀δ > 0,
+
+(A.7) P
+
+
+
+σmin (A) ≥√δ
+
+pr(n − r)
+
+
+
+≥ 1 − δ . 
+
+Lemma A.6. ([28], Theorem 1.1). Let A be an n × n standard Gaussian random matrix. Then, ∀δ > 0,
+
+(A.8) P
+
+
+
+σmin (A) ≥ δ
+
+√n
+
+
+
+= exp( −δ2/2 − δ) .
+
+Lemma A.7. ([31], Corollary 5.35). Let A be an m × n matrix whose entries are independent standard normal random variables. Then ∀δ ∈ (0 , 1] , with probability at least 1 − δ, we have 
+
+σmin (A) ≥ √m − √n − p2 log(2 /δ ) ,(A.9) 
+
+σmax (A) ≤ √m + √n + p2 log(2 /δ ) .(A.10) 20 GAOHANG YU, YIHAO PAN, AILUN JIAN, XIAOHAO CAI 
+
+Acknowledgements. This work was supported in part by National Natural Science Foundation of China (No. 12071104). 
+
+Ethics Declarations. We declare that we have no commercial or associative interest that represents a conflict of interest in connection with the work submitted. 
+
+Data Availability. All underlying data sets can be made available upon request or are publicly available. MATLAB codes used in this paper are available upon request to the authors. 
+
+REFERENCES [1] B. W. Bader and T. G. Kolda , Tensor toolbox for matlab , www.tensortoolbox.org, (2023). [2] J. Banks, J. Garza-Vargas, A. Kulkarni, and N. Srivastava , Pseudospectral shattering, the sign function, and diagonalization in nearly matrix multiplication time , Foundations of computational mathematics, 23 (2023), pp. 1959–2047. [3] K. Batselier, W. Yu, L. Daniel, and N. Wong , Computing low-rank approximations of large-scale matrices with the tensor network randomized svd , SIAM Journal on Matrix Analysis and Applications, 39 (2018), pp. 1221–1244. [4] M. Che and Y. Wei , Randomized algorithms for the approximations of tucker and the tensor train decompositions , Advances in Computational Mathematics, 45 (2019), pp. 395–428. [5] M. Che, Y. Wei, and H. Yan , The computation of low multilinear rank approximations of tensors via power scheme and random projection , SIAM Journal on Matrix Analysis and Applications, 41 (2020), pp. 605–636. [6] M. Che, Y. Wei, and H. Yan , Randomized algorithms for computing the tensor train approx-imation and their applications , arXiv preprint arXiv:2405.07147, (2024). [7] Z. Chen, H. Jiang, G. Yu, and L. Qi , Low-rank tensor train decomposition using tensorsketch ,arXiv preprint arXiv:2309.08093, (2023). [8] P. Comon , Canonical tensor decompositions , in Workshop on Tensor Decompositions, Palo Alto, CA, 2004. [9] P. Comon , Tensors: a brief introduction , IEEE Signal Processing Magazine, 31 (2014), pp. 44– 53. [10] H. A. Daas, G. Ballard, and P. Benner , Parallel algorithms for tensor train arithmetic ,SIAM Journal on Scientific Computing, 44 (2022), pp. C25–C53. [11] L. De Lathauwer, B. De Moor, and J. Vandewalle , A multilinear singular value decom-position , SIAM journal on Matrix Analysis and Applications, 21 (2000), pp. 1253–1278. [12] W. Dong, G. Yu, L. Qi, and X. Cai , Practical sketching algorithms for low-rank tucker approximation of large tensors , Journal of Scientific Computing, 95 (2023), p. 52. [13] G. H. Golub and C. F. Van Loan , Matrix computations , JHU press, 2013. [14] L. Grasedyck, D. Kressner, and C. Tobler , A literature survey of low-rank tensor approx-imation techniques , GAMM-Mitteilungen, 36 (2013), pp. 53–78. [15] M. Gu , Subspace iteration randomization and singular value problems , SIAM Journal on Sci-entific Computing, 37 (2015), pp. A1139–A1173. [16] N. Halko, P.-G. Martinsson, and J. A. Tropp , Finding structure with randomness: Proba-bilistic algorithms for constructing approximate matrix decompositions , SIAM review, 53 (2011), pp. 217–288. [17] P. C. Hansen , Oblique projections, pseudoinverses, and standard-form transformations , Tech-nical University of Denmark, Tech. Rep, (2004). [18] N. J. Higham , Matrix nearness problems and applications , Applications of matrix theory, 22 (1989). [19] B. Huber, R. Schneider, and S. Wolf , A randomized tensor train singular value decom-position , in Compressed Sensing and its Applications: Second International MATHEON Conference 2015, Springer, 2017, pp. 261–290. [20] M. E. Kilmer and C. D. Martin , Factorization strategies for third-order tensors , Linear Algebra and its Applications, 435 (2011), pp. 641–658. [21] T. G. Kolda and B. W. Bader , Tensor decompositions and applications , SIAM review, 51 (2009), pp. 455–500. [22] A. Ma, D. St¨ oger, and Y. Zhu , Robust recovery of low-rank matrices and low-tubal-rank tensors from noisy sketches , SIAM Journal on Matrix Analysis and Applications, 44 (2023), pp. 1566–1588. LOW-RANK TENSOR-TRAIN APPROXIMATION 21 
+
+[23] P.-G. Martinsson and J. A. Tropp , Randomized numerical linear algebra: Foundations and algorithms , Acta Numerica, 29 (2020), pp. 403–572. [24] R. Minster, A. K. Saibaba, and M. E. Kilmer , Randomized algorithms for low-rank tensor decompositions in the tucker format , SIAM journal on mathematics of data science, 2 (2020), pp. 189–215. [25] I. V. Oseledets , Tensor-train decomposition , SIAM Journal on Scientific Computing, 33 (2011), pp. 2295–2317. [26] T. Shi, M. Ruth, and A. Townsend , Parallel algorithms for computing the tensor-train decomposition , SIAM Journal on Scientific Computing, 45 (2023), pp. C101–C130. [27] Y. Sun, Y. Guo, C. Luo, J. Tropp, and M. Udell , Low-rank tucker approximation of a tensor from streaming data , SIAM Journal on Mathematics of Data Science, 2 (2020), pp. 1123–1150. [28] T. Tao and V. Vu , Random matrices: The distribution of the smallest singular values , Geo-metric And Functional Analysis, 20 (2010), pp. 260–297. [29] J. A. Tropp, A. Yurtsever, M. Udell, and V. Cevher , Practical sketching algorithms for low-rank matrix approximation , SIAM Journal on Matrix Analysis and Applications, 38 (2017), pp. 1454–1485. [30] J. A. Tropp, A. Yurtsever, M. Udell, and V. Cevher , Streaming low-rank matrix approxi-mation with an application to scientific simulation , SIAM Journal on Scientific Computing, 41 (2019), pp. A2430–A2463. [31] R. Vershynin , Introduction to the non-asymptotic analysis of random matrices , arXiv preprint arXiv:1011.3027, (2010). [32] C. R. Vogel and J. Wade , Iterative svd-based methods for ill-posed problems , SIAM Journal on Scientific Computing, 15 (1994), pp. 736–754. [33] G. Yu, J. Feng, Z. Chen, X. Cai, and L. Qi , A randomized block Krylov method for tensor train approximation , Frontiers in Applied Mathematics and Statistics, 12 (2026), p. 1824146, https://doi.org/10.3389/fams.2026.1824146. [34] W. Yu, Y. Gu, and Y. Li , Efficient randomized algorithms for the fixed-precision low-rank matrix approximation , SIAM Journal on Matrix Analysis and Applications, 39 (2018), pp. 1339–1359. [35] J. Zhang, A. K. Saibaba, M. E. Kilmer, and S. Aeron , A randomized tensor singular value decomposition based on the t-product , Numerical Linear Algebra with Applications, 25 (2018), p. e2179. [36] Q. Zhao, G. Zhou, S. Xie, L. Zhang, and A. Cichocki , Tensor ring decomposition , arXiv preprint arXiv:1606.05535, (2016).

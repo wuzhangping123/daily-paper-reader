@@ -6,29 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-12
-- 运行时间：2026-06-12 20:51:38 UTC
+- 最新运行日期：2026-06-13
+- 运行时间：2026-06-13 20:59:46 UTC
 - 运行状态：成功
 - 本次总论文数：2
 - 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今日速读2篇论文，均获7.0分，分别关注光谱重建中的物理-频率融合与稀疏变换学习。  
-值得关注的方向：将物理先验嵌入Transformer进行光谱重建；双稀疏显式条件变换的表示学习。  
-建议深入理解物理先验如何提升模型泛化性，并关注稀疏变换在小样本场景下的应用。
-- 详情：[/202606/12/README](/202606/12/README)
+1) 今日速读两篇7分论文，聚焦流形数据去噪与张量火车逼近。  
+2) 值得关注非参数黎曼经验贝叶斯在流形去噪中的应用，以及双边草图算法加速低秩张量分解。  
+3) 建议优先阅读黎曼流形上的贝叶斯框架，再结合张量算法处理高维数据。
+- 详情：[/202606/13/README](/202606/13/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [PF-Trans: Physics-Embedded Frequency-Aware Transformer for Spectral Reconstruction](/202606/12/2606.10373v1-pf-trans-physics-embedded-frequency-aware-transformer-for-spectral-reconstruction)  
+1. [Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds](/202606/13/2606.11183v1-nonparametric-riemannian-empirical-bayes-and-denoising-measurements-on-manifolds)  
    标签：评分：7.0/10、query:hsi-denoise
-   evidence：遥感光谱重建中的频率感知去噪
-2. [Learning Doubly Sparse Explicitly Conditioned Transforms](/202606/12/2606.10975v1-learning-doubly-sparse-explicitly-conditioned-transforms)  
+   evidence：流形上的测量去噪
+2. [A Two-Sided Sketching Algorithm for Low-rank Tensor Train Approximation](/202606/13/2606.11603v1-a-two-sided-sketching-algorithm-for-low-rank-tensor-train-approximation)  
    标签：评分：7.0/10、query:hsi-denoise
-   evidence：学习稀疏变换用于噪声抑制
+   evidence：用于高维数据的低秩张量列近似算法
 
 
 <div class="dpr-home-promo-card">

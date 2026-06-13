@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-13",
+  "date": "2026-06-13",
+  "generated_at": "2026-06-13T20:59:53",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/13/2606.11183v1-nonparametric-riemannian-empirical-bayes-and-denoising-measurements-on-manifolds",
+      "section": "quick",
+      "title_en": "Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds",
+      "authors": "Adam Quinn Jaffe, Leonardo V. Santoro, Bodhisattva Sen",
+      "date": "2026-06-09",
+      "pdf": "https://arxiv.org/pdf/2606.11183v1",
+      "score": "7.0",
+      "evidence": "流形上的测量去噪",
+      "tldr": "针对流形上潜变量及其测量值的非参数经验贝叶斯去噪问题，本文提出一种基于黎曼高斯混合模型的切向贝叶斯去噪器。该去噪器通过一阶近似避免后验Fréchet均值的计算，并利用拉普拉斯-贝尔特拉米算子的谱理论实现数据驱动。理论分析表明，在低噪声下该替代oracle接近贝叶斯风险，但收敛速率因黎曼高斯密度在切割轨迹处的奇异性而慢于欧几里得情形。在圆上验证了极小极大最优性。方法成功应用于伽马射线暴定位和蛋白质扭转角去噪。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We initiate the study of nonparametric empirical Bayes denoising methods in the setting where both the latent variables and their measurements lie on a compact Riemannian manifold, and where the likelihood is a Riemannian Gaussian distribution. Our starting point is a novel Tweedie-Eddington formula for Riemannian Gaussian mixture models which identifies a certain surrogate oracle denoiser in terms of the marginal distribution of the measurements; it avoids the explicit computation of the posterior Fréchet mean (as required by the Bayes denoiser) via a first-order approximation, hence we refer to it as the \"tangential\" Bayes denoiser. We show that this surrogate oracle achieves nearly the Bayes risk in a low-noise regime, we construct a fully data-driven approximation of it using the spectral theory of the Laplace-Beltrami operator, and we establish finite-sample rates of convergence for the distance between the the surrogate oracle and its approximation. Contrasting the nearly-parametric rates from the Euclidean setting, the rates in the Riemannian setting are slower due to the singularities of the Riemannian Gaussian density at the cut locus of its Fréchet mean; in the special case of the circle we establish matching lower bounds which show that our proposed denoiser is minimax-optimal, and that the denoising problem exhibits a genuinely nonparametric rate of convergence. Lastly, we implement our methodology in two scientific applications: in astronomy, the sphere-valued problem of denoising the locations of gamma ray bursts; in structural biology, the torus-valued problem of denoising pairs of torsion angles of adjacent amino acids in a protein (i.e., the Ramachandran plot).",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/13/2606.11603v1-a-two-sided-sketching-algorithm-for-low-rank-tensor-train-approximation",
+      "section": "quick",
+      "title_en": "A Two-Sided Sketching Algorithm for Low-rank Tensor Train Approximation",
+      "authors": "Gaohang Yu, Yihao Pan, Ailun Jian, Xiaohao Cai",
+      "date": "2026-06-10",
+      "pdf": "https://arxiv.org/pdf/2606.11603v1",
+      "score": "7.0",
+      "evidence": "用于高维数据的低秩张量列近似算法",
+      "tldr": "张量火车分解是获取低秩张量的有力工具，但大规模矩阵奇异值分解计算成本高昂。本文提出一种基于双边草绘的随机算法，结合单程草绘和子空间迭代，避免显式SVD。理论推导了算法的误差界与鲁棒性，在合成和真实数据集上实验表明，该算法在保持精度的同时显著提升计算效率，为大规模张量低秩近似提供了实用方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Tensor train (TT) decomposition is a powerful method to acquire low-rank tensors. However, the computational process is frequently obstructed by the large-scale matrix singular value decomposition (SVD). The sketching algorithm serves as an efficient data compression technique that can quickly derive low-rank matrix approximations. In this paper, we propose a randomized algorithm to obtain the TT approximation of tensors using a one-pass sketching algorithm and subspace iteration, and offer thorough error-bound and robustness analysis. Numerical experiments on synthetic and real-world datasets demonstrate the effectiveness and efficiency of the proposed algorithm.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
