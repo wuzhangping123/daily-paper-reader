@@ -6,29 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-13
-- 运行时间：2026-06-13 20:59:46 UTC
+- 最新运行日期：2026-06-14
+- 运行时间：2026-06-14 20:15:32 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：0
 - 精读区：0
-- 速读区：2
+- 速读区：0
 
 ### 今日简报（AI）
-1) 今日速读两篇7分论文，聚焦流形数据去噪与张量火车逼近。  
-2) 值得关注非参数黎曼经验贝叶斯在流形去噪中的应用，以及双边草图算法加速低秩张量分解。  
-3) 建议优先阅读黎曼流形上的贝叶斯框架，再结合张量算法处理高维数据。
-- 详情：[/202606/13/README](/202606/13/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202606/14/README](/202606/14/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds](/202606/13/2606.11183v1-nonparametric-riemannian-empirical-bayes-and-denoising-measurements-on-manifolds)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：流形上的测量去噪
-2. [A Two-Sided Sketching Algorithm for Low-rank Tensor Train Approximation](/202606/13/2606.11603v1-a-two-sided-sketching-algorithm-for-low-rank-tensor-train-approximation)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：用于高维数据的低秩张量列近似算法
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
