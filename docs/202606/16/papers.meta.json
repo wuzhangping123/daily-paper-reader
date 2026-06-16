@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-16",
+  "date": "2026-06-16",
+  "generated_at": "2026-06-16T22:28:58",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/16/2606.16396v1-sp3-spherical-priors-for-plug-and-play-restoration",
+      "section": "deep",
+      "title_en": "SP$^3$: Spherical Priors for Plug-and-Play Restoration",
+      "authors": "Sean Man, Ron Raphaeli, Matan Kleiner, Or Ronai",
+      "date": "2026-06-15",
+      "pdf": "https://arxiv.org/pdf/2606.16396v1",
+      "score": "8.0",
+      "evidence": "即插即用恢复方法可应用于高光谱去噪",
+      "tldr": "图像恢复通常依赖去噪器作为先验，但现有方法计算成本高或收敛慢。本文提出SP^3算法，用球形编码器（SE）替代传统去噪器，通过其结构化的潜在空间实现自然图像流形的鲁棒投影，结合半二次分裂进行闭式数据一致性步骤，无需梯度计算即可稳定收敛。实验表明，SP^3在多种恢复任务中达到与扩散/流方法相当的感知质量，同时提速3-630倍，且具备任意时刻恢复能力。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "In this paper, we introduce SP$^3$, a novel Plug-and-Play algorithm that accelerates maximum a posteriori image restoration by replacing denoisers with Spherical Encoders (SE) as generative priors. SP$^3$ approximates the intractable proximal prior step by utilizing the SE tightly structured latent space as a robust projection onto the natural image manifold. Alternating this projection with a closed-form data-consistency step, via Half-Quadratic Splitting, achieves stable convergence without requiring gradient computation during inference. This unique formulation unlocks \"anytime\" restoration capabilities, producing sharp, plausible images from the first iteration. Evaluations across a variety of image restoration tasks demonstrate that SP$^3$ achieves perceptual quality comparable to state-of-the-art zero-shot diffusion and flow methods while being $3$-$630\\times$ faster.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-16 <!--dpr-date:20260616-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/16/2606.16396v1-sp3-spherical-priors-for-plug-and-play-restoration" data-sidebar-item="{&quot;title&quot;: &quot;SP$^3$: Spherical Priors for Plug-and-Play Restoration&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.16396v1-sp3-spherical-priors-for-plug-and-play-restoration&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;即插即用恢复方法可应用于高光谱去噪&quot;}">SP$^3$: Spherical Priors for Plug-and-Play Restoration</a>
   * 2026-06-13 <!--dpr-date:20260613-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/13/2606.11183v1-nonparametric-riemannian-empirical-bayes-and-denoising-measurements-on-manifolds" data-sidebar-item="{&quot;title&quot;: &quot;Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.11183v1-nonparametric-riemannian-empirical-bayes-and-denoising-measurements-on-manifolds&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;流形上的测量去噪&quot;}">Nonparametric Riemannian Empirical Bayes, and Denoising Measurements on Manifolds</a>
