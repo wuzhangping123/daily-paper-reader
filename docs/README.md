@@ -6,24 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-16
-- 运行时间：2026-06-16 22:28:51 UTC
+- 最新运行日期：2026-06-17
+- 运行时间：2026-06-17 22:12:24 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：1
-- 速读区：0
+- 本次总论文数：2
+- 精读区：0
+- 速读区：2
 
 ### 今日简报（AI）
-今日精读1篇高分论文，探析球面先验在即插即用图像恢复中的应用。最值得关注的是SP³方法通过球面流形建模有效提升去噪与超分辨率效果，分数达8.0/10。建议对此方向感兴趣的读者可进一步探究球面先验与现有恢复框架的融合细节。
-- 详情：[/202606/16/README](/202606/16/README)
+今日速读两篇线性逆问题论文，聚焦后验得分精确估计与数据驱动先验比较。  
+最值得关注：第一篇提出精确后验得分估计法，第二篇系统对比多种得分函数先验的效果。  
+建议先读第一篇理解核心算法，再借第二篇指导实际方法选型。
+- 详情：[/202606/17/README](/202606/17/README)
 
 ### 精读区论文标签
-1. [SP$^3$: Spherical Priors for Plug-and-Play Restoration](/202606/16/2606.16396v1-sp3-spherical-priors-for-plug-and-play-restoration)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：即插即用恢复方法可应用于高光谱去噪
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Exact Posterior Score Estimation for Solving Linear Inverse Problems](/202606/17/2606.17048v1-exact-posterior-score-estimation-for-solving-linear-inverse-problems)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：使用深度神经网络解决逆问题的通用去噪方法
+2. [Bridging data-driven priors via the score function for posterior sampling -- Comparative review and experimental study](/202606/17/2606.14800v1-bridging-data-driven-priors-via-the-score-function-for-posterior-sampling----comparative-review-and-experimental-study)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：包括正则化去噪在内的数据驱动先验统一框架，可应用于高光谱影像恢复
 
 
 <div class="dpr-home-promo-card">

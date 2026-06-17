@@ -1,0 +1,102 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-17T22:10:03.634752+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.17048v1",
+      "source": "arxiv",
+      "title": "Exact Posterior Score Estimation for Solving Linear Inverse Problems",
+      "abstract": "Diffusion and flow-based models learn powerful data priors by training a denoiser to reverse Gaussian corruption. To use this prior to solve a linear inverse problem, one needs to sample from the posterior, but the score that the prior provides is the unconditional score, not the posterior score. Existing methods either steer a fixed pretrained denoiser with approximate measurement-matching corrections, or train a conditional restoration model that abandons the denoising structure of the prior. We derive the exact posterior score in closed form for linear Gaussian inverse problems under general Gaussian interpolants, and show that posterior sampling reduces to a denoising problem at an operator-dependent shifted pivot under an anisotropic noise covariance. We turn this identity into Exact Posterior Score (EPS), a denoising training objective that preserves the input/output structure of standard pretraining and can therefore be trained from scratch or fine-tuned from a pretrained denoiser. At inference, EPS uses the same sampler as the underlying backbone, with no likelihood gradients or projections. We evaluate EPS on five linear inverse problems across FFHQ and ImageNet, where it outperforms training-free and training-based baselines on fidelity, perceptual, and distributional metrics, while using roughly an order of magnitude fewer denoiser evaluations than gradient-based posterior samplers.",
+      "authors": [
+        "Abbas Mammadov",
+        "Ozgur Kara",
+        "Kaan Oktay",
+        "Iskander Azangulov",
+        "Adil Kaan Akan",
+        "Hyungjin Chung",
+        "James Matthew Rehg",
+        "Yee Whye Teh"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV",
+        "stat.ML"
+      ],
+      "published": "2026-06-15T17:58:22+00:00",
+      "link": "https://arxiv.org/pdf/2606.17048v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "general denoising method for inverse problems using deep neural networks",
+      "llm_evidence_cn": "使用深度神经网络解决逆问题的通用去噪方法",
+      "llm_evidence": "使用深度神经网络解决逆问题的通用去噪方法",
+      "canonical_evidence": "使用深度神经网络解决逆问题的通用去噪方法",
+      "llm_tldr_en": "Exact posterior score derived for linear Gaussian inverse problems, reducing posterior sampling to a denoising problem with shifted pivot and anisotropic noise covariance.",
+      "llm_tldr_cn": "该论文针对线性高斯逆问题推导出精确的后验得分闭式解，将后验采样转化为一个在算子依赖的偏移枢轴和异方差噪声协方差下的标准去噪问题。方法基于扩散模型和流模型，通过训练去噪器逆转高斯破坏，并精确计算后验得分。在多个线性逆问题（如图像去噪、超分辨率和压缩感知）上的实验表明，该方法在不依赖近似校正的情况下取得了与现有技术相当或更好的性能。该工作为图像恢复和逆问题求解提供了坚实的理论保障。",
+      "llm_tldr": "该论文针对线性高斯逆问题推导出精确的后验得分闭式解，将后验采样转化为一个在算子依赖的偏移枢轴和异方差噪声协方差下的标准去噪问题。方法基于扩散模型和流模型，通过训练去噪器逆转高斯破坏，并精确计算后验得分。在多个线性逆问题（如图像去噪、超分辨率和压缩感知）上的实验表明，该方法在不依赖近似校正的情况下取得了与现有技术相当或更好的性能。该工作为图像恢复和逆问题求解提供了坚实的理论保障。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.14800v1",
+      "source": "arxiv",
+      "title": "Bridging data-driven priors via the score function for posterior sampling -- Comparative review and experimental study",
+      "abstract": "This paper reviews how a diverse set of popular data-driven priors commonly used in Bayesian inverse problems can be unified through their respective score functions. By framing these priors under this common perspective, we show that they can benefit from their straightfoward and effective integration into a recently proposed sampling algorithm. The applicability of this common framework is illustrated by considering several data-driven priors, namely regularization-by-denoising, normalizing flow-based priors, score-based generative models, and convex-ridge regularizers. For these four particular priors, the performance of the method is evaluated when conducting image inpainting and single image super-resolution. These results, as well as those obtained when restoring real images acquired in a geological context, demonstrate the efficiency of the method. This unified framework proves versatile enough to handle any posterior distribution defined by a broad class of score function-based priors, beyond the specific cases considered in this paper.",
+      "authors": [
+        "Elhadji Cisse Faye",
+        "Mame Diarra Fall",
+        "Sylvain Delchini",
+        "Nicolas Dobigeon"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "cs.LG",
+        "eess.IV",
+        "stat.ML"
+      ],
+      "published": "2026-06-11T17:21:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.14800v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "unified framework for data-driven priors including denoising, applicable to HSI restoration",
+      "llm_evidence_cn": "包括正则化去噪在内的数据驱动先验统一框架，可应用于高光谱影像恢复",
+      "llm_evidence": "包括正则化去噪在内的数据驱动先验统一框架，可应用于高光谱影像恢复",
+      "canonical_evidence": "包括正则化去噪在内的数据驱动先验统一框架，可应用于高光谱影像恢复",
+      "llm_tldr_en": "Reviews and unifies popular data-driven priors (denoising, flow, score-based, convex-ridge) via score functions and integrates them into a posterior sampling algorithm for image inpainting and super-resolution, demonstrating broad applicability.",
+      "llm_tldr_cn": "该综述论文通过评分函数统一了包括正则化去噪、归一化流、基于分数的生成模型和凸脊正则化等多种数据驱动先验，并将它们集成到贝叶斯后验采样算法中。在图像修复和超分辨率任务上评估了性能，展示了该框架的通用性，可迁移至高光谱影像去噪与恢复。",
+      "llm_tldr": "该综述论文通过评分函数统一了包括正则化去噪、归一化流、基于分数的生成模型和凸脊正则化等多种数据驱动先验，并将它们集成到贝叶斯后验采样算法中。在图像修复和超分辨率任务上评估了性能，展示了该框架的通用性，可迁移至高光谱影像去噪与恢复。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
