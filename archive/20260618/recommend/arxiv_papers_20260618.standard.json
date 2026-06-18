@@ -1,0 +1,218 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-18T22:04:41.524234+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2606.14436v1",
+      "source": "arxiv",
+      "title": "Joint Nuclear and $\\ell_1$ Regularization for Logistic Matrix Regression with Applications to Brain Imaging",
+      "abstract": "We introduce a new convex optimization framework for logistic scalar-on-matrix regression which incorporates nuclear and $\\ell_1$ norm penalties to enforce simultaneously low-rank and sparse structures in the estimated coefficient matrix. The proposed method enables interpretable modeling of high-dimensional matrix-valued predictors in the presence of binary responses. We derive a custom algorithm based on the Alternating Direction Method of Multipliers (ADMM) to efficiently solve the resulting convex optimization problem and establish the theoretical properties of the obtained solution. Numerical experiments clearly demonstrate the effectiveness of our method in recovering meaningful predictive patterns. Finally, we apply our method to the brain imaging data to identify structures in functional brain connectivity matrices that are characteristic of subjects with a family history of alcohol use disorders (AUDs).",
+      "authors": [
+        "Damian Brzyski",
+        "Aaron Cohen",
+        "Zijian Wang",
+        "Mario Dzemidzic",
+        "David A. Kareken",
+        "Jaroslaw Harezlak"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "math.OC",
+        "stat.ML"
+      ],
+      "published": "2026-06-12T13:17:30+00:00",
+      "link": "https://arxiv.org/pdf/2606.14436v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Joint nuclear and l1 regularization for low-rank representation",
+      "llm_evidence_cn": "联合核范数和l1正则化实现低秩表示",
+      "llm_evidence": "联合核范数和l1正则化实现低秩表示",
+      "canonical_evidence": "联合核范数和l1正则化实现低秩表示",
+      "llm_tldr_en": "Proposes convex optimization with nuclear and l1 penalties for low-rank and sparse matrix regression, applied to brain imaging.",
+      "llm_tldr_cn": "本文针对逻辑矩阵回归提出联合核范数和l1范数惩罚的凸优化框架，强制系数矩阵同时低秩和稀疏。算法使用ADMM高效求解，理论上保证了解的性质。实验表明该方法能有效恢复有意义的预测模式，其低秩表示思想可直接迁移至高光谱图像去噪中的低秩逼近任务。",
+      "llm_tldr": "本文针对逻辑矩阵回归提出联合核范数和l1范数惩罚的凸优化框架，强制系数矩阵同时低秩和稀疏。算法使用ADMM高效求解，理论上保证了解的性质。实验表明该方法能有效恢复有意义的预测模式，其低秩表示思想可直接迁移至高光谱图像去噪中的低秩逼近任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.19097v1",
+      "source": "arxiv",
+      "title": "DVANet: Degradation-aware Visual-prior Alignment Network for Image Restoration",
+      "abstract": "All-in-One image restoration aims to develop a unified restoration framework for handling diverse degradation types. Existing end-to-end methods usually regard the restoration process as a black-box mapping, lacking an explicit optimization interpretation. Although deep unfolding provides an interpretable iterative modeling paradigm for image restoration, existing methods mostly rely on fixed degradation assumptions or predefined degradation information, making them difficult to adapt to unified restoration requirements under complex degradations and locally damaged content. This limitation restricts their performance in degradation suppression and structural detail recovery. To address these issues, this paper proposes DVANet, a deep unfolding network inspired by the half-quadratic splitting optimization algorithm, which formulates unified image restoration under complex degradations as a collaborative unfolding process between degradation-aware observation consistency and visual-prior-guided reconstruction. Specifically, in the degradation-aware observation consistency branch, a degradation representation module is employed to extract global degradation attributes and local degradation cues, and degradation-conditioned mapping is used to enhance the model's adaptability to different degradation types. In the visual-prior-guided reconstruction branch, DINOv3 is introduced to provide structural and semantic information as hierarchical visual priors, thereby complementing the missing structural information in damaged regions and improving detail recovery. Extensive experiments demonstrate that DVANet achieves superior or competitive performance on multi-scenario degradation and cross-domain image restoration tasks, showing favorable degradation adaptability and generalization ability.",
+      "authors": [
+        "Yanjie Tu",
+        "Qingsen Yan",
+        "Axi Niu",
+        "Tao Hu",
+        "Haokui Zhang",
+        "Jiantao Zhou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-17T14:09:39+00:00",
+      "link": "https://arxiv.org/pdf/2606.19097v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "deep unfolding network for unified image restoration handling multiple degradations, applicable to hyperspectral denoising",
+      "llm_evidence_cn": "基于深度展开的全能图像恢复网络，可处理多种退化，适用于高光谱去噪",
+      "llm_evidence": "基于深度展开的全能图像恢复网络，可处理多种退化，适用于高光谱去噪",
+      "canonical_evidence": "基于深度展开的全能图像恢复网络，可处理多种退化，适用于高光谱去噪",
+      "llm_tldr_en": "Proposes DVANet, a deep unfolding network for all-in-one image restoration that aligns visual priors and handles multiple degradations, achieving state-of-the-art performance.",
+      "llm_tldr_cn": "该论文针对现有全能图像恢复方法缺乏显式优化解释、难以适应复杂退化的问题，提出DVANet，一种深度展开网络，利用退化感知的可视先验对齐机制，在多个任务上取得最优性能。该方法不仅能够处理常见的雨、雾、噪声等退化，还具备可解释性，为高光谱图像恢复提供了有效的框架。实验表明DVANet在退化抑制和细节恢复上优于现有方法。",
+      "llm_tldr": "该论文针对现有全能图像恢复方法缺乏显式优化解释、难以适应复杂退化的问题，提出DVANet，一种深度展开网络，利用退化感知的可视先验对齐机制，在多个任务上取得最优性能。该方法不仅能够处理常见的雨、雾、噪声等退化，还具备可解释性，为高光谱图像恢复提供了有效的框架。实验表明DVANet在退化抑制和细节恢复上优于现有方法。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.15236v2",
+      "source": "arxiv",
+      "title": "Show the Signal, Hide the Noise: Spectral Forcing for Pixel-Space Diffusion",
+      "abstract": "Pixel-space diffusion models are trained on full-bandwidth noisy images, yet the useful signal available to the denoiser is strongly frequency dependent. Under rectified-flow diffusion and natural-image power-law spectra, the per-band data-to-noise contour $k^{*}(t) = (1-t)^{-2/α}$ separates a signal-bearing low-frequency region from a noise-dominated high-frequency region at each time $t$. We show that this implicit coarse-to-fine structure is not merely descriptive: it induces a capacity-allocation problem. A standard pixel-space denoiser must discover the moving bandwidth boundary internally and can spend computation on frequency-time regions where the optimal prediction collapses to deterministic baselines rather than data-distribution modeling. To make this boundary explicit, we introduce Spectral Forcing, a parameter-free, time-conditional 2D-DCT low-pass operator applied to the noisy input before the patch embedder. Its cutoff expands monotonically with the diffusion time and becomes the identity at the data endpoint. Through controlled synthetic experiments, we identify the regime in which the operator is beneficial: coarse patch tokenization and data whose high-frequency content is predominantly noise rather than essential signal. On ImageNet-256 with JiT-700M/32, Spectral Forcing consistently improves both FID and Inception Score across different training epochs, demonstrating robust gains throughout training; at finer tokenization, the spectral forcing is still competitive. We further insert the unchanged operator into SenseNova-U1, a unified text-to-image model, where it improves DPG-Bench and GenEval, showing that the input-side spectral prior transfers beyond class-conditional generation. These results suggest a route to capacity-efficient pixel-space diffusion by showing the signal and hiding the noise.",
+      "authors": [
+        "Weichen Fan",
+        "Haiwen Diao",
+        "Penghao Wu",
+        "Ziwei Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-13T10:29:11+00:00",
+      "link": "https://arxiv.org/pdf/2606.15236v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "diffusion-based denoising with spectral forcing, applicable to hyperspectral data",
+      "llm_evidence_cn": "基于谱强制的扩散去噪方法，可迁移至高光谱图像",
+      "llm_evidence": "基于谱强制的扩散去噪方法，可迁移至高光谱图像",
+      "canonical_evidence": "基于谱强制的扩散去噪方法，可迁移至高光谱图像",
+      "llm_tldr_en": "Proposes spectral forcing for pixel-space diffusion to improve denoising by exploiting frequency-dependent signal-to-noise ratio, with potential for hyperspectral applications.",
+      "llm_tldr_cn": "该论文针对像素空间扩散模型中噪声与信号在不同频率分布不均的问题，提出一种谱强制方法，通过显式分离低频信号区与高频噪声区，缓解了模型容量分配问题。该方法在自然图像扩散中提升了去噪效率，虽然未直接在高光谱图像上验证，但其基础思想可迁移至高光谱图像去噪任务，尤其是处理光谱-空间噪声分布。此方法为高光谱深度学习去噪提供了新视角。",
+      "llm_tldr": "该论文针对像素空间扩散模型中噪声与信号在不同频率分布不均的问题，提出一种谱强制方法，通过显式分离低频信号区与高频噪声区，缓解了模型容量分配问题。该方法在自然图像扩散中提升了去噪效率，虽然未直接在高光谱图像上验证，但其基础思想可迁移至高光谱图像去噪任务，尤其是处理光谱-空间噪声分布。此方法为高光谱深度学习去噪提供了新视角。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.16298v1",
+      "source": "arxiv",
+      "title": "DDTNet: Degradation Disentanglement and Transfer Network for Test-Time All-in-One De-weathering Adaptation",
+      "abstract": "All-in-one adverse weather image restoration aims to remove multiple degradations, such as rain, haze, and snow, using a single unified model. Despite their broad applicability, existing methods typically compromise performance, delivering balanced but suboptimal results for individual degradation types. This issue becomes more pronounced when a domain gap exists between training and testing data. Motivated by the observation that modeling degradation patterns is more feasible than recovering clean content, we propose the Degradation Disentanglement and Transfer Network (DDTNet), which focuses specifically on degradation transfer. By disentangling degradation patterns from target-domain degraded images and transferring them to source domain clean images, DDTNet generates domain-adaptive paired training data. These pairs are then used to fine-tune restoration models, significantly enhancing their adaptability across diverse weather conditions and domains. The core of DDTNet is the Degradation Disentanglement Module (DDM), which comprises Degradation Coupled Attention (DCA) to capture both general and weather-specific features, thereby enabling effective disentanglement and transfer of degradation patterns. Experimental results demonstrate that DDTNet significantly and consistently improves existing all-in-one models across real-world deraining, desnowing, and dehazing datasets.",
+      "authors": [
+        "Kuan-Hung Lin",
+        "Fu-Jen Tsai",
+        "Yan-Tsung Peng",
+        "Min-Hung Chen",
+        "Chia-Wen Lin",
+        "Yen-Yu Lin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-15T07:05:16+00:00",
+      "link": "https://arxiv.org/pdf/2606.16298v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "degradation disentanglement and transfer network for multi-weather restoration, transferable to hyperspectral denoising",
+      "llm_evidence_cn": "基于退化解耦与迁移的多天气图像恢复网络，可迁移至高光谱去噪",
+      "llm_evidence": "基于退化解耦与迁移的多天气图像恢复网络，可迁移至高光谱去噪",
+      "canonical_evidence": "基于退化解耦与迁移的多天气图像恢复网络，可迁移至高光谱去噪",
+      "llm_tldr_en": "Proposes DDTNet for test-time all-in-one de-weathering by disentangling and transferring degradation patterns.",
+      "llm_tldr_cn": "该论文针对多天气图像恢复中训练-测试域差距问题，提出退化解耦与迁移网络，通过将目标域退化模式解耦并迁移至源域，实现自适应恢复。该方法不依赖固定退化先验，适用于未知退化类型。虽然针对天气退化，但思路可推广至高光谱图像中的噪声去除，尤其是条纹噪声等结构化噪声的迁移学习。实验表明DDTNet在多种天气下效果优于现有方法。",
+      "llm_tldr": "该论文针对多天气图像恢复中训练-测试域差距问题，提出退化解耦与迁移网络，通过将目标域退化模式解耦并迁移至源域，实现自适应恢复。该方法不依赖固定退化先验，适用于未知退化类型。虽然针对天气退化，但思路可推广至高光谱图像中的噪声去除，尤其是条纹噪声等结构化噪声的迁移学习。实验表明DDTNet在多种天气下效果优于现有方法。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.16392v1",
+      "source": "arxiv",
+      "title": "Towards UAV Image Dehazing: A UAV Atmospheric Scattering Model, Benchmark, and Geometry-Aware Deep Unfolding Network",
+      "abstract": "In UAV applications, haze significantly obscures distant details and weaken structural information, hindering the recovery of details. Current UAV scenarios still face two key challenges: (i) paired hazy/clean images from the real world are unobtainable, while the classical atmospheric scattering model is inadequate for modeling the spatially non-uniform haze in UAV imagery; (ii) existing dehazing methods struggle to remove the heavy haze accumulated in the upper regions of UAV images. To address these issues, we first propose a UAV Atmospheric Scattering Model (UASM), which explicitly incorporates flight altitude, viewing pitch, and extinction to characterize the non-uniform haze distribution in UAV imaging. Based on UASM, we develop a physics-driven dehazing framework, termed Geometry-aware Proximal Deep Unfolding Network (GP-DUN). Specifically, GP-DUN consists of three key modules: a Latent Geometry Estimator (LGE) that infers transmittance consistent with UAV imaging geometry, a Geometry-aware Gradient Descent Module (GeoGDM) that embeds UASM into the data-fidelity term and performs physics-consistent closed-form updates, and an Pooling-Expert Proximal Mapping Module (PE-PMM) that learns an implicit prior to restore textures and structures beyond the capability of explicit physical modeling. In addition, we further construct UASM-HazeSet, which provides controllable paired synthetic data together with 2,285 real UAV haze images for testing. Extensive experiments show that GP-DUN consistently outperforms existing methods on both UASM-HazeSet and real UAV haze benchmarks.",
+      "authors": [
+        "Wenxuan Fang",
+        "Jiangwei Weng",
+        "Yu Zheng",
+        "Junkai Fan",
+        "Guangfa Wang",
+        "Xiang Chen",
+        "Jian Yang",
+        "Jun Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-15T08:24:51+00:00",
+      "link": "https://arxiv.org/pdf/2606.16392v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "UAV image dehazing with geometry-aware deep unfolding, applicable to atmospheric correction and denoising",
+      "llm_evidence_cn": "无人机图像去雾方法，包含大气散射模型和几何感知深度展开，可用于遥感图像辐射校正",
+      "llm_evidence": "无人机图像去雾方法，包含大气散射模型和几何感知深度展开，可用于遥感图像辐射校正",
+      "canonical_evidence": "无人机图像去雾方法，包含大气散射模型和几何感知深度展开，可用于遥感图像辐射校正",
+      "llm_tldr_en": "Proposes a UAV atmospheric scattering model and geometry-aware deep unfolding network for haze removal, with a benchmark.",
+      "llm_tldr_cn": "该论文针对无人机图像去雾中非均匀雾霾难以建模、缺乏真实配对数据的问题，提出无人机大气散射模型，显式引入飞行高度、俯仰角等几何参数，并结合几何感知深度展开网络进行去雾。构建了仿真基准数据集，实验证明该方法能够有效去除非均匀雾霾，恢复细节。该方法为遥感图像中的大气校正和去噪提供了新的几何感知范式。",
+      "llm_tldr": "该论文针对无人机图像去雾中非均匀雾霾难以建模、缺乏真实配对数据的问题，提出无人机大气散射模型，显式引入飞行高度、俯仰角等几何参数，并结合几何感知深度展开网络进行去雾。构建了仿真基准数据集，实验证明该方法能够有效去除非均匀雾霾，恢复细节。该方法为遥感图像中的大气校正和去噪提供了新的几何感知范式。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "relative radiometric correction for remote sensing images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

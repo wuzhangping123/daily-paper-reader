@@ -1,0 +1,935 @@
+Title: DDTNet: Degradation Disentanglement and Transfer Network for Test-Time All-in-One De-weathering Adaptation
+
+URL Source: https://arxiv.org/pdf/2606.16298v1
+
+Published Time: Tue, 16 Jun 2026 02:18:29 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+> 1
+
+# DDTNet: Degradation Disentanglement and Transfer Network for Test-Time All-in-One De-weathering Adaptation 
+
+Kuan-Hung Lin*, Fu-Jen Tsai*, Yan-Tsung Peng, Senior Member, IEEE, 
+
+Min-Hung Chen, Chia-Wen Lin, Fellow, IEEE, and Yen-Yu Lin, Senior Member, IEEE 
+
+Abstract —All-in-one adverse weather image restoration aims to remove multiple degradations, such as rain, haze, and snow, using a single unified model. Despite their broad applicability, existing methods typically compromise performance, delivering balanced but suboptimal results for individual degradation types. This issue becomes more pronounced when a domain gap exists between training and testing data. Based on the observation that modeling degradation patterns is more tractable than recovering clean content, we propose the Degradation Disentanglement and Transfer Network (DDTNet), a framework designed specifically for degradation transfer. By disentangling degradation patterns from target-domain degraded images and transferring them to source-domain clean images, DDTNet generates domain-adaptive paired training data. These pairs are then used to fine-tune restoration models, significantly enhancing their adaptability across diverse weather conditions and domains. The core of DDTNet is the Degradation Disentanglement Module (DDM), which comprises Degradation Coupled Attention (DCA) to cap-ture both general and weather-specific features, thereby enabling effective disentanglement and transfer of degradation patterns. Experimental results demonstrate that DDTNet significantly and consistently improves existing all-in-one models across real-world deraining, desnowing, and dehazing datasets. 
+
+Index Terms —Low-level vision, adverse weather image restora-tion, domain adaptation 
+
+I. I NTRODUCTION 
+
+Image de-weathering aims to recover clean, high-quality images from inputs degraded by atmospheric conditions. In the past, research has focused on specialized solutions for individual weather conditions, such as deraining [1]–[11], dehazing [12]–[22], and desnowing [23]–[27]. However, be-cause weather conditions are inherently unpredictable and vary over time, de-weathering methods designed for a single type of weather-induced degradation have limited practical applicability. To overcome these limitations, all-in-one image de-weathering [28]–[38] has recently emerged as a significant research direction. Unlike task-specific approaches, a unified framework aims to handle multiple weather scenarios, making it more scalable and adaptable to real-world applications. To this end, several studies have explored jointly learning               
+
+> *Kuan-Hung Lin and Fu-Jen Tsai contributed equally to this work. Kuan-Hung Lin and Yen-Yu Lin are with National Yang Ming Chiao Tung University, Hsinchu 300093, Taiwan (e-mail: guan.cs13@nycu.edu.tw; lin@cs.nycu.edu.tw). Fu-Jen Tsai and Chia-Wen Lin are with National Tsing Hua University, Hsinchu 300044, Taiwan (e-mail: fjtsai@gapp.nthu.edu.tw; cwlin@ee.nthu.edu.tw). Yan-Tsung Peng is with National Chengchi University, Taipei 116011, Taiwan (e-mail: ytpeng@cs.nccu.edu.tw). Min-Hung Chen is with NVIDIA (e-mail: minhungc@nvidia.com). This work has been submitted to IEEE Transactions on Multimedia.
+
+degradation-specific and degradation-general representations within a shared architecture [29], [31], [32], [39]. Despite their specific designs and advancements, existing all-in-one methods face two critical bottlenecks: multi-task trade-off and domain gaps. First, the joint multi-task train-ing strategy inherently trades off performance across tasks. Although it enables a single model to handle diverse degra-dations, it usually yields suboptimal results for single tasks compared to specialized single-task models. Second, while most image restoration methods are sensitive to domain gaps between training and testing data, all-in-one methods are even more vulnerable as they capture a wide spectrum of degrada-tion statistics within a single architecture. Consequently, these domain shifts severely hinder all-in-one methods’ generaliza-tion and effectiveness in real-world deployment. To address these issues, previous studies [29], [30], [40], [41] have focused on improving restoration performance by re-fining restoration models. However, recovering unknown clean content directly from complex degradations is a highly ill-posed problem. In this work, we pivot from content recovery 
+
+to degradation modeling based on a key observation: mod-eling degradation patterns is inherently more tractable than directly recovering clean images, as these degradation patterns, like raindrops or haze, are relatively uniform, smooth, and dominated by low-frequency structures (Empirical evidence supporting this observation is provided in Section IV.B.). Consequently, we propose the Degradation Disentanglement and Transfer Network (DDTNet), which focuses on degra-dation transfer to enhance the performance of a restoration model. It disentangles degradation patterns from target-domain weather-degraded images and transfers them onto source-domain clean images, acting as targeted data augmentation. This process generates domain-adaptive pairs that reflect the target distribution and fine-tune all-in-one restoration models, thereby bridging the domain gap and improving restoration quality. As shown in Figure 1(a), the technical core of DDTNet is the Degradation Disentanglement Module (DDM), which uses a Degradation Coupled Attention (DCA) mechanism to effectively disentangle diverse degradation patterns. The DCA is a two-stage attention mechanism applied to learnable 
+
+degradation-sensing tokens . In the first stage, these tokens serve as queries to retrieve degraded features from the input image, yielding degradation tokens that encode the under-lying degradation patterns. In the second stage, the roles are reversed: the image tokens act as queries to aggregate information stored in these degradation tokens for distilling degradation features. Repeating this two-stage interaction can        
+
+> arXiv:2606.16298v1 [cs.CV] 15 Jun 2026 2(b) (a)
+> DDTNet
+> Transferred Image
+> Source-domain
+> Clean Image
+> Target Domain
+> Paired data
+> Source Domain
+> Transfer
+> Target-domain
+> Degraded Image
+> Content
+> Encoder
+> Degradation
+> Encoder
+> Transfer
+> Decoder
+> Rain Haze Snow General
+> Degradation-sensing Tokens
+> Degraded Image
+> Clean Image Transferred Image Attention L ayer 2
+> queries key-value pairs
+> queries
+> key-value pairs
+> Degradation Disentanglement
+> Module Attention L ayer 1
+> DDTNet
+> Fig. 1. DDTNet for all-in-one model adaptation. (a) DDTNet is a dual-branch encoder-decoder architecture with a Degradation Disentanglement Module (DDM). A degraded image is first fed into the degradation encoder branch, followed by a two-stage attention mechanism guided by Degradation-sensing Tokens encoding diverse weather cues, to disentangle the underlying degradation patterns. These disentangled degradation patterns are then transferred to a clean image processed by the content encoder branch and finally fused by the decoder to synthesize the target degraded image. (b) For test-time adaptation, DDTNet disentangles degradation patterns from a target-domain degraded image and transfers them to a source-domain clean image, generating paired images for fine-tuning an arbitrary all-in-one restoration model.
+
+progressively disentangle degradation patterns from the image. This disentanglement strategy is the core of our work, which allows DDTNet to transfer isolated degradation patterns from a target-domain degraded image to a source-domain clean image. As shown in Figure 1(b), this transfer process generates domain-adaptive paired data, consisting of clean source images with target-domain degradation patterns. These synthetic yet aligned pairs not only embed target-domain characteristics but also adapt to weather-specific conditions such as rain, haze, snow, or even mixed weather, which are then used to fine-tune de-weathering models. Through explicitly aligning the restoration models with target-domain degradations, DDTNet improves model performance and restoration quality in chal-lenging real-world scenarios. This work makes three primary contributions. First, we present DDTNet to tackle two critical challenges in all-in-one image restoration: suboptimal cross-task performance and sensitivity to domain gaps. DDTNet disentangles and transfers degradation patterns from target-domain degraded images to source-domain clean images, hence generating paired, domain-adaptive images for fine-tuning all-in-one restoration models. Second, we propose DCA, a two-stage attention mechanism that effectively identifies and separates degradation patterns from degraded images by alternating the roles of queries and key-value pairs between degradation sensing tokens and image tokens. Finally, we demonstrate through extensive experiments that DDTNet significantly improves existing all-in-one restora-tion models on real-world deraining, desnowing, and dehazing benchmarks. II. R ELATED WORK 
+
+This section reviews two research topics relevant to the de-velopment of our method, including all-in-one image restora-tion and domain adaptation for image restoration. 
+
+A. All-in-One Image Restoration 
+
+All-in-one image restoration aims to handle multiple degra-dations, such as rain, haze, and snow, using a unified model. To tackle this task, several studies [30], [32], [33], [36], [39], [42] explore learning both degradation-specific and degradation-agnostic features in the network. Potlapalli et al. [32] inte-grated degradation-specific cues into a unified model via learn-able prompts to handle diverse degradations. Cui et al. [33] extracted degradation-specific frequency subbands to adap-tively address different degradations through frequency mining and modulation. Furthermore, Tian et al. [39] introduced degradation-aware feature perturbations to align degradation-specific prompts within a unified architecture. Although these methods demonstrate the potential of unified networks to handle diverse degradations, they often yield suboptimal performance on individual tasks due to the inherent interference in multi-task joint training. Moreover, the domain gap between training and testing data frequently causes signif-icant performance drops, severely degrading restoration results in real-world scenarios. To overcome these inherent limitations, our proposed DDT-Net introduces a distinctly different test-time adaptation strat-egy. Rather than developing a complex unified restoration architecture, DDTNet synthesizes realistic training pairs by disentangling degradation patterns from the unseen target domain and transferring them to clean reference images. By leveraging these synthesized pairs for test-time fine-tuning, DDTNet not only narrows the domain gap but also allows a pre-trained all-in-one model to concentrate on the current degradation patterns, thereby effectively alleviating the sub-optimal performance issues associated with joint multi-task training. 3
+
+B. Domain Adaptation for Image Restoration 
+
+Domain adaptation in the field of image restoration seeks to narrow the domain gap between the source and target domains, ensuring that models trained on synthetic data generalize well to real-world scenarios. Early research primarily focuses on single-degradation scenarios [43], [44]. For instance, Wei et al. [43] and Shao et al. [44] utilized CycleGAN [45] to generate pseudo-training data for deraining and dehazing tasks. Patil et al. [46] proposed a domain translation approach that converts degraded images across weather types to learn weather-invariant features via generative adversarial networks (GANs). However, GAN-based translation often suffers from uncontrollable results, which limits its reliability for consistent weather modeling and synthesis. More recently, Chi et al. [47] introduced a meta-auxiliary learning strategy to enable fast test-time adaptation for deblurring. Although these methods alleviate the domain shift issue in single-degradation scenarios, they lack the flexibility to generalize across diverse degradation types. To address this, Liao et al. [48] proposed a general domain adaptation frame-work built upon a pre-trained diffusion model [49], which computes a diffusion loss to align the distributions of restored synthetic and real-world images. However, since this method is not tailored for all-in-one image restoration, which requires both degradation-specific and degradation-general features, it cannot effectively handle multiple degradations within a unified framework. The most closely related work to our method is our early study, the weather-transfer network (WTNet) [50], [51], which transfers target-domain weather patterns to clean images. However, WTNet relies heavily on the physical priors of the atmospheric scattering model (ASM) [51], [52] to disen-tangle and decompose weather patterns into two parameters, atmospheric light and haze density, which is insufficient to address diverse real-world degradation patterns, as real-world scenes often contain mixed and spatially varying degradations beyond the assumptions of ASM. In contrast, the proposed DDTNet bypasses these rigid physical priors and adopts a more general approach by disentangling and transferring both degradation-specific and degradation-general features. This enables DDTNet to transfer diverse degradation patterns from target domains to source-domain clean images, generating realistic training pairs for fine-tuning restoration models and improving restoration performance. III. P ROPOSED METHOD 
+
+In this section, we present the proposed Degradation Dis-entanglement and Transfer Network (DDTNet), a framework specifically designed to address two primary challenges in all-in-one image restoration: 1) the suboptimal task-specific performance of an all-in-one model on individual tasks com-pared to specialized single-task models and 2) the domain gap between synthetic training data and complex real-world scenes. Unlike previous methods that rely on task-specific physical priors, DDTNet employs a generalized degradation-transfer-driven strategy to synthesize high-quality, domain-adaptive training pairs. In the following, we first provide an architectural overview of DDTNet. We then detail the core design of the Degradation Disentanglement Module (DDM) and its Degradation-Coupled Attention (DCA) mechanism, which effectively disentangles and transfers diverse degradation patterns. Finally, we elab-orate on the complete test-time domain adaptation pipeline utilizing our generated adaptive pairs. 
+
+A. Overview 
+
+DDTNet is designed to transfer diverse degradation pat-terns from a degraded image in an unseen target domain to a clean image in the source domain. By doing so, the clean source image and its degradation-transferred counterpart form a domain-adaptive training pair. Consequently, DDTNet facilitates test-time adaptation (TTA) through the generation of these pairs, enabling model fine-tuning and significantly improving restoration performance under unseen degradation conditions. As illustrated in Figure 2(a), DDTNet adopts a dual-branch architecture: the top branch for extracting degradation features and the bottom branch for compiling content feature repre-sentation. Given a degraded image Id ∈ RH×W ×3 and a clean image Ic ∈ RH×W ×3, DDTNet employs a Degradation Encoder (DE) and a Content Encoder (CE) for feature extrac-tion. Both encoders consist of three scales, with each scale containing residual blocks. The two encoders produce multi-scale degradation features DE( Id) = {F di ∈ R H    
+
+> 2i×W
+> 2i×Ci
+
+} and content features CE( Ic) = {F ci ∈ R H    
+
+> 2i×W
+> 2i×Ci
+
+}, respectively, where i ∈ { 0, 1, 2} indexes the feature scale and Ci = 32 · 2i.At each scale i, the degradation features F di are pro-cessed by the proposed Degradation Disentanglement Mod-ule (DDM). The DDM integrates parallel Spatial-wise Degradation-Coupled Attention (DCA S) and Channel-wise Degradation-Coupled Attention (DCA C) layers to distill degradation cues while suppressing scene content. Specifi-cally, the DDM produces the distilled degradation features 
+
+˜F di = DDM( F di ) ∈ R H    
+
+> 2i×W
+> 2i×Ci
+
+via 
+
+DDM( F di ) = Conv 
+
+
+
+Concat  (DCA S)3(F di ),
+
+(DCA C)3(F di )
+
+, (1) where (DCA S)3 and (DCA C)3 denote the sequential appli-cation of three spatial and three channel attention layers, respectively. The specific mechanisms of DCA S and DCA C
+
+for simultaneous degradation cue distillation and scene content suppression are detailed in the next subsection. Subsequently, we apply the Transfer Decoder (TD), a net-work containing three scales with channel sizes of 128 , 64 ,and 32 , respectively, to fuse multi-scale distilled degraded features { ˜F di } and content features {F ci }, for generating the degradation-transferred image Io ∈ RH×W ×3 via 
+
+F i = TD i
+
+
+
+Concat   ˜F di , F ci , F (i+1) ↑ 
+
+, for i ∈ { 0, 1, 2},
+
+(2) where F 3 := ∅, and Io := F 0. Here, operator (·)↑ denotes a 2× upsampling operator, and {TD i}2 
+
+> i=0
+
+are the Transfer Decoder for different scales. 4DDM  
+
+> DDM
+> Degradation
+> Disentanglement Module
+> Softmax
+> Softmax
+
+Attention Layer 1  Attention Layer 2            
+
+> (b) (a)
+> Degradation-sensing Tokens
+> DE
+> CE
+> TD
+> Fig. 2. Network architecture of DDTNet. (a) DDTNet employs a dual-branch structure: the top branch extracts degradation features from a degraded image
+> Idvia a Degradation Encoder (DE) and a Degradation Disentanglement Module (DDM). The DDM leverages both spatial-wise and channel-wise Degradation Coupled Attention ( DCA Sand DCA C) to isolate degradation features from image content. The bottom branch extracts content features from a clean image
+> Icusing a Content Encoder (CE). These dual-branch features are fused through a Transfer Decode (TD) to generate the degradation-transferred image Io. (b) DCA is a two-stage attention mechanism: learnable degradation-sensing tokens Tfirst retrieve degradation patterns from a degraded image to yield degradation tokens ˜T, which are subsequently queried by image tokens to isolate degradation patterns from scene content by distilling only degradation features. Finally, a feedforward (FF) layer is applied to further refine these extracted representations.
+
+B. Degradation Coupled Attention (DCA) 
+
+Our proposed DCA is specifically designed to disentangle degradation patterns not only in single-degradation scenarios but also under complex mixed degradations, such as rain com-bined with haze or snow combined with haze. As illustrated in Figure 2(b), DCA adopts a two-stage attention mechanism guided by degradation-sensing tokens, enabling it to capture both degradation-general and degradation-specific features. Let the input features of DCA be X ∈ RN ×D , representing 
+
+N tokens of dimension D. In the first stage, X is processed by linear projection layers L to generate the key and value features, i.e., Xk ∈ RN ×D and Xv ∈ RN ×D , which is formulated as 
+
+(Xk, X v ) = L( X). (3) We then introduce a set of learnable degradation-sensing tokens T ∈ RM ×D , consisting of M tokens of dimension 
+
+D. These tokens are linearly projected through L′ to serve as queries, T q = L ′(T ), and can retrieve degradation-related in-formation from X via cross-attention, yielding the degradation tokens ˜T ∈ RM ×D :
+
+˜T = softmax( T q (Xk)⊤
+
+√D )Xv + T, (4) where ⊤ denotes the transpose operation. In practice, we set 
+
+M = 256 . The resulting ˜T can be regarded as a set of degradation kernels that are dynamically generated through the interaction between the input degraded image features and the degradation-sensing tokens. In the second stage, the roles are reversed: the input features 
+
+X act as queries to aggregate the information stored in the degradation tokens ˜T , thereby distilling degradation features. Specifically, we process X and ˜T through linear projection layers U and U′ to generate the query, key, and value features, denoted as Xq ∈ RN ×D , ˜T k ∈ RM ×D , and ˜T v ∈ RM ×D ,respectively: 
+
+Xq = U( X) and ( ˜T k, ˜T v ) = U ′( ˜T ). (5) It follows that the distilled degradation features ˜X ∈ RN ×D ,which retain degradation cues while suppressing scene content, are obtained via 
+
+˜X = softmax( Xq ( ˜T k)⊤
+
+√D ) ˜T v + X. (6) To effectively disentangle degradation patterns in the pro-posed DDM, we apply DCA along both the spatial and channel dimensions of the features. The spatial-wise DCA ( DCA S)emphasizes the geometric structure and spatial distribution of degradations, while the channel-wise DCA ( DCA C) concen-trates on the contrast and intensity attenuation of degradation, as detailed below. 
+
+a) Spatial-wise Degradation Coupled Attention ( DCA S): 
+
+Let the input to DCA S be X ∈ RH×W ×C . We first flatten X
+
+into a 2D tensor X ∈ RHW ×C , treating it as HW tokens of C dimensions. The reshaped input is then processed by the DCA operations as defined in Equations (3)–(6). Finally, the resulting features are projected back to the original spatial dimensions H × W × C to yield the output of DCA S.
+
+b) Channel-wise Degradation Coupled Attention (DCA C): Let the input feature map to DCA C be 
+
+X ∈ RH×W ×C . We first perform spatial pooling to X
+
+to obtain a downsampled representation Xpool ∈ R24 ×24 ×C ,and then reshape it into a 2D tensor of size RC×576 ,corresponding to C tokens of 576 dimensions. The 2D tensor is then processed by the DCA operations as defined in Equations (3)–(6), and the output is reshaped back to 
+
+24 × 24 × C. Finally, bilinear upsampling is utilized to restore the resolution to H × W × C, yielding the output of DCA C.5
+
+C. Loss Function 
+
+DDTNet is trained on degraded–clean-mixed triplets 
+
+{(Idi , I ci , I mi )}Ki=1 , where the ground-truth mixed image Imi
+
+preserves the scene content of Ici while exhibiting the same degradation patterns as Idi , as described in Section IV-A. To supervise the generation of each degradation-transferred image 
+
+Ioi = DDTNet( Idi , I ci ), we adopt the ℓ1 reconstruction loss, defined as 
+
+L = 1
+
+K
+
+> K
+
+X
+
+> i=1
+
+∥Ioi − Imi ∥1. (7) 
+
+D. Domain-Adaptive Fine-Tuning Process 
+
+After training, DDTNet is employed to transfer degrada-tion patterns from target-domain degraded images {Idi }Ki=1 to source-domain clean images {Ici }Ki=1 , randomly sampled from a source-domain dataset, where K denotes the total number of images in the target dataset. As illustrated in Figure 2(b), for each pair (Idi , I ci ), DDTNet generates a degradation-transferred image Ioi = DDTNet( Idi , I ci ), which preserves the scene content of Ici while embedding the degradation patterns from Idi . This process allows us to construct domain-adaptive training pairs Dadapt = {(Ioi , I ci )}Ki=1 , which are then used to update restoration models during testing. By generating the aligned training pairs with target-domain degradations and their corresponding clean images, DDTNet effectively adapts restoration models to the target domain, therefore improving their generalization and performance. IV. E XPERIMENTS 
+
+In this section, we conduct extensive experiments to evaluate the effectiveness of the proposed DDTNet. We first describe our experimental setup and implementation details, followed by quantitative and qualitative comparisons with state-of-the-art methods and detailed ablation studies to analyze the contributions of individual components. 
+
+A. Implementation Details a) Datasets: We construct a set of degraded-clean-mixed triplets {(Idi , I ci , I mi )}Ki=1 . Here, Idi denotes a degraded image from the target domain, Ici represents a clean image with different scene content, and Imi is a synthesized degraded image that preserves the content of Ici while incorporating the specific degradation patterns of Idi . This strategy enables the construction of triplet data that share consistent degradation patterns but differ in scene content to train DDTNet. The data synthesis process for generating the degraded image Im across different weather conditions is described as follows. For rainy and snowy scenarios, we employ degra-dation masks from the Rain100H [53], Rain100L [53], and Snow100K [25] datasets. Given a clean image Ic ∈ RH×W ×3,we extract a binary rain or snow mask M ∈ { 0, 1}H×W ×1
+
+from the corresponding degraded image Id. We then synthe-size the degraded image Im ∈ RH×W ×3 as follows: 
+
+Im = (1 − λM ) ⊙ Ic + ( λM ) ⊙ c, (8)   
+
+> TABLE I
+> HYPOTHESIS VERIFICATION :COMPARISON BETWEEN CLEAN IMAGE RECOVERY AND DEGRADATION PATTERN PREDICTION ACROSS DIFFERENT DEGRADATION TYPES (PSNR).
+
+Prediction Target Rain Snow Haze Average Image Recovery 32.83 30.51 38.67 34.15 Degradation Prediction 34.63 31.67 41.21 35.84 
+
+where ⊙ denotes element-wise multiplication, λ ∈ [0 , 1] is the mask coefficient controlling the degradation intensity, and c ∈
+
+[0 , 1] 1×1×3 represents the chromatic aberration value. For hazy images, we leverage the RESIDE dataset [54], which provides the parameters to synthesize images sharing the same haze characteristics (i.e., haze density and atmospheric light) but differing in content. Following previous methods [50], [51], we generate the hazy image Im ∈ RH×W ×3 using the clean image Ic with the specific haze parameters: 
+
+Im = Ic × M t + α × (1 − M t), (9) where α ∈ R3 represents the atmospheric light, and M t =
+
+e−β×d denotes the transmission map, which is determined by the haze density β ∈ R1.During training, we sample 5, 000 triplets for each of the three tasks, yielding a total of 15 , 000 pairs for jointly optimizing DDTNet and the restoration models. To evaluate the effectiveness of DDTNet, we use the real-world Weath-erStream dataset [55], which contains 4, 500 hazy, 3, 000 
+
+rainy, and 3, 960 snowy images with corresponding clean counterparts. This dataset poses a particularly challenging benchmark as it includes not only single-degraded cases but also mixed degradations, such as rain with haze and snow with haze. Furthermore, we adopt the latest real-world dataset, WeatherBench [56], which includes 200 images for each of the three weather types (rain, haze, and snow) to evaluate the effectiveness of DDTNet. 
+
+b) DDTNet Configuration: We optimize DDTNet using the Adam optimizer with a learning rate of 1 × 10 −4, a batch size of 4, and 150 training epochs. DDTNet comprises 31 
+
+million parameters and achieves an inference time of 33 ms on an NVIDIA RTX A5000 GPU for an input size of 256 ×256 .
+
+c) Restoration Models: To evaluate the effectiveness of DDTNet for domain adaptation, we adopt three state-of-the-art (SOTA) restoration models: PromptIR [32], AdaIR [33], and DFPIR [39]. All models are initially trained in an all-in-one manner on the 15 , 000 synthesized training pairs using their respective default training configurations. Although the fine-tuning time naturally varies with model architecture and the volume of generated domain-adaptive pairs, we find that asingle epoch of fine-tuning on our generated paired images is sufficient to achieve consistent performance gains. This demonstrates that DDTNet enables highly efficient domain adaptation without requiring extensive retraining. 
+
+B. Why Degradation Pattern Prediction is Easier? 
+
+To validate our observation that predicting degradation patterns from a degraded image is more tractable than directly recovering its clean image content, we conduct a comparative 6
+
+TABLE II 
+
+QUANTITATIVE COMPARISON OF DIFFERENT TEST -TIME DOMAIN ADAPTATION METHODS (S TYLE SSP, WTN ET , AND THE PROPOSED DDTN ET )
+
+INTEGRATED WITH THREE BASELINE MODELS (P ROMPT IR, A DA IR, AND DFPIR). EVALUATIONS ARE PERFORMED ON THE WEATHER STREAM AND 
+
+WEATHER BENCH DATASETS ACROSS THREE REAL -WORLD WEATHER TYPES : RAIN , SNOW , AND HAZE . T HE BEST RESULTS AMONG THE INTEGRATED METHODS FOR EACH BASELINE ARE HIGHLIGHTED IN BOLD .
+
+WeatherStream [55] WeatherBench [56] Method Rain Snow Haze Average Rain Snow Haze Average PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑
+
+PromptIR 
+
+Baseline 22.96 0.7620 21.36 0.7381 19.08 0.6894 21.13 0.7298 27.49 0.8327 22.52 0.7975 13.58 0.5783 21.20 0.7362 +StyleSSP 16.44  
+
+> (-6.52)
+
+0.6890  
+
+> (-0.0730)
+
+18.74  
+
+> (-2.62)
+
+0.7046  
+
+> (-0.0335)
+
+16.09  
+
+> (-2.99)
+
+0.6682  
+
+> (-0.0212)
+
+17.09  
+
+> (-4.04)
+
+0.6873  
+
+> (-0.0425)
+
+17.85  
+
+> (-9.64)
+
+0.7010  
+
+> (-0.1317)
+
+18.09  
+
+> (-4.43)
+
+0.7174  
+
+> (-0.0801)
+
+13.31  
+
+> (-0.27)
+
+0.5885  
+
+> (+0.0102)
+
+16.42  
+
+> (-4.78)
+
+0.6689 
+
+> (-0.0673)
+
++WTNet 23.24  
+
+> (+0.28)
+
+0.7365  
+
+> (-0.0255)
+
+21.90  
+
+> (+0.54)
+
+0.7260  
+
+> (-0.0121)
+
+19.75  
+
+> (+0.67)
+
+0.6485  
+
+> (-0.0409)
+
+21.62  
+
+> (+0.49)
+
+0.7043  
+
+> (-0.0255)
+
+25.61  
+
+> (-1.88)
+
+0.8211  
+
+> (-0.0116)
+
+21.95  
+
+> (-0.57)
+
+0.7762  
+
+> (-0.0213)
+
+13.65  
+
+> (+0.07)
+
+0.5850  
+
+> (+0.0067)
+
+20.41  
+
+> (-0.79)
+
+0.7274 
+
+> (+0.0088)
+
++DDTNet 23.82  
+
+> (+0.86)
+
+0.7699  
+
+> (+0.0079)
+
+22.12  
+
+> (+0.76)
+
+0.7442  
+
+> (+0.0061)
+
+20.72  
+
+> (+1.64)
+
+0.6945  
+
+> (+0.0061)
+
+22.22  
+
+> (+1.09)
+
+0.7362  
+
+> (+0.0064)
+
+28.29  
+
+> (+0.80)
+
+0.8592  
+
+> (+0.0265)
+
+23.83  
+
+> (+1.31)
+
+0.8020  
+
+> (+0.0045)
+
+13.78  
+
+> (+0.20)
+
+0.5858  
+
+> (+0.0075)
+
+21.97  
+
+> (+0.77)
+
+0.7490 
+
+> (+0.0128)
+
+AdaIR 
+
+Baseline 22.92 0.7616 21.26 0.7378 18.58 0.6870 20.92 0.7288 27.71 0.8433 22.53 0.7981 13.93 0.5885 21.39 0.7433 +StyleSSP 18.89  
+
+> (-4.03)
+
+0.6735  
+
+> (-0.0881)
+
+18.59  
+
+> (-2.67)
+
+0.6395  
+
+> (-0.0983)
+
+17.34  
+
+> (-1.24)
+
+0.6444  
+
+> (-0.0426)
+
+18.27  
+
+> (-2.65)
+
+0.6525  
+
+> (-0.0763)
+
+16.27  
+
+> (-11.44)
+
+0.6626  
+
+> (-0.1807)
+
+18.19  
+
+> (-4.34)
+
+0.5670  
+
+> (-0.2311)
+
+13.02  
+
+> (-0.91)
+
+0.6626  
+
+> (+0.0741)
+
+15.83  
+
+> (-5.56)
+
+0.6510 
+
+> (-0.0923)
+
++WTNet 23.01  
+
+> (+0.09)
+
+0.7422  
+
+> (-0.0331)
+
+21.90  
+
+> (+0.64)
+
+0.7257  
+
+> (-0.0121)
+
+19.23  
+
+> (+0.65)
+
+0.6513  
+
+> (-0.0357)
+
+21.38  
+
+> (+0.46)
+
+0.7064  
+
+> (-0.0224)
+
+26.63  
+
+> (-1.08)
+
+0.8450  
+
+> (+0.0017)
+
+22.47  
+
+> (-0.06)
+
+0.7770  
+
+> (-0.0211)
+
+13.63  
+
+> (-0.30)
+
+0.5879  
+
+> (-0.0006)
+
+20.91  
+
+> (-0.48)
+
+0.7366 
+
+> (-0.0067)
+
++DDTNet 24.17  
+
+> (+1.25)
+
+0.7753  
+
+> (+0.0137)
+
+22.49  
+
+> (+1.23)
+
+0.7490  
+
+> (+0.0112)
+
+20.42  
+
+> (+1.84)
+
+0.7010  
+
+> (+0.0140)
+
+22.36  
+
+> (+1.44)
+
+0.7416  
+
+> (+0.0128)
+
+27.84  
+
+> (+0.13)
+
+0.8466  
+
+> (+0.0033)
+
+22.73  
+
+> (+0.20)
+
+0.7997  
+
+> (+0.0016)
+
+13.96  
+
+> (+0.06)
+
+0.5955  
+
+> (+0.0070)
+
+21.51  
+
+> (+0.12)
+
+0.7472 
+
+> (+0.0039)
+
+DFPIR 
+
+Baseline 22.95 0.7525 21.12 0.7169 20.09 0.6752 21.19 0.7099 25.20 0.7232 22.18 0.7785 12.24 0.5146 19.87 0.6721 +StyleSSP 17.03  
+
+> (-5.92)
+
+0.6768  
+
+> (-0.0757)
+
+18.05  
+
+> (-3.07)
+
+0.6479  
+
+> (-0.0690)
+
+15.77  
+
+> (-4.32)
+
+0.6363  
+
+> (-0.0389)
+
+16.88  
+
+> (-4.31)
+
+0.6509  
+
+> (-0.0590)
+
+16.49  
+
+> (-8.71)
+
+0.6403  
+
+> (-0.0829)
+
+17.73  
+
+> (-4.45)
+
+0.6880  
+
+> (-0.0905)
+
+12.94  
+
+> (+0.70)
+
+0.4811  
+
+> (-0.0335)
+
+15.72  
+
+> (-4.15)
+
+0.6031 
+
+> (-0.0690)
+
++WTNet 23.14  
+
+> (+0.19)
+
+0.7539  
+
+> (+0.0014)
+
+21.96  
+
+> (+0.84)
+
+0.7234  
+
+> (+0.0065)
+
+19.13  
+
+> (-0.96)
+
+0.6428  
+
+> (-0.0324)
+
+21.16  
+
+> (-0.03)
+
+0.7001  
+
+> (-0.0098)
+
+25.05  
+
+> (-0.15)
+
+0.8113  
+
+> (+0.0811)
+
+22.04  
+
+> (-0.14)
+
+0.7562  
+
+> (-0.0223)
+
+13.25  
+
+> (+1.01)
+
+0.5109  
+
+> (-0.0037)
+
+20.11  
+
+> (+0.24)
+
+0.6928 
+
+> (+0.0207)
+
++DDTNet 24.04  
+
+> (+1.09)
+
+0.7645  
+
+> (+0.0120)
+
+21.80  
+
+> (+0.68)
+
+0.7194  
+
+> (+0.0025)
+
+21.16  
+
+> (+1.07)
+
+0.6805  
+
+> (+0.0053)
+
+22.13  
+
+> (+0.94)
+
+0.7160  
+
+> (+0.0061)
+
+27.14  
+
+> (+1.94)
+
+0.7958  
+
+> (+0.0726)
+
+22.21  
+
+> (+0.03)
+
+0.7800  
+
+> (+0.0015)
+
+13.40  
+
+> (+1.16)
+
+0.5431  
+
+> (+0.0285)
+
+20.91  
+
+> (+1.04)
+
+0.7064 
+
+> (+0.0343)
+
+DDTNet Avg Gain +1.07 +0.0112 +0.89 +0.0066 +1.52 +0.0084 +1.16 +0.0084 +0.96 +0.0341 +0.62 +0.0092 +0.47 +0.0143 +0.68 +0.0170 
+
+Fig. 3. Quantitative comparison among three training configurations: 1) task-specific training, 2) all-in-one training, and 3) all-in-one training enhanced with DDTNet. All-in-one methods (PromptIR, AdaIR, and DFPIR) often underperform their task-specific versions. In contrast, DDTNet enhances the performance of all-in-one models, allowing them to surpass task-specific performance. 
+
+experiment based on a standard U-Net architecture. Table I compares the PSNR results of two prediction targets across three degradation types. The first setting directly reconstructs clean images from degraded inputs, whereas the second pre-dicts the corresponding degradation components, i.e. , rain masks from rainy images, snow masks from snowy images, and transmission maps from hazy images. As shown in Table I, degradation pattern prediction achieves consistently higher PSNR values than clean image recovery for all three degradation types. These results support our hypothesis that degradation patterns are easier to model than clean image con-tent, thereby motivating our degradation-transfer-based design. 
+
+C. Quantitative Comparison 
+
+Table II presents a comprehensive quantitative comparison of different test-time domain adaptation (TTDA) methods integrated into three state-of-the-art (SOTA) all-in-one image restoration models: PromptIR [32], AdaIR [33], and DF-PIR [39]. In the table, “Baseline” denotes these SOTA models trained without any adaptation, while the subsequent rows show the results of applying StyleSSP [57], WTNet [50], and our proposed DDTNet to these baselines for TTDA. Compared to existing TTDA approaches, DDTNet demon-strates superior robustness and adaptability. Specifically, Sty-leSSP suffers from severe performance degradation on the WeatherBench dataset (e.g., PSNR drops of up to 11 .44 dB on AdaIR deraining) and fails to generalize effectively across varying degradation types. Meanwhile, WTNet provides only marginal gains or even negative impacts in several scenarios (e.g., a 1.88 dB drop on PromptIR deraining in Weather-Bench). In contrast, DDTNet consistently and significantly boosts performance across all baseline models and datasets. On WeatherStream [55], DDTNet yields impressive perfor-mance gains, boosting the average PSNR by 1.09 dB for PromptIR, 1.44 dB for AdaIR, and 0.94 dB for DFPIR. When investigated by task, DDTNet achieves overall average PSNR improvements of 1.07 dB for deraining, 0.89 dB for desnowing, and 1.52 dB for dehazing. On WeatherBench [56], 7Rain        
+
+> Snow
+> Haze
+> Input Baseline + DDTNet GT Input Baseline + DDTNet GT + WTNet + WTNet
+
+Fig. 4. Qualitative comparison of PromptIR on WeatherStream (left) and WeatherBench (right) between its baseline and its WTNet- and DDTNet-enhanced versions under rain, snow, and haze conditions. Rain        
+
+> Snow
+> Haze
+> Input Baseline + DDTNet GT Input Baseline + DDTNet GT + WTNet + WTNet
+
+Fig. 5. Qualitative comparison of DFPIR on WeatherStream (left) and AdaIR on WeatherBench (right) between their baselines and their WTNet- and DDTNet-enhanced versions under rain, snow, and haze conditions. 
+
+DDTNet likewise achieves notable gains, improving the aver-age PSNR by 0.77 dB, 0.12 dB, and 1.14 dB for Promp-tIR, AdaIR, and DFPIR, respectively. For each specific task, DDTNet delivers average PSNR improvements of 0.96 dB for deraining, 0.62 dB for desnowing, and 0.47 dB for dehazing. Furthermore, Figure 3 compares the three restoration models under three training configurations: 1) task-specific training, 2) all-in-one training, and 3) all-in-one training enhanced with DDTNet. The results confirm that all-in-one training typically suffers from inter-task interference, yielding suboptimal results compared to task-specific training. In contrast, DDTNet con-sistently improves performance across all models and tasks, even outperforming their task-specific counterparts. Overall, these results demonstrate that DDTNet not only improves restoration performance on unseen target domains but also effectively mitigates the inherent limitations of conventional all-in-one training schemes. We also compare DDTNet with the general-purpose domain adaptation approach for this task, Noise-DA [48]. To ensure a fair comparison, we adopt the UNet backbone used in Noise-DA as the baseline restoration model. We also re-implement Noise-DA with its official settings and train it on our dataset under the all-in-one training scheme. As reported in Table III, Noise-DA exhibits limited generalization: while it yields gains on deraining and desnowing, it causes a performance drop on dehazing, reflecting its lack of adaptability to diverse 
+
+TABLE III 
+
+QUANTITATIVE COMPARISON BETWEEN DDTN ET AND NOISE -DA ON 
+
+WEATHER STREAM , WITH THE RESTORATION BACKBONE EMPLOYED BY 
+
+NOISE -DA AS THE BASELINE .Rain Snow Haze Average Method PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑ PSNR ↑ SSIM ↑                        
+
+> Baseline 16.23 0.496 15.32 0.484 18.06 0.561 16.74 0.514 +Noise-DA 19.11 (+2.88) 0.596 (+0.100) 17.24 (+1.92) 0.577 (+0.093) 16.93 (-1.13) 0.583 (+0.022) 17.76 (+1.02) 0.586 (+0.072)
+> +DDTNet 24.56 (+8.33) 0.779 (+0.283) 21.55 (+6.23) 0.735 (+0.251) 21.12 (+3.06) 0.699 (+0.138) 22.41 (+5.67) 0.737 (+0.223)
+
+degradations in an all-in-one setting. In contrast, DDTNet disentangles heterogeneous degradation patterns to generate domain-adaptive pairs, consistently boosting the restoration performance across all tasks and achieving a substantial aver-age PSNR gain of 5.67 dB over the baseline. 
+
+D. Qualitative Comparison 
+
+We present qualitative comparisons of de-weathering re-sults using three restoration models, including PromptIR in Figure 4, and AdaIR and DFPIR in Figure 5. In these visualizations, “Baseline” denotes the models trained without DDTNet, whereas “+WTNet” and “+DDTNet” indicate their WTNet- and DDTNet-enhanced counterparts, respectively. The baseline models often struggle to generalize to diverse degradation patterns in the target domains. Although WTNet achieves promising results in degradation removal, it tends to 8Clean images  Degraded images  Transferred images   
+
+> Rain
+> Snow
+> Haze
+> Fig. 6. Examples of degradation-transferred images. Degradation patterns in the target-domain images from WeatherStream and WeatherBench are transferred to clean source-domain images from RESIDE.
+
+compromises fine-grained content details, leading to noticeable image distortion. In contrast, the DDTNet-enhanced models effectively remove complex degradations, producing visually superior and perceptually more realistic results. Figure 6 further shows examples of degradation-transferred images, where the degraded inputs are selected from Weath-erStream [55] and WeatherBench [56], and the clean images are sampled from RESIDE. In each case, DDTNet faithfully replicates the degradation patterns of the degraded images while strictly preserving the scene content of the clean image. These results demonstrate that DDTNet can successfully gen-erate domain-adaptive pairs that align with the target-domain degradation distribution, thereby enabling effective fine-tuning of restoration models and improving their performance during inference. These visualizations highlight DDTNet’s strong cross-domain generalization capability in handling diverse real-world weather degradations. 
+
+E. Ablation Studies 
+
+To analyze the quality of the generated degradation-transferred images, we construct a test set of 900 
+
+degraded–clean-mixed triplets {(Idi , I ci , I mi )}900  
+
+> i=1
+
+on Rain100H/Rain100L [53], Snow100K [25], and RESIDE [54], with 300 triplets per task, to synthesize rain, snowy, and hazy images. Based on this dataset, we provide a comprehensive component analysis of the proposed DDTNet. 
+
+a) Ablation Study of DDTNet: Table IV presents an ablation study of the two DCA components within DDT-Net: DCA S and DCA C. We implement four variants of the network, including 1) Net1: a vanilla encoder–decoder architecture without DDM, serving as the baseline; 2) Net2: Net1 augmented with DCA S alone in the DDM; 3) Net3: Net1 augmented with DCA C alone in the DDM; and 4) Ours: the complete DDTNet with both DCA S and DCA C. The                                                     
+
+> TABLE IV
+> COMPONENT ANALYSIS OF DDTN ET BASED ON THE AVERAGE PSNR OF DEGRADATION -TRANSFERRED IMAGES ACROSS RAIN 100H/L, SNOW 100K, AND RESIDE. Enc–Dec DDM PSNR
+> DCA SDCA C
+> Net1 ✓31.59 Net2 ✓✓34.30 Net3 ✓✓32.44 Ours ✓✓✓34.53
+> TABLE V
+> COMPONENT ANALYSIS OF DEGRADATION -C OUPLED ATTENTION
+> (DCA) BASED ON THE AVERAGE PSNR OF DEGRADATION -TRANSFERRED IMAGES ACROSS RAIN 100H/L, S NOW 100K, AND RESIDE. Enc–Dec Degr.-Sensing Attention Layers PSNR Tokens Attn–L1 Attn–L2 Net1 ✓31.59 Net4 ✓✓✓33.00 Net5 ✓✓✓33.35 Ours ✓✓✓✓34.53
+> TABLE VI
+> ABLATION STUDY OF THE DEGRADATION -SENSING TOKEN COUNT (M)
+> ON DEGRADATION TRANSFER QUALITY .
+
+Number of Tokens ( M ) 32 64 128 256 512 Average PSNR (dB) 32.78 32.93 33.46 34.49 34.01 
+
+results indicate that both Net2 and Net3 enhance the average performance of the baseline (Net1), yielding average PSNR gains of 2.71 dB and 0.85 dB, respectively. Our proposed DDTNet achieves the best overall performance among all variants. Specifically, DDTNet improves the average PSNR of the baseline encoder-decoder model by 2.94 dB across the three degradation removal tasks. 
+
+b) Ablation Study of DCA: Table V analyzes the ef-fectiveness and contributions of the proposed Degradation-Coupled Attention (DCA). DCA is composed of three internal components: degradation-sensing tokens, Attention Layer 1, and Attention Layer 2. We compare four module configura-tions, including 1) Net1: a pure encoder–decoder architecture without DDM, identical to the baseline in Table IV; 2) Net4: Net1 augmented with Attention Layers 1 and 2 in DCA, but without degradation-sensing tokens. In this case, the attention layers directly perform self-attention on the input features, functioning as a standard data-driven mechanism; 3) Net5: Net1 augmented with degradation-sensing tokens and Attention Layer 2, where the tokens are directly fed into the second attention layer without applying the designed coupling mechanism; and 4) Ours: the full DDTNet with all DCA com-ponents. The comparison reveals that both degradation-sensing tokens and the coupled attention layers individually improve the baseline. Crucially, the complete integration of all three components significantly outperforms the other variants. This verifies the effectiveness of the proposed DCA in facilitating robust degradation transfer. 9(b) (a)       
+
+> Fig. 7. Visualization of the learned degradation tokens and degradation features. (a) t-SNE visualization of the learned degradation tokens ˜T. (b) t-SNE analysis of the degradation features at different stages: (left) encoder output ˜Xwithout DDM, (middle) DCA without Attention Layer 1, and (right) the DDM output of the full DDTNet.
+
+c) Impact of Degradation-Sensing Token Count: To de-termine the optimal representational capacity for capturing complex weather conditions, we investigate the impact of the number of degradation-sensing tokens. Table VI reports the degradation transfer quality in terms of average PSNR across different token counts M ∈ { 32 , 64 , 128 , 256 , 512 }. As the results indicate, increasing the number of tokens from 32 to 
+
+256 yields a consistent performance improvement, with the av-erage PSNR rising from 32 .78 dB to a peak of 34 .49 dB. This suggests that a longer token sequence provides the network with a larger capacity to extract richer and more fine-grained degradation representations. However, further increasing M
+
+to 512 results in a slight performance decline to 34 .01 dB, likely due to the potential informational redundancy among these tokens and the risk of overfitting on the degradation representations. Consequently, we empirically set M = 256 
+
+as the default configuration for DDTNet to achieve the best trade-off between representational capacity and restoration performance. 
+
+d) Analysis of the Degradation Tokens and Features: 
+
+Figure 7(a) presents a t-SNE visualization of the learned degradation tokens ˜T , obtained by randomly sampling 150 images per task (deraining, desnowing, and dehazing). These learned tokens exhibit clear clustering based on their weather types: rain samples (blue) are grouped in the middle-right, haze samples (orange) are in the lower-left, and snow sam-ples (green) are near the center. This clear separation across weather types, combined with strong intra-class consistency, confirms that the degradation tokens ˜T effectively capture and disentangle degradation-specific features. Furthermore, Figure 7(b) presents the t-SNE plots of the output features produced by three module configurations. Its left plot corresponds to the model without the DDM (i.e., Net1 in Table V), where the encoder output features ˜X for rain, snow, and haze are heavily entangled. The middle plot corresponds to Net5 in Table V, which retains only Attention Layer 2. The output features ˜X still exhibit substantial overlap, though rain features can be separated from other weather types. As shown in the right plot, the full DDM produces distinct, weather-specific clusters. These results show that the DDM effectively disentangles degradation patterns and yields discriminative features, enabling robust degradation transfer in all-in-one restoration. V. C ONCLUSION 
+
+This paper introduces the Degradation Disentanglement and Transfer Network (DDTNet), a novel approach designed for domain adaptation in all-in-one image de-weathering. To address the common challenge where paired degraded–clean images are typically unavailable during target-domain infer-ence, DDTNet effectively transfers degradation patterns from target-domain degraded images onto source-domain clean images. This process generates domain-adaptive pairs for test-time fine-tuning. The technical cornerstone of DDTNet is the Degradation-Coupled Attention (DCA) mechanism, which integrates learnable degradation-sensing tokens to ex-tract degradation cues and then distills these degradation features through a two-stage attention mechanism. Extensive experimental results demonstrate that DDTNet substantially improves state-of-the-art all-in-one restoration models across real-world deraining, dehazing, and desnowing benchmarks, validating its effectiveness for robust cross-domain adaptation. Furthermore, while this study focuses on adverse-weather restoration, DDTNet’s generic encoder–decoder design and attention-based degradation transferability make it applica-ble to other restoration tasks, where degraded–clean–mixed triplets are available, providing a promising foundation for future research. REFERENCES [1] K. Jiang, Z. Wang, C. Chen, Z. Wang, L. Cui, and C.-W. Lin, “Magic ELF: Image deraining meets association learning and transformer,” in         
+
+> ACM Int. Conf. Multimedia , 2022. [2] X. Hu, C.-W. Fu, L. Zhu, and P.-A. Heng, “Depth-attentional features for single-image rain removal,” in Int. Conf. Comput. Vis. Pattern Recog. ,2019. [3] H. Wang, Q. Xie, Q. Zhao, and D. Meng, “A model-driven deep neural network for single image rain removal,” in Int. Conf. Comput. Vis. Pattern Recog. , 2020. [4] T. Wang, X. Yang, K. Xu, S. Chen, Q. Zhang, and R. W. Lau, “Spatial attentive single-image deraining with a high quality real rain dataset,” in Int. Conf. Comput. Vis. Pattern Recog. , 2019. [5] X. Fu, J. Huang, D. Zeng, Y. Huang, X. Ding, and J. Paisley, “Removing rain from single images via a deep detail network,” in Int. Conf. Comput. Vis. Pattern Recog. , 2017. 10
+
+[6] K. Jiang, Z. Wang, P. Yi, C. Chen, B. Huang, Y. Luo, J. Ma, and J. Jiang, “Multi-scale progressive fusion network for single image deraining,” in 
+
+Int. Conf. Comput. Vis. Pattern Recog. , 2020. [7] R. Li, L.-F. Cheong, and R. T. Tan, “Heavy rain image restoration: Integrating physics model and conditional adversarial learning,” in Int. Conf. Comput. Vis. Pattern Recog. , 2019. [8] X. Chen, J. Pan, and J. Dong, “Bidirectional multi-scale implicit neural representations for image deraining,” in Int. Conf. Comput. Vis. Pattern Recog. , 2024. [9] N. Gao, X. Jiang, X. Zhang, and Y. Deng, “Efficient frequency-domain image deraining with contrastive regularization,” in Eur. Conf. Comput. Vis. , 2024. [10] R. Zhang, J. Yu, J. Chen, G. Li, L. Lin, and D. Wang, “A prior guided wavelet-spatial dual attention transformer framework for heavy rain image restoration,” IEEE Transactions on Multimedia , 2024. [11] Y. Yang, J. Guan, S. Huang, W. Wan, Y. Xu, and J. Liu, “End-to-end rain removal network based on progressive residual detail supplement,” 
+
+IEEE Transactions on Multimedia , 2022. [12] H. Wu, Y. Qu, S. Lin, J. Zhou, R. Qiao, Z. Zhang, Y. Xie, and L. Ma, “Contrastive learning for compact single image dehazing,” in Int. Conf. Comput. Vis. Pattern Recog. , 2021. [13] C.-L. Guo, Q. Yan, S. Anwar, R. Cong, W. Ren, and C. Li, “Image dehazing transformer with transmission-aware 3d position embedding,” in Int. Conf. Comput. Vis. Pattern Recog. , 2022. [14] Y. Song, Z. He, H. Qian, and X. Du, “Vision transformers for single image dehazing,” IEEE Trans. Image Process. , 2023. [15] X. Liu, Y. Ma, Z. Shi, and J. Chen, “Griddehazenet: Attention-based multi-scale network for image dehazing,” in Int. Conf. Comput. Vis. ,2019. [16] Q. Deng, Z. Huang, C.-C. Tsai, and C.-W. Lin, “HardGAN: A haze-aware representation distillation GAN for single image dehazing,” in 
+
+Eur. Conf. Comput. Vis. , 2020. [17] H. Yu, N. Zheng, M. Zhou, J. Huang, Z. Xiao, and F. Zhao, “Frequency and spatial dual guidance for image dehazing,” in Eur. Conf. Comput. Vis. , 2022. [18] X. Qin, Z. Wang, Y. Bai, X. Xie, and H. Jia, “FFA-Net: Feature fusion attention network for single image dehazing,” in AAAI Conf. Artif. Intell. ,2020. [19] Y. Zhang, S. Zhou, and H. Li, “Depth information assisted collaborative mutual promotion network for single image dehazing,” in Int. Conf. Comput. Vis. Pattern Recog. , 2024. [20] W. Fang, J. Fan, Y. Zheng, J. Weng, Y. Tai, and J. Li, “Guided real image dehazing using ycbcr color space,” in AAAI Conf. Artif. Intell. ,2025. [21] C. Lin, X. Rong, and X. Yu, “Msaff-net: Multiscale attention feature fusion networks for single image dehazing and beyond,” IEEE Transac-tions on Multimedia , 2023. [22] J. Gui, X. Cong, L. He, Y. Y. Tang, and J. T.-Y. Kwok, “Illumination con-trollable dehazing network based on unsupervised retinex embedding,” 
+
+IEEE Transactions on Multimedia , 2024. [23] W.-T. Chen, H.-Y. Fang, J.-J. Ding, C.-C. Tsai, and S.-Y. Kuo, “JSTASR: Joint size and transparency-aware snow removal algorithm based on modified partial convolution and veiling effect removal,” in Eur. Conf. Comput. Vis. , 2020. [24] W.-T. Chen, H.-Y. Fang, C.-L. Hsieh, C.-C. Tsai, I. Chen, J.-J. Ding, S.-Y. Kuo et al. , “ALL Snow Removed: Single image desnowing algorithm using hierarchical dual-tree complex wavelet representation and contradict channel loss,” in Int. Conf. Comput. Vis. , 2021. [25] Y.-F. Liu, D.-W. Jaw, S.-C. Huang, and J.-N. Hwang, “DesnowNet: Context-aware deep network for snow removal,” IEEE Trans. Image Process. , 2018. [26] K. Zhang, R. Li, Y. Yu, W. Luo, and C. Li, “Deep dense multi-scale network for snow removal using semantic and geometric priors,” IEEE Trans. Image Process. , 2021. [27] Y. Wang, S. Liu, C. Chen, and B. Zeng, “A hierarchical approach for rain or snow removing in a single color image,” IEEE Trans. Image Process. , 2017. [28] B. Li, X. Liu, P. Hu, Z. Wu, J. Lv, and X. Peng, “All-In-One Image Restoration for Unknown Corruption,” in Int. Conf. Comput. Vis. Pattern Recog. , 2022. [29] J. M. J. Valanarasu, R. Yasarla, and V. M. Patel, “Transweather: Transformer-based restoration of images degraded by adverse weather conditions,” in Int. Conf. Comput. Vis. Pattern Recog. , 2022. [30] W.-T. Chen, Z.-K. Huang, C.-C. Tsai, H.-H. Yang, J.-J. Ding, and S.-Y. Kuo, “Learning multiple adverse weather removal via two-stage knowl-edge learning and multi-contrastive regularization: Toward a unified model,” in Int. Conf. Comput. Vis. Pattern Recog. , 2022. [31] D. Park, B. H. Lee, and S. Y. Chun, “All-in-one image restoration for unknown degradations using adaptive discriminative filters for specific degradations,” in Int. Conf. Comput. Vis. Pattern Recog. , 2023. [32] V. Potlapalli, S. W. Zamir, S. Khan, and F. Khan, “PromptIR: Prompting for all-in-one image restoration,” in Adv. Neural Inform. Process. Syst. ,2023. [33] Y. Cui, S. W. Zamir, S. Khan, A. Knoll, M. Shah, and F. S. Khan, “AdaIR: Adaptive all-in-one image restoration via frequency mining and modulation,” in Int. Conf. Learn. Represent. , 2025. [34] S. Sun, W. Ren, X. Gao, R. Wang, and X. Cao, “Restoring images in adverse weather conditions via histogram transformer,” Eur. Conf. Comput. Vis. , 2024. [35] J. Zhang, J. Huang, M. Yao, Z. Yang, H. Yu, M. Zhou, and F. Zhao, “Ingredient-oriented multi-degradation learning for image restoration,” in Int. Conf. Comput. Vis. Pattern Recog. , 2023, pp. 5825–5835. [36] A. Kulkarni, P. W. Patil, S. Murala, and S. Gupta, “Unified multi-weather visibility restoration,” IEEE Transactions on Multimedia , 2023. [37] Y. Wen, T. Gao, Z. Li, J. Zhang, K. Zhang, and T. Chen, “All-in-one weather-degraded image restoration via adaptive degradation-aware self-prompting model,” IEEE Transactions on Multimedia , 2025. [38] D. Cheng, Y. Li, D. Zhang, N. Wang, J. Sun, and X. Gao, “Progressive negative enhancing contrastive learning for image dehazing and beyond,” 
+
+IEEE Transactions on Multimedia , 2024. [39] X. Tian, X. Liao, X. Liu, M. Li, and C. Ren, “Degradation-aware feature perturbation for all-in-one image restoration,” in Int. Conf. Comput. Vis. Pattern Recog. , 2025. [40] H. Yang, L. Pan, Y. Yang, and W. Liang, “Language-driven all-in-one adverse weather removal,” in Int. Conf. Comput. Vis. Pattern Recog. ,2024. [41] D. Cheng, Y. Ji, D. Gong, Y. Li, N. Wang, J. Han, and D. Zhang, “Continual all-in-one adverse weather removal with knowledge replay on a unified network structure,” IEEE Transactions on Multimedia , 2024. [42] Y. Zhu, T. Wang, X. Fu, X. Yang, X. Guo, J. Dai, Y. Qiao, and X. Hu, “Learning weather-general and weather-specific features for image restoration under multiple adverse weather conditions,” in Int. Conf. Comput. Vis. Pattern Recog. , 2023. [43] Y. Wei, Z. Zhang, Y. Wang, M. Xu, Y. Yang, S. Yan, and M. Wang, “Deraincyclegan: Rain attentive cyclegan for single image deraining and rainmaking,” IEEE Trans. Image Process. , 2021. [44] Y. Shao, L. Li, W. Ren, C. Gao, and N. Sang, “Domain adaptation for image dehazing,” in Int. Conf. Comput. Vis. Pattern Recog. , 2020. [45] J.-Y. Zhu, T. Park, P. Isola, and A. A. Efros, “Unpaired image-to-image translation using cycle-consistent adversarial networks,” in Int. Conf. Comput. Vis. , 2017. [46] P. W. Patil, S. Gupta, S. Rana, S. Venkatesh, and S. Murala, “Multi-weather image restoration via domain translation,” in Int. Conf. Comput. Vis. , 2023. [47] Z. Chi, Y. Wang, Y. Yu, and J. Tang, “Test-time fast adaptation for dynamic scene deblurring via meta-auxiliary learning,” in Int. Conf. Comput. Vis. Pattern Recog. , 2021. [48] K. Liao, Z. Yue, Z. Wang, and C. C. Loy, “Denoising as adaptation: Noise-space domain adaptation for image restoration,” in Int. Conf. Learn. Represent. , 2025. [49] J. Ho, A. Jain, and P. Abbeel, “Denoising diffusion probabilistic models,” in Adv. Neural Inform. Process. Syst. , 2020. [50] S.-Y. Huang, F.-J. Tsai, C.-W. Lin, and Y.-Y. Lin, “Wtnet: A weather transfer network for domain-adaptive all-in-one adverse weather image restoration,” in Brit. Mach. Vis. Conf. , 2025. [51] K. He, J. Sun, and X. Tang, “Single image haze removal using dark channel prior,” in Int. Conf. Comput. Vis. Pattern Recog. , 2009. [52] R. Fattal, “Single image dehazing,” ACM Trans. Graph. , 2008. [53] W. Yang, R. T. Tan, J. Feng, J. Liu, Z. Guo, and S. Yan, “Deep joint rain detection and removal from a single image,” in Int. Conf. Comput. Vis. Pattern Recog. , 2017. [54] B. Li, W. Ren, D. Fu, D. Tao, D. Feng, W. Zeng, and Z. Wang, “Benchmarking single-image dehazing and beyond,” IEEE Trans. Image Process. , 2019. [55] H. Zhang, Y. Ba, E. Yang, V. Mehra, B. Gella, A. Suzuki, A. Pfahnl, C. C. Chandrappa, A. Wong, and A. Kadambi, “WeatherStream: Light transport automation of single image deweathering,” in Int. Conf. Com-put. Vis. Pattern Recog. , 2023. [56] Q. Guan, Q. Yang, X. Chen, T. Song, G. Jin, and J. Jin, “Weatherbench: A real-world benchmark dataset for all-in-one adverse weather image restoration,” in ACM Int. Conf. Multimedia , 2025. [57] R. Xu, W. Xi, X. Wang, Y. Mao, and Z. Cheng, “Stylessp: Sampling startpoint enhancement for training-free diffusion-based method for style transfer,” Int. Conf. Comput. Vis. Pattern Recog. , 2025.
