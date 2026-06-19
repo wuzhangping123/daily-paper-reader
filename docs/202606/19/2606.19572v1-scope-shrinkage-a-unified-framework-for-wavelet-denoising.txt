@@ -1,0 +1,629 @@
+Title: SCOPE Shrinkage: A Unified Framework for Wavelet Denoising
+
+URL Source: https://arxiv.org/pdf/2606.19572v1
+
+Published Time: Fri, 19 Jun 2026 00:12:10 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+# SCOPE Shrinkage: A Unified Framework for Wavelet Denoising 
+
+## Dixon Vimalajeewa 1, Vijini Lakmini 2, Malith Premarathna 1,Fabrizio Ruggeri 3, and Brani Vidakovic 2 
+
+> 1
+
+Department of Statistics, University of Nebraska, Lincoln, NE 68588, USA 
+
+> 2
+
+Department of Statistics, Texas A&M University, College Station, TX 77843, USA 
+
+> 3
+
+IMATI - CNR, 20133, Milano, Italy 
+
+## June 19, 2026 
+
+Abstract 
+
+We introduce Symmetric CDF Oriented Probability Enhanced (SCOPE) shrink-age, a unified family of sign-preserving shrinkage rules constructed from centered cumulative distribution functions of symmetric unimodal distributions. The pro-posed framework generates a broad class of attenuation profiles that interpolate between strong local shrinkage near zero and asymptotically unbiased behavior in the tails. A general formulation is developed that separates scale and shape ef-fects through two interpretable parameters, allowing effective threshold location and transition sharpness to be controlled independently. Under explicit regularity assumptions, structural properties of SCOPE shrinkage are established, including oddness, monotonicity, continuity, contractivity, and a mixture representation that connects the rules to softened thresholding operators. A Bayesian and penalized likelihood interpretation is also developed: SCOPE rules admit even penalty representations that are nondecreasing in coefficient magnitude, and suitable subclasses arise as exact maximum a posteriori estimators under proper symmetric unimodal priors. Representative examples based on logistic, uniform, and Cauchy distributions illustrate how probabilistic shape governs shrinkage behavior. Data driven parameter selection for smooth subclasses is discussed via Stein-type unbiased risk estimation. Oracle calibrated simulation studies on standard Donoho-Johnstone test func-tions show that SCOPE shrinkage performs competitively with several established wavelet denoising methods, while retaining a high degree of interpretability and 
+
+1
+
+> arXiv:2606.19572v1 [stat.ME] 17 Jun 2026 structural flexibility. The results highlight centered distribution functions as a nat-ural and versatile design principle for shrinkage in wavelet denoising and related estimation problems.
+
+# 1 Introduction 
+
+Shrinkage rules play a central role in modern nonparametric estimation, particularly in wavelet denoising, where noisy coefficients must be attenuated in a way that suppresses noise while preserving significant signal features. A useful shrinkage rule should preserve sign, contract small coefficients strongly, leave large coefficients essentially unchanged, and pass between these regimes in a stable and interpretable manner. These requirements have motivated a large literature in wavelet based estimation, where shrinkage functions are valued not only for empirical performance but also for the structural insight they provide into statistical regularization. Classical wavelet shrinkage methods were developed by Donoho and Johnstone (Donoho and Johnstone, 1994, 1995), with important extensions based on SURE, multiple testing ideas (Abramovich and Benjamini, 1996), cross-validation (Nason, 1996), decision theory (Ruggeri and Vidakovic, 1999), Γ-minimax theory (Vimalajeewa et al., 2023), and pe-nalized likelihood formulations (Antoniadis and Fan, 2001; Fan and Li, 2001). Bayesian approaches to wavelet shrinkage have also been studied extensively, including adaptive multiscale posterior location rules and Bayes factors (Vidakovic, 1998; Vidakovic and Ruggeri, 2001; Chipman et al., 1997). At the same time, many successful rules have been introduced in rather specialized forms, making it natural to ask whether a broader and more unified design principle may underlie them. In this paper we introduce such a framework, termed SCOPE shrinkage , short for 
+
+Symmetric CDF Oriented Probability Enhanced shrinkage. The basic idea is simple. Let 
+
+F be a symmetric unimodal distribution function on R and define its centered version by 
+
+F ∗(x) = 2 F (x) − 1. (1) The function F ∗ is odd and bounded between −1 and 1, and for regular choices of F it is locally linear near the origin and saturates in the tails. These are exactly the qualitative features one wants from a shrinkage attenuation factor. Near zero, the attenuation is small and strong contraction is enforced. Far from zero, the attenuation approaches one in magnitude and large coefficients are nearly preserved. The SCOPE construction inserts an observed coefficient x into this centered distribu-tion through the scaled argument λx , where λ > 0 controls the effective scale at which shrinkage transitions from active to negligible. The attenuation factor is then raised to a power k ≥ 0, which allows the sharpness of that transition to be adjusted independently 2of scale. This leads to the general SCOPE rule 
+
+δ(x; λ, k ) = x |F ∗(λx )|k. (2) This form is transparent and flexible. The factor x preserves sign, while |F ∗(λx )|k acts as a bounded attenuation term taking values in [0 , 1] . Thus the rule never amplifies a coefficient, yet it can range from very gentle shrinkage to sharply concentrated attenuation depending on the choices of λ, k, and the underlying distribution F .The two parameters λ and k play distinct and interpretable roles. The parameter λ
+
+governs the horizontal scale of the transition region. Since the centered CDF is evaluated at λx , the effective width of the central shrinkage region is of order 1/λ . The parameter 
+
+k governs the sharpness of the transition between strong shrinkage near zero and near identity behavior away from zero. Small values of k produce gentler attenuation, while larger values produce more decisive shrinkage without forcing a discontinuous rule. We first present three analytically transparent prototypes: logistic, uniform, and Cauchy. These examples clarify the main mechanisms of the construction. The sim-ulation study later includes additional smooth centered CDFs, namely normal, Laplace, and hyperbolic secant specifications, because they are natural smooth competitors for practical denoising. Their explicit formulas are reported in the supplementary material. The contribution of the paper is therefore twofold. First, it provides a unified distri-bution based construction of shrinkage rules with interpretable scale and shape control. Second, it shows that this construction is practically useful in wavelet denoising, where one seeks rules that are competitive, stable, and amenable to data-driven tuning. Our emphasis in the main text is on the core methodological thread: definition of the class, de-fensible structural properties under explicit assumptions, representative prototype rules, practical parameter selection, and concise empirical validation. The remainder of the paper is organized as follows. Section 2 defines the SCOPE family and its main structural properties. Section 3 presents the logistic, uniform, and Cauchy prototypes. Section 4 develops the penalty and Bayesian interpretation, includ-ing the distinction between generalized and proper-prior MAP representations. Section 5 reports simulation results on Donoho-Johnstone test functions and comparisons with benchmark denoising methods. Section 6 concludes. Additional derivations, tuning de-tails, extensions, and empirical results are given in the supplementary material. 
+
+# 2 Definition and Basic Properties 
+
+The shrinkage rules studied in this paper are motivated by the standard nonparametric regression model 
+
+yi = fi + σε i, i = 1 , . . . , n, (3) 3where εi
+
+> iid
+
+∼ N (0 , 1) and σ > 0 is assumed known. Under an orthonormal wavelet trans-form, this model becomes the Gaussian sequence model 
+
+xi = θi + σε i, i = 1 , . . . , n, (4) where xi are the empirical wavelet coefficients and θi are the corresponding signal coeffi-cients. Since σ is known, one may equivalently standardize by σ and work with 
+
+x∗ 
+
+> i
+
+= θ∗ 
+
+> i
+
++ εi, x∗ 
+
+> i
+
+= xi/σ, θ∗ 
+
+> i
+
+= θi/σ, (5) so that, without loss of generality for the theoretical development, the noise variance may be taken to be 1.The SCOPE shrinkage rule is applied coordinatewise in the wavelet domain to estimate the signal coefficient vector (θ1, . . . , θ n) from the noisy empirical coefficients (x1, . . . , x n).The resulting estimator (bθ1, . . . , bθn) is then mapped back to the signal domain by the inverse wavelet transform, producing the estimator bf = ( bf1, . . . , bfn) of f = ( f1, . . . , f n).For notational simplicity, in what follows we write x for a generic observed coefficient. 
+
+Standing assumption. Throughout this section, unless stated otherwise, F denotes a continuous symmetric unimodal distribution function on R such that its centered version 
+
+F ∗(x) = 2 F (x) − 1 (6) is continuous, odd, and satisfies 
+
+xF ∗(x) > 0, x̸ = 0 , (7) 
+
+−1 ≤ F ∗(x) ≤ 1, x ∈ R. (8) 
+
+Definition 1 (General SCOPE shrinkage rule). Let λ > 0 and k ≥ 0. The SCOPE shrinkage rule associated with F is defined by 
+
+δ(x; λ, k ) = x |F ∗(λx )|k. (9) When k = 0 , we adopt the natural convention |F ∗(λx )|0 ≡ 1, so that 
+
+δ(x; λ, 0) = x. (10) The construction is transparent. The coefficient x is inserted into the centered dis-tribution through the scaled argument λx , and its magnitude is then modulated by the attenuation factor |F ∗(λx )|k. Because |F ∗(u)| ≤ 1, the rule never amplifies a coefficient. The factor x outside the modulus preserves sign, while λ and k govern scale and sharpness of transition. 4Proposition 1 (Core structural properties). Let δ(x; λ, k ) be defined by 
+
+δ(x; λ, k ) = x|F ∗(λx )|k,
+
+where λ > 0 and k ≥ 0. Then the following hold. (a) δ(·; λ, k ) is odd. (b) δ(·; λ, k ) is sign-preserving, that is, 
+
+sgn δ(x; λ, k ) = sgn( x), x̸ = 0 .
+
+(c) δ(·; λ, k ) is contractive in magnitude: 
+
+|δ(x; λ, k )| ≤ | x|, x ∈ R.
+
+(d) δ(·; λ, k ) is monotone increasing on R.(e) δ(·; λ, k ) is continuous on R.(f) δ(·; λ, k ) is tail-preserving in the relative sense: 
+
+δ(x; λ, k )
+
+x −→ 1, |x| → ∞ .
+
+The proof of Proposition 1 is deferred to the supplementary material. The proposition captures the main qualitative behavior of SCOPE shrinkage in a compact way. The rule is odd, sign-preserving, monotone, bounded in magnitude by the identity map, and approaches the identity in the relative tail sense. These are precisely the features one wants from a stable shrinkage transformation. 
+
+Remark 1 (Odd-k form as a special case). Suppose that k is an odd positive integer. Then the SCOPE rule can be written equivalently as 
+
+δ(x; λ, k ) = |x|{ F ∗(λx )}k. (11) Indeed, since F ∗ is odd, 
+
+F ∗(λx ) = sgn( x)|F ∗(λx )|. (12) For odd k,
+
+{F ∗(λx )}k = sgn( x)|F ∗(λx )|k. (13) Multiplying by |x| gives the stated identity. Thus, the equation (11) is occasionally convenient algebraically, but the general form (9) is the primary definition and remains valid for all real k ≥ 0.52.1 Mixture of uniforms representation 
+
+A particularly useful structural fact is that SCOPE attenuation factors inherit a mixture representation from the underlying symmetric unimodal distribution. This connects the framework to softened threshold type operators and helps explain why the family is both flexible and interpretable. 
+
+Theorem 1. (Mixture of uniforms representation) Let F be a continuous symmet-ric unimodal distribution function with centered version F ∗(x) = 2 F (x) − 1. Then there exists a probability distribution G on [0 , ∞) such that 
+
+|F ∗(u)| =
+
+Z ∞
+
+> 0
+
+min 
+
+|u|
+
+t , 1
+
+
+
+dG (t), u ∈ R. (14) Consequently, for every λ > 0 and k ≥ 0,
+
+δ(x; λ, k ) = x
+
+Z ∞
+
+> 0
+
+min 
+
+|λx |
+
+t , 1
+
+
+
+dG (t)
+
+k
+
+. (15) 
+
+Proof. By the classical Khintchine representation for symmetric unimodal laws, a sym-metric unimodal distribution can be represented as a scale mixture of centered uniform laws (Khintchine, 1938). Thus there exists a probability distribution G on [0 , ∞) such that 
+
+F (x) = 
+
+Z ∞
+
+> 0
+
+Ft(x) dG (t), (16) where, for t > 0, Ft denotes the distribution function of the uniform law on [−t, t ], and for t = 0 we interpret F0 as the degenerate distribution at 0.For t > 0 one has 
+
+2Ft(x) − 1 = sgn( x) min 
+
+|x|
+
+t , 1
+
+
+
+. (17) Substituting (17) into (16) and centering yields 
+
+F ∗(x) = sgn( x)
+
+Z ∞
+
+> 0
+
+min 
+
+|x|
+
+t , 1
+
+
+
+dG (t). (18) Taking absolute values gives (14). Replacing u by λx and raising to the power k gives (15). □
+
+The interpretation is quite appealing. Each SCOPE attenuation factor can be viewed as an average of elementary attenuators of the form 
+
+min 
+
+|λx |
+
+t , 1
+
+
+
+, (19) which are the basic softened linear building blocks of threshold like behavior. The expo-nent k then sharpens or softens this averaged attenuation without changing the funda-mental sign-preserving and bounded structure of the rule. 63 Prototype SCOPE Rules 
+
+In this section we present three representative SCOPE shrinkage rules that capture the main qualitative behaviors of the framework. Rather than giving an extensive catalog of possible underlying distributions, we focus on logistic, uniform, and Cauchy models. These three examples are sufficient for the main paper. They are explicit, easy to inter-pret, and together they display the principal roles of central behavior, saturation, and tail thickness in shaping shrinkage. The logistic rule provides a smooth analytic benchmark with gradual saturation. The uniform rule yields an especially transparent piecewise form, making the transition from central shrinkage to exact identity completely explicit. The Cauchy rule illustrates the effect of heavier tails, which slow the approach of the attenuation factor to one and therefore maintain shrinkage farther into the tails. More elaborate constructions can be viewed as extensions of these three prototypes and are deferred to supplementary material. 
+
+## 3.1 The logistic SCOPE rule 
+
+We begin with the logistic distribution, which leads to one of the simplest and most useful members of the SCOPE family. Its centered distribution function has a closed form and the resulting shrinkage rule is smooth and analytically transparent. The standard logistic distribution function is 
+
+F (x) = 11 + e−x . (20) Its centered version is 
+
+F ∗(x) = 2 F (x) − 1 = ex − 1
+
+ex + 1 = tanh 
+
+x
+
+2
+
+
+
+. (21) Absorbing the factor 1/2 into the scale parameter, we write 
+
+F ∗(λx ) = tanh( λx ), λ > 0. (22) The corresponding logistic SCOPE rule is therefore 
+
+δ(x; λ, k ) = x | tanh( λx )|k, k ≥ 0. (23) This rule is continuous, odd, sign-preserving, and bounded in magnitude by |x|. Near the origin, 
+
+tanh( λx ) = λx + O(x3), x → 0, (24) so 
+
+δ(x; λ, k ) = x |λx |k 1 + o(1) , x → 0. (25) 7(a) (b) (c) 
+
+Fig. 1: SCOPE rules: (a) logistic SCOPE shrinkage rules with λ = 1 and k = 1 , 3, 5, 7,with the identity line shown for comparison; (b) uniform SCOPE shrinkage rule with 
+
+λ = 1 and k = 3 ; and (c) comparison of normal, Laplace, and Cauchy SCOPE rules with 
+
+λ = 1 and k = 3 . The Cauchy rule remains farther from the identity for moderate and large |x|.. Thus small coefficients are contracted at polynomial order k + 1 . In the tails, 
+
+tanh( λx ) → sgn( x) as |x| → ∞ , (26) and hence δ(x; λ, k )
+
+x −→ 1, |x| → ∞ . (27) Large coefficients are therefore preserved in relative scale. The roles of the parameters are particularly clear in this prototype. The parameter 
+
+λ controls the width of the central transition region, while k controls how sharply the rule moves from strong attenuation near zero to near-identity behavior away from zero. Increasing k produces a more decisive threshold-like transition, but the rule remains continuous. Figure 1a illustrates this progression. For small k the attenuation is gentle and globally smooth. As k increases, the rule becomes flatter near zero and more rapidly approaches the identity outside the central region. 
+
+## 3.2 The uniform SCOPE rule 
+
+The uniform distribution gives the most explicit prototype in the SCOPE family. Unlike the logistic case, whose attenuation factor saturates smoothly, the uniform centered dis-tribution saturates exactly after a finite point. This yields a rule that is polynomial near zero and exactly equal to the identity outside the active shrinkage region. 8Consider the uniform distribution on [−1, 1] , whose distribution function is 
+
+F (x) = 
+
+
+
+0, x < −1,x + 1 2 , −1 ≤ x ≤ 1,
+
+1, x > 1.
+
+(28) Its centered version is 
+
+F ∗(x) = 2 F (x) − 1 = 
+
+
+
+−1, x < −1,x, −1 ≤ x ≤ 1,
+
+1, x > 1.
+
+(29) The associated SCOPE rule is 
+
+δ(x; λ, k ) = x |F ∗(λx )|k, k ≥ 0. (30) Because F ∗ is piecewise linear, the rule can be written explicitly: 
+
+δ(x; λ, k ) = 
+
+
+
+x |λx |k, |λx | ≤ 1,x, |λx | > 1.
+
+(31) Thus, in the central region |x| ≤ 1/λ , the rule has the power-law form x|λx |k, with local order k +1 . Outside that region it is exactly the identity. The parameter λ therefore determines the width of the active shrinkage zone, while k determines the curvature of the central contraction. This example is particularly useful because it shows, in a completely explicit way, how a SCOPE rule can connect strong local contraction to exact tail preservation without any discontinuity in the rule itself. It is not smooth in the usual differentiable sense at the joining points, but it remains continuous and monotone. Figure 1b displays the uniform prototype for λ = 1 and k = 3 . The figure makes the two-regime structure visually explicit: power-law contraction near the origin and exact identity outside the interval of active shrinkage. 
+
+## 3.3 The Cauchy SCOPE rule 
+
+The third prototype is generated by the Cauchy distribution. It serves to illustrate how heavier tails in the underlying distribution produce slower saturation in the attenuation factor and hence more persistent shrinkage of moderate and large coefficients. The standard Cauchy distribution function is 
+
+F (x) = 12 + 1
+
+π arctan( x). (32) 9Its centered version is 
+
+F ∗(x) = 2 F (x) − 1 = 2
+
+π arctan( x). (33) Accordingly, the Cauchy SCOPE rule is 
+
+δ(x; λ, k ) = x 2
+
+π arctan( λx )
+
+> k
+
+, k ≥ 0. (34) Near the origin, 
+
+arctan( λx ) = λx + O(x3), x → 0, (35) so 
+
+δ(x; λ, k ) = x 2λx π 
+
+> k
+
+ 1 + o(1) , x → 0. (36) Thus the Cauchy rule, like the previous prototypes, contracts small coefficients at poly-nomial order k + 1 . The main difference appears away from the origin. Since arctan( u)
+
+approaches its limiting values only slowly, 
+
+2
+
+π arctan( λx )
+
+> k
+
+(37) approaches one more gradually than in thinner-tailed models. As a result, the Cauchy CDF saturates slowly, so attenuation persists farther into the tails. This can be useful as a conservative rule, but it may overshrink moderate and large coefficients, which agrees with the simulation results. This behavior makes the Cauchy prototype closer in spirit to rules with persistent tail attenuation: it is conservative for moderate coefficients, but the price is additional bias for moderately large coefficients. Figure 1c compares the Cauchy rule with normal and Laplace variants at λ = 1 and 
+
+k = 3 . The Cauchy curve stands out by attenuating larger coefficients more strongly, reflecting the slower saturation induced by heavier tails. 
+
+# 4 Bayesian and penalty interpretation of SCOPE 
+
+A complementary way to understand SCOPE shrinkage is through a Bayesian or pe-nalized likelihood lens. This viewpoint is useful, but it must be stated carefully. For a broad SCOPE rule one can always construct a symmetric penalty for which the SCOPE estimator is the exact penalized Gaussian estimator. Whether that penalty corresponds to a proper prior density is a separate question, and depends on the tail behavior of the rule. This distinction is important for the prototype rules studied in this paper and will also clarify the role of this section relative to the simulation study. 10 Throughout this section, let 
+
+δ(x; λ, k ) = x |F ∗(λx )|k, λ > 0, k ≥ 0, (38) where F ∗(x) = 2 F (x) − 1 is the centered version of a continuous symmetric unimodal distribution function F .We assume throughout that for the chosen F , λ, and k, the map x 7 → δ(x; λ, k )
+
+is strictly increasing on R. From Section 2, δ is continuous, odd, sign-preserving, and satisfies 
+
+|δ(x; λ, k )| ≤ |x|, x ∈ R, (39) 
+
+δ(x; λ, k )
+
+x −→ 1, |x| → ∞ . (40) Consider the Gaussian location model 
+
+X | θ ∼ N (θ, σ 2), σ2 > 0. (41) Since δ is continuous, odd, unbounded in both directions, and strictly increasing, it admits a continuous odd inverse 
+
+h(θ) = δ−1(θ). (42) Because |δ(x)| ≤ | x|, we have 
+
+h(θ) ≥ θ for θ ≥ 0. (43) 
+
+Theorem 2. (Generalized MAP or penalty representation of SCOPE) Let δ be a SCOPE rule of the form 
+
+δ(x) = x|F ∗(λx )|k, λ > 0, k ≥ 0,
+
+and assume that δ is continuous, odd, strictly increasing on R, and satisfies 
+
+|δ(x)| ≤ | x|, x ∈ R,
+
+together with 
+
+lim  
+
+> x→∞
+
+δ(x) = ∞, lim  
+
+> x→−∞
+
+δ(x) = −∞ .
+
+Then δ is a one-to-one and onto map from R to R, and hence it has a continuous, odd, strictly increasing inverse h = δ−1. Define 
+
+Ψ( θ) = 1
+
+σ2
+
+Z θ
+
+> 0
+
+{h(u) − u} du. (44) Then the following statements hold. 11 First, Ψ is even and nondecreasing in |θ|.Second, for each observed x ∈ R, the criterion 
+
+Qx(θ) = (x − θ)2
+
+2σ2 + Ψ( θ)
+
+has the unique global minimizer 
+
+bθ(x) = δ(x).
+
+Equivalently, under these assumptions, the SCOPE rule is an exact penalized Gaussian estimator. It may also be interpreted as a generalized MAP estimator under the formal prior 
+
+π(θ) ∝ exp {− Ψ( θ)}, (45) which may be proper or improper. 
+
+Proof. Since δ is odd and strictly increasing, its inverse h is also odd and strictly increas-ing. Hence h(u) − u is odd, so the integral in (44) defines an even function Ψ.Next, (43) implies that h(θ) − θ ≥ 0 for θ ≥ 0, hence 
+
+Ψ′(θ) = h(θ) − θσ2 ≥ 0 for θ > 0. (46) By oddness of h(θ) − θ, it follows that Ψ′(θ) ≤ 0 for θ < 0. Therefore Ψ is nondecreasing in |θ|.Now fix x ∈ R. Differentiating Qx(θ) gives 
+
+Q′
+
+> x
+
+(θ) = θ − xσ2 + Ψ ′(θ)= θ − xσ2 + h(θ) − θσ2
+
+= h(θ) − xσ2 . (47) Because h is strictly increasing, Q′
+
+> x
+
+(θ) < 0 when θ < δ (x), Q′
+
+> x
+
+(θ) = 0 when θ = δ(x),and Q′
+
+> x
+
+(θ) > 0 when θ > δ (x). Therefore Qx(θ) decreases up to θ = δ(x) and increases afterward. Hence δ(x) is the unique global minimizer of Qx(θ). □
+
+Theorem 2 is the correct general statement. Every SCOPE rule satisfying the assumptions of Theorem 2 is an exact penalized estimator under an even, nondecreasing in |θ| penalty. What is not automatic is that the formal prior in (45) is integrable. 
+
+Corollary 1. Under the assumptions of Theorem 2, the formal prior (45) is symmetric and unimodal. It is a proper prior density if and only if 
+
+Z ∞−∞ 
+
+exp {− Ψ( θ)} dθ < ∞. (48) 12 In particular, if there exist constants θ0 > 0 and c > 0 such that 
+
+h(θ) − θ ≥ c for all θ ≥ θ0, (49) then the prior is proper. 
+
+Proof. Symmetry follows from evenness of Ψ. Since Ψ is nondecreasing in |θ|, the function 
+
+exp( −Ψ( θ)) is nonincreasing on [0 , ∞) and nondecreasing on (−∞ , 0] , hence unimodal with mode at zero. Condition (48) is exactly the integrability requirement for a proper prior density. If (49) holds, then for θ ≥ θ0,
+
+Ψ( θ) = Ψ( θ0) + 1
+
+σ2
+
+Z θθ0
+
+ h(u) − u du 
+
+≥ Ψ( θ0) + cσ2 (θ − θ0), (50) so Ψ( θ) grows at least linearly in the tails and exp( −Ψ( θ)) is integrable. □
+
+Corollary 1 shows clearly what can be claimed without ambiguity. SCOPE always induces an even penalty that is nondecreasing in |θ|, and hence a formal prior that is symmetric and unimodal when written in the form (45). Proper prior interpretations hold only for subclasses whose inverse map remains separated from the identity by a nonvanishing amount in the tails. 
+
+Example 1 (Uniform SCOPE: generalized MAP but not proper MAP). For the uniform prototype, 
+
+δ(x; λ, k ) = 
+
+
+
+x |λx |k, |λx | ≤ 1,x, |λx | > 1.
+
+(51) Hence δ(x) = x for all sufficiently large |x|, so its inverse satisfies 
+
+h(θ) = θ for all sufficiently large |θ|. (52) Therefore Ψ′(θ) = 0 in the tails, which implies that Ψ( θ) is eventually constant. The formal prior (45) is then necessarily improper. Thus the uniform SCOPE rule has an exact penalty representation and a generalized MAP interpretation, but not a proper-prior MAP interpretation. 
+
+Example 2 (Cauchy SCOPE: a proper prior case) For the Cauchy prototype with 
+
+k > 0,
+
+δ(x; λ, k ) = x 2
+
+π arctan( λx )
+
+> k
+
+. (53) 13 As x → ∞ ,
+
+arctan( λx ) = π
+
+2 − 1
+
+λx + O(x−3), (54) hence 
+
+2
+
+π arctan( λx ) = 1 − 2
+
+πλx + O(x−3). (55) Therefore 
+
+δ(x; λ, k ) = x
+
+
+
+1 − 2
+
+πλx + O(x−3)
+
+k
+
+= x − 2kπλ + O(x−1) as x → ∞ . (56) Inverting (56) gives 
+
+h(θ) = θ + 2kπλ + O(θ−1) as θ → ∞ . (57) Hence h(θ) − θ ≥ c for all sufficiently large θ, for some c > 0, and Corollary 1 shows that the induced prior is proper. Thus the Cauchy SCOPE rule is an exact MAP estimator under a proper symmetric unimodal prior. 
+
+Remark. For thinner tailed prototypes such as the logistic and normal based rules, the quantity h(θ)−θ typically tends to zero as |θ| → ∞ , so the corresponding penalty flattens in the tails. In such cases the penalized likelihood interpretation remains valid, but the proper-prior MAP interpretation generally fails. The simulations select (λ, k ) by risk-based calibration, whereas the present results show what those same parameters imply penalty-wise. In particular, they determine a symmet-ric shrinkage penalty and, for some subclasses, a proper prior density. Thus the Bayesian interpretation supports the structure of SCOPE, but it is not the tuning mechanism used in the numerical study. 
+
+# 5 Simulation Study 
+
+This section evaluates the empirical performance of SCOPE shrinkage under a range of signal geometries, distributional choices, and noise levels. The study is designed to address four questions. First, how sensitive is reconstruction accuracy to the choice of centered distribution function within the SCOPE family. Second, how stable is perfor-mance across different signal to noise ratios. Third, how competitive is SCOPE relative to established wavelet denoising procedures. Fourth, how does the method behave under a deliberately difficult low SNR regime. Unless stated otherwise, all SCOPE results reported in this section are based on oracle tuning over a finite grid of (λ, k ) values. The reported AMSE values therefore describe benchmark performance under calibrated choices of the two SCOPE parameters. 14 (a) (b) 
+
+Fig. 2: Four benchmark signals used in the simulation study: (a) clean signals and (b) corresponding noisy realizations at SNR = 5. 
+
+## 5.1 Simulation design 
+
+We consider the four standard Donoho-Johnstone test signals Doppler, Blocks, Bumps, 
+
+and HeaviSine , shown in Figure 2a. These signals represent a broad range of local reg-ularity patterns and remain standard benchmarks in the wavelet denoising literature. Following common practice, different wavelet filters are used for different signals: the Haar filter for Blocks, the six-tap Daubechies filter for Bumps, and the eight-tap Symm-let filter for Doppler and HeaviSine. All simulations are carried out in MATLAB. Existing competing procedures are im-plemented using the GaussianWaveDen toolbox, with methodological background given in Antoniadis and Fan (2001). For each signal, noisy observations are generated by additive Gaussian noise with mean zero and variance σ2 = 1 . The underlying signal is rescaled so that this noise level corresponds to the target signal to noise ratio. Each realization consists of n =1024 equally spaced observations on [0 , 1] . After transformation to the wavelet domain, shrinkage is applied to the empirical detail coefficients, followed by inverse transformation to obtain the reconstructed signal. We define SNR as 
+
+SNR = ∥f ∥2
+
+σ√n,
+
+so that rescaling the test signal determines the desired noise level relative to the root mean square signal amplitude. Performance is evaluated by average mean squared error, 
+
+AMSE( f ) = 1
+
+nN 
+
+> N
+
+X
+
+> r=1
+> n
+
+X
+
+> i=1
+
+
+
+f (ti) − bfr(ti)
+
+2
+
+, (58) 15 (a) (b) 
+
+Fig. 3: Representative oracle calibration for the Doppler signal at SNR = 5 under the logistic SCOPE rule. Panel (a) shows the AMSE surface over the (λ, k ) grid, with the near-optimal region highlighted. Panel (b) shows the reconstructed signal at the oracle optimum together with the true and noisy signals. where f is the true signal, bfr is the reconstruction from the rth Monte Carlo replication, and N = 100 throughout. Figure 2b shows representative noisy realizations at SNR = 5 .
+
+## 5.2 Oracle calibration over (λ, k )
+
+For each signal and each selected centered distribution function, the SCOPE rule is calibrated by minimizing AMSE over a finite grid in (λ, k ). This calibration displays the denoising potential of the family and identifies favorable regions of the parameter space. Operational details on parameter selection, including possible SURE-based data-driven calibration, are deferred to the supplementary material. To visualize the optimization landscape, Figure 3 reports a representative example for the Doppler signal under the logistic specification at SNR = 5 . The left panel displays the AMSE surface over the (λ, k ) grid, while the right panel shows the corresponding reconstruction at the oracle optimum. The contour plot indicates a fairly broad near-optimal region rather than an isolated minimizer, which is empirically useful because it suggests that the calibration is not unduly sensitive to small perturbations of the tuning parameters. 
+
+## 5.3 Performance across candidate distribution functions 
+
+This section examines how reconstruction performance varies across several smooth candi-date centered distribution functions within the SCOPE family. The comparison includes Logistic, Normal, Laplace, Sech, Uniform and Cauchy specifications. 16 Fig. 4: Monte Carlo MSE distributions for SCOPE denoising under six centered distri-bution functions at SNR = 5 . Each boxplot is based on 100 replications with oracle calibrated (λ, k ).Figure 4 presents the Monte Carlo distribution of the resulting MSE values for the four benchmark signals at SNR = 5 . The figure shows that the Logistic, Normal, Laplace, Sech and Uniform specifications are nearly indistinguishable for the smoother signals, especially Doppler and HeaviSine. In contrast, the separation is more visible for the less regular signals Bumps and Blocks. The Cauchy specification is consistently less competitive in this experiment and exhibits substantially larger dispersion. Table 1 summarizes the corresponding oracle AMSE values together with the optimal hyperparameter pairs. The main conclusion is not that a single CDF dominates uniformly, but rather that several thin and moderate tailed specifications perform comparably well, while the preferred choice depends somewhat on signal morphology. This supports the view that the choice of centered CDF mainly provides a shape parameterization rather than a uniformly dominant rule. 
+
+## 5.4 Robustness across signal to noise ratios 
+
+We now examine robustness with respect to noise level by repeating the same analysis described in section 5.3 at SNR values 3, 5, and 7. Table 2 reports oracle calibrated AMSE values together with the corresponding optimal parameter pairs. Table 2 confirms that, within each fixed SNR regime, the thin and moderate-tailed specifications remain close to one another, while the Cauchy specification is less com-petitive. Because the test signals are rescaled across SNR levels, the raw AMSE values should not be interpreted as a direct monotone measure of difficulty across SNR. Their main use here is to compare methods within a fixed noise regime. 17 Signal Quantity Centered distribution function Logistic Normal Laplace Sech Uniform Cauchy Doppler 
+
+AMSE 0.1147 0.1161 0.1148 0.1149 0.1141 0.2721 
+
+λ 1.0151 0.6331 0.8341 0.6532 0.2110 1.4171 
+
+k 12.8989 18.4647 15.7778 18.4647 2.9192 3.4949 
+
+HeaviSine 
+
+AMSE 0.0430 0.0429 0.0447 0.0440 0.0428 0.2201 
+
+λ 0.8341 0.4120 0.6733 0.4924 0.1909 0.8341 
+
+k 14.4343 13.0909 16.5455 17.8889 8.4849 2.3434 
+
+Bumps 
+
+AMSE 0.3004 0.3019 0.3007 0.3027 0.3068 0.3987 
+
+λ 1.1558 0.5728 1.0553 0.8140 0.2713 1.5979 
+
+k 7.9091 5.6061 11.1717 14.4343 2.3434 3.3030 
+
+Blocks 
+
+AMSE 0.1539 0.1532 0.1549 0.1557 0.1557 0.3131 
+
+λ 1.3166 0.6733 1.1357 0.7537 0.2512 0.9949 
+
+k 19.2323 15.0101 16.5455 18.2727 3.1111 2.3434 
+
+Table 1: Oracle calibrated AMSE values and corresponding optimal (λ, k ) pairs for the six SCOPE specifications at SNR = 5 . Boldface indicates the smallest AMSE within each signal. 18 Signal  SNR  Logistic  Normal  Laplace  Sech  Uniform  Cauchy 
+
+> Doppler 3 0.1013  0.1008  0.1023  0.1019  0.1017  0.2618
+> (1.1558,19.4242)  (0.5728,15.7778)  (0.9145,19.4242)  (0.5728,13.4748)  (0.2713,7.1414)  (0.9346,2.3434)
+> 5 0.1147  0.1161  0.1148  0.1149  0.1141  0.2721
+> (1.0151,12.8989)  (0.6331,18.4646)  (0.8341,15.7778)  (0.6532,18.4646)  (0.2110,2.9192)  (1.4171,3.4949)
+> 7 0.1267  0.1270  0.1261  0.1258  0.1293  0.2806
+> (1.0553,11.9394)  (0.6130,16.5455)  (0.7537,9.0606)  (0.7135,19.8081)  (0.2311,3.1111)  (1.0352,2.5354)
+> HeaviSine 3 0.0416  0.0399  0.0428  0.0421  0.0382  0.2172
+> (0.9145,19.0404)  (0.4924,17.3131)  (0.7738,19.2323)  (0.5125,15.9697)  (0.2110,19.4242)  (1.1558,3.1111)
+> 5 0.0430  0.0429  0.0447  0.0440  0.0428  0.2201
+> (0.8341,14.4343)  (0.4120,13.0909)  (0.6733,16.5455)  (0.4924,17.8889)  (0.1909,8.4849)  (0.8341,2.3434)
+> 7 0.0476  0.0477  0.0488  0.0488  0.0486  0.2234
+> (0.6733,8.4848)  (0.4522,15.9697)  (0.6130,15.5859)  (0.3919,11.9394)  (0.2110,8.8687)  (0.9949,2.7273)
+> Bumps 3 0.2860  0.2859  0.2847  0.2858  0.2915  0.3600
+> (1.0553,5.6061)  (0.5728,5.6061)  (0.9949,9.2525)  (0.6331,7.9091)  (0.2512,1.9596)  (1.7588,3.8788)
+> 5 0.3004  0.3019  0.3007  0.3027  0.3068  0.3987
+> (1.1558,7.9091)  (0.5728,5.6061)  (1.0553,11.1717)  (0.8140,14.4343)  (0.2713,2.3434)  (1.5979,3.3030)
+> 7 0.3134  0.3123  0.3126  0.3135  0.3174  0.4200
+> (1.0151,4.4545)  (0.5929,5.9899)  (1.0553,10.0202)  (0.8542,16.1616)  (0.2713,2.9192)  (0.9748,1.9596)
+> Blocks 3 0.1527  0.1534  0.1553  0.1541  0.1559  0.3001
+> (1.2764,15.2020)  (0.6733,15.9697)  (1.1156,19.2323)  (0.7135,15.7778)  (0.2713,3.8788)  (1.9196,4.6465)
+> 5 0.1539  0.1532  0.1549  0.1557  0.1557  0.3131
+> (1.3166,19.2323)  (0.6733,15.0101)  (1.1357,16.5455)  (0.7537,18.2727)  (0.2512,3.1111)  (0.9949,2.3434)
+> 7 0.1521  0.1520  0.1542  0.1536  0.1541  0.3200
+> (1.3367,19.8081)  (0.6331,12.1313)  (1.0151,14.4343)  (0.7135,17.8889)  (0.2713,4.2626)  (0.8944,1.9596)
+> Table 2: Oracle calibrated AMSE values for four benchmark signals across six SCOPE specifications and three SNR levels. The paren-thesized entries beneath each AMSE value give the corresponding optimal  (λ, k ) pair. Boldface indicates the smallest AMSE within each signal and SNR combination.
+
+19 Fig. 5: Monte Carlo MSE distributions at SNR = 5 for Best SCOPE and eight benchmark denoising procedures. The boxplot positions are: 1 Best SCOPE, 2 BAMS, 3 Decompsh, 4 block median, 5 block mean, 6 hybrid block median, 7 BlockJS, 8 VisuShrink, and 9 GCV. For each signal, the SCOPE entry uses the best performing centered distribution function under oracle calibration. 
+
+## 5.5 Comparison with benchmark denoising procedures 
+
+We next compare the best performing SCOPE specification for each signal against eight established denoising procedures: Bayesian adaptive multiresolution shrinkage (Vidakovic and Ruggeri, 2001) (BAMS), Decompsh (Huang and Cressie, 2000), block median and block mean procedures (Abramovich et al., 2002), the hybrid block median rule (Abramovich et al., 2002), BlockJS (Cai, 1999), VisuShrink (Donoho and Johnstone, 1994), and gener-alized cross validation (Amato and Vuza, 1998). These methods span Bayesian, blockwise, level dependent, and global thresholding paradigms, and therefore provide a reasonably broad benchmark set. For each signal, the SCOPE entry uses the best performing centered distribution function together with its calibrated parameter pair. Figure 5 displays the Monte Carlo MSE distributions at SNR = 5 . The corresponding results for SNR = 3 and SNR = 7 are provided in Figure SI 4 and Figure SI 5 of the Supplementary Information. The results indicate that SCOPE is broadly competitive with the benchmark procedures, achieving best or near-best performance for several of the four test signals. 
+
+# 6 Discussion and Conclusions 
+
+We have introduced SCOPE shrinkage as a unified distribution based framework for con-structing sign-preserving shrinkage rules from centered cumulative distribution functions 20 of symmetric unimodal distributions. The central idea is simple but flexible: if 
+
+F ∗(x) = 2 F (x) − 1, (59) then the rule 
+
+δ(x; λ, k ) = x |F ∗(λx )|k (60) produces a broad family of attenuation profiles that combine strong local contraction near the origin with near identity behavior in the tails. This construction yields shrink-age rules that are interpretable, structurally coherent, and adaptable to different signal morphologies through the probabilistic shape of the underlying distribution function. The main lesson is that the SCOPE construction separates two aspects of shrinkage that are often intertwined. The scale parameter λ determines where attenuation becomes active, while the exponent k determines how sharply the rule moves from local contraction to near identity behavior. This makes the family easy to interpret: λ acts like a threshold-scale parameter, and k acts like a transition-shape parameter. The structural results explain why this construction is stable. Centered CDFs auto-matically generate shrinkage rules that preserve sign, remain contractive, are monotone and continuous, and approach the identity in a relative sense in the tails. The mixture of uniforms representation further shows that SCOPE attenuation factors behave like averaged softened-thresholding profiles. Thus the framework is not merely a collection of formulas, but a probabilistic way to design and interpret threshold-like shrinkage rules. The Bayesian content of the framework is also more precise when stated in penalty form. For the broad class considered here, every SCOPE rule admits an even penalty representation with the penalty nondecreasing in coefficient magnitude, and hence a gen-eralized MAP interpretation in the Gaussian location model. For subclasses with suitable tail separation, this formal representation corresponds to a proper prior density; for other subclasses, including the uniform prototype, the correct interpretation is penalized likeli-hood rather than MAP under a proper prior. This distinction is important theoretically and helps place the SCOPE family within a broader shrinkage and regularization litera-ture without overstating the Bayesian claim. The three prototype rules retained in the main paper illustrate the main qualitative regimes of the framework. The logistic rule provides a smooth analytic baseline and per-forms strongly across several benchmark signals. The uniform rule gives a transparent reference case with an explicit active shrinkage region and exact identity outside that region. The Cauchy rule illustrates the effect of slow saturation in the centered CDF. Conceptually, it is useful because it shows how heavy-tailed generating distributions can produce attenuation far into the tails. Empirically, however, this behavior was not fa-vorable in the Donoho and Johnstone experiments considered here, where the Cauchy 21 specification overshrank moderate and large empirical coefficients and was less competi-tive than the thin and moderate-tailed alternatives. The simulation study shows that calibrated SCOPE has competitive benchmark risk relative to a range of established denoising procedures. Across the Donoho-Johnstone benchmark signals, the best thin and moderate-tailed SCOPE specifications perform similarly and often achieve strong reconstruction accuracy relative to existing methods. These results identify favorable members of the SCOPE family, while the SURE-type criteria discussed in the supplementary material provide a route to data-driven imple-mentation. Taken together, these results suggest that centered distribution functions provide a natural design principle for shrinkage. The SCOPE framework is broad enough to re-cover qualitatively different attenuation profiles, yet structured enough to admit common analytical treatment. This combination of flexibility and coherence is, in our view, the main methodological value of the approach. Several directions remain open. The first is a fuller study of data-driven calibration, especially in level-dependent and adaptive settings. A second direction is extension to redundant and nondecimated transforms, where the smoothness and interpretability of SCOPE-type rules may be especially useful. It would also be natural to investigate multivariate and blockwise versions of the framework, as well as applications to inverse problems and other high-dimensional estimation settings. In all of these directions, the central message remains the same: centered symmetric distribution functions offer a simple and powerful organizing principle for shrinkage design. Supplementary materials and code developed for this study are available at https:// github.com/Vijini95/SCOPE_Shrinkage .
+
+# Acknowledgments 
+
+B. Vidakovic acknowledges the partial support of the H.O. Hartley Chair Foundation and NSF Award 2515246 at Texas A&M University. 
+
+# References 
+
+Abramovich, F. and Benjamini, Y. (1996). Adaptive thresholding of wavelet coefficients. 
+
+Computational Statistics & Data Analysis , 22(4):351–361. Abramovich, F., Besbeas, P., and Sapatinas, T. (2002). Empirical bayes approach to block wavelet function estimation. Computational Statistics & Data Analysis , 39(4):435–451. 22 Amato, U. and Vuza, D. (1998). Wavelet simultaneous approximation from samples affected by noise. Computers & Mathematics with Applications , 36(5):101–111. Antoniadis, A. and Fan, J. (2001). Regularization of wavelet approximations. Journal of the American Statistical Association , 96(455):939–967. Cai, T. T. (1999). Adaptive wavelet estimation: a block thresholding and oracle inequality approach. The Annals of Statistics , 27(3):898 – 924. Chipman, H. A., Kolaczyk, E. D., and McCulloch, R. E. (1997). Adaptive bayesian wavelet shrinkage. Journal of the American Statistical Association , 92(440):1413–1421. Donoho, D. L. and Johnstone, I. M. (1994). Ideal spatial adaptation by wavelet shrinkage. 
+
+Biometrika , 81(3):425–455. Donoho, D. L. and Johnstone, I. M. (1995). Adapting to unknown smoothness via wavelet shrinkage. Journal of the American Statistical Association , 90(432):1200–1224. Fan, J. and Li, R. (2001). Variable selection via nonconcave penalized likelihood and its oracle properties. Journal of the American Statistical Association , 96(456):1348–1360. Huang, H.-C. and Cressie, N. (2000). Deterministic/stochastic wavelet decomposition for recovery of signal from noisy data. Technometrics , 42(3):262–276. Khintchine, A. Y. (1938). On unimodal distributions. Izvestiya Nauchno-Issledovatel’skogo Instituta Matematiki i Mekhaniki , 2:1–7. Nason, G. P. (1996). Wavelet shrinkage using cross-validation. Journal of the Royal Statistical Society, Series B , 58(2):463–479. Ruggeri, F. and Vidakovic, B. (1999). A bayesian decision theoretic approach to the choice of thresholding parameter. Statistica Sinica , 9(1):183–197. Vidakovic, B. (1998). Nonlinear wavelet shrinkage with bayes rules and bayes factors. 
+
+Journal of the American Statistical Association , 93(441):173–183. Vidakovic, B. and Ruggeri, F. (2001). BAMS method: Theory and simulations. Sankhy¯ a: The Indian Journal of Statistics, Series B , 63(2):234–249. Special issue on Wavelets. Vimalajeewa, D., DasGupta, A., Ruggeri, F., and Vidakovic, B. (2023). Gamma-minimax wavelet shrinkage for signals with low snr. The New England Journal of Statistics in Data Science , 1(2):159–171. 23
