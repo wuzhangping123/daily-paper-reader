@@ -1,0 +1,1141 @@
+Title: Machine Learning Integrated in Wavelet Shrinkage (MLShrink)
+
+URL Source: https://arxiv.org/pdf/2606.19580v1
+
+Published Time: Fri, 19 Jun 2026 00:17:46 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# Machine Learning Integrated in Wavelet Shrinkage (MLShrink) 
+
+Dixon Vimalajeewa 1, Vijini Lakmini 2, and Brani Vidakovic 2 
+
+> 1
+
+Department of Statistics, University of Nebraska, Lincoln, NE 68588, USA 
+
+> 2
+
+Department of Statistics, Texas A&M University, College Station, TX 77843, USA 
+
+June 19, 2026 
+
+Abstract 
+
+Data encountered in practice are frequently contaminated by additive noise, and wavelet shrinkage remains a fundamental tool for recovering underlying signals in nonparametric estimation. Classical procedures such as hard and soft thresholding decide whether to retain a wavelet coefficient almost entirely from its magnitude. Although effective in many settings, these rules can be too rigid for coefficients whose magnitudes fall in an intermediate region where the distinction between signal and noise is uncertain. We propose MLShrink , a two-threshold wavelet denoising procedure that combines wavelet shrinkage with machine learning. Coefficients below a lower threshold are discarded, coeffi-cients above an upper threshold are retained, and coefficients in the intermediate band are classified using local wavelet-domain features. In this way, MLShrink preserves the simplic-ity of classical thresholding away from the decision boundary while allowing data-adaptive decisions for ambiguous coefficients. The paper also develops a theoretical framework tailored to this architecture. We show that MLShrink is a nonexpansive support-selection rule, derive an oracle-based risk decom-position showing that excess denoising risk is determined by classification errors on the undecided band, and establish an oracle-consistency result under suitable assumptions on classifier performance. Simulation experiments on standard benchmark signals indicate that MLShrink is com-petitive with several established wavelet shrinkage methods and is especially effective for sig-nals with irregular, edge-rich, or non-smooth structure. These findings suggest that learned decisions on the intermediate threshold band provide a useful and interpretable connection between classical wavelet denoising and modern statistical learning. 
+
+# 1 Introduction 
+
+Signal measurements collected in practice are almost always contaminated by additive noise, and a primary task in many scientific and engineering pipelines is therefore to recover a clean estimate of the underlying signal. Over the past several decades, wavelet methods have become a standard tool for this purpose in nonparametric statistics and signal processing because they represent signals locally in both time and frequency. This localization makes wavelet methods especially effective for signals with spatially inhomogeneous behavior, transient phenomena, edges, and abrupt structural changes (Vimalajeewa et al., 2023). A central wavelet-domain denoising strategy is wavelet shrinkage , also called wavelet thresh-olding . Following the seminal work of Donoho and Johnstone, wavelet shrinkage has become a cornerstone of nonparametric function estimation and signal denoising (Donoho and Johnstone, 1994, 1995, 1998). The basic idea is simple: transform the noisy signal into the wavelet domain, modify the empirical coefficients by a shrinkage rule, and reconstruct the signal by the inverse transform. This approach is effective because many signals admit sparse wavelet representations, 1
+
+> arXiv:2606.19580v1 [stat.ME] 17 Jun 2026
+
+so that a relatively small number of coefficients carry most of the structural information, while the noise is spread more diffusely across coefficients. A broad range of shrinkage rules has been developed, including risk-based procedures, cross-validation methods, multiple-testing formulations, block thresholding rules, and Bayesian ap-proaches (Antoniadis et al., 2001). Important extensions include translation-invariant denoising, adaptive multiple-testing thresholding, firm shrinkage, Bayesian thresholding, block threshold-ing, neighboring-coefficient rules, and empirical-Bayes threshold selection (Coifman and Donoho, 1995; Abramovich and Benjamini, 1996; Gao and Bruce, 1997; Abramovich et al., 1998; Hall et al., 1998; Cai, 1999; Cai and Silverman, 2001; Johnstone and Silverman, 2005). In most of these methods, however, the essential decision is still the same: determine which empirical wavelet coefficients should be retained as signal and which should be suppressed as noise. Classical rules such as hard and soft thresholding make this decision using a single threshold. Although these methods are simple and often effective, they can be too rigid near the decision boundary. Very small coefficients are usually dominated by noise, and very large coefficients are usually informative. The main difficulty arises for coefficients whose magnitudes fall in an intermediate region where the distinction between signal and noise is unclear. In that regime, a single-threshold rule may either discard useful structure or retain noisy artifacts. In this paper we propose MLShrink , a two-threshold wavelet denoising procedure that com-bines classical wavelet shrinkage with machine learning. Instead of relying on a single threshold, 
+
+MLShrink uses two thresholds, λ1 and λ2, with 0 < λ 1 < λ 2. Coefficients with |dj,k | ≤ λ1 are treated as clear noise and discarded, while coefficients with |dj,k | ≥ λ2 are treated as clear signal and retained. Coefficients in the intermediate band λ1 < |dj,k | < λ 2 are regarded as undecided .Their final status is determined by a classifier trained on the confidently labeled coefficients and informed by local wavelet-domain features. This formulation is attractive because it separates easy decisions from difficult ones. Coeffi-cients far below the lower threshold and far above the upper threshold require no sophisticated treatment, while only the ambiguous middle band is subjected to additional modeling. In this sense, the novelty of MLShrink is localized exactly where classical thresholding is most vulnera-ble. The method is also naturally flexible: once the two-threshold architecture is fixed, different learning algorithms may be used for the undecided band without changing the overall shrinkage mechanism. 
+
+MLShrink is related to earlier multithreshold ideas, including semi-soft thresholding and previously proposed semi-supervised wavelet shrinkage methods. The present method differs in how the intermediate-band coefficients are handled. Semi-soft thresholding replaces the abrupt threshold decision by a deterministic linear transition, whereas earlier semi-supervised wavelet shrinkage methods rely on a specific manifold-regularization mechanism. In contrast, MLShrink 
+
+treats the middle-band decision as a classification problem and allows a broader family of learning algorithms, including logistic regression, support vector machines, decision trees, random forests, and neural networks. On the methodological side, MLShrink is especially close in spirit to firm shrinkage, neighboring-coefficient methods, and Bayesian wavelet thresholding, but differs in replacing a deterministic or model-specific middle-band rule by a classifier-based decision on the undecided band (Gao and Bruce, 1997; Cai and Silverman, 2001; Abramovich et al., 1998). This preserves the underlying wavelet shrinkage architecture while allowing more adaptive decisions in the most ambiguous region. The same viewpoint also leads naturally to the theory developed later in the paper: outside the intermediate band, MLShrink behaves like an ordinary deterministic thresholding rule, while its statistical gain or loss is governed by the quality of classification on the undecided band. To assess empirical performance, we study MLShrink on several standard benchmark signals observed under multiple noise levels and compare it with a collection of established wavelet shrinkage methods. The numerical results indicate that MLShrink is competitive across a range of settings and is especially promising for signals with irregular, edge-rich, or non-smooth struc-2ture. These findings suggest that learned decisions on the intermediate threshold band provide a useful and interpretable bridge between classical wavelet denoising and modern statistical learning. The remainder of the paper is organized as follows. Section 2 reviews the wavelet-domain background needed for the development of MLShrink . Section 3 introduces the MLShrink pro-cedure. Section 4 develops its theoretical properties. Section 5 presents parameter selection, simulation design, and comparative performance evaluation. Section 6 discusses the implica-tions of the results and possible extensions. Section 7 concludes the paper. 
+
+# 2 Preliminaries 
+
+This section briefly reviews the statistical model, the wavelet-domain representation, and the main thresholding ideas that motivate MLShrink . Suppose we observe noisy data 
+
+yi = f (ti) + σε i, i = 1 , 2, . . . , n, (1) where f is the unknown regression function of interest, σ > 0 is the noise level, and the errors εi are independent standard normal random variables. The goal is to estimate f from the contaminated observations with small mean squared error. For an estimator ˆf , we measure performance by the empirical L2 risk 
+
+R(f, ˆf ) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+E
+
+
+
+f (ti) − ˆf (ti)
+
+2
+
+. (2) Let W denote an orthonormal discrete wavelet transform matrix, and define the empirical wavelet coefficients and true wavelet coefficients by 
+
+d = W y, θ = W f. (3) Because W is orthonormal, the Gaussian noise structure is preserved in the transform do-main, so the model becomes 
+
+dj,k = θj,k + σz j,k , (4) where the zj,k are again standard normal random variables. This representation is funda-mental in wavelet denoising: many signals have sparse wavelet expansions, whereas noise is spread more diffusely across coefficients. As a result, denoising can be carried out by shrinking or thresholding the empirical coefficients dj,k and then reconstructing the signal by the inverse transform. The simplest and most widely used rule is hard thresholding. Given a threshold 
+
+λ > 0, the hard-threshold estimator is 
+
+ˆd Hj,k =
+
+( dj,k , |dj,k | ≥ λ, 
+
+0, |dj,k | < λ. (5) A common default choice is the universal threshold 
+
+λ = ˆ σp2 log n, (6) where ˆσ is a noise estimate, often obtained from the finest-scale detail (Donoho and John-stone, 1994). The corresponding signal estimate is then reconstructed as 
+
+ˆy = W T ˆd. (7) 3Hard thresholding is attractive because of its simplicity and its ability to preserve large coef-ficients exactly. Its main weakness is that the keep-or-kill decision is abrupt near the threshold, which can lead to instability and loss of moderate but informative coefficients. To reduce this rigidity, several multithreshold rules have been proposed. One important example is semi-soft thresholding, also known as firm shrinkage. Given two thresholds 0 < λ 1 <λ2, the semi-soft rule is 
+
+S(dj,k ) = 
+
+
+
+0, |dj,k | ≤ λ1,
+
+sign( dj,k ) λ2
+
+ |dj,k |− λ1
+
+ 
+
+> λ2−λ1
+
+, λ1 < |dj,k | < λ 2,dj,k , |dj,k | ≥ λ2.
+
+(8) This rule interpolates between hard and soft thresholding. Coefficients below λ1 are dis-carded, coefficients above λ2 are retained, and coefficients in the transition region are mod-ified by a deterministic linear rule. The advantage is continuity; the limitation is that the intermediate-band decision still depends only on magnitude. To reduce this rigidity, several multithreshold and nonconvex shrinkage rules have been proposed. One important example is semi-soft thresholding, also known as firm shrinkage. Another influential example is SCAD-type wavelet thresholding, which also introduces a more flexible transition between suppression and retention than classical hard or soft thresholding (Gao and Bruce, 1997; Antoniadis and Fan, 2001; Kudryavtsev and Shestakov, 2024; Kulkarni et al., 2026). A second line of work, closer in spirit to the present paper, treats the intermediate region as a classification problem. More broadly, the idea of borrowing strength from nearby coefficients has substantial precedent in neighboring-coefficient and block-thresholding methods, where local context is used to stabilize coefficient selection and improve risk performance (Hall et al., 1998; Cai, 1999; Cai and Silverman, 2001). Coefficients far below a lower threshold are labeled as noise, coefficients far above an upper threshold are labeled as signal, and coefficients in the middle band are treated as uncertain. Earlier semi-supervised wavelet shrinkage methods resolve these uncertain coefficients using manifold-regularization ideas and neighborhood information. This viewpoint is important because it suggests that the main statistical difficulty lies not in the clearly small or clearly large coefficients, but in the ambiguous middle band. MLShrink builds directly on this perspective by replacing a fixed deterministic rule on the undecided band with a learned decision rule based on local wavelet-domain features. 
+
+# 3 MLShrink 
+
+We now introduce MLShrink , a two-threshold wavelet shrinkage procedure in which the coeffi-cients that are clearly small or clearly large are handled deterministically, while coefficients in an intermediate band are classified by a learning algorithm. Let dj,k denote a detail wavelet coefficient at resolution level j and location k. The MLShrink 
+
+rule is based on two thresholds, 
+
+λ1 = ˆ σpc log n, λ2 = ˆ σp2 log n, 0 < c < 2, (9) where ˆσ is an estimate of the noise standard deviation. The restriction 0 < c < 2 guarantees that λ1 < λ 2, so that a genuine undecided band is present. Thus, every empirical detail coefficient is assigned to one of three regions (see Figure 1): 
+
+R0 = {(j, k ) : |dj,k | ≤ λ1},
+
+Ru = {(j, k ) : λ1 < |dj,k | < λ 2}, (10) 
+
+R1 = {(j, k ) : |dj,k | ≥ λ2}.
+
+4Figure 1: Schematic representation of the MLShrink rule. The thresholds λ1 and λ2 divide empirical wavelet coefficients into three groups: coefficients below λ1 are treated as noise, coef-ficients above λ2 are treated as signal, and coefficients in the intermediate band are classified by a learning algorithm. The set R0 contains coefficients treated as noise, R1 contains coefficients treated as signal, and Ru is the undecided band. It is convenient to define the initial label 
+
+L(0)  
+
+> j,k
+
+=
+
+
+
+0, (j, k ) ∈ R 0,u, (j, k ) ∈ R u,
+
+1, (j, k ) ∈ R 1.
+
+Equivalently, 
+
+L(0)  
+
+> j,k
+
+=
+
+
+
+0, |dj,k | ≤ λ1,u, λ1 < |dj,k | < λ 2,
+
+1, |dj,k | ≥ λ2.
+
+The clearly labeled coefficients form the training set, 
+
+Dlab = {(dj,k , L (0)  
+
+> j,k
+
+) : L(0)  
+
+> j,k
+
+∈ { 0, 1}} , (11) and the ambiguous coefficients form the undecided set, 
+
+Du = {(dj,k , L (0)  
+
+> j,k
+
+) : L(0)  
+
+> j,k
+
+= u}. (12) For each coefficient dj,k we construct a feature vector 
+
+xj,k =
+
+
+
+|dj,k |, j, ν j,k 
+
+T
+
+∈ R3, (13) where the local neighborhood summary is defined by 
+
+νj,k = |dj,k −1| + |dj,k +1 |
+
+2 . (14) Thus the features incorporate the coefficient magnitude, the resolution level, and a same-scale local context term. For boundary coefficients, one may use the available neighbor only or a simple boundary convention; this has negligible impact on the implementation. Let 5X = {xj,k }, Xtrain = {xj,k : ( dj,k , L (0)  
+
+> j,k
+
+) ∈ D lab }, Ytrain = {L(0)  
+
+> j,k
+
+: ( dj,k , L (0)  
+
+> j,k
+
+) ∈ D lab }. (15) A classifier C is trained on the confidently labeled coefficients: 
+
+C : R3 −→ { 0, 1}. (16) Although the labels are generated by the two-threshold rule, the learning step itself is an ordinary supervised classification problem carried out on the labeled subset. For each undecided coefficient (j, k ) ∈ Ru, the trained classifier produces the predicted label 
+
+ˆLj,k = C(xj,k ).
+
+For notational convenience, define the final label for all coefficients by 
+
+˜Lj,k =
+
+
+
+0, (j, k ) ∈ R0,
+
+ˆLj,k , (j, k ) ∈ Ru,
+
+1, (j, k ) ∈ R1.
+
+The MLShrink estimator in the wavelet domain is then 
+
+ˆd M LShrink j,k = dj,k ˜Lj,k . (17) Equivalently, 
+
+ˆd M LShrink j,k = dj,k 1{| dj,k | ≥ λ2} + dj,k 1{λ1 < |dj,k | < λ 2} ˆLj,k . (18) Hence MLShrink coincides with an ordinary two-threshold keep-discard rule outside the intermediate band and differs from classical thresholding only through the learned decisions on 
+
+Ru. After thresholding the detail coefficients, the denoised signal is reconstructed by the inverse wavelet transform, 
+
+ˆy = W T ˆd M LShrink , (19) while the scaling coefficients are left unchanged. The procedure is classifier-agnostic: in our experiments we consider Logistic Regression ( LR ), Support Vector Machines ( SVM ), Deci-sion Trees ( DT ), Random Forests ( RF ), and Neural Networks ( NN ), but the overall shrinkage architecture remains unchanged. For completeness and reproducibility, a step-by-step algorith-mic description of the MLShrink procedure is provided in Algorithm S1 in the Supplementary Information. The procedure is classifier-agnostic. In our experiments we consider logistic regression, sup-port vector machines, decision trees, random forests, and neural networks. The specific choice of classifier affects only the prediction rule on the undecided band; the overall shrinkage ar-chitecture remains unchanged. This formulation is particularly convenient for the theoretical development in the next section, since the contribution of MLShrink can be isolated to the classification of coefficients with λ1 < |dj,k | < λ 2.
+
+# 4 Theoretical Properties of MLShrink 
+
+In this section we give a theoretical characterization of MLShrink . The main point is that 
+
+MLShrink is not a new continuous shrinkage family, but rather a two-threshold support-selection rule in which the only genuinely nontrivial statistical decision is made on the undecided band. Accordingly, the most natural theory is one that isolates the role of classification on that band and quantifies how classification quality affects denoising risk. 6We work in the Gaussian sequence model associated with an orthonormal wavelet transform: 
+
+dj,k = θj,k + σz j,k , zj,k ∼ N (0 , 1) , (20) where the zj,k are independent, or approximately independent under the orthonormal trans-form. Let λ1 and λ2 satisfy 
+
+0 < λ 1 < λ 2. (21) As in Section 3, define the three coefficient regions 
+
+R0 = {(j, k ) : |dj,k | ≤ λ1},Ru = {(j, k ) : λ1 < |dj,k | < λ 2}, (22) 
+
+R1 = {(j, k ) : |dj,k | ≥ λ2}.
+
+Then the MLShrink estimator can be written as 
+
+ˆd M LShrink j,k = dj,k 1{| dj,k | ≥ λ2} + dj,k 1{λ1 < |dj,k | < λ 2} ˆLj,k , (23) where ˆLj,k ∈ { 0, 1} is the predicted label for coefficients in the undecided band. 
+
+4.1 Basic structural properties 
+
+Proposition 4.1. For every coefficient (j, k ), the MLShrink estimator in (23) satisfies 
+
+ˆd M LShrink j,k ≤ | dj,k |. (24) Hence MLShrink is nonexpansive in magnitude. Moreover, if the predicted label ˆLj,k depends only on sign-invariant features such as |dj,k |, j, and local magnitude summaries, then MLShrink is sign-preserving in the sense that 
+
+ˆd M LShrink j,k = 0 or sgn 
+
+ ˆd M LShrink j,k 
+
+
+
+= sgn( dj,k ). (25) Finally, MLShrink coincides exactly with the deterministic two-threshold keep-discard rule outside the undecided band Ru.
+
+Proof. If (j, k ) ∈ R0, then ˆd M LShrink j,k = 0 , so (24) is immediate. If (j, k ) ∈ R1, then ˆd M LShrink j,k =
+
+dj,k , so equality holds in (24). If (j, k ) ∈ Ru, then ˆd M LShrink j,k = dj,k ˆLj,k with ˆLj,k ∈ { 0, 1}, hence 
+
+ˆd M LShrink j,k = |dj,k | | ˆLj,k | ≤ | dj,k |.
+
+This proves nonexpansiveness. The sign-preserving property follows because multiplication by ˆLj,k ∈ { 0, 1} either annihilates the coefficient or leaves its sign unchanged. The final statement follows directly from the definition of the estimator. Proposition 4.1 clarifies that MLShrink is a support-selection rule rather than a coefficient-rescaling rule. The only place where it differs from ordinary two-threshold thresholding is the middle band Ru.74.2 Oracle benchmark and exact risk decomposition 
+
+To measure the quality of classification on the undecided band, it is convenient to introduce an oracle benchmark. For (j, k ) ∈ Ru, define the oracle label 
+
+L⋆j,k = arg min 
+
+> ℓ∈{ 0,1}
+
+
+
+ℓd j,k − θj,k 
+
+2
+
+. (26) Equivalently, 
+
+L⋆j,k =
+
+( 1, (dj,k − θj,k )2 ≤ θ2
+
+> j,k
+
+,
+
+0, (dj,k − θj,k )2 > θ 2
+
+> j,k
+
+. (27) Thus the oracle retains a middle-band coefficient if keeping it yields smaller local squared error than discarding it. The associated oracle estimator is 
+
+ˆd oracle j,k = dj,k 1{| dj,k | ≥ λ2} + dj,k 1{λ1 < |dj,k | < λ 2}L⋆j,k . (28) For (j, k ) ∈ Ru, define the local oracle loss gap 
+
+∆j,k = θ2 
+
+> j,k
+
+− (dj,k − θj,k )2 = 2dj,k θj,k − d2 
+
+> j,k
+
+. (29) 
+
+Theorem 4.1 (Exact oracle-risk decomposition) . The total quadratic risk of MLShrink admits the exact decomposition 
+
+E ˆd M LShrink − θ 2
+
+= E ˆd oracle − θ 2
+
++ X
+
+> j,k
+
+E
+
+h
+
+1{(j, k ) ∈ Ru}∆j,k 1{ ˆLj,k ̸ = L⋆j,k }
+
+i
+
+. (30) In particular, the excess risk of MLShrink relative to the oracle rule is driven entirely by classification errors on the undecided band. 
+
+Proof. Outside Ru, the MLShrink estimator and the oracle estimator coincide coefficientwise. Hence any risk difference can only arise from coefficients in Ru.For a fixed (j, k ) ∈ Ru, the MLShrink loss is 
+
+ ˆLj,k dj,k − θj,k 
+
+2
+
+,
+
+while the oracle loss is 
+
+L⋆j,k dj,k − θj,k 
+
+2
+
+.
+
+If ˆLj,k = L⋆j,k , the difference is zero. If ˆLj,k ̸ = L⋆j,k , then one label yields local loss θ2 
+
+> j,k
+
+and the other yields local loss (dj,k − θj,k )2. Since L⋆j,k is defined as the minimizing label, the excess local loss is exactly 
+
+θ2 
+
+> j,k
+
+− (dj,k − θj,k )2 = ∆ j,k .
+
+Therefore, coefficientwise, 
+
+ ˆd M LShrink j,k − θj,k 
+
+2
+
+=
+
+ ˆd oracle j,k − θj,k 
+
+2
+
++ 1{(j, k ) ∈ Ru}∆j,k 1{ ˆLj,k ̸ = L⋆j,k }.
+
+Summing over (j, k ) and taking expectations gives (30). 8Corollary 4.1 (A probability bound for excess oracle risk) . Suppose that on the undecided band one has 
+
+|θj,k | ≤ M for all (j, k ) ∈ Ru. (31) Then 
+
+E ˆd M LShrink − θ 2
+
+− E ˆd oracle − θ 2
+
+≤ λ2(2 M + λ2) X
+
+> j,k
+
+P
+
+ ˆLj,k ̸ = L⋆j,k , (j, k ) ∈ Ru
+
+
+
+. (32) 
+
+Proof. If (j, k ) ∈ Ru, then |dj,k | < λ 2. Hence, by (29), 
+
+∆j,k = |2dj,k θj,k − d2
+
+> j,k
+
+|≤ 2|dj,k || θj,k | + |dj,k |2
+
+≤ 2λ2M + λ22
+
+= λ2(2 M + λ2). (33) Substituting this bound into (30) yields (32). 
+
+4.3 Comparison with hard thresholding 
+
+The oracle-risk decomposition compares MLShrink with the best possible keep-or-discard rule on the undecided band. It is also useful to compare MLShrink directly with a standard deterministic benchmark, namely hard thresholding at level λ2.
+
+Theorem 4.2 (Exact comparison with hard thresholding on the undecided band) . Define the hard-threshold estimator at level λ2 by 
+
+ˆd hard j,k = dj,k 1{| dj,k | ≥ λ2}. (34) Then 
+
+E ˆd M LShrink − θ 2
+
+− E ˆd hard − θ 2
+
+= − X
+
+> j,k
+
+E
+
+h
+
+1{(j, k ) ∈ Ru}∆j,k 1{L⋆j,k = 1 } ˆLj,k 
+
+i
+
++ X
+
+> j,k
+
+E
+
+h
+
+1{(j, k ) ∈ Ru}∆j,k 1{L⋆j,k = 0 } ˆLj,k 
+
+i
+
+. (35) In particular, MLShrink improves on hard thresholding precisely through coefficients in the undecided band for which retention is preferable and the classifier predicts ˆLj,k = 1 .
+
+Proof. Outside Ru, the estimators ˆd M LShrink and ˆd hard coincide coefficientwise. Indeed, both estimators set coefficients in R0 to zero and both retain coefficients in R1. Hence any risk difference arises only from coefficients in Ru.Fix (j, k ) ∈ Ru. On this band, 
+
+ˆd hard j,k = 0 , ˆd M LShrink j,k = ˆLj,k dj,k , ˆLj,k ∈ { 0, 1}. (36) Therefore the local risk difference is 
+
+ ˆd M LShrink j,k − θj,k 
+
+2
+
+−
+
+ ˆd hard j,k − θj,k 
+
+2
+
+=
+
+ ˆLj,k dj,k − θj,k 
+
+2
+
+− θ2
+
+> j,k
+
+. (37) Since ˆLj,k ∈ { 0, 1}, this becomes 
+
+ ˆLj,k dj,k − θj,k 
+
+2
+
+− θ2 
+
+> j,k
+
+= ˆLj,k 
+
+
+
+(dj,k − θj,k )2 − θ2
+
+> j,k
+
+
+
+. (38) 9If L⋆j,k = 1 , then (dj,k − θj,k )2 ≤ θ2
+
+> j,k
+
+, so 
+
+(dj,k − θj,k )2 − θ2 
+
+> j,k
+
+= −∆j,k . (39) If L⋆j,k = 0 , then (dj,k − θj,k )2 > θ 2
+
+> j,k
+
+, so 
+
+(dj,k − θj,k )2 − θ2 
+
+> j,k
+
+= +∆ j,k . (40) Substituting (39) and (40) into (38) yields 
+
+ ˆd M LShrink j,k − θj,k 
+
+2
+
+−
+
+ ˆd hard j,k − θj,k 
+
+2
+
+= −∆j,k 1{L⋆j,k = 1 } ˆLj,k + ∆ j,k 1{L⋆j,k = 0 } ˆLj,k . (41) Multiplying by 1{(j, k ) ∈ Ru}, summing over (j, k ), and taking expectations gives (35). 
+
+Corollary 4.2 (A sufficient condition for improvement over hard thresholding) . Let 
+
+Su = {(j, k ) ∈ Ru : L⋆j,k = 1 } (42) denote the recoverable part of the undecided band. Assume that there exist deterministic constants ∆j,k > 0 for (j, k ) ∈ Su and ∆j,k > 0 for (j, k ) ∈ Ru \ Su such that 
+
+E
+
+
+
+∆j,k | ˆLj,k = 1 
+
+
+
+≥ ∆j,k , (j, k ) ∈ Su, (43) and 
+
+E
+
+
+
+∆j,k | ˆLj,k = 1 
+
+
+
+≤ ∆j,k , (j, k ) ∈ Ru \ Su. (44) Assume also that 
+
+P ( ˆLj,k = 1) ≥ 1 − η1, (j, k ) ∈ Su, (45) and 
+
+P ( ˆLj,k = 1) ≤ η0, (j, k ) ∈ Ru \ Su. (46) Then 
+
+E ˆd M LShrink − θ 2
+
+− E ˆd hard − θ 2
+
+≤ − X
+
+> (j,k )∈Su
+
+∆j,k (1 − η1) + X
+
+> (j,k )∈Ru\Su
+
+∆j,k η0. (47) In particular, if 
+
+X
+
+> (j,k )∈Su
+
+∆j,k (1 − η1) > X
+
+> (j,k )∈Ru\Su
+
+∆j,k η0, (48) then 
+
+E ˆd M LShrink − θ 2
+
+< E ˆd hard − θ 2
+
+. (49) 10 Proof. By Theorem 4.2, 
+
+E ˆd M LShrink − θ 2
+
+− E ˆd hard − θ 2
+
+= − X
+
+> (j,k )∈Su
+
+E
+
+h
+
+∆j,k ˆLj,k 
+
+i
+
++ X
+
+> (j,k )∈Ru\Su
+
+E
+
+h
+
+∆j,k ˆLj,k 
+
+i
+
+. (50) For (j, k ) ∈ Su,
+
+E
+
+h
+
+∆j,k ˆLj,k 
+
+i
+
+= E
+
+h
+
+∆j,k | ˆLj,k = 1 
+
+i
+
+P ( ˆLj,k = 1) 
+
+≥ ∆j,k (1 − η1), (51) by (43) and (45). Similarly, for (j, k ) ∈ Ru \ Su,
+
+E
+
+h
+
+∆j,k ˆLj,k 
+
+i
+
+= E
+
+h
+
+∆j,k | ˆLj,k = 1 
+
+i
+
+P ( ˆLj,k = 1) 
+
+≤ ∆j,k η0, (52) by (44) and (46). Substituting these bounds into (50) proves (47), and (49) follows immediately from (48). 
+
+4.4 Oracle consistency 
+
+Theorem 4.1 suggests the appropriate asymptotic target. Since the only novel part of MLShrink 
+
+is the classifier on Ru, the natural notion of asymptotic optimality is oracle consistency relative to the same two-threshold architecture. 
+
+Theorem 4.3 (Oracle consistency of MLShrink ). Consider a sequence of problems indexed by 
+
+n. Let 
+
+pn = sup 
+
+> j,k
+
+P
+
+ ˆL(n)
+
+> j,k
+
+̸ = L⋆, (n) 
+
+> j,k
+
+(j, k ) ∈ R(n)
+
+> u
+
+
+
+. (53) Assume that there exist deterministic sequences Mn and an > 0 such that 
+
+|θ(n) 
+
+> j,k
+
+| ≤ Mn for all (j, k ) ∈ R(n) 
+
+> u
+
+, (54) 
+
+λ2,n (2 Mn + λ2,n ) X
+
+> j,k
+
+P
+
+
+
+(j, k ) ∈ R(n)
+
+> u
+
+
+
+= O(an), (55) and 
+
+pn −→ 0 as n → ∞ . (56) Then 
+
+E ˆd M LShrink n − θn
+
+> 2
+
+− E ˆd oracle n − θn
+
+> 2
+
+an
+
+−→ 0. (57) 
+
+Proof. By Corollary 4.1, 
+
+E ˆd M LShrink n − θn
+
+> 2
+
+− E ˆd oracle n − θn
+
+> 2
+
+≤ λ2,n (2 Mn + λ2,n ) X
+
+> j,k
+
+P
+
+ ˆL(n)
+
+> j,k
+
+̸ = L⋆, (n) 
+
+> j,k
+
+, (j, k ) ∈ R(n)
+
+> u
+
+
+
+≤ λ2,n (2 Mn + λ2,n ) X
+
+> j,k
+
+P
+
+ ˆL(n)
+
+> j,k
+
+̸ = L⋆, (n) 
+
+> j,k
+
+(j, k ) ∈ R(n)
+
+> u
+
+
+
+P
+
+
+
+(j, k ) ∈ R(n)
+
+> u
+
+
+
+≤ pn λ2,n (2 Mn + λ2,n ) X
+
+> j,k
+
+P
+
+
+
+(j, k ) ∈ R(n)
+
+> u
+
+
+
+. (58) 11 By (55), the factor multiplying pn is O(an), and by (56), pn → 0. Dividing both sides of (58) by an proves (57). Theorem 4.3 should be interpreted modestly. It does not claim global minimax optimality. Rather, it states that if the classifier becomes accurate on the undecided band, then MLShrink 
+
+approaches the best possible keep-or-discard rule within the same two-threshold framework. 
+
+4.5 Bayesian interpretation under a contamination prior 
+
+A complementary interpretation of MLShrink is obtained by placing a contamination prior on the wavelet coefficients and studying the Bayes keep-or-discard rule on the undecided band. This viewpoint provides a formal justification for contextual features and clarifies why learning on the intermediate band can improve upon deterministic thresholding. For each coefficient (j, k ), let Hj,k ∈ { 0, 1} denote the latent indicator of signal presence, where Hj,k = 0 corresponds to a noise-only coefficient and Hj,k = 1 corresponds to a signal-bearing coefficient. Conditional on a contextual feature vector uj,k , assume 
+
+P (Hj,k = 1 | uj,k ) = π(uj,k ), (59) and 
+
+θj,k | Hj,k = 0 , u j,k = 0,θj,k | Hj,k = 1 , u j,k ∼ Gj,k (· | uj,k ), (60) where Gj,k is a slab distribution, possibly depending on scale and context. The observed coefficient satisfies 
+
+dj,k = θj,k + σz j,k , zj,k ∼ N (0 , 1) . (61) Under squared-error loss, consider the two available actions on the undecided band: retain the coefficient, yielding estimator dj,k , or discard it, yielding estimator 0. Thus the action is indexed by a ∈ { 0, 1} and the corresponding estimator is a d j,k .
+
+Theorem 4.4 (Bayes rule under a contamination prior) . Under the contamination prior (59)– (61), the posterior risk of action a ∈ { 0, 1} given (dj,k , u j,k ) is 
+
+R(a | dj,k , u j,k ) = E
+
+h a d j,k − θj,k 
+
+2 | dj,k , u j,k 
+
+i
+
+. (62) Let 
+
+m(dj,k , u j,k ) = E(θj,k | dj,k , u j,k ) (63) denote the posterior mean. Then the Bayes rule retains the coefficient if and only if 
+
+2 dj,k m(dj,k , u j,k ) ≥ d2
+
+> j,k
+
+. (64) Equivalently, if the slab is symmetric and the posterior mean has the same sign as dj,k , then the Bayes rule retains the coefficient if and only if 
+
+|m(dj,k , u j,k )| ≥ |dj,k |
+
+2 . (65) 
+
+Proof. For a = 1 ,
+
+R(1 | dj,k , u j,k ) = E
+
+h
+
+(dj,k − θj,k )2 | dj,k , u j,k 
+
+i
+
+= d2 
+
+> j,k
+
+− 2dj,k E(θj,k | dj,k , u j,k ) + E(θ2 
+
+> j,k
+
+| dj,k , u j,k ). (66) 12 For a = 0 ,
+
+R(0 | dj,k , u j,k ) = E(θ2 
+
+> j,k
+
+| dj,k , u j,k ). (67) Therefore, 
+
+R(1 | dj,k , u j,k ) − R(0 | dj,k , u j,k ) = d2 
+
+> j,k
+
+− 2dj,k m(dj,k , u j,k ). (68) Hence retention is preferable if and only if (64) holds. Under the stated sign condition, (64) is equivalent to (65). Theorem 4.4 provides a principled interpretation of MLShrink . The optimal decision on the undecided band is not determined by magnitude alone, but by the posterior mean of the latent coefficient under a contamination model. Since 
+
+m(dj,k , u j,k ) = P (Hj,k = 1 | dj,k , u j,k ) E(θj,k | Hj,k = 1 , d j,k , u j,k ), (69) both posterior inclusion probability and contextual information influence the decision. This gives a formal justification for using a classifier, or more generally a learned score, to approxi-mate the keep-or-discard rule on the undecided band. This perspective is also consistent with earlier neighboring-coefficient and empirical-Bayes wavelet methods, both of which show that local or levelwise context can materially improve coefficient selection beyond purely marginal thresholding Cai and Silverman (2001); Johnstone and Silverman (2005). 
+
+4.6 Utility of contextual features 
+
+The contamination-prior theorem explains why features can matter. The next result shows why same-scale neighborhood information and parent information are particularly natural in wavelet denoising for signals with localized irregularities. Let θj,k = ⟨f, ψ j,k ⟩ denote the noiseless wavelet coefficients of f , where ψj,k is a compactly supported orthonormal wavelet with r vanishing moments and regularity r > α . Let 
+
+νθj,k = max 
+
+n
+
+|θj,k −1|, |θj,k |, |θj,k +1 |
+
+o
+
+(70) denote a same-scale neighborhood summary, and let 
+
+pθj,k = |θj+1 ,⌊k/ 2⌋| (71) denote the parent magnitude. 
+
+Proposition 4.2 (Utility of neighborhood and parent features) . Assume that f is piecewise Cα
+
+on [0 , 1] except for a finite set S of singular points. Suppose that at each singular point s ∈ S 
+
+the local smoothness index is βs < α . Then there exist constants C > 0, cs > 0, and an integer 
+
+J0 such that for all j ≥ J0 the following hold. If the support of ψj,k and the supports of its immediate same-scale neighbors are separated from S, then 
+
+νθj,k + pθj,k ≤ C 2−j(α+1 /2) . (72) On the other hand, for each singular point s ∈ S and each sufficiently fine level j, there exists an index ks(j) such that the support of ψj,k s(j) intersects a neighborhood of s and 
+
+νθj,k s(j) + pθj,k s(j) ≥ cs 2−j(βs+1 /2) . (73) 13 Consequently, 
+
+νθj,k s(j) + pθj,k s(j)
+
+sup  
+
+> k: supp( ψj,k )∩S =∅
+
+ νθj,k + pθj,k 
+
+ ≥ cs
+
+C 2j(α−βs), (74) and the contrast between coefficients associated with singular structure and coefficients from smooth regions increases exponentially with scale. 
+
+Proof. The bound (72) is a standard consequence of wavelet regularity theory: away from singu-larities, compactly supported wavelets with r > α vanishing moments yield coefficient decay of order 2−j(α+1 /2) . Since the same argument applies to neighboring coefficients and to the parent coefficient at level j + 1 , their combined summary is of the same order. For coefficients whose support intersects a singular point with local smoothness index βs <α, wavelet coefficients decay at the slower rate 2−j(βs+1 /2) . Because the wavelet support is compact and dyadic supports are nested across scales, at least one coefficient in a fixed same-scale neighborhood of the singular location, together with its parent coefficient, must inherit this slower decay. This yields (73). Dividing (73) by (72) gives (74). Proposition 4.2 gives a mathematical explanation for why neighborhood and parent features are useful. In smooth regions, both same-scale and inter-scale coefficients decay rapidly. Near singularities, however, coefficients persist across adjacent locations and scales. Thus contextual summaries such as neighbor magnitude, parent magnitude, local energy, and short-range inter-scale slopes are not ad hoc additions, but natural descriptors of wavelet-domain signal structure. The same viewpoint suggests that the feature set used by MLShrink can be expanded in several sensible directions. A first extension concerns local energy and local noise scale . For example, one may use 
+
+E(m) 
+
+> j,k
+
+= X
+
+> |r−k|≤ m
+
+d2 
+
+> j,r
+
+(75) as a local energy summary, together with a robust local noise estimate such as 
+
+ˆσ loc j,k = 1 .4826 MAD 
+
+n
+
+dj,r : |r − k| ≤ m
+
+o
+
+, (76) which may help detect heteroscedastic or non-i.i.d. noise. A second extension concerns autocorrelation and interscale dependence . If the noise is colored rather than white, then short-lag autocorrelation and parent-child dependence may themselves be informative. Natural examples are 
+
+ρ(1)  
+
+> j,k
+
+=
+
+P 
+
+> |r−k|≤ m
+
+dj,r dj,r −1
+
+P 
+
+> |r−k|≤ m
+
+d2 
+
+> j,r
+
++ ε , (77) and 
+
+ρ ps j,k = dj,k dj+1 ,⌊k/ 2⌋
+
+q
+
+d2 
+
+> j,k
+
++ ε
+
+q
+
+d2 
+
+> j+1 ,⌊k/ 2⌋
+
++ ε, (78) which measure, respectively, local same-scale autocorrelation and parent-child coherence. These features are especially relevant when the transformed noise is not approximately white within each subband. A third extension concerns Bayesian information . In the contamination-prior setting, it is natural to augment the feature vector by posterior summaries such as the local posterior inclusion probability 
+
+ˆπ post j,k = P
+
+
+
+Hj,k = 1 | dN (j,k ), u j,k 
+
+
+
+(79) 14 and the local posterior mean 
+
+ˆm post j,k = E
+
+
+
+θj,k | dN (j,k ), u j,k 
+
+
+
+, (80) where N (j, k ) denotes a local neighborhood in location and scale. Such quantities summarize, in a model-based way, how likely a coefficient is to be signal-bearing and how large the underlying clean coefficient is expected to be. A fourth extension concerns local smoothness and regularity . Beyond the simple parent-child slope already used in (71), one may use local regularity surrogates based on wavelet leaders or related multiscale maxima. For example, letting 
+
+ℓj,k = sup  
+
+> λ′⊂3λj,k , j ′≥j
+
+|dλ′ |, (81) one may define the empirical leader slope 
+
+α lead j,k = − log 2
+
+ℓj+1 ,⌊k/ 2⌋ + εℓj,k + ε , (82) which acts as a local smoothness descriptor. Features of this kind may help distinguish isolated noisy coefficients from coefficients generated by genuine singular or cusp-like structure. Thus, beyond magnitude, level, neighbors, and parents, one may incorporate local energy, robust local noise scale, same-scale autocorrelation, parent-child coherence, posterior inclusion probability, posterior mean, and wavelet-leader-based smoothness surrogates. In practical im-plementations, these features can be used either individually or in combination, depending on whether the main source of difficulty is non-smooth signal structure, correlated noise, het-eroscedasticity, or uncertainty about coefficient inclusion. 
+
+# 5 Performance Evaluation 
+
+This section evaluates the empirical performance of MLShrink under varying noise levels, thresh-old choices, signal classes, and classifier selections. We also compare MLShrink with a collection of established wavelet-domain denoising rules in order to assess its competitiveness. The study uses four standard one-dimensional benchmark signals, namely Blocks , Heavisine ,
+
+Doppler , and Bumps . These signals represent a range of structural behaviors, including smooth oscillation, local irregularity, and sharp discontinuities; see Figure 2. Following common practice in the denoising literature, we use the Haar and Daubechies 6-tap wavelet filters for the Blocks 
+
+and Bumps signals, and the Symmlet 8-tap filter for the Heavisine and Doppler signals. Performance is measured by the average mean squared error (AMSE), 
+
+AM SE (f ) = 1
+
+nN 
+
+> N
+
+X
+
+> r=1
+> n
+
+X
+
+> i=1
+
+
+
+f (ti) − ˆfr(ti)
+
+2
+
+, (83) where f denotes the underlying signal, ˆfr is the reconstructed signal in replication r, n is the signal length, and N is the number of Monte Carlo replications. In all experiments we use 
+
+N = 100 replications. All simulations were carried out in MATLAB. For the competing denoising rules, we used the GaussianWaveDen toolbox; see also Antoniadis et al. (2001) for related background. 
+
+5.1 Simulation Design 
+
+To generate noisy observations, independent Gaussian noise with variance σ2 = 1 was added to each benchmark signal after rescaling the signal to achieve a prescribed signal-to-noise ratio (SNR). Each noisy realization consisted of n = 1024 equally spaced samples on [0 , 1] . Figure 2b shows representative noisy versions of the four test signals. 15 (a) (b) 
+
+Figure 2: Four benchmark signals used in the simulation study: (a) clean signals and (b) corresponding noisy realizations. 
+
+5.2 Parameter Selection 
+
+The empirical performance of MLShrink depends primarily on the lower threshold parameter c
+
+through 
+
+λ1 = ˆ σpc log n, 
+
+the noise level, the classifier C used on the undecided band, and the structural features of the underlying signal. The upper threshold is fixed at 
+
+λ2 = ˆ σp2 log n. 
+
+Accordingly, our parameter study focuses on the choice of ˆσ, the lower-threshold parameter 
+
+c, and the classifier C.
+
+Noise estimation. The noise level was estimated from the finest-scale detail coefficients ac-cording to 
+
+ˆσ =
+
+q
+
+Var( d1,k ),
+
+where d1,k denotes the empirical detail coefficients at the finest resolution level and J =log 2(n).
+
+Selection of the lower threshold. To determine a suitable lower threshold, we varied c over the interval [0 .2, 2.0] and selected the value minimizing AMSE for a fixed signal, classifier, and SNR level. Figure 3 illustrates this procedure for the Blocks signal using a Random Forest classifier at SNR = 5 . In that example, the minimum AMSE occurs at c = 1 .2, and the recon-structed signal closely tracks the true signal. The corresponding hyperparameter configuration for the Random Forest model used in Figure 3 is reported in Table SI 1 in the Supplementary Information. 16 (a) (b) 
+
+Figure 3: Selection of the lower threshold for MLShrink : (a) AMSE as a function of c and (b) reconstructed Blocks signal at the empirically selected value c = 1 .2. The signal, classifier, and SNR were fixed at Blocks , Random Forest, and SNR = 5 , respectively. 
+
+Classifier SNR LR 
+
+c / AMSE 
+
+SVM 
+
+c / AMSE 
+
+RF 
+
+c / AMSE 
+
+DT 
+
+c / AMSE 
+
+NN 
+
+c / AMSE 3 1.4 / 0.2147 1.4 / 0.2164 1.2 / 0.1830 1.2 / 0.1883 1.4 / 0.1852 5 0.2 / 0.2222 0.4 / 0.2224 1.2 / 0.1851 1.2 / 0.1824 1.2 / 0.1828 7 0.6 / 0.2306 1.0 / 0.2315 1.2 / 0.1827 1.2 / 0.1813 1.2 / 0.1838 Table 1: Best-performing values of c and the corresponding AMSE for the Blocks signal under five classifiers and three SNR levels. Boldface indicates the smallest AMSE within each SNR level. 
+
+Sensitivity to noise level. To examine how the choice of c changes with contamination level, we repeated the same analysis for SNR values 3, 5, and 7 while keeping the signal and classifier fixed. Figure 4 shows that the AMSE profile as a function of c changes with the noise level, which confirms that the lower threshold should be tuned adaptively rather than fixed a priori across all settings. The optimized parameter settings corresponding to Figure 4 across different SNR levels are reported in Table SI 2 in the Supplementary Information. 
+
+Selection of the classifier. The classifier used to label the undecided coefficients is a central component of MLShrink . We therefore compared Logistic Regression ( LR ), Support Vector Machines ( SVM ), Random Forests ( RF ), Decision Trees ( DT ), and Neural Networks ( NN )across a range of values of c and SNR levels. The hyperparameter configurations for each classifier are summarized in Table SI 3 in the Supplementary Information. Table 1 summarizes the best-performing value of c and the corresponding AMSE for the Blocks signal. According to the current numerical results, Random Forest yields the lowest AMSE at SNR = 3 , while Decision Tree yields the lowest AMSE at SNR = 5 and SNR = 7 . These findings suggest that the optimal classifier may depend on both the signal geometry and the contamination level. 
+
+5.3 Comparative Performance 
+
+We next evaluated MLShrink across the four benchmark signals and compared it with a range of classical and modern wavelet shrinkage procedures. 
+
+Performance across signal classes. For each signal and each SNR level, we selected the empirically best combination of classifier and lower-threshold parameter c from the candidate set considered above. Table 2 reports the selected classifier, the corresponding c value, and 17 Figure 4: Sensitivity of MLShrink to noise level for the Blocks signal with a Random Forest classifier. The top panel shows AMSE as a function of c, and the bottom panel shows the corresponding reconstructions at the selected values of c.the resulting AMSE for each signal-SNR configuration. Figure 5 presents representative recon-structions at SNR = 5. Additional reconstructions for SNR = 3 and SNR = 7 are provided in Figure SI 1 and Figure SI 2 in the Supplementary Information. The results indicate that no single classifier dominates uniformly across all settings. This is consistent with the design of MLShrink : the learning task on the undecided band depends on the interaction between signal geometry, noise level, and the local feature map. In particular, the results suggest that classifier choice is part of the denoising mechanism rather than a merely secondary tuning component. 
+
+Comparison with competing shrinkage rules. Using the empirically selected values of c
+
+and classifier C, we compared MLShrink with ten competing wavelet-domain procedures: Semi-Soft, Hard, BAMS, DCOMPSH, Block-Median, Block-Mean, Hybrid Block-Median, BlockJS, VisuShrink, and Generalized Cross-Validation. Figure 6 shows a representative comparison at SNR = 5 . The corresponding comparisons at SNR = 3 and SNR = 7 are provided in Figure SI 
+
+SNR 
+
+3 5 7
+
+Signal c/Cl. AMSE c/Cl. AMSE c/Cl. AMSE Doppler 0.80 / LR 0.1107 2.00 / LR 0.1306 1.60 / NN 0.1495 HeaviSine 2.00 / DT 0.0415 1.00 / SVM 0.0464 2.00 / NN 0.0526 Bumps 1.00 / NN 0.3567 1.00 / DT 0.3687 1.00 / RF 0.3845 Blocks 1.40 / DT 0.1799 1.20 / DT 0.1826 1.20 / NN 0.1812 Table 2: Empirically selected classifier and lower-threshold parameter for MLShrink across the four benchmark signals and three SNR levels. 18 Figure 5: Representative MLShrink reconstructions for the four benchmark signals at SNR = 5. The black curve is the true signal, the blue points are the noisy observations, and the red curve is the reconstructed signal. 3 and Figure SI 4 in the Supplementary Information. Overall, the empirical evidence suggests that MLShrink is competitive with the existing shrinkage methods and is particularly promising for signals with pronounced local irregularity or discontinuous structure. For the Blocks signal, MLShrink tends to produce smaller recon-struction error than many of the competing methods. For smoother signals such as Heavisine ,the differences among methods are narrower, which is consistent with the fact that classical thresholding rules already perform well in smoother settings. More broadly, the simulation re-sults support the interpretation developed in the theoretical section: the principal contribution of MLShrink comes from improved decision-making on coefficients in the ambiguous middle band. The simulation study therefore suggests two main conclusions. First, the performance of 
+
+MLShrink depends materially on both the threshold geometry and the classifier used to resolve the undecided coefficients. Second, despite this dependence, the method remains competitive across a variety of signals and noise levels, with its most visible gains occurring for non-smooth signals where local contextual information is especially informative. 
+
+# 6 Discussion 
+
+This paper studied MLShrink , a two-threshold wavelet denoising procedure in which coefficients that are clearly small or clearly large are handled deterministically, while coefficients in the intermediate band are classified by a learning rule. The empirical study used four standard benchmark signals, namely Blocks , Bumps , HeaviSine , and Doppler , chosen to represent a range of structural behaviors including discontinuities, local spikes, oscillatory structure, and mixed smoothness. Taken together, the numerical results show that MLShrink is a competitive de-noising procedure and is particularly attractive in settings where a purely magnitude-based thresholding rule may be too rigid. A central contribution of the present work is that the empirical study is now supported by a theoretical framework tailored to the actual architecture of the method. Rather than treating 
+
+MLShrink as a generic shrinkage family, the theoretical section identifies it as a two-threshold 19 Figure 6: Boxplots of AMSE for MLShrink and competing denoising procedures at SNR =5. The methods shown are: (1) MLShrink , (2) Semi-soft, (3) Hard, (4) Bayesian adaptive multiresolution shrinker (BAMS), (5) DCOMPSH, (6) Block-median, (7) Block-mean, (8) Hybrid block-median, (9) BlockJS, (10) VisuShrink, and (11) Generalized cross-validation. support-selection rule whose only genuinely new statistical component lies in the undecided band. This viewpoint leads to three useful conclusions. First, MLShrink is structurally simple: it is nonexpansive in magnitude, sign-preserving under natural feature choices, and identical to a deterministic two-threshold rule outside the intermediate region. Second, its excess quadratic risk relative to an oracle rule is driven entirely by classification errors on the undecided coef-ficients. Third, under a suitable classifier-consistency assumption, MLShrink approaches the oracle performance associated with the same two-threshold architecture. These results do not establish full minimax optimality, but they do provide a mathematically faithful explanation of where the method can help and where it can fail. The simulation study is consistent with this interpretation. In problems where the keep-or-discard decision is unambiguous, MLShrink behaves much like an ordinary thresholding rule. Its advantage appears when a substantial fraction of the coefficients falls into the gray zone between 
+
+λ1 and λ2, where local context can improve the decision. This is especially relevant for signals with edges, jumps, transient peaks, or irregular local structure, where neighboring coefficients often carry meaningful information about whether a middle-band coefficient is signal-like or noise-like. 
+
+6.1 Impact of Noise Level and Threshold Geometry 
+
+The numerical experiments confirm that the behavior of MLShrink depends strongly on the noise level and on the geometry of the two thresholds. As the contamination level increases, the relative placement of λ1 and λ2 changes the size of the undecided band and therefore changes both the classification task and the final reconstruction. In lower-SNR settings, more coefficients are pushed toward the lower region, fewer coefficients are confidently retained, and reconstruction tends to become smoother. In higher-SNR settings, more informative coefficients survive into the middle and upper regions, so the classifier has greater opportunity to improve on a purely deterministic rule. Figure 7 helps visualize this mechanism. It shows how the proportion of coefficients in the 20 Figure 7: Proportion of empirical wavelet coefficients in the three MLShrink regions, namely 
+
+|d| ≤ λ1, λ1 < |d| ≤ λ2, and |d| > λ 2, for the Blocks signal under SNR = 3 , 5, 7 and varying values of c.lower, middle, and upper regions changes with c and SNR. This empirical pattern is consistent with the theoretical development in Section 4: the practical behavior of MLShrink is governed by how difficult the classification problem becomes on the undecided band and by how informative the available contextual features are in that region. In particular, the size of the undecided band determines how much training information is available and how much scope there is for improvement over deterministic thresholding. 
+
+6.2 Role of Classifier Selection 
+
+The classifier used on the undecided band is not a minor implementation detail but an integral part of MLShrink . Different classifiers induce different decision boundaries in the local feature space, and therefore different patterns of coefficient retention. The empirical results suggest that no single classifier dominates uniformly across all signals and SNR levels. This is not surprising. The learning problem faced by MLShrink changes with the signal class, the noise level, and the threshold configuration, so the best classifier may also change. This observation also clarifies the practical meaning of the theory. The theory is intention-ally classifier-agnostic: it does not depend on the detailed finite-sample properties of Logistic Regression, Support Vector Machines, Random Forests, Decision Trees, or Neural Networks. In-stead, it says that the quality of the final denoiser is controlled by how accurately the classifier recovers the oracle labels on the undecided band. This provides a clean separation between the wavelet-domain architecture of the method and the choice of the learning engine used within that architecture. 
+
+6.3 Comparison with Existing Methods 
+
+The comparison with existing wavelet shrinkage procedures suggests that MLShrink is particu-larly promising for signals with non-smooth structure. For piecewise-constant or edge-dominated signals such as Blocks , the method often compares favorably with hard thresholding, semi-soft thresholding, and several other classical procedures. For smoother signals, the differences among methods are smaller, which is also expected: when the signal is sufficiently regular, standard shrinkage rules already perform well and there is less room for a classifier-based correction. 21 More broadly, the experiments suggest that MLShrink should not be viewed as a universal replacement for all denoising rules. Rather, it is a flexible hybrid procedure that appears most useful when coefficient magnitude alone does not provide enough information for a stable de-cision. In that sense, its best use case is precisely the one emphasized by the theory: settings where the intermediate band contains recoverable signal and local contextual information is informative. 
+
+6.4 Limitations and Future Directions 
+
+The present study still has several limitations. First, the classification step is based on a small feature set consisting mainly of coefficient magnitude, scale information, and a local neighbor-hood summary. While these features already produce competitive results, they almost certainly do not exhaust the useful information available in the wavelet domain. Richer local and inter-scale descriptors, parent-child relations, wavelet-tree persistence measures, local energy sum-maries, and covariates derived from the original signal may improve classification accuracy on the undecided band. Second, the method currently relies on a model-selection stage across several candidate clas-sifiers and threshold parameters. This improves flexibility, but it also increases computational cost. More efficient tuning rules, level-dependent threshold choices, and classifier-specific regu-larization strategies would make MLShrink more scalable. Third, the present work is restricted to one-dimensional signals and orthonormal wavelet transforms. Extending the methodology to images, volumetric data, wavelet packets, redundant transforms, and nondecimated wavelet systems is a natural next step. Such extensions are particularly appealing because contextual structure across neighboring coefficients is often even stronger in two-dimensional and three-dimensional settings. A particularly promising future direction is the incorporation of modern deep learning meth-ods into the undecided-band classifier. Instead of using hand-crafted low-dimensional features, one may learn representations directly from local coefficient neighborhoods or from short multi-scale coefficient sequences. Convolutional neural networks could be used to learn local wavelet patches, recurrent architectures could capture sequential dependencies across scales, and graph-based neural networks could model parent-child or neighborhood relations in wavelet trees. Re-cent wavelet-aware deep architectures also suggest concrete paths forward, including multi-level wavelet convolutional networks and learnable wavelet packet models that combine multiscale structure with data-adaptive representation learning Liu et al. (2018); Frusque and Fink (2024). Transformers are also an appealing possibility. Since wavelet coefficients naturally form structured sequences across locations and scales, transformer-style attention mechanisms may be able to learn long-range dependencies that are invisible to local thresholding rules. A transformer restricted to the undecided band, or supplied with multiscale positional encodings, could in principle learn whether a coefficient should be retained based on a broader contextual field than the current feature map allows. Hybrid procedures are especially attractive here: one may preserve the transparent two-threshold architecture of MLShrink while replacing the current shallow classifier by a deeper learned decision module. Such a hybrid would retain interpretability at the thresholding level while gaining representational power in the ambiguous region. Another important direction is self-supervised or weakly supervised learning in the wavelet domain. Since the initial threshold labels are noisy surrogates rather than true oracle labels, future work could seek iterative refinement schemes, pseudo-labeling strategies, contrastive learn-ing objectives, or uncertainty-aware losses tailored to the undecided band. This may be partic-ularly useful when class imbalance becomes severe or when informative coefficients are rare. In summary, the present results suggest that MLShrink is not only a workable denoising procedure, but also a flexible framework in which wavelet-domain support selection can be coupled with increasingly sophisticated learning mechanisms. 22 7 Concluding Remarks 
+
+This paper introduced MLShrink , a classifier-assisted two-threshold wavelet shrinkage procedure for signal denoising. The method combines the structural simplicity of deterministic threshold-ing with a data-adaptive learning rule applied only to the coefficients in the undecided band. Coefficients below the lower threshold are discarded, coefficients above the upper threshold are retained, and coefficients in the intermediate region are classified using local wavelet-domain information. The contribution of the paper is twofold. Methodologically, MLShrink offers a flexible al-ternative to purely magnitude-based thresholding rules by learning the keep-or-discard decision on the undecided band. Theoretically, the paper provides a framework that matches the actual architecture of the method. The structural results show that MLShrink remains a nonexpan-sive, sign-preserving support-selection rule. The oracle risk decomposition shows that its excess risk relative to the best possible middle-band rule is governed entirely by misclassification on the undecided coefficients. The oracle-consistency result further shows that, when the classifier becomes accurate on that band, the denoiser approaches the oracle benchmark associated with the same two-threshold design. Several directions remain open. These include richer wavelet-domain feature engineering, better handling of class imbalance, more efficient tuning of thresholds and classifiers, extensions to multidimensional data and redundant transforms, and the incorporation of deep learning architectures such as convolutional networks, graph-based models, and transformers into the undecided-band decision step. These developments may substantially broaden the scope of the 
+
+MLShrink framework while preserving the central idea of learned support selection in the wavelet domain. Overall, MLShrink provides a mathematically interpretable and empirically competitive bridge between classical wavelet shrinkage and modern statistical learning. We believe that this hybrid viewpoint offers a useful direction for future research in adaptive denoising. For reproducibility, the code developed for this study is available at https://github.com/ Vijini95/MLShrink .Supplementary materials are available at: https://github.com/Vijini95/MLShrink .
+
+# Acknowledgments 
+
+B. Vidakovic acknowledges the partial support of the H.O. Hartley Chair Foundation and NSF Award 2515246 at Texas A&M University. 
+
+# References 
+
+Abramovich, F. and Benjamini, Y. (1996). Adaptive thresholding of wavelet coefficients. Com-putational Statistics & Data Analysis , 22(4):351–361. Abramovich, F., Sapatinas, T., and Silverman, B. W. (1998). Wavelet thresholding via a bayesian approach. Journal of the Royal Statistical Society: Series B , 60(4):725–749. Antoniadis, A., Bigot, J., and Sapatinas, T. (2001). Wavelet estimators in nonparametric re-gression: a comparative simulation study. Journal of statistical software , 6:1–83. Antoniadis, A. and Fan, J. (2001). Regularization of wavelet approximations. Journal of the American Statistical Association , 96(455):939–967. Cai, T. T. (1999). Adaptive wavelet estimation: A block thresholding and oracle inequality approach. The Annals of Statistics , 27(3):898–924. 23 Cai, T. T. and Silverman, B. W. (2001). Incorporating information on neighboring coefficients into wavelet estimation. Sankhy¯ a: The Indian Journal of Statistics, Series B , 63(2):127–148. Coifman, R. R. and Donoho, D. L. (1995). Translation-invariant de-noising. In Antoniadis, A. and Oppenheim, G., editors, Wavelets and Statistics , volume 103 of Lecture Notes in Statistics ,pages 125–150. Springer, New York. Donoho, D. L. and Johnstone, I. M. (1994). Ideal spatial adaptation by wavelet shrinkage. 
+
+biometrika , 81(3):425–455. Donoho, D. L. and Johnstone, I. M. (1995). Adapting to unknown smoothness via wavelet shrinkage. Journal of the american statistical association , 90(432):1200–1224. Donoho, D. L. and Johnstone, I. M. (1998). Minimax estimation via wavelet shrinkage. The annals of Statistics , 26(3):879–921. Frusque, G. and Fink, O. (2024). Robust time series denoising with learnable wavelet packet transform. Advanced Engineering Informatics , 62:102669. Gao, H.-Y. and Bruce, A. G. (1997). Waveshrink with firm shrinkage. Statistica Sinica , 7(4):855– 874. Hall, P., Kerkyacharian, G., and Picard, D. (1998). Block threshold rules for curve estimation using kernel and wavelet methods. The Annals of Statistics , 26(3):922–942. Johnstone, I. M. and Silverman, B. W. (2005). Empirical bayes selection of wavelet thresholds. 
+
+The Annals of Statistics , 33(4):1700–1752. Kudryavtsev, A. A. and Shestakov, O. V. (2024). Properties of the sure estimates when using continuous thresholding functions for wavelet shrinkage. Mathematics , 12(23):3646. Kulkarni, R., Pinheiro, A., Vidakovic, B., and Atto, A. M. (2026). Smooth SCAD: A raised cosine thresholding rule for wavelet denoising. Mathematics , 14(5):787. Liu, P., Zhang, H., Zhang, K., Lin, L., and Zuo, W. (2018). Multi-level wavelet-cnn for image restoration. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pages 773–782. Vimalajeewa, D., DasGupta, A., Ruggeri, F., and Vidakovic, B. (2023). Gamma-minimax wavelet shrinkage for signals with low snr. The New England Journal of Statistics in Data Science , 1(2):159–171. 24

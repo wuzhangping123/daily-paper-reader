@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-20",
+  "date": "2026-06-20",
+  "generated_at": "2026-06-20T20:21:13",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/20/2606.19540v1-overfitted-high-dimensional-matrix-factorizations-via-adaptive-spectral-shrinkage",
+      "section": "deep",
+      "title_en": "Overfitted high-dimensional matrix factorizations via adaptive spectral shrinkage",
+      "authors": "Lorenzo Mauri, David B. Dunson",
+      "date": "2026-06-17",
+      "pdf": "https://arxiv.org/pdf/2606.19540v1",
+      "score": "8.0",
+      "evidence": "高维矩阵分解结合自适应谱收缩用于低秩信号提取，可应用于去噪",
+      "tldr": "高维因子模型面临潜在维度选择难题，尤其在低信噪比下。本文提出EigenBayes方法，基于谱估计和自适应经验贝叶斯校准，实现快速过拟合因子分解。其后验分析解析可解，自动收缩多余成分，提供不确定性量化。理论渐近性质优良，数值实验和基因组应用中优于现有方法。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Factor models are popular approaches for analyzing high-dimensional data to extract low-rank signals and estimate covariances. They decompose the covariance matrix as the sum of low-rank and diagonal components. A key issue is how to choose the latent dimension $k$, which is particularly challenging when the factor model only holds approximately and in low signal-to-noise scenarios. Bayesian overfitted factor models specify an upper bound on $k$ and rely on structured shrinkage priors to effectively remove extra components. Such approaches are popular and effective, but computationally expensive. We propose a much faster \\texttt{EigenBayes} approach that provides valid uncertainty quantification, based on spectral estimation of latent factors and adaptive empirical Bayes calibration of key hyperparameters. The resulting posterior distribution factorizes across outcomes and is analytically tractable, bypassing Markov chain Monte Carlo. We show that \\texttt{EigenBayes} adapts to the signal-to-noise ratio of each outcome and latent dimension, while shrinking superfluous latent components to zero. We establish favorable asymptotic properties and demonstrate strong empirical performance in numerical experiments and a genomics application, where EigenBayes outperforms state-of-the-art alternatives.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/20/2606.19580v1-machine-learning-integrated-in-wavelet-shrinkage-mlshrink",
+      "section": "quick",
+      "title_en": "Machine Learning Integrated in Wavelet Shrinkage (MLShrink)",
+      "authors": "Dixon Vimalajeewa, Vijini Lakmini, Brani Vidakovic",
+      "date": "2026-06-17",
+      "pdf": "https://arxiv.org/pdf/2606.19580v1",
+      "score": "7.0",
+      "evidence": "结合机器学习的小波阈值去噪方法，可应用于高光谱图像",
+      "tldr": "实际数据常受加性噪声污染，经典小波阈值去噪对中间系数只依赖幅度，决策刚性。MLShrink提出双阈值策略，低于下阈值丢弃、高于上阈值保留，中间带利用局部小波域特征通过机器学习分类。理论证明其非扩张性、风险由分类误差决定，并满足oracle一致性。实验表明对不规则、边缘丰富信号效果优于经典方法，桥接了经典小波去噪与统计学习。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Data encountered in practice are frequently contaminated by additive noise, and wavelet shrinkage remains a fundamental tool for recovering underlying signals in nonparametric estimation. Classical procedures such as hard and soft thresholding decide whether to retain a wavelet coefficient almost entirely from its magnitude. Although effective in many settings, these rules can be too rigid for coefficients whose magnitudes fall in an intermediate region where the distinction between signal and noise is uncertain. We propose MLShrink, a two-threshold wavelet denoising procedure that combines wavelet shrinkage with machine learning. Coefficients below a lower threshold are discarded, coefficients above an upper threshold are retained, and coefficients in the intermediate band are classified using local wavelet-domain features. In this way, MLShrink preserves the simplicity of classical thresholding away from the decision boundary while allowing data-adaptive decisions for ambiguous coefficients. The paper also develops a theoretical framework tailored to this architecture. We show that MLShrink is a nonexpansive support-selection rule, derive an oracle-based risk decomposition showing that excess denoising risk is determined by classification errors on the undecided band, and establish an oracle-consistency result under suitable assumptions on classifier performance. Simulation experiments on standard benchmark signals indicate that MLShrink is competitive with several established wavelet shrinkage methods and is especially effective for signals with irregular, edge-rich, or non-smooth structure. These findings suggest that learned decisions on the intermediate threshold band provide a useful and interpretable connection between classical wavelet denoising and modern statistical learning.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/20/2606.19813v1-tidy-thermal-infrared-image-denoising-via-wavelet-domain-entropy-and-directional-stripe-index",
+      "section": "quick",
+      "title_en": "TIDY: Thermal Infrared Image Denoising via Wavelet Domain Entropy and Directional Stripe Index",
+      "authors": "Tai Hyoung Rhee, Dong-Guw Lee, Ayoung Kim",
+      "date": "2026-06-18",
+      "pdf": "https://arxiv.org/pdf/2606.19813v1",
+      "score": "7.0",
+      "evidence": "热红外图像去噪，利用小波域熵和定向条纹指数去除条纹噪声",
+      "tldr": "热红外成像在低光环境下表现优异，但受强噪声干扰，尤其在室内场景。现有去噪方法速度慢或鲁棒性差，且依赖合成噪声训练。为此提出TIDY，一种轻量级小波域去噪器，在真实数据上训练。通过小波分解显式分离噪声与结构，并引入波尔兹曼熵和方向条纹指数作为损失，有效抑制随机和条纹噪声。TIDY速度达34Hz，在室内零样本场景下鲁棒性强，并显著提升热惯性里程计和单目深度估计等下游任务性能。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Thermal infrared (TIR) imaging has been a popular choice for field robotics due to its robust perception capability under low light visual degradation, but it suffers from severe stochastic and fixed-pattern noise that breaks downstream estimation. This noise is intensified indoors due to low thermal contrast and uniform temperature distributions, contributing to the relative lack of indoor TIR deployments. Existing TIR denoising methods exhibit a poor accuracy-efficiency tradeoff, either too slow for online deployment required in robotics or insufficiently robust to severe degradation, while typically being trained on synthetic noise. Addressing these problems, we propose TIDY, a lightweight wavelet-domain denoiser trained on real clean-noisy TIR data. By reformulating TIR denoising in the wavelet domain, TIDY explicitly disentangles noise from structural content, enabling targeted suppression with reduced spatial complexity, significantly improving inference speed over prior methods (~34Hz). TIDY introduces two new metrics, Wavelet Entropy and Wavelet Directional Stripe Index, as complementary loss terms to explicitly suppress stochastic noise and stripe artifacts. Across severe indoor corruption and zero-shot settings, TIDY improves robustness and yields consistent gains in downstream robotics tasks including thermal inertial odometry and monocular depth estimation. Code and dataset is available at: https://github.com/williamrheeth/TIDY",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

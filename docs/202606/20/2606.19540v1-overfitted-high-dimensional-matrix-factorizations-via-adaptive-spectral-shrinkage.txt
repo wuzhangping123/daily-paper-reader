@@ -1,0 +1,3463 @@
+Title: Overfitted high-dimensional matrix factorizations via adaptive spectral shrinkage
+
+URL Source: https://arxiv.org/pdf/2606.19540v1
+
+Published Time: Fri, 19 Jun 2026 00:14:30 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+# Overfitted high-dimensional matrix factorizations via adaptive spectral shrinkage 
+
+Lorenzo Mauri Department of Statistical Science, Duke University 
+
+lorenzo.mauri@duke.edu 
+
+David B. Dunson Department of Statistical Science, Duke University June 19, 2026 
+
+Abstract 
+
+Factor models are popular approaches for analyzing high-dimensional data to extract low-rank signals and estimate covariances. They decompose the covariance matrix as the sum of low-rank and diagonal components. A key issue is how to choose the latent dimension 𝑘 ,which is particularly challenging when the factor model only holds approximately and in low signal-to-noise scenarios. Bayesian overfitted factor models specify an upper bound on 𝑘 and rely on structured shrinkage priors to effectively remove extra components. Such approaches are popular and effective, but computationally expensive. We propose a much faster EigenBayes 
+
+approach that provides valid uncertainty quantification, based on spectral estimation of latent factors and adaptive empirical Bayes calibration of key hyperparameters. The resulting posterior distribution factorizes across outcomes and is analytically tractable, bypassing Markov chain Monte Carlo. We show that EigenBayes adapts to the signal-to-noise ratio of each outcome and latent dimension, while shrinking superfluous latent components to zero. We establish favorable asymptotic properties and demonstrate strong empirical performance in numerical experiments and a genomics application, where EigenBayes outperforms state-of-the-art alternatives. 
+
+Keywords: Empirical Bayes; Factor analysis; High-dimensional; Latent variable model; Scalable Bayesian computation; Singular value decomposition 1
+
+> arXiv:2606.19540v1 [stat.ME] 17 Jun 2026
+
+# 1 Introduction 
+
+Estimating covariances in high-dimensions is a challenging statistical and computational problem, generally requiring O( 𝑝 2) parameters to be estimated, where 𝑝 is the ambient dimension of the data. A popular approach introduces latent factors and models the 𝑖 -th observation as 
+
+𝑦 𝑖 = Λ 𝜂 𝑖 + 𝜖 𝑖 , 𝜖 𝑖 ∼ 𝑁 𝑝 (0, Σ), (𝑖 = 1, . . . , 𝑛 ), (1) where 𝜂 𝑖 ∈ R𝑘 denotes the latent factors for the 𝑖 -th observation, Λ ∈ R𝑝 ×𝑘 is the factor loadings matrix, Σ = diag (𝜎 21 , . . . , 𝜎 2
+
+> 𝑝
+
+) is the matrix of residual error variances, 𝑛 is the sample size, 𝑘 is the latent dimension, and, generally 𝑘 ≪ 𝑝 . Assuming 𝜂 𝑖 ∼ 𝑁 𝑘 (0, 𝐼 𝑘 ), and integrating out the latent factors, we obtain an equivalent representation: 
+
+𝑦 𝑖 ∼ 𝑁 𝑝 (0, Θ) , (𝑖 = 1, . . . , 𝑛 ), Θ = ΛΛ ⊤ + Σ. (2) Model (2) decomposes the covariance Θ as a sum of low-rank and diagonal matrices. A rich literature has developed corresponding estimators. Letting 𝑀 = 𝜂 1, · · · , 𝜂 𝑛 
+
+⊤ ∈ R𝑛 ×𝑘 be the matrix of latent factors, spectral approaches let 𝑀 ⊤ 𝑀 = 𝑛𝐼 𝑘 and estimate the loading matrix Λ with ˆΛ = 𝑉 1: 𝑘 𝐷 1: 𝑘 /√𝑛 , where 𝐷 1: 𝑘 is a diagonal matrix with the 𝑘 largest singular values of data matrix 
+
+𝑌 on the diagonal and 𝑉 1: 𝑘 is the matrix of left singular vectors (Bai 2003, Bai & Ng 2020, Doz et al. 2012). A number of consistent information criteria have been proposed to infer 𝑘 (Bai & Ng 2002, Ahn & Horenstein 2013, Chen & Li 2021). In our numerical experiments, information criteria tend to underestimate 𝑘 in challenging signal-to-noise scenarios. Even when 𝑘 is specified correctly, spectral estimates can suffer from poor estimation accuracy when the magnitude of some latent components is not large compared to the noise. Barigozzi & Cho (2018) propose an estimator that addresses this issue based on scaling the entries of the eigenvectors of the sample covariance matrix for an overfitted rank. However, their method lacks uncertainty quantification and is outperformed by alternatives in our experiments. Early Bayesian approaches (Lopes & West 2004) placed priors on 𝑘 and conducted posterior sampling via inefficient reversible jump Markov chain Monte Carlo sampling. More recently, overfitted factor models have been popular, specifying an upper-bound on 𝑘 and using shrinkage priors on loadings to remove unnecessary factors (Bhattacharya & Dunson 2011, Durante 2017, Legramanti et al. 2020). Numerous extensions of overfitted factor models have been proposed and applied in a variety of settings (De Vito et al. 2021, Kowal & Canale 2023, Zorzetto et al. 2025, Landy et al. 2026). These approaches can be sensitive to hyperparameters and Gibbs samplers can suffer from slow convergence and mixing, particularly when 𝑝 is large. Alternatively, variational approximations have been proposed (Hoffman et al. 2013, Ranganath et al. 2014, Blei et al. 2017, Kucukelbir et al. 2017, Buettner et al. 2017), but can massively underestimate uncertainty. Rockova & George (2016) infer sparsity in the loading matrix via an Indian buffet process (Griffiths & Ghahramani 2011) prior, but focus on point estimation. Particularly relevant to our development is Chattopadhyay et al. (2024), who combine the spectral estimation of latent factors with Bayesian inference for the remaining model parameters, including the loadings and residual error variances. Chattopadhyay et al. (2024) is related to a rich literature combining pre-estimation of latent factors, via spectral methods or joint maximum likelihood estimation, with Bayesian inference (Fan et al. (2022, 2023), Xie & Wu (2024), Wu & Xie (2025 a,b)). Related approaches tend to have excellent empirical performance and strong theoretical support in high-dimensional asymptotic scenarios (Chen et al. 2019, 2020, Lee et al. 2025, Mauri & Dunson 2025 a, Mauri et al. 2025, Mauri & Dunson 2025 b, Mauri et al. 2026). However, existing approaches in this area do not provide a mechanism for adaptive overfitted rank selection or adaptation to outcomes with varying signal-to-noise ratios. 2Inspired by these considerations, we propose EigenBayes , which combines the computational efficiency of spectral estimators with data-adaptive shrinkage and uncertainty quantification of Bayesian approaches. We obtain a spectral estimate of the latent factors using an overestimated latent dimension and infer loadings and residual error variances via surrogate Bayesian linear regres-sion tasks. We adopt normal-inverse gamma priors with outcome- and latent component-dependent shrinkage parameters. Crucially, conditioning on the spectral estimate leads to a factorized posterior across outcomes, reducing inference to 𝑝 Bayesian regressions, enabling embarrassingly parallel computation. While the point estimators can be interpreted as regularized spectral estimators, sampling from the posterior distribution arising from the surrogate regressions allows for full un-certainty quantification, yielding a computationally efficient alternative to the popular overfitted Bayesian factor models mentioned above. We develop a data-adaptive tuning procedure for shrink-age hyperparameters, which admits interpretable closed-form expressions in terms of the singular value decomposition of the observed data. The resulting estimates adapt to the signal-to-noise ratio of each outcome and latent dimension. Superfluous components are appropriately shrunk to zero, automatically adapting to the true rank. Further, we prove posterior contraction around the true pa-rameter, a central limit theorem for point estimators, and a Bernstein-von Mises result characterising the asymptotic behaviour of the induced posterior distribution on the entries of the covariance. To our knowledge, this provides one of the first formal frequentist theoretical justifications for empirical Bayes inference in overfitted factor models. We show substantial gains in accuracy and uncertainty quantification in numerical experiments and demonstrate utility on a gene expression dataset. 
+
+# 2 Method 
+
+2.1 Notation 
+
+For a matrix 𝐴 , we denote by 𝑎 𝑟 and 𝑎 (𝑐 ) its 𝑟 -th row and 𝑐 -th column, respectively. We denote by 
+
+𝑠 𝑙 ( 𝐴 ) the 𝑙 -th largest singular value of 𝐴 and by || 𝐴 || and || 𝐴 || ∞ its spectral and entrywise infinity norms, respectively. For a vector 𝑣 , we denote by || 𝑣 || its Euclidean norm. For two sequences 
+
+(𝑎 𝑛 )𝑛 ≥1 and (𝑏 𝑛 )𝑛 ≥1, we write 𝑎 𝑛 ≲ 𝑏 𝑛 , if 𝑎 𝑛 ≤ 𝐶𝑏 𝑛 eventually for some 𝐶 < ∞.
+
+2.2 General methodology 
+
+We first rewrite the model in its matrix form: 
+
+𝑌 = 𝑀 Λ⊤ + 𝐸, where 𝑌 = 𝑦 1, · · · , 𝑦 𝑛 
+
+⊤ , 𝑀 = 𝜂 1, · · · , 𝜂 𝑛 
+
+⊤ , 𝐸 = 𝜖 1, · · · , 𝜖 𝑛 
+
+⊤ (3) Let 𝐷 1: 𝐻 = diag (𝑑 1, . . . , 𝑑 𝐻 ) where 𝑑 𝑙 = 𝑠 𝑙 (𝑌 ) is the 𝑙 -th largest singular value of 𝑌 , and 
+
+𝑈 1: 𝐻 ∈ R𝑛 ×𝐻 , 𝑉 1: 𝐻 ∈ R𝑝 ×𝐻 are the matrices of the corresponding left and right singular vectors, respectively. We select 𝐻 as a conservative upper bound to the true latent dimension 𝑘 . More details are provided in Section 2.3. As described in the introduction, a spectral estimator for the latent factors is given by the matrix of left singular vectors associated to the leading singular values scaled by √𝑛 (Bai 2003). Following this approach, we let ˆ𝑀 = √𝑛𝑈 1: 𝐻 as our initial estimate of the latent factors. Given ˆ𝑀 , as in Chattopadhyay et al. (2024), we infer the loadings via the surrogate regression 
+
+𝑌 = ˆ𝑀 ˜Λ⊤ + ˜𝐸, ˜𝐸 =  ˜𝑒 1 · · · ˜𝑒 𝑛 
+
+⊤ , ˜𝑒 𝑖 ∼ 𝑁 (0, ˜Σ), (4) introducing the new parameters ˜ Λ ∈ R𝑝 ×𝐻 and ˜ Σ = diag   ˜𝜎 21 , . . . , ˜𝜎 2
+
+> 𝑝
+
+. We specify a conjugate normal-inverse gamma prior on the loadings and residual error variance for the 𝑗 -th outcome: ˜𝜆 𝑗 | ˜𝜎 2 
+
+> 𝑗
+
+, 𝜏 2 
+
+> 𝑗
+
+, ˜Ψ ∼ 𝑁 𝐻 (0, ˜𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+˜Ψ), ˜𝜎 2 
+
+> 𝑗
+
+∼ 𝐼𝐺 (𝑣 /2, 𝑣𝑠 2/2), ( 𝑗 = 1, . . . , 𝑝 ), (5) 3where Ψ = diag (𝜓 21, . . . , 𝜓 2 
+
+> 𝐻
+
+) with 𝜓 2 
+
+> 𝑙
+
+controlling the strength of the 𝑙 -th latent component globally, while 𝜏 2 
+
+> 𝑗
+
+modulates the signal-to-noise ratio for the 𝑗 -th outcome. This allows latent component and outcome dependent shrinkage. In the following, we describe a data-adaptive procedure for tuning such hyperparameters. Crucially, we set 𝜓 𝑙 ’s to decreasing values so that the shrinkage increases with the latent component dimension. In Section 3, we show that when 𝐻 > 𝑘 , our estimates of the 𝜓 𝑙 ’s for 𝑙 > 𝑘 converge to 0, appropriately shrinking superfluous components and automatically adapting to the true rank. The role of the 𝜏 2 
+
+> 𝑗
+
+’s is to capture heterogeneity in signal-to-noise ratios across variables. For instance, in genomics it is common that some genes display a strong signal, while others have larger idiosyncratic noise. Under the prior specification in (5), we obtain the following conjugate update: ˜𝜆 𝑗 | ˜𝜎 2 
+
+> 𝑗
+
+, 𝑌 , ˆ𝑀, 𝜏 𝑗 , Ψ ∼ 𝑁 𝐻 
+
+  ˆ𝜆 𝑗 , ˜𝜎 2 
+
+> 𝑗
+
+Ψ−1
+
+> 𝑛, 𝑗
+
+,
+
+˜𝜎 2 
+
+> 𝑗
+
+| 𝑌 , ˆ𝑀, 𝜏 𝑗 , Ψ ∼ 𝐼𝐺 
+
+ 𝑣 + 𝑛 
+
+2 , 𝑣𝑠 2 + || 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 || 2
+
+2
+
+
+
+,
+
+( 𝑗 = 1, . . . , 𝑝 ), (6) where ˆ𝜆 𝑗 = 𝐸 [𝜆 𝑗 | 𝑌 , ˆ𝑀, 𝜏 𝑗 , Ψ] = √𝑛 Ψ−1 
+
+> 𝑛, 𝑗
+
+𝐷 1: 𝐻 𝑣 𝑗, 1: 𝐻 , Ψ𝑛, 𝑗 = diag  𝑛 + 𝜏 −2 
+
+> 𝑗
+
+𝜓 −21 , . . . , 𝑛 + 𝜏 −2 
+
+> 𝑗
+
+𝜓 −2
+
+> 𝐻
+
+, (7) and 𝑣 𝑗, 1: 𝐻 denotes the 𝑗 -th row of 𝑉 1: 𝐻 . We denote by ˆ Λ the matrix whose 𝑗 -th row is given by ˆ𝜆 𝑗 , that is ˆ Λ = [ ˆ𝜆 1 · · · ˆ𝜆 𝑝 ]⊤. The posterior mean is equivalent to the solution of the following least squares problem with adaptive 𝐿 2 regularisation: ˆ𝜆 𝑗 = arg 𝛽 ∈R𝐻 min || 𝑦 ( 𝑗 ) − ˆ𝑀 𝛽 || 2 +
+
+> 𝐻
+
+∑︁ 
+
+> 𝑙 =1
+
+1
+
+𝜏 2 
+
+> 𝑗
+
+𝜓 2
+
+> 𝑙
+
+𝛽 2 
+
+> 𝑙
+
+, where 𝛽 = (𝛽 1, . . . , 𝛽 𝐻 )⊤. (8) Equation (8) shows that our point estimator corresponds to a ridge estimator in the surrogate regression with component-wise penalties, yielding adaptive shrinkage across both variables and latent directions. (6) induces a posterior distribution on the entries of ΛΛ ⊤, which suffers from slight undercov-erage. To solve a related problem, Chattopadhyay et al. (2024) use a posterior variance inflation factor 𝜌 > 1 having a closed form formula that guarantees asymptotic valid frequentist coverage on average across entries of ΛΛ ⊤. The coverage corrected posterior distribution for ˜ 𝜆 𝑗 is ˜𝜆 𝑗 | 𝜌 2, ˜𝜎 2 
+
+> 𝑗
+
+, 𝑌 , ˆ𝑀, 𝜏 𝑗 , Ψ ∼ 𝑁 𝐻 ( ˆ𝜆 𝑗 , 𝜌 2 ˜𝜎 2 
+
+> 𝑗
+
+Ψ−1 
+
+> 𝑛, 𝑗
+
+). (9) Let ˜ Λ =  ˜𝜆 1, · · · , ˜𝜆 𝑝 
+
+⊤ and ˜ Σ = diag ( ˜𝜎 21 , · · · , ˜𝜎 2
+
+> 𝑝
+
+) be posterior samples for the loading matrix and residual variances, respectively. We denote by ˜ 𝐿 = ˜Λ ˜Λ⊤ and ˜ Θ = ˜𝐿 + ˜Σ the corresponding samples for the low-rank component and the overall covariance, respectively. The spectral estimator for Λ, 𝑉 1: 𝐻 𝐷 1: 𝐻 /√𝑛 , corresponds to the ordinary least squares estimate of ˜ Λ in the surrogate regression (4). Taking a Bayesian approach has three major advantages: (i) it leads to a regularized point estimate, which can have superior estimation accuracy, (ii) the prior specification in (5) allows for a simple yet effective hyperparameter specification detailed in Section 2.3, (iii) the induced posterior distribution can be used to propagate uncertainty about any functional of the parameters of interest. Next, we can estimate ΛΛ ⊤ via ˆ 𝐿 = ˆΛ ˆΛ⊤ and the covariance matrix via ˆ 𝐿 + ˆΣ, where ˆ Σ = 
+
+diag (𝛿 21, . . . , 𝛿 2
+
+> 𝑝
+
+), with 𝛿 2 
+
+> 𝑗
+
+= 𝑣𝑠 2+| | 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 | | 2 
+
+> 𝑣 +𝑛 −2
+
+the posterior mean for the 𝑗 -th outcome error variance for 𝑗 = 1, . . . , 𝑝 . We study asymptotic properties of this estimate in Section 3. Alternatively, one could estimate ΛΛ ⊤ via its posterior mean arising from (9), that is 𝐸 [ ˜Λ ˜Λ⊤ | 𝜌 2, 𝑌 , ˆ𝑀, {𝜏 𝑗 }𝑝 𝑗 =1, Ψ] =
+
+4ˆ𝐿 + 𝜌 2 tr (Ψ) 
+
+> 𝑛
+
+ˆΣT , with T = diag (𝜏 21 , . . . , 𝜏 2
+
+> 𝑝
+
+). In practice, we find negligible differences between this posterior mean and ˆ 𝐿 .While ˆ𝑀 serves as an initial estimate for 𝑀 , posterior quantities of 𝑀 , including posterior mean and interval estimates, can be easily obtained from the full conditional of 𝑀 , using posterior samples of Λ and Σ. For instance, for given samples of ˜ Λ and ˜ Σ, we can sample from the posterior distribution of the latent factors of the 𝑖 -th sample (the 𝑖 -th row of 𝑀 ), via 
+
+𝜂 𝑖 | 𝑦 𝑖 , ˜Λ, ˜Σ ∼ 𝑁 𝐻 
+
+  ˜Λ⊤ ˜Σ−1 ˜Λ + 𝐼 𝐻 
+
+ −1 ˜Λ⊤ ˜Σ−1 𝑦 𝑖 ,   ˜Λ⊤ ˜Σ−1 ˜Λ + 𝐼 𝐻 
+
+ −1
+
+
+
+. (10) Given 𝑁 𝑀𝐶 samples of ˜ Λ and ˜ Σ, { ˜Λ(𝑠 ) }𝑁 𝑀𝐶  
+
+> 𝑠 =1
+
+, { ˜Σ(𝑠 ) }𝑁 𝑀𝐶  
+
+> 𝑠 =1
+
+, an approximation to the posterior mean for 𝜂 𝑖 is available via 
+
+𝐸 [𝜂 𝑖 | 𝑦 𝑖 ] ≈ 1
+
+𝑁 𝑀𝐶 𝑁 𝑀𝐶 ∑︁ 
+
+> 𝑠 =1
+
+  ˜Λ(𝑠 )⊤ ˜Σ(𝑠 ) − 1 ˜Λ(𝑠 ) + 𝐼 𝐻 
+
+ −1 ˜Λ(𝑠 )⊤ ˜Σ(𝑠 ) − 1 𝑦 𝑖 . (11) The estimate in (11) is a refinement of the 𝑖 -th row of the initial estimate ˆ𝑀 , that takes into account the heteroscedasticity across variables and uncertainty in model parameters. Sampling from (10) allows full uncertainty quantification for the latent factors and differently from Gibbs sampling does not require any post-processing routine to resolve the rotational ambiguity of the Monte Carlo samples. 
+
+2.3 Hyperparameter selection 
+
+We first describe a strategy for tuning the prior shrinkage hyperparameters. The prior distributions depend on the two sets of hyperparameters via the products {𝜏 2 
+
+> 𝑗
+
+Ψ}𝑝 𝑗 =1. Dividing the 𝜏 2 
+
+> 𝑗
+
+’s by some constant 𝑐 > 0, and multiplying Ψ by the same constant, we obtain the same specification. Hence, we impose the following normalizing condition: tr (Ψ) = 𝐻 . The expected a priori 
+
+squared norms of ˜𝜆 𝑗 and ˜𝜆 (𝑙 ) , the 𝑗 -th row and 𝑙 -th column of ˜Λ, respectively, are given by 
+
+𝐸 [|| ˜𝜆 𝑗 || 2 
+
+> 𝐹
+
+| ˜𝜎 2 
+
+> 𝑗
+
+, 𝜏 2 
+
+> 𝑗
+
+, Ψ] = ˜𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+tr (Ψ) = ˜𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+𝐻 , and 𝐸 [|| ˜𝜆 (𝑙 ) || 2 
+
+> 𝐹
+
+| { ˜𝜎 2 
+
+> 𝑗
+
+, 𝜏 2 
+
+> 𝑗
+
+}𝑝 𝑗 =1, 𝜓 2 
+
+> 𝑙
+
+] = 𝜓 2
+
+> 𝑙
+
+Í𝑝 𝑗 =1 ˜𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+.We select hyperparameters via an empirical Bayes moment-matching strategy, calibrating prior expected magnitudes of loadings to their spectral estimates while correcting for overestimation of the latent dimension. We estimate ˜ 𝜎 2 
+
+> 𝑗
+
+via ˆ 𝜎 2 
+
+> 𝑗
+
+= ||( 𝐼 𝑛 − 𝑈 𝐻 𝑈 ⊤ 
+
+> 𝐻
+
+)𝑦 ( 𝑗 ) || 2 
+
+> 𝐹
+
+/( 𝑛 − 𝐻 ) ∨ 𝑐 𝜎 , where 𝑐 𝜎 is some small constant, || ˜𝜆 𝑗 || 2 
+
+> 𝐹
+
+via 𝑣 ⊤ 
+
+> 𝑗, 1: 𝐻
+
+(𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 )𝑣 𝑗, 1: 𝐻 /𝑛 , and || ˜𝜆 (𝑙 ) || 2 
+
+> 𝐹
+
+via (𝑑 2 
+
+> 𝑙
+
+− 𝑑 2
+
+> 𝐻 +1
+
+)/ 𝑛 .Plugging everything together, we obtain ˆ𝜓 2 
+
+> 𝑙
+
+= 𝑑 2 
+
+> 𝑙
+
+− 𝑑 2
+
+> 𝐻 +1
+
+Í𝐻 𝑙 =1 (𝑑 2 
+
+> 𝑙
+
+− 𝑑 2
+
+> 𝐻 +1
+
+) 𝐻, (𝑙 = 1, . . . , 𝐻 ),
+
+ˆ𝜏 2 
+
+> 𝑗
+
+= 𝑣 ⊤ 
+
+> 𝑗, 1: 𝐻
+
+(𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 )𝑣 𝑗, 1: 𝐻 
+
+𝑛𝐻 ˆ𝜎 2
+
+> 𝑗
+
+, ( 𝑗 = 1, . . . , 𝑝 ).
+
+(12) These choices are motivated by the following rationale: if we neglected the term 𝑑 2 
+
+> 𝐻 +1
+
+in (12), we would obtain 𝐸 [|| ˜𝜆 𝑗 || 2 | ˆ𝜎 2 
+
+> 𝑗
+
+, ˆ𝜏 2 
+
+> 𝑗
+
+, Ψ] = || ˆ𝜆 𝑠𝑣𝑑, 𝑗 || 2, and 𝐸 [|| ˜𝜆 (𝑙 ) || 2 
+
+> 𝐹
+
+| { ˆ𝜎 2 
+
+> 𝑗
+
+, ˆ𝜏 2 
+
+> 𝑗
+
+}𝑝 𝑗 =1, ˆ𝜓 2 
+
+> 𝑙
+
+] = || ˆ𝜆 (𝑙 ) 
+
+> 𝑠𝑣𝑑
+
+|| 2 
+
+> 𝐹
+
+,with ˆ 𝜆 𝑠𝑣𝑑, 𝑗 and ˆ 𝜆 (𝑙 ) 
+
+> 𝑠𝑣𝑑
+
+denoting the 𝑗 -th row and 𝑙 -th column of ˆ Λ𝑠𝑣𝑑 = 𝑉 1: 𝐻 𝐷 1: 𝐻 /√𝑛 , the spectral estimate for Λ with latent dimension 𝐻 . However, this estimate does not take into account the fact that the true latent dimension is being overestimated. The subtraction of 𝑑 2 
+
+> 𝐻 +1
+
+removes the bulk noise contribution associated with overfitted components. Under spiked covariance models, the first few singular values beyond the true rank concentrate around the upper edge of the Marchenko–Pastur 5Figure 1: Left panel: prior expected squared magnitude (across 50 replications) and true squared magnitude of the columns of the loading matrix. Right panel: squared magnitude of the rows of the loading matrix (x-axis) vs their prior expected value (y-axis) in one replication. distribution (Marchenko & Pastur 1967). Hence, 𝑑 2 
+
+> 𝐻 +1
+
+provides an estimate of the noise level, and subtracting it yields a better estimate of signal strength. A complete derivation is reported in the supplementary material. Hyperparameter estimates have intuitive forms. ˆ𝜓 2 
+
+> 𝑙
+
+is proportional to the relative contribution of variability explained by the 𝑙 -th latent component after subtracting the variability explained by the 𝐻 + 1 component. ˆ𝜏 2 
+
+> 𝑗
+
+is proportional to the ratio of the amount of variability explained by the 
+
+𝐻 latent components in the 𝑗 -th outcome ( 𝑣 ⊤ 
+
+> 𝑗, 1: 𝐻
+
+(𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 )𝑣 𝑗, 1: 𝐻 ) and an estimate of the residual error variance ( ˆ 𝜎 2 
+
+> 𝑗
+
+), allowing stronger shrinkage for noisy variables and weaker shrinkage for informative ones. We characterize the asymptotic behavior of such estimates in Section 3 and show that 𝜓 2
+
+> 𝑙 𝑝𝑟
+
+→ 0, whenever the 𝑙 -th latent component is superfluous, ensuring automatic rank adaptation. As a result, leading singular directions receive moderate shrinkage, while components beyond the true rank are aggressively shrunk toward zero. Here, we conduct a simple numerical experiment to illustrate the adaptivity of our shrinkage hyperparameters. We generate data via the scenario (a) described in section 4 with 𝑛 = 1000, 
+
+𝑝 = 5000. For simplicity, we set 𝐻 = 15, while the true rank 𝑘 is 10. In the left panel of Figure 1, histograms show 𝐸 [|| ˜𝜆 (𝑙 ) || 2 | { ˆ𝜎 2 
+
+> 𝑗
+
+, ˆ𝜏 2 
+
+> 𝑗
+
+}𝑝 𝑗 =1, ˆ𝜓 2 
+
+> 𝑙
+
+] = ˆ𝜓 2
+
+> 𝑙
+
+Í𝑝 𝑗 =1 ˆ𝜏 2 
+
+> 𝑗
+
+ˆ𝜎 2 
+
+> 𝑗
+
+, the prior expected value of the squared magnitude of the 𝑙 -th column of ˜ Λ conditionally on the point estimates for the variances 
+
+{ ˆ𝜎 2 
+
+> 𝑗
+
+}𝑝 𝑗 =1, and the hyperparameters { ˆ𝜏 2 
+
+> 𝑗
+
+}𝑝 𝑗 =1 and ˆ𝜓 2 
+
+> 𝑙
+
+, for each component 𝑙 = 1, . . . , 𝐻 across 50 independent replications, while red dots indicate the squared singular values of the true loading matrix. First, we note that for the active components ( 𝑙 = 1, . . . , 10), the prior expectation of the squared magnitude of each column is very close to the corresponding squared singular value, demonstrating that our tuning procedure correctly adapts to the amount of signal in the data. Moreover, for the superfluous components ( 𝑙 = 11 , . . . , 15), the prior expectations are very low and such components are successfully shrunk to 0. The right panel compares the squared magnitude of the rows of Λ (x-axis) with their respective prior expectations 𝐸 [|| ˜𝜆 𝑗 || 2 | ˆ𝜎 2 
+
+> 𝑗
+
+, ˆ𝜏 2 
+
+> 𝑗
+
+, { ˆ𝜓 𝑙 }𝐻 𝑙 =1] 𝑝 𝑗 =1
+
+(y-axis) for one random replication of the experiment, providing evidence of the ability of our procedure to adapt to each outcome signal-to-noise ratio. As for the selection of the latent dimension, various criteria have been proposed, which can be divided into two categories: (a) information criteria (Bai & Ng 2002, Ahn & Horenstein 2013, Chen & Li 2021) and (b) “elbow methods”, based on the comparison of ratio or differences of adjacent pairs of (squared) singular values (Fan et al. 2023). Our methodology relies on setting 𝐻 
+
+to some overfitted value. Theoretical results presented in Section 3 require 𝐻 =≲ 𝑝 2/5, however, in 6practice, we found that setting 𝐻 = ⌊√𝑝 ⌋ or 𝐻 = b𝑘 JIC + 10, where b𝑘 JIC is found minimizing the joint information criterion by Chen & Li (2021) to have good empirical performance in our numerical experiments and application. 
+
+# 3 Theoretical Support 
+
+Prior to stating the results, we enumerate some regularity conditions. 
+
+Assumption 1. The data are generated from model (2) , and the true loading matrix and residual error variance are denoted by Λ0 = 𝜆 01 , · · · , 𝜆 0 𝑝 
+
+⊤ and Σ0, respectively. We also let 𝐿 0 = Λ 0Λ⊤
+
+> 0
+
+and Θ0 = 𝐿 0 + Σ0 be the true low-rank components and the true covariance matrix, respectively. 
+
+Assumption 2. We have 𝑝 → ∞ as 𝑛 → ∞ with 𝑝 𝑛 → 𝑐 ∈ ( 0, ∞) .
+
+Assumption 3. The true loading matrix is such that 𝑠 𝑙 (Λ0) ≍ √𝑝 for 𝑙 = 1, . . . , 𝑘 , || Λ0 || ∞ ≤ 𝐶 Λ < ∞
+
+and min 𝑗 =1,..., 𝑝 || 𝜆 0 𝑗 || ≥ 𝑐 Λ > 0.
+
+Assumption 4. The idiosyncratic error variance is spherical, that is Σ0 = 𝜎 20 𝐼 𝑝 , with 𝜎 20 < ∞.
+
+The first result establishes automatic rank adaptation. Although we do not explicitly model the latent dimension, the empirical Bayes variance components associated with redundant components vanish asymptotically. 
+
+Proposition 1. Suppose 𝐻 > 𝑘 , 𝐻 = O( 𝑛 2/5) and Assumptions 1–4 hold. Then, for each 𝑘 < 𝑙 ≤ 𝐻 ,with probability at least 1 − 𝑜 (1), we have 
+
+max 
+
+> 𝑗 =1,..., 𝑝
+
+ˆ𝜓 2 
+
+> 𝑙
+
+ˆ𝜏 2 
+
+> 𝑗
+
+≲ 1
+
+𝑛 1+2/5 ,
+
+where ˆ𝜓 2 
+
+> 𝑙
+
+and ˆ𝜏 2 
+
+> 𝑗
+
+are defined in Section 2.3. 
+
+Proofs of all theoretical results are reported in the supplemental. Proposition 1 states that as the sample size and the outcome dimension diverge and the data are generated according to the model 1, the prior variance parameters for superfluous latent components (that is, those corresponding to indices strictly larger than 𝑘 ) converge to zero at a fast rate. As a result, the estimates for the corresponding elements in the loading matrix converge to 0, which is formalized in the following corollary. 
+
+Corollary 1. Under the assumptions of Proposition 1, for each 𝑘 < 𝑙 ≤ 𝐻 , we have 
+
+ˆ𝜆 (𝑙 )
+
+> 𝑗
+> 𝑝𝑟
+
+→ 0,
+
+as 𝑛 → ∞ , where ˆ𝜆 (𝑙 ) 
+
+> 𝑗
+
+is the 𝑙 -th column of ˆΛ, which is defined in Section 2.2. 
+
+Next, we study the asymptotic performance of our estimator in recovering the covariance matrix. We find similar consistency and distributional results to the ones in Chattopadhyay et al. (2024), without assuming that the latent dimension is known a priori, allowing the upper bound of the latent dimension 𝐻 to grow with 𝑛 , and taking into account the effect of estimating the empirical Bayes hyperparameters from the same data. 7Theorem 1. Let ˆ𝐿 = ˆΛ ˆΛ⊤ and ˆΘ = ˆ𝐿 + ˆΣ be the point estimates for the low-rank component and the overall covariance matrix defined in Section 2.2. Then, if 𝐻 = O( 𝑛 2/5) and Assumptions 1–4 hold, with probability at least 1 − 𝑜 (1), we have 
+
+|| ˆ𝐿 − 𝐿 0 || || 𝐿 0 || ≲√︂ log 𝑛 𝑛 , || ˆΘ − Θ0 || || Θ0 || ≲√︂ log 𝑛 𝑛 . (13) 
+
+Moreover, with probability at least 1 − 𝑜 (1),
+
+𝐸 
+
+"
+
+Π || ˜𝐿 − 𝐿 0 || || 𝐿 0 || ≥ 𝐶 1√︂ log 𝑛 𝑛 
+
+!# 
+
+→ 0, 𝐸 
+
+"
+
+Π || ˜Θ − Θ0 || || Θ0 || ≥ 𝐶 2√︂ log 𝑛 𝑛 
+
+!# 
+
+→ 0, (14) 
+
+for some constants 𝐶 1, 𝐶 2 < ∞.
+
+In Theorem 1, we consider the error in spectral norm in estimating the low-rank component of the covariance and the overall covariance matrix. To make results comparable across dimension, we divide the errors by the norms of the true parameter. The first result justifies the use of ˆ 𝐿 and ˆ Θ
+
+as point estimators for ΛΛ ⊤ and Ω. The second result is stronger and characterises the contraction of the entire posterior distribution. The central idea of the proof is to use Proposition 1, along with appropriate bounds on the ˆ 𝜓 2 
+
+> 𝑙
+
+’s for 𝑙 = 1, . . . , 𝑘 and on the ˆ 𝜏 2 
+
+> 𝑗
+
+’s, to show that asymptotically ˆ Λ ˆΛ⊤
+
+behaves similarly to the oracle spectral estimator, the one that selects the correct latent dimension, as superfluous components are appropriately shrunk to 0. Importantly, this result does not require 
+
+𝐻 to be fixed but allows it to grow at a rate 𝑛 2/5.
+
+Remark 1. Although our estimator behaves asymptotically as the spectral estimator with the correct latent dimension, our numerical experiments show that it may even perform better in finite samples due to the effectiveness of the adaptive shrinkage. 
+
+Remark 2. Theorem 1 requires Σ0 = 𝜎 20 𝐼 𝑝 , however, we relax this assumption letting Σ0 be a diagonal matrix in the numerical experiments, where our estimator achieves state-of-the-art performance. 
+
+Remark 3. Here, we require 𝐻 ≲ 𝑛 2/5 ≍ 𝑝 2/5 to obtain theoretical support, but, in the numerical experiments, we also consider 𝐻 = ⌊√𝑝 ⌋ with excellent empirical performance. 
+
+The last two results concern uncertainty quantification about our estimate. The first one is a central limit theorem showing entry-wise asymptotic normality for the point estimator. 
+
+Theorem 2. Suppose 𝐻 = O( 𝑛 2/5) and Assumptions 1–4 hold. Let ˆ𝜃 𝑗 𝑗 ′ and 𝜃 0 𝑗 𝑗 ′ be the 𝑗, 𝑗 ′-th entry of ˆΘ and Θ0, respectively, for 𝑗, 𝑗 ′ ∈ { 1, . . . , 𝑝 }. Then, as 𝑛 → ∞ , we have 
+
+√𝑛 𝑆 0 𝑗 𝑗 ′
+
+  ˆ𝜃 𝑗 𝑗 ′ − 𝜃 0 𝑗 𝑗 ′
+
+ ⇒ 𝑁 (0, 1), ( 𝑗, 𝑗 ′ = 1, . . . , 𝑝 ),
+
+where 
+
+𝑆 20 𝑗 𝑗 ′ =
+
+(𝜎 20
+
+ || 𝜆 0 𝑗 || 2 + || 𝜆 0 𝑗 ′ || 2 + ( 𝜆 ⊤  
+
+> 0𝑗
+
+𝜆 0 𝑗 ′ )2 + || 𝜆 0 𝑗 || 2 || 𝜆 0 𝑗 ′ || 2, if 𝑗 ≠ 𝑗 ′
+
+2 𝜎 20 + || 𝜆 0 𝑗 ′ || 22, if 𝑗 = 𝑗 ′. (15) Theorem 2 states that the 𝑗, 𝑗 ′-th entry of our point estimator for the covariance is approximately normal distributed centered at the corresponding true value of the parameter with variance 𝑆 20 𝑗 𝑗 ′ /𝑛 ,8that is, for large 𝑛 , ˆ 𝜃 𝑗 𝑗 ′ ·
+
+∼ 𝑁 (𝜃 0 𝑗 𝑗 ′ , 𝑆 20 𝑗 𝑗 ′ /𝑛 ), where ·
+
+∼ reads “is approximately distributed as”. Hence, an asymptotically valid (1 − 𝛼 )% confidence interval for 𝜃 0 𝑗 𝑗 ′ is CI 𝑗 𝑗 ′ =
+
+
+
+ˆ𝜃 𝑗 𝑗 ′ ± 𝑧 1− 𝛼 /2
+
+ˆ𝑆 𝑗 𝑗 ′
+
+√𝑛 
+
+
+
+, (16) where 𝑧 𝑞 = Φ −1 (𝑞 ), Φ(·) denotes the cumulative distribution function of a standard Gaussian random variable, and ˆ𝑆 𝑗 𝑗 ′ is a consistent estimate of 𝑆 0 𝑗 𝑗 ′ . Similarly, we can characterise the asymptotic behaviour of the posterior distribution on the entries of ˜ Ω induced by (9). 
+
+Theorem 3. Suppose 𝐻 = O( 𝑛 2/5) and Assumptions 1–4 hold. Then, as 𝑛 → ∞ , we have 
+
+sup  
+
+> 𝑥 ∈R
+
+Π
+
+( √𝑛 ( ˜𝜃 𝑗 𝑗 ′ − ˆ𝜃 0 𝑗 𝑗 ′ )
+
+𝑇 20 𝑗 𝑗 ′ (𝜌 ) ≤ 𝑥 
+
+)
+
+− Φ(𝑥 ) 𝑝𝑟 
+
+→ 0, ( 𝑗, 𝑗 ′ = 1, . . . , 𝑝 ),
+
+where 
+
+𝑇 20 𝑗 𝑗 ′ (𝜌 ) =
+
+(
+
+𝜌 2𝜎 20
+
+ || 𝜆 0 𝑗 || 2 + || 𝜆 0 𝑗 ′ || 2, if 𝑗 ≠ 𝑗 ′
+
+2𝜎 40 + 4𝜌 2𝜎 20 || 𝜆 0 𝑗 || 2, if 𝑗 = 𝑗 ′. (17) According to Theorem 3, the induced posterior distribution on the 𝑗, 𝑗 ′-th entry of the covari-ance after appropriate recentering and rescaling converges to a zero-mean Gaussian with variance 
+
+𝑇 20 𝑗 𝑗 ′ (𝜌 ). Estimating 𝑇 0 𝑗 𝑗 ′ (𝜌 ) with ˆ 𝑇 𝑗 𝑗 ′ (𝜌 ) by replacing true parameters with their respective point estimates, we obtain an analytic asymptotic approximation to a credible interval for 𝜃 𝑗 𝑗 ′ ,CR 𝑗 𝑗 ′ (𝜌 ) =
+
+
+
+ˆ𝜃 𝑗 𝑗 ′ ± 𝑧 1− 𝛼 /2
+
+ˆ𝑇 𝑗 𝑗 ′ (𝜌 )√𝑛 
+
+
+
+. (18) Note that 𝑇 0 𝑗 𝑗 ′ (1) ≤ 𝑆 0 𝑗 𝑗 ′ , which shows the undercoverage suffered by the posterior without correction induced by (6). We adopt the same strategy of Chattopadhyay et al. (2024) to tune the inflation term 𝜌 to achieve asymptotically valid coverage on average across entries of Θ.
+
+# 4 Numerical experiments 
+
+We compare our procedure (denoted by EB in the figures) with four alternatives: Barigozzi & Cho (2018) ( BC ), the principal component estimator ( PC ), Rockova & George (2016) ( ROTATE ), Chattopadhyay et al. (2024) ( FABLE ) and Bhattacharya & Dunson (2011) ( MGSP ). FABLE ’s imple-mentation provided by the authors estimates the rank via the joint information criterion (JIC, Chen & Li (2021)). MGSP is fit using its default overfitted specification, which adaptively shrinks redun-dant factors. For all other procedures, we consider four choices: the true latent dimension 𝑘 , b𝑘 JIC ,
+
+b𝑘 JIC + 10, where b𝑘 JIC is the estimate obtained via the JIC, and ⌊√𝑝 ⌋.We consider three generating mechanisms for the loading matrix. Scenario (a) represents a standard dense factor model, scenario (b) introduces variable-specific signal heterogeneity, and scenario (c) imposes sparsity in the loading matrix. In particular, letting 𝑠 2 = (𝑠 21, . . . , 𝑠 2 
+
+> 𝑘
+
+), with 
+
+𝑠 𝑙 = 0.15 + 0.1 𝑙 −1 
+
+> 𝑘 −1
+
+for 𝑙 = 1, . . . , 𝑘 , we generate the elements of the loading matrix according to one of the following three options: (a) 𝜆 0 𝑗𝑙 ∼ 𝑁 (0, 𝑠 2 
+
+> 𝑙
+
+)
+
+(b) 𝜆 0 𝑗𝑙 ∼ 𝑁 (0, 𝑠 2 
+
+> 𝑗𝑙
+
+), with 𝑠 2 
+
+> 𝑗𝑙
+
+= 𝑟 2 
+
+> 𝑗
+
+𝑠 2 
+
+> 𝑙
+
+and 𝑟 2 
+
+> 𝑗
+
+=
+
+
+
+3 if 𝑗 ≤ ⌊ 𝑝 /3⌋,
+
+1/3 if 𝑗 ≥ ⌊ 2𝑝 /3⌋ + 1,
+
+1 otherwise 9(c) 
+
+(
+
+𝜆 0 𝑗𝑙 ∼ 𝑁 (0, 𝑠 2 
+
+> 𝑙
+
+) if 𝑗 ≤ ⌊ 2𝑝 /3⌋,
+
+0 otherwise for 𝑙 = 1, . . . , 𝑘 and 𝑗 = 1, . . . , 𝑝 . We generate residual error variances as 𝜎 20 𝑗 ∼ Unif (1, 5) for 
+
+𝑗 = 1, . . . , 𝑝 . We set 𝑘 = 10 and consider every possible combination of (𝑛, 𝑝 ) ∈ { 500 , 1000 } × {1000 , 5000 }. We evaluate the prediction accuracy via the relative Frobenius error for point estimates of the covariance.                       
+
+> (a) 𝑛 =500 , 𝑝 =1000 (b) 𝑛 =1000 , 𝑝 =1000
+> (c) 𝑛 =500 , 𝑝 =5000 (d) 𝑛 =1000 , 𝑝 =5000
+
+Figure 2: Relative Frobenius error in estimating the true covariance matrix under different sample size ( 𝑛 ) and dimension ( 𝑝 ) settings in the first scenario. Overall, EigenBayes achieves state-of-the-art accuracy in reconstructing the covariance in various settings. Under the first scenario, EigenBayes , FABLE , and MGSP are the best-performing method when 𝑛 = 1000, with EigenBayes outperforming the competitors in the lower sample size setting (Figure 2). The results are qualitatively similar in the second scenario (Figure 3), that is, when the loading magnitudes vary across outcomes, with a slightly more pronounced advantage for EigenBayes . In the sparse setting (4), ROTATE , which explicitly models sparsity in the loading matrix, is the second-best performing method, and is out-performed only by EigenBayes , in particular in the higher-dimensional example. Across all simulations, all methods with the latent dimension set to b𝑘 JIC (including EigenBayes )perform sub-optimally, when the JIC underestimates the true 𝑘 (such as when 𝑛 = 500). We report the result fitting EigenBayes with 𝐻 = b𝑘 JIC as a reference, as we always recommend setting 𝐻 to a higher value. Indeed, the accuracy of EigenBayes is remarkably robust to the choice of latent dimension whenever 𝐻 is chosen to be sufficiently large, with estimates under the most conservative choice ( 𝐻 = ⌊√𝑝 ⌋) performing almost indistinguishably from those having correct latent dimension 
+
+(𝐻 = 𝑘 ), while competitors tend to provide less accurate estimates as the choice of latent dimension 10 increases. Even when b𝑘 JIC = 𝑘 , EigenBayes performs just as well and sometimes even better, such as in the sparse setting, than FABLE .                      
+
+> (a) 𝑛 =500 , 𝑝 =1000 (b) 𝑛 =1000 , 𝑝 =1000
+> (c) 𝑛 =500 , 𝑝 =5000 (d) 𝑛 =1000 , 𝑝 =5000
+
+Figure 3: Relative Frobenius error in estimating the true covariance matrix under different sample size ( 𝑛 ) and dimension ( 𝑝 ) settings in the second scenario. Table 1 reports the average coverage of entries of the covariance matrix for interval estimates. For simplicity, we report the results of EigenBayes with 𝐻 = ⌊√𝑝 ⌋, but similar results were obtained with the other choices. While our procedure provides accurate frequentist coverage on average across entries of the covariance, FABLE ’s estimates suffer from non-negligible undercoverage while having comparable width on average, and MGSP slightly undercovers the true parameters when 
+
+𝑝 = 5000. 
+
+# 5 Application 
+
+We analyze the ImmGen microarray dataset GSE15907 (Painter et al. 2011, Desch et al. 2011), which contains gene-expression measurements from multiple ex-vivo immune lineages, primarily collected from adult B6 male mice and comprising 628 samples. We randomly select 5000 genes out of the half with the highest variance and apply standard pre-processing, which is reported in the supplemental. We evaluate competing methodologies via out-of-sample log-likelihood. Specifically, we per-form 50 random 80 /20 train-test splits, fit each method on the training samples, and compute the log-likelihood of the held-out samples under the estimated covariance model. For all methods that require specifying either the number of factors or an upper bound on it, we fit the method over a grid of values ranging from 40 to 160, assess the robustness of the resulting out-of-sample log-likelihoods to this choice, and compare performance against FABLE .11 (a) 𝑛 = 500 , 𝑝 = 1000 (b) 𝑛 = 1000 , 𝑝 = 1000            
+
+> (c) 𝑛 =500 , 𝑝 =5000 (d) 𝑛 =1000 , 𝑝 =5000
+
+Figure 4: Relative Frobenius error in estimating the true covariance matrix under different sample size ( 𝑛 ) and dimension ( 𝑝 ) settings in the third scenario. The left panel of Figure 5 reports the mean difference in out-of-sample log-likelihood between 
+
+EigenBayes and each competing method across replications, together with pointwise 95% bands. Positive values indicate better predictive performance for EigenBayes . EigenBayes is consistently better than BC and PCA for all values of the latent dimension considered. As 𝐻 increases, EigenBayes 
+
+shows improvements over FABLE and MGSP for a wide range of values for 𝐻 . Finally, the difference with ROTATE is negligible for smaller values of 𝐻 , but EigenBayes consistently achieves higher out-of-sample log-likelihood for larger values and is substantially more robust to overfitting 𝐻 .In real applications, fitting each method over many values of 𝐻 may be computationally intensive. We therefore also study two default choices, b𝑘 JIC + 10 and ⌊√𝑝 ⌋. For each choice, we report the distribution of 𝑝 -values from one-sided paired 𝑡 -tests assessing whether EigenBayes achieves higher out-of-sample log-likelihood (right panel of Figure 5). For each competing method except for 
+
+FABLE and MGSP , we compare EigenBayes against the competitor using the same number of latent components. The resulting 𝑝 -values are small in most comparisons except for the ones with MGSP ,providing evidence that EigenBayes yields higher predictive log-likelihood than the competing methods under these default choices of 𝐻 . The comparison with MGSP is more nuanced, since MGSP 
+
+tends to have a slightly better (worse) out-of-sample performance when we select 𝐾 = b𝑘 JIC + 10 (𝐻 = ⌊√𝑝 ⌋ respectively), but evidence in favour of either approach is not overwhelming for both choices. Nevertheless, EigenBayes is massively faster with model fitting taking on average less than 1 second, while posterior computation for MGSP took ≈ 30 minutes for each replication. Overall, these results show that EigenBayes achieves excellent accuracy while displaying remarkable robustness to the specification of the number of latent components and appealing computational efficiency. This makes EigenBayes a compelling alternative for practitioners when 12 EigenBayes FABLE MGSP 
+
+CLT Π
+
+Scenario (𝑛, 𝑝 ) Cov Len Cov Len Cov Len Cov Len (a) 
+
+(500 , 1000 ) 0.940 0.278 0.941 0.278 0.718 0.272 0.946 0.280 
+
+(500 , 5000 ) 0.940 0.204 0.941 0.204 0.678 0.201 0.945 0.201 
+
+(1000 , 1000 ) 0.944 0.272 0.944 0.272 0.700 0.258 0.876 0.304 
+
+(1000 , 5000 ) 0.945 0.198 0.946 0.198 0.679 0.205 0.810 0.199 (b) 
+
+(500 , 1000 ) 0.954 0.323 0.953 0.320 0.749 0.326 0.950 0.318 
+
+(500 , 5000 ) 0.948 0.237 0.947 0.234 0.685 0.231 0.944 0.230 
+
+(1000 , 1000 ) 0.955 0.320 0.954 0.317 0.746 0.326 0.910 0.393 
+
+(1000 , 5000 ) 0.953 0.232 0.953 0.229 0.688 0.228 0.862 0.256 (c) 
+
+(500 , 1000 ) 0.965 0.218 0.964 0.218 0.786 0.184 0.963 0.216 
+
+(500 , 5000 ) 0.965 0.160 0.964 0.160 0.797 0.159 0.963 0.154 
+
+(1000 , 1000 ) 0.971 0.217 0.970 0.217 0.771 0.164 0.925 0.223 
+
+(1000 , 5000 ) 0.970 0.156 0.969 0.156 0.799 0.150 0.871 0.157 Table 1: Average frequentist coverage (Cov) and average interval length (Len) for interval estimates. For EigenBayes , we report results from interval estimates obtained both using the central limit theorem and the approximation of the posterior distribution. selecting the factor dimension is difficult, while also reducing the need for extensive tuning. 
+
+Figure 5: Left panel: difference in out-of-sample log-likelihood between EigenBayes and each competing method as 𝐻 varies, reported as the mean across 50 replications together with pointwise 95% bands. Right panel: 𝑝 -values across the 50 replications from one-sided paired 𝑡 -tests for the hypothesis that EigenBayes achieves higher out-of-sample log-likelihood, for two default choices of 𝐻 .13 6 Discussion 
+
+We have proposed EigenBayes , a novel methodology for scalable factor analysis, which does not require the rank to be known in advance or to be otherwise estimated. The adaptive shrinkage prior calibrates the regularisation to both latent components and outcomes, allowing superfluous components to be shrunk toward zero and mitigating the sensitivity to the choice of latent dimension. Theoretical results show that EigenBayes recovers the low-rank covariance component at favourable rates and provides asymptotically valid uncertainty quantification, while numerical experiments demonstrate strong finite-sample performance relative to existing alternatives. Several directions for future research are promising. First, it would be useful to extend the framework beyond Gaussian data. Many scientific applications involve positive, count, binary, or network-valued observations, for which low-rank structure is still central but the Gaussian factor model is inappropriate. Examples include mutational signature analysis and cancer genomics (Zito & Miller 2024), where nonnegative matrix factorization-type structure is natural (Lee & Seung 1999), as well as generalized linear factor models (Moustaki & Knott 2000) for binary responses in ecology, social networks, and recommender systems. Developing similar procedures for these settings would require replacing the conjugate Gaussian surrogate regression with scalable approximate Bayesian updates while preserving adaptive component-specific shrinkage. Second, another natural direction is to further localize the shrinkage mechanism. The present formulation adapts to heterogeneity across outcomes and latent components through outcome-specific and component-specific shrinkage parameters, but it does not allow the prior variance to vary freely across individual entries of the loading matrix. Introducing entrywise or more locally adaptive shrinkage could improve performance in settings with sparse or highly heterogeneous loading patterns, although doing so would require new strategies beyond the row- and component-level moment matching used here. Third, extending the theory to allow dependence and misspecification is an important next step. This includes serial or spatial correlation across observations, heavier-tailed noise distributions, heteroscedasticity beyond the settings considered here, and approximate factor models in which the covariance is only approximately low-rank plus diagonal. Such extensions would broaden applicability of the method to longitudinal, spatial, and observational datasets. Finally, another interesting direction is to study combinations of spectral or algorithmic estima-tors with Bayesian inference approaches in more generality, to speed up computation while allowing for adaptive regularisation and uncertainty quantification. 
+
+# Acknowledgement 
+
+This research was partially supported by the Office of Naval Research (Grant N00014-24-1-2626), by the National Institutes of Health (Grant R01GM163225 and Grant R01ES035625), and by the European Research Council under the European Union’s Horizon 2020 research and innovation programme (grant agreement No 856506). 
+
+# References 
+
+Ahn, S. C. & Horenstein, A. R. (2013), ‘Eigenvalue ratio test for the number of factors’, Econometrica 
+
+81 (3), 1203–1227. Bai, J. (2003), ‘Inferential Theory for Factor Models of Large Dimensions’, Econometrica 
+
+71 (1), 135–171. 14 Bai, J. & Ng, S. (2002), ‘Determining the number of factors in approximate factor models’, Econo-metrica 70 (1), 191–221. Bai, J. & Ng, S. (2020), ‘Simpler proofs for approximate factor models of large dimensions’, arXiv preprint arXiv:2008.00254 .Bandeira, A. S. & van Handel, R. (2016), ‘Sharp nonasymptotic bounds on the norm of random matrices with independent entries’, The Annals of Probability 44 (4), 2479 – 2506. Barigozzi, M. & Cho, H. (2018), ‘Consistent estimation of high-dimensional factor models when the factor number is over-estimated’, Electronic Journal of Statistics .Bhattacharya, A. & Dunson, D. B. (2011), ‘Sparse Bayesian infinite factor models’, Biometrika 
+
+98 (2), 291–306. Blei, D., Kucukelbir, A. & McAuliffe, J. D. (2017), ‘Variational Inference: A Review for Statisti-cians’, Journal of the American Statistical Association 112 (518), 859–877. Bloemendal, A., Knowles, A., Yau, H.-T. & Yin, J. (2016), ‘On the principal components of sample covariance matrices’, Probability Theory and Related Fields 164 (1–2), 459–552. Bloemendal, A., L´ aszl´ o, E., Antti, K., Horng-Tzer, Y. & Jun, Y. (2014), ‘Isotropic local laws for sam-ple covariance and generalized Wigner matrices’, Electronic Journal of Probability 19 (none), 1 – 53. Buettner, F., Pratanwanich, N., McCarthy, D., Marioni, J. & Stegle, O. (2017), ‘f-scLVM: scalable and versatile factor analysis for single-cell RNA-seq.’, Genome Biology 18 (212), 1–13. Chattopadhyay, S., Zhang, A. R. & Dunson, D. B. (2024), ‘Blessing of dimension in Bayesian inference on covariance matrices’, arXiv preprint arXiv:2404.03805 .Chen, Y. & Li, X. (2021), ‘Determining the number of factors in high-dimensional generalized latent factor models’, Biometrika 109 (3), 769–782. Chen, Y., Li, X. & Zhang, S. (2019), ‘Joint Maximum Likelihood Estimation for High-Dimensional Exploratory Item Factor Analysis’, Psychometrika 84 (1), 124–146. Chen, Y., Li, X. & Zhang, S. (2020), ‘Structured Latent Factor Analysis for Large-scale Data: Iden-tifiability, Estimability, and Their Implications’, Journal of the American Statistical Association 
+
+115 (532), 1756–1770. De Vito, R., Bellio, R., Trippa, L. & Parmigiani, G. (2021), ‘Bayesian multistudy factor analysis for high-throughput biological data’, The Annals of Applied Statistics 15 (4), 1723 – 1741. Desch, A., Murphy, K., Kedl, R., Lahoud, M., Caminschi, I., Shortman, K., Henson, P. & Jakubzick, C. (2011), ‘Cd103+ pulmonary dendritic cells preferentially acquire and present apoptotic cell-associated antigen’, The Journal of experimental medicine 208 , 1789–97. Doz, C., Giannone, D. & Reichlin, L. (2012), ‘A quasi–maximum likelihood approach for large, approximate dynamic factor models’, Review of Economics and Statistics 94 (4), 1014–1024. Durante, D. (2017), ‘A note on the multiplicative gamma process’, Statistics & Probability Letters 
+
+122 , 198–204. 15 Fan, J., Jiang, B. & Sun, Q. (2022), ‘Bayesian factor-adjusted sparse regression’, Journal of Econo-metrics 230 (1), 3–19. Fan, J., Masini, R. P. & Medeiros, M. C. (2023), ‘Bridging factor and sparse models’, The Annals of Statistics 51 (4), 1692–1717. Griffiths, T. L. & Ghahramani, Z. (2011), ‘The indian buffet process: An introduction and review’, 
+
+Journal of Machine Learning Research 12 (32), 1185–1224. Hoffman, M. D., Blei, D., Wang, C. & Paisley, J. (2013), ‘Stochastic variational inference’, Journal of Machine Learning Research 14 (40), 1303–1347. Kowal, D. R. & Canale, A. (2023), ‘Semiparametric functional factor models with Bayesian rank selection’, Bayesian Analysis 18 (4), 1161–1189. Kucukelbir, A., Tran, D., Ranganath, R., Gelman, A. & Blei, D. M. (2017), ‘Automatic differentiation variational inference’, Journal of Machine Learning Research 18 (14), 1–45. Landy, J. M., Basava, N. & Parmigiani, G. (2026), ‘bayesNMF: Fast Bayesian Poisson NMF with automatically learned rank applied to mutational signatures’, Journal of Computational and Graphical Statistics 0(ja), 1–17. Lee, D. D. & Seung, H. S. (1999), ‘Learning the parts of objects by non-negative matrix factoriza-tion’, Nature 401 (6755), 788–791. Lee, S. & Lee, J. O. (2024), ‘Phase transition for the generalized two-community stochastic block model’, Journal of Applied Probability 61 (2), 385–400. Lee, S. M., Chen, Y. & Sit, T. (2025), ‘A latent variable approach to learning high-dimensional multivariate longitudinal data’, Journal of the American Statistical Association 0(ja), 1–21. Legramanti, S., Durante, D. & Dunson, D. B. (2020), ‘Bayesian cumulative shrinkage for infinite factorizations’, Biometrika 107 (3), 745–752. Lopes, H. F. & West, M. (2004), ‘Bayesian model assessment in factor analysis’, Statistica Sinica 
+
+14 (1), 41–67. Marchenko, V. A. & Pastur, L. A. (1967), ‘Distribution of eigenvalues for some sets of random matrices’, Mathematics of the USSR-Sbornik 1(4), 457. Mauri, L., Anceschi, N. & Dunson, D. B. (2025), ‘Spectral decomposition-assisted multi-study factor analysis’, arXiv preprint arXiv:2502.14600 .Mauri, L. & Dunson, D. B. (2025 a), ‘Factor pre-training in Bayesian multivariate logistic models’, 
+
+Biometrika p. asaf056. Mauri, L. & Dunson, D. B. (2025 b), ‘Inference on covariance structure in high-dimensional multi-view data’, arXiv preprint arXiv:2509.02772 .Mauri, L., Stolf, F., Herring, A. H., Miller, C. & Dunson, D. B. (2026), ‘Pathway-based Bayesian factor models for gene expression data’, arXiv preprint arXiv:2601.13419 .Moustaki, I. & Knott, M. (2000), ‘Generalized latent trait models’, Psychometrika 65 , 391–411. 16 Painter, M. W., Davis, S., Hardy, R. R., Mathis, D., Benoist, C. & Consortium, T. I. G. P. (2011), ‘Transcriptomes of the b and t lineages compared by multiplatform microarray profiling’, The Journal of Immunology 186 (5), 3047–3057. Ranganath, R., Gerrish, S. & Blei, D. (2014), Black box variational inference, in S. Kaski & J. Coran-der, eds, ‘Proceedings of the Seventeenth International Conference on Artificial Intelligence and Statistics’, Vol. 33 of Proceedings of Machine Learning Research , PMLR, Reykjavik, Iceland, pp. 814–822. Rockova, V. & George, E. I. (2016), ‘Fast Bayesian Factor Analysis via Automatic Rotations to Sparsity’, Journal of the American Statistical Association 111 (516), 1608–1622. Stewart, G. W. & Sun, J.-g. (1990), Matrix Perturbation Theory , Academic Press, Boston. Vershynin, R. (2012), Introduction to the non-asymptotic analysis of random matrices , Cambridge University Press, p. 210–268. Wu, D. & Xie, F. (2025 a), ‘Sanvi: A fast spectral-assisted network variational inference method with an extended surrogate likelihood function’, arXiv preprint arXiv:2509.00562 .Wu, D. & Xie, F. (2025 b), ‘Statistical inference of random graphs with a surrogate likelihood function’, Journal of Machine Learning Research 26 (230), 1–65. Xie, F. & Wu, D. (2024), ‘An eigenvector-assisted estimation framework for signal-plus-noise matrix models’, Biometrika 111 (2), 661–676. Zhang, A. R. & Zhou, Y. (2020), ‘On the non-asymptotic and sharp lower tail bounds of random variables’, Stat 9(1), e314. Zito, A. & Miller, J. W. (2024), ‘Compressive Bayesian non-negative matrix factorization for mutational signatures analysis’, arXiv preprint arXiv:2404.10974 .Zorzetto, D., Landy, J., Zigler, C., Parmigiani, G. & De Vito, R. (2025), ‘Multivariate causal effects: a Bayesian causal regression factor model’, arXiv preprint arXiv:2504.03480 .17 Supplementary material of “Overfitted high-dimensional matrix fac-torizations via adaptive spectral shrinkage” A Proof of the theoretical results 
+
+A.1 Proofs of the main results 
+
+Proof of Proposition 1. By Lemma 4, we have Í𝐻 𝑙 =1 (𝑑 2 
+
+> 𝑙
+
+− 𝑑 2
+
+> 𝐻 +1
+
+) ≍ 𝑘𝑛𝑝 ≍ 𝑛 2, with probability at least 1 − 𝑜 (1). By Lemma 9, for 𝑘 < 𝑙 ≤ 𝐻 , we have 𝑑 2 
+
+> 𝑙
+
+− 𝑑 2 
+
+> 𝐻 +1
+
+≍ 𝑛 1/3 (𝑙 − 𝑘 )2/3 ≲ 𝑛 1/3𝑛 25 23 =
+
+𝑛 3/5, with probability at least 1 − 𝑜 (1). Similarly, max 𝑗 =1,..., 𝑝 𝑣 ⊤ 
+
+> 𝑗, 1: 𝐻
+
+(𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 )𝑣 𝑗, 1: 𝐻 ≤
+
+max 𝑗 =1,..., 𝑝 || 𝑦 ( 𝑗 ) || ≲ 𝑛 , with probability at least 1 − 𝑜 (1), by Lemma 5. Moreover, we have min 𝑗 =1,..., 𝑝 ˆ𝜎 2 
+
+> 𝑗
+
+≥ 𝑐 𝜎 . Putting everything together, we get max 
+
+> 𝑗 =1,..., 𝑝
+
+ˆ𝜓 2 
+
+> 𝑙
+
+ˆ𝜏 2 
+
+> 𝑗
+
+≲ 𝑛 3/5
+
+𝑛 2
+
+𝑛 𝑛 ≲ 1
+
+𝑛 1+2/5 .
+
+Proof of Corollary 1. See Lemma 8. 
+
+Proof of Theorem 1. We first show consistency of point estimates. Let ˆ Λ1: 𝑘 ∈ R𝑝 ×𝑘 and ˆ Λ𝑘 +1: 𝐻 ∈
+
+R𝑝 ×𝐻 −𝑘 be the matrices obtained by extracting the first 𝑘 columns and the remaining 𝐻 − 𝑘 ones of ˆΛ respectively. Moreover, let ˆ 𝐿 𝑘 = ˆΛ1: 𝑘 ˆΛ⊤ 
+
+> 1: 𝑘
+
+, and ˆ 𝐿 𝑠𝑣𝑑 = ˆΛ𝑠𝑣𝑑 ˆΛ⊤ 
+
+> 𝑠𝑣𝑑
+
+, with ˆ Λ𝑠𝑣𝑑 = 𝑉 1: 𝑘 𝐷 1: 𝑘 /√𝑛 , be the estimated low-rank component using only the first 𝑘 columns of ˆ Λ and the spectral estimate of the low-rank component selecting 𝑘 as the rank, respectively. By Lemma 8 || ˆΛ𝑘 +1: 𝐻 || ≲ 1 
+
+> 𝑛 1/5
+
+with probability at least 1 − 𝑜 (1). This implies that, with probability at least 1 − 𝑜 (1),
+
+|| ˆ𝐿 − ˆ𝐿 𝑘 || = || ˆΛ𝑘 +1: 𝐻 ˆΛ⊤ 
+
+> 𝑘 +1: 𝐻
+
+|| ≲ 1
+
+𝑛 2/5 .
+
+Moreover, by Lemma 10, with probability at least 1 − 𝑜 (1), we have max 
+
+> 𝑗 =1,..., 𝑝
+
+√𝑛 𝑛 + ˆ𝜓 −2 
+
+> 𝑙
+
+ˆ𝜏 −2
+
+> 𝑗
+
+− 1
+
+√𝑛 = min 
+
+> 𝑗 =1,..., 𝑝
+
+√𝑛 𝑛 + ˆ𝜓 −2 
+
+> 𝑙
+
+ˆ𝜏 −2
+
+> 𝑗
+
+− 1
+
+√𝑛 ≲ 1
+
+𝑛 3/2 ,
+
+which implies 
+
+|| ˆΛ1: 𝑘 − ˆΛ𝑠𝑣𝑑 || ≲ 1
+
+𝑛 3/2
+
+√𝑛𝑝 ≍ 1
+
+√𝑛 ,
+
+with probability at least 1 − 𝑜 (1), since 𝑑 𝑙 ≲ √𝑛𝑝 , with probability at least 1 − 𝑜 (1), by Lemma 4. Hence, with probability at least 1 − 𝑜 (1),
+
+|| ˆ𝐿 𝑠𝑣𝑑 − ˆ𝐿 𝑘 || ≲ 1, (19) since || ˆΛ1: 𝑘 || ≲ || ˆΛ|| ≲ √𝑛 , with probability at least 1 − 𝑜 (1), by Lemma 8. Moreover, with probability at least 1 − 𝑜 (1), we have 
+
+|| 𝐿 0 − ˆ𝐿 𝑠𝑣𝑑 || ≲|| 𝐿 0 − 𝑌 ⊤𝑈 1: 𝑘 𝑈 ⊤
+
+> 1: 𝑘
+
+𝑌 /𝑛 || ≤ || Λ0Λ⊤ 
+
+> 0
+
+− 𝑌 ⊤𝑈 0,1: 𝑘 𝑈 ⊤
+
+> 0,1: 𝑘
+
+𝑌 /𝑛 || + || 𝑌 ⊤  𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤
+
+> 0,1: 𝑘
+
+𝑌 /𝑛 || 
+
+≲|| Λ0
+
+ 𝑀 ⊤ 𝑀 /𝑛 − 𝐼 𝑘 
+
+Λ⊤ 
+
+> 0
+
+|| + || 𝑌 ⊤  𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤
+
+> 0,1: 𝑘
+
+𝑌 ||/ 𝑛 
+
++ || 𝐸 ⊤𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝐸 ||/ 𝑛 + || Λ0 𝑀 ⊤𝐸 ||/ 𝑛 
+
+≲ 𝑝 √︂ log 𝑛 𝑛 +   1
+
+√𝑛 + 1
+
+√𝑝 
+
+ 𝑛𝑝 𝑛 + 𝑝 𝑛 + 𝑝 
+
+√𝑛 + √𝑝 ≍√︁ 𝑛 log 𝑛, 
+
+18 since, with probability at least 1 − 𝑜 (1), we have || 𝑀 ⊤ 𝑀 /𝑛 − 𝐼 𝑘 || ≲√︁ log 𝑛 /𝑛 and || 𝑀 || ≲ √𝑛 by Lemma 1, || 𝐸 || ≲ √𝑛 + √𝑝 by Lemma 3, and || 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+|| ≲ 1√𝑛 + 1√ 𝑝 by Lemma 6. Putting everything together, with probability at least 1 − 𝑜 (1), we have || 𝐿 0 − ˆ𝐿 || ≲√︁ 𝑛 log 𝑛 ,which implies 
+
+|| 𝐿 0 − ˆ𝐿 || || 𝐿 0 || ≲√︁ log 𝑛 
+
+√𝑛 ,
+
+since || 𝐿 0 || ≍ 𝑝 ≍ 𝑛 .We proceed by showing consistency for the residual error variance. Let 𝛿 2 
+
+> 𝑗
+
+= 𝑣𝑠 2+| | 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 | | 2 
+
+> 𝑣 +𝑛 −2
+
+.Using Lemma 12, we can write 
+
+𝛿 2 
+
+> 𝑗
+
+− 𝜎 20 = 𝜎 20
+
+𝑛 
+
+ 𝑠 2
+
+> 𝑗
+
+𝜎 20
+
+− ( 𝑛 − 𝑘 )
+
+
+
+− 𝑘𝜎 20
+
+𝑛 + 𝐹 𝑗 ,
+
+where 𝑠 2
+
+> 𝑗
+> 𝜎 20
+
+∼ 𝜒 2 
+
+> 𝑛 −𝑘
+
+and max 𝑗 =1,..., 𝑝 |𝐹 𝑗 | ≲ 1 
+
+> 𝑛 2/5
+
+with probability at least 1 − 𝑜 (1). Using Lemma E.7 of Chattopadhyay et al. (2024), we have max  
+
+> 𝑗 =1,..., 𝑝
+
+| 𝑠 2
+
+> 𝑗
+
+𝜎 20
+
+− ( 𝑛 − 𝑘 )| ≲ 𝑛   log 𝑛 𝑛 
+
+1/3,
+
+with probability at least 1 − 𝑜 (1). Then, recalling ˆ Σ = diag (𝛿 21, . . . , 𝛿 2
+
+> 𝑝
+
+), we have 
+
+|| ˆΣ − 𝜎 20 𝐼 𝑝 || ≲   log 𝑛 𝑛 
+
+1/3,
+
+with probability at least 1 − 𝑜 (1). Combining all of the above with || Θ0 || = || 𝐿 0 || ≍ 𝑝 ≍ 𝑛 , we have 
+
+|| ˆΘ − Θ0 || || Θ0 || ≲√︂ log 𝑛 𝑛 , (20) with probability at least 1 − 𝑜 (1).Next, we show posterior contraction around the true parameters 𝐿 0 and Θ0 via similar steps to Chattopadhyay et al. (2024). Let ˜ Λ and ˜ Σ = diag ( ˜𝜎 21 , · · · , ˜𝜎 2
+
+> 𝑝
+
+) be a posterior sample for the loading matrix and the residual variances respectively. We can represent ˜ Λ as ˜Λ = ˆΛ + ˜𝑍, ˜𝑍 =  ˜𝑧 1, · · · , ˜𝑧 𝑝 
+
+ , with ˜ 𝑧 𝑗 ∼ 𝑁 (0, 𝜌 2 ˜𝜎 2 
+
+> 𝑗
+
+Ψ−1 
+
+> 𝑛, 𝑗
+
+), ( 𝑗 = 1, . . . , 𝑝 ).
+
+Thus, ˜ 𝐿 = ˜Λ ˜Λ⊤ = ˆ𝐿 + ˆΛ ˜𝑍 ⊤ + ˜𝑍 ˆΛ⊤ + ˜𝑍 ˜𝑍 ⊤, which implies || ˜𝐿 − 𝐿 0 || ≤ || ˆ𝐿 − 𝐿 0 || + 2|| ˆΛ|||| ˜𝑍 || + || ˜𝑍 || 2.Note Π(|| ˜Σ|| < 𝐶 ) ≥ 1 − 𝑜 (1), with probability at least 1 − 𝑜 (1), by Lemma 11, where Π(·) denotes the probability measure induced by (6, 9). Then, with probability at least 1 − 𝑜 (1),
+
+|| ˜𝑍 || 2 ≲ 𝜌 2 𝑝 || Ψ−1 
+
+> 𝑛, 𝑗
+
+|| max  
+
+> 𝑗 =1,..., 𝑝
+
+𝜎 2 
+
+> 𝑗
+
+≲ 𝑝 𝑛 ≍ 1,
+
+since || Ψ−1 
+
+> 𝑛,𝑙
+
+|| ≍ 1 
+
+> 𝑛
+
+, and, by Lemma 8, 
+
+|| ˆΛ|| ≲ √𝑝 ≍ √𝑛. 
+
+Next, let 𝐷 𝑗 = ˜𝜎 2 
+
+> 𝑗
+
+− 𝜎 20 and note || ˜Σ − 𝜎 20 𝐼 𝑝 || = max 𝑗 =1,..., 𝑝 |𝐷 𝑗 |. We can express 𝐷 𝑗 as 
+
+𝐷 𝑗 =
+
+
+
+1 + 2Δ𝑗 
+
+𝑣 𝑛 
+
+ −1 (𝛿 2 
+
+> 𝑗
+
+− 𝜎 20 ) − 2Δ𝑗 
+
+𝑣 𝑛 
+
+𝜎 20 , Δ𝑗 = 𝑣 𝑛 𝛿 2
+
+> 𝑗
+
+2 ˜𝜎 −2 
+
+> 𝑗
+
+− 𝑣 𝑛 
+
+2 .
+
+19 Lemma E.7 of Chattopadhyay et al. (2024) gives max 𝑗 =1,..., 𝑝 |Δ𝑗 |/ 𝑣 𝑛 ≲ {log 𝑝 /𝑛 }1/3, which also implies min 𝑗 =1,..., 𝑝 |1 + 2Δ𝑗 /𝑣 𝑛 | ≳ 1/2, with probability at least 1 − 𝑜 (1). Hence, with probability at least 1 − 𝑜 (1),
+
+|| ˜Σ − 𝜎 20 𝐼 𝑝 || ≲
+
+ log 𝑝 𝑛 
+
+1/3
+
+since max 𝑗 =1,..., 𝑝 |𝛿 2 
+
+> 𝑗
+
+− 𝜎 20 | ≲ (log 𝑝 /𝑛 )1/3 ≍ ( log 𝑛 /𝑛 )1/3, with probability at least 1 − 𝑜 (1). Finally, letting ˜ Θ = ˜𝐿 + ˜Σ, we have 
+
+|| ˜Θ − Θ0 || || Θ0 || ≤ || ˜𝐿 − 𝐿 0 || + || ˜Σ − 𝜎 20 𝐼 𝑝 || || Θ0 || ≲√︂ log 𝑛 𝑛 ,
+
+with probability at least 1 − 𝑜 (1).
+
+Proof of Theorem 2. First, we show that the entries of ˆ 𝐿 are asymptotically appropriately close to the ones of ˆ 𝐿 𝑠𝑣𝑑 . Let ¯ 𝜆 𝑢 = 𝐷 1: 𝐻 𝑣 𝑢, 1: 𝐻 /√𝑛 for 𝑢 = 1, . . . , 𝑝 . Denote by ˆ 𝑙 𝑗 𝑗 ′ and ˆ 𝑙 𝑠𝑣𝑑, 𝑗 𝑗 ′
+
+the 𝑗, 𝑗 ′-th entries of ˆ𝐿 and ˆ𝐿 𝑠𝑣𝑑 respectively. Moreover, let Θ𝑠𝑣𝑑 = ˆ𝐿 𝑠𝑣𝑑 + ˆΣ𝑠𝑣𝑑 , where ˆΣ𝑠𝑣𝑑 = diag (𝛿 2
+
+> 𝑠𝑣𝑑, 1
+
+, · · · , 𝛿 2
+
+> 𝑠𝑣𝑑, 𝑝
+
+). Denote by ˆ 𝜃 𝑠𝑣𝑑, 𝑗 𝑗 ′ and 𝜃 0 𝑗 𝑗 ′ the 𝑗, 𝑗 ′-th entries of ˆ Θ𝑠𝑣𝑑 and 
+
+Θ0 respectively. Note that ˆ 𝑙 𝑗 𝑗 ′ = ¯𝜆 ⊤ 
+
+> 𝑗
+
+𝐵 𝑗 𝐵 𝑗 ′ ¯𝜆 𝑗 ′ and ˆ 𝑙 𝑠𝑣𝑑, 𝑗 𝑗 ′ = ¯𝜆 ⊤ 
+
+> 𝑗
+
+𝐵 2 ¯𝜆 𝑗 ′ , respectively, where 
+
+𝐵 𝑢 = 𝑛 Ψ−1 
+
+> 𝑛, 𝑗
+
+diag 
+
+ 𝑛 𝑛 + 𝜏 −2 
+
+> 𝑗
+
+𝜓 21
+
+, · · · , 𝑛 𝑛 + 𝜏 −2 
+
+> 𝑗
+
+𝜓 2
+
+> 𝐻
+
+
+
+, (𝑢 = 𝑗, 𝑗 ′), (21) and 
+
+𝐵 =
+
+ 𝐼 𝑘 O𝑘,𝐻 −𝑘 
+
+O𝐻 −𝑘,𝑘 O𝐻 −𝑘,𝐻 −𝑘 
+
+
+
+, (22) where 0𝑑 1 ,𝑑 2 ∈ R𝑑 1 ×𝑑 2 denotes the zero-matrix of dimension 𝑑 1 × 𝑑 2. Hence, with probability at least 1 − 𝑜 (1), we have 
+
+√𝑛 ˆ𝑙 𝑗 𝑗 ′ − ˆ𝑙 𝑠𝑣𝑑, 𝑗 𝑗 ′ =√𝑛 | ¯𝜆 ⊤
+
+> 𝑗
+
+ 𝐵 𝑗 𝐵 𝑗 ′ − 𝐵 2 ¯𝜆 𝑗 ′ | ≤ √𝑛 || ¯𝜆 𝑗 |||| ¯𝜆 𝑗 ′ |||| 𝐵 𝑗 𝐵 𝑗 ′ − 𝐵 2 || ≤ √𝑛 max 
+
+(
+
+𝑛 𝑛 + 𝜏 −2 
+
+> 𝑗
+
+𝜓 2
+
+> 𝑘
+
+− 1, 𝑛 𝑛 + 𝜏 −2 
+
+> 𝑗 ′
+
+𝜓 2
+
+> 𝑘
+
+− 1, 𝑛 𝑛 + 𝜏 −2 
+
+> 𝑗
+
+𝜓 2
+
+> 𝑘 +1
+
+, 𝑛 𝑛 + 𝜏 −2 
+
+> 𝑗 ′
+
+𝜓 2
+
+> 𝑘 +1
+
+)! 2
+
+≍ √𝑛 
+
+ 1
+
+𝑛 + 1
+
+𝑛 4/5
+
+
+
+≍ 1
+
+𝑛 3/10 ,
+
+where we used Proposition 1 and Lemma 10 to bound the ratios in the second line and the fact that || ¯𝜆 𝑗 |||| ¯𝜆 𝑗 ′ || ≤ || 𝑦 ( 𝑗 ) |||| 𝑦 ( 𝑗 ′ ) ||/ 𝑛 ≲ 1, with probability at least 1 − 𝑜 (1), by Lemma 5. Next, let 
+
+𝛿 2 
+
+> 𝑠𝑣𝑑, 𝑗
+
+= ||( 𝐼 𝑛 −𝑈 1: 𝑘 𝑈 1: 𝑘 )𝑦 ( 𝑗 ) || 2 
+
+> 𝐹
+
+/𝑛 and, using the steps in the proof of Lemma 12, we can also show 
+
+√𝑛 |𝛿 2 
+
+> 𝑗
+
+− 𝛿 2 
+
+> 𝑠𝑣𝑑, 𝑗
+
+| ≲ √𝑛 1
+
+𝑛 ≍ 1
+
+√𝑛 
+
+for each 𝑗 = 1, . . . , 𝑝 . Combining the two bounds, we obtain, with probability at least 1 − 𝑜 (1),
+
+√𝑛 ˆ𝜃 𝑗 𝑗 ′ − ˆ𝜃 𝑠𝑣𝑑, 𝑗 𝑗 ′ = 𝑜 𝑝𝑟 (1).
+
+It remains to prove a central limit theorem for ˆ Θ𝑠𝑣𝑑 . Let 
+
+𝑃 = 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+, 𝑃 0 = 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+, 𝑚 ( 𝑗 ) = 𝑀 0𝜆 0 𝑗 , ( 𝑗 = 1, . . . , 𝑝 ).
+
+20 For 𝑗 ≠ 𝑗 ′, since ˆ 𝜃 𝑠𝑣𝑑, 𝑗 𝑗 ′ = 𝑛 −1 𝑦 ( 𝑗 )⊤ 𝑃𝑦 ( 𝑗 ′ ) , we write ˆ𝜃 𝑠𝑣𝑑, 𝑗 𝑗 ′ − 𝜃 0 𝑗 𝑗 ′ = 𝐷 𝑗 𝑗 ′ + 𝑅 𝑗 𝑗 ′ ,
+
+where 
+
+𝐷 𝑗 𝑗 ′ = 1
+
+𝑛 𝑚 ( 𝑗 )⊤ 𝑚 ( 𝑗 ′ ) − 𝜆 ⊤  
+
+> 0𝑗
+
+𝜆 0 𝑗 ′ + 1
+
+𝑛 𝑚 ( 𝑗 )⊤ 𝜖 ( 𝑗 ′ ) + 1
+
+𝑛 𝑚 ( 𝑗 ′ )⊤ 𝜖 ( 𝑗 )
+
+and 
+
+𝑅 𝑗 𝑗 ′ = 1
+
+𝑛 𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝑚 ( 𝑗 ′ ) + 1
+
+𝑛 𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝜖 ( 𝑗 ′ ) + 1
+
+𝑛 𝑚 ( 𝑗 ′ )⊤ (𝑃 − 𝑃 0)𝜖 ( 𝑗 ) + 1
+
+𝑛 𝜖 ( 𝑗 )⊤ 𝑃𝜖 ( 𝑗 ′ ) .
+
+We first show that √𝑛𝑅 𝑗 𝑗 ′ = 𝑜 𝑝𝑟 (1). Since 𝑚 ( 𝑗 ) , 𝑚 ( 𝑗 ′ ) ∈ col (𝑃 0), we have ∥𝑃 0 (𝑃 − 𝑃 0)𝑃 0 ∥ ≤ ∥𝑃 −𝑃 0 ∥2. Moreover, we have ∥𝑃 −𝑃 0 ∥ = O𝑝𝑟 (𝑛 −1/2), by Lemma 6 and ∥𝑚 (𝑢 ) ∥ ≤ ∥ 𝑀 0 ∥|| 𝜆 0 𝑗 || ≲ √𝑛 
+
+with 𝑢 = 𝑗, 𝑗 ′, since ∥𝑀 0 ∥ = 𝑂 𝑝𝑟 (√𝑛 ) by Lemma 1. Hence, 
+
+|𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝑚 ( 𝑗 ′ ) | ≤ ∥ 𝑚 ( 𝑗 ) ∥∥ 𝑃 0 (𝑃 − 𝑃 0)𝑃 0 ∥∥ 𝑚 ( 𝑗 ′ ) ∥ = O𝑝𝑟 (1),
+
+and therefore 𝑛 −1/2𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝑚 ( 𝑗 ′ ) = 𝑜 𝑝𝑟 (1). Next, let 𝑃 (− 𝑗 ′ ) = 𝑈 (− 𝑗 ′ ) 
+
+> 1: 𝑘
+
+𝑈 (− 𝑗 ′ )⊤  
+
+> 1: 𝑘
+
+, where 
+
+𝑈 (− 𝑗 ′ ) 
+
+> 1: 𝑘
+
+∈ R𝑛 ×𝑘 is the matrix of the left singular vectors associated to the leading-𝑘 singular values of the matrix 𝑌 after deleting the 𝑗 ′-th column. Then 
+
+𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝜖 ( 𝑗 ′ ) = 𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 (− 𝑗 ′ ) )𝜖 ( 𝑗 ′ ) + 𝑚 ( 𝑗 )⊤ (𝑃 (− 𝑗 ′ ) − 𝑃 0)𝜖 ( 𝑗 ′ ) .
+
+By Lemma 7, ∥𝑃 − 𝑃 (− 𝑗 ′ ) ∥ = O𝑝𝑟 (𝑛 −1). Since ∥𝑚 ( 𝑗 ) ∥ = O𝑝𝑟 (√𝑛 ) and ∥𝜖 ( 𝑗 ′ ) ∥ = O𝑝𝑟 (√𝑛 ) by Lemma 5, 
+
+|𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 (− 𝑗 ′ ) )𝜖 ( 𝑗 ′ ) | ≤ ∥ 𝑚 ( 𝑗 ) ∥∥ 𝑃 − 𝑃 (− 𝑗 ′ ) ∥∥ 𝜖 ( 𝑗 ′ ) ∥ = O𝑝𝑟 (1).
+
+Conditional on 𝑃 (− 𝑗 ′ ) , the vector 𝜖 ( 𝑗 ′ ) is independent of 𝑃 (− 𝑗 ′ ) , and 
+
+𝐸 {𝑚 ( 𝑗 )⊤ (𝑃 (− 𝑗 ′ ) − 𝑃 0)𝜖 ( 𝑗 ′ ) }2 | 𝑃 (− 𝑗 ′ )  = 𝜎 20 ∥( 𝑃 (− 𝑗 ′ ) − 𝑃 0)𝑚 ( 𝑗 ) ∥2.
+
+Since 𝑚 ( 𝑗 ) ∈ col (𝑃 0), ∥( 𝑃 (− 𝑗 ′ ) − 𝑃 0)𝑚 ( 𝑗 ) ∥ ≤ ∥( 𝑃 (− 𝑗 ′ ) − 𝑃 0)𝑃 0 ∥∥ 𝑚 ( 𝑗 ) ∥ = O𝑝𝑟 (1). Hence the conditional second moment is O𝑝𝑟 (1), and Chebyshev’s inequality gives 
+
+𝑚 ( 𝑗 )⊤ (𝑃 (− 𝑗 ′ ) − 𝑃 0)𝜖 ( 𝑗 ′ ) = O𝑝𝑟 (1).
+
+Thus 𝑚 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝜖 ( 𝑗 ′ ) = O𝑝𝑟 (1), and similarly 𝑚 ( 𝑗 ′ )⊤ (𝑃 − 𝑃 0)𝜖 ( 𝑗 ) = O𝑝𝑟 (1). Finally, consider the following decomposition 
+
+𝜖 ( 𝑗 )⊤ 𝑃𝜖 ( 𝑗 ′ ) = 𝜖 ( 𝑗 )⊤ 𝑃 0𝜖 ( 𝑗 ′ ) + 𝜖 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝜖 ( 𝑗 ′ ) .
+
+The first term is O𝑝𝑟 (1), since 𝜖 ( 𝑗 )⊤ 𝑃 0𝜖 ( 𝑗 ′ ) = 𝜖 ( 𝑗 )⊤ 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝜖 ( 𝑗 ′ ) , and 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝜖 (𝑢 ) ∼ 𝑁 𝑘 (0, 𝐼 𝑘 ),with 𝑢 = 𝑗, 𝑗 ′. For the second term, let 𝑃 (− 𝑗 𝑗 ′ ) = 𝑈 (− 𝑗 𝑗 ′ ) 
+
+> 1: 𝑘
+
+𝑈 (− 𝑗 𝑗 ′ )⊤  
+
+> 1: 𝑘
+
+, where 𝑈 (− 𝑗 𝑗 ′ ) 
+
+> 1: 𝑘
+
+∈ R𝑛 ×𝑘 be the matrix of left singular vectors associated to the leading 𝑘 singular values of 𝑌 after removing the 
+
+𝑗, 𝑗 ′-th columns. Then 
+
+𝜖 ( 𝑗 )⊤ (𝑃 − 𝑃 0)𝜖 ( 𝑗 ′ ) = 𝜖 ( 𝑗 )⊤ (𝑃 − 𝑃 (− 𝑗 𝑗 ′ ) )𝜖 ( 𝑗 ′ ) + 𝜖 ( 𝑗 )⊤ (𝑃 (− 𝑗 𝑗 ′ ) − 𝑃 0)𝜖 ( 𝑗 ′ ) .
+
+By Lemma 7, ∥𝑃 − 𝑃 (− 𝑗 𝑗 ′ ) ∥ = O𝑝𝑟 (𝑛 −1), and by Lemma 5, ∥𝜖 ( 𝑗 ) ∥, ∥𝜖 ( 𝑗 ′ ) ∥ = O𝑝𝑟 (√𝑛 ). Hence 
+
+|𝜖 ( 𝑗 )⊤ (𝑃 − 𝑃 (− 𝑗 𝑗 ′ ) )𝜖 ( 𝑗 ′ ) | ≤ ∥ 𝜖 ( 𝑗 ) ∥∥ 𝑃 − 𝑃 (− 𝑗 𝑗 ′ ) ∥∥ 𝜖 ( 𝑗 ′ ) ∥ = O𝑝𝑟 (1).
+
+21 Conditional on 𝑃 (− 𝑗 𝑗 ′ ) , the vectors 𝜖 ( 𝑗 ) and 𝜖 ( 𝑗 ′ ) are independent of 𝑃 (− 𝑗 𝑗 ′ ) , and hence 
+
+𝐸 {𝜖 ( 𝑗 )⊤ (𝑃 (− 𝑗 𝑗 ′ ) − 𝑃 0)𝜖 ( 𝑗 ′ ) }2 | 𝑃 (− 𝑗 𝑗 ′ )  = 𝜎 40 ∥𝑃 (− 𝑗 𝑗 ′ ) − 𝑃 0 ∥2 
+
+> 𝐹
+
+.
+
+Since ∥𝑃 (− 𝑗 𝑗 ′ ) − 𝑃 0 ∥𝐹 = O𝑝𝑟 (𝑛 −1/2), Chebyshev’s inequality gives 
+
+𝜖 ( 𝑗 )⊤ (𝑃 (− 𝑗 𝑗 ′ ) − 𝑃 0)𝜖 ( 𝑗 ′ ) = O𝑝𝑟 (𝑛 −1/2).
+
+Therefore 𝜖 ( 𝑗 )⊤ 𝑃𝜖 ( 𝑗 ′ ) = O𝑝𝑟 (1). Combining all of the above gives √𝑛𝑅 𝑗 𝑗 ′ = 𝑜 𝑝𝑟 (1).It remains to derive the limiting distribution of 𝐷 𝑗 𝑗 ′ . Writing 𝑀 0 = 𝜂 1, . . . , 𝜂 𝑛 
+
+⊤, we have 
+
+√𝑛𝐷 𝑗 𝑗 ′ = 1
+
+√𝑛 
+
+> 𝑛
+
+∑︁ 
+
+> 𝑖 =1
+
+𝜉 𝑖, 𝑗 𝑗 ′ ,
+
+where 
+
+𝜉 𝑖, 𝑗 𝑗 ′ = (𝜆 ⊤  
+
+> 0𝑗
+
+𝜂 𝑖 )( 𝜆 ⊤  
+
+> 0𝑗 ′
+
+𝜂 𝑖 ) − 𝜆 ⊤  
+
+> 0𝑗
+
+𝜆 0 𝑗 ′ + ( 𝜆 ⊤  
+
+> 0𝑗
+
+𝜂 𝑖 )𝜖 𝑖 𝑗 ′ + ( 𝜆 ⊤  
+
+> 0𝑗 ′
+
+𝜂 𝑖 )𝜖 𝑖 𝑗 .
+
+The variables 𝜉 𝑖, 𝑗 𝑗 ′ are independent and identically distributed with mean zero. Standard calculations give Var (𝜉 𝑖, 𝑗 𝑗 ′ ) = 𝜎 20 (∥ 𝜆 0 𝑗 ∥2 + ∥ 𝜆 0 𝑗 ′ ∥2) + ( 𝜆 ⊤  
+
+> 0𝑗
+
+𝜆 0 𝑗 ′ )2 + ∥ 𝜆 0 𝑗 ∥2 ∥𝜆 0 𝑗 ′ ∥2, 𝑗 ≠ 𝑗 ′.
+
+Therefore the classical central limit theorem gives 
+
+√𝑛 ( ˆ𝜃 𝑠𝑣𝑑, 𝑗 𝑗 ′ − 𝜃 0 𝑗 𝑗 ′ ) ⇒ 𝑁 (0, Var (𝜉 𝑖, 𝑗 𝑗 ′ )) , 𝑗 ≠ 𝑗 ′.
+
+For the diagonal entries, observe that ˆ𝜃 𝑠𝑣𝑑, 𝑗 𝑗 = 1
+
+𝑛 𝑦 ( 𝑗 )⊤ 𝑃𝑦 ( 𝑗 ) + 1
+
+𝑛 𝑦 ( 𝑗 )⊤ (𝐼 𝑛 − 𝑃 )𝑦 ( 𝑗 ) = 1
+
+𝑛 ∥𝑦 ( 𝑗 ) ∥2.
+
+Since 𝑦 𝑖 𝑗 = 𝜆 ⊤  
+
+> 0𝑗
+
+𝜂 𝑖 + 𝜖 𝑖 𝑗 ∼ 𝑁 (0, ∥𝜆 0 𝑗 ∥2 + 𝜎 20 ), we have 𝜃 0 𝑗 𝑗 = ∥𝜆 0 𝑗 ∥2 + 𝜎 20 and 
+
+√𝑛 ( ˆ𝜃 𝑠𝑣𝑑, 𝑗 𝑗 − 𝜃 0 𝑗 𝑗 ) = 1
+
+√𝑛 
+
+> 𝑛
+
+∑︁ 
+
+> 𝑖 =1
+
+{𝑦 2 
+
+> 𝑖 𝑗
+
+− (∥ 𝜆 0 𝑗 ∥2 + 𝜎 20 )} ⇒ 𝑁 
+
+
+
+0, 2(∥ 𝜆 0 𝑗 ∥2 + 𝜎 20 )2
+
+.
+
+Thus, for all fixed 𝑗, 𝑗 ′, √𝑛 ( ˆ𝜃 𝑠𝑣𝑑, 𝑗 𝑗 ′ − 𝜃 0 𝑗 𝑗 ′ ) ⇒ 𝑁 (0, 𝑆 20 𝑗 𝑗 ′ ),
+
+where 
+
+𝑆 20 𝑗 𝑗 ′ =
+
+(𝜎 20
+
+ || 𝜆 0 𝑗 || 2 + || 𝜆 0 𝑗 ′ || 2 + ( 𝜆 ⊤  
+
+> 0𝑗
+
+𝜆 0 𝑗 ′ )2 + || 𝜆 0 𝑗 || 2 || 𝜆 0 𝑗 ′ || 2, if 𝑗 ≠ 𝑗 ′
+
+2 𝜎 20 + || 𝜆 0 𝑗 ′ || 22, if 𝑗 = 𝑗 ′ (23) Combining this result with √𝑛 | ˆ𝜃 𝑗 𝑗 ′ − ˆ𝜃 𝑠𝑣𝑑, 𝑗 𝑗 ′ | = 𝑜 𝑝𝑟 (1), Slutsky’s theorem yields 
+
+√𝑛 ( ˆ𝜃 𝑗 𝑗 ′ − 𝜃 0 𝑗 𝑗 ′ ) ⇒ 𝑁 (0, 𝑆 20 𝑗 𝑗 ′ ),
+
+which concludes the proof. 22 Proof of Theorem 3. Fix 𝑗, 𝑗 ′ ∈ { 1, . . . , 𝑝 }. From (9), we can write ˜𝜆 𝑗 = ˆ𝜆 𝑗 + 𝜌 ˜𝜎 𝑗 Ψ−1/2 
+
+> 𝑛, 𝑗
+
+𝑧 𝑗 , 𝑧 𝑗 ∼ 𝑁 𝐻 (0, 𝐼 𝐻 ),
+
+independently across 𝑗 , for 𝑗 = 1, . . . , 𝑝 . Let ˜𝜃 𝑗 𝑗 ′ = ˜𝜆 ⊤ 
+
+> 𝑗
+
+˜𝜆 𝑗 ′ + ˜𝜎 2 
+
+> 𝑗
+
+1( 𝑗 = 𝑗 ′), ˆ𝜃 𝑗 𝑗 ′ = ˆ𝜆 ⊤ 
+
+> 𝑗
+
+ˆ𝜆 𝑗 ′ + 𝛿 2 
+
+> 𝑗
+
+1( 𝑗 = 𝑗 ′).
+
+First suppose 𝑗 ≠ 𝑗 ′. Expanding around ˆ 𝜃 𝑗 𝑗 ′ gives ˜𝜃 𝑗 𝑗 ′ − ˆ𝜃 𝑗 𝑗 ′ = 𝜌 ˜𝜎 𝑗 ′ ˆ𝜆 ⊤ 
+
+> 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗 ′
+
+𝑧 𝑗 ′ + 𝜌 ˜𝜎 𝑗 ˆ𝜆 ⊤ 
+
+> 𝑗 ′
+
+Ψ−1/2 
+
+> 𝑛, 𝑗
+
+𝑧 𝑗 + 𝜌 2 ˜𝜎 𝑗 ˜𝜎 𝑗 ′ 𝑧 ⊤ 
+
+> 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗 ′
+
+𝑧 𝑗 ′ . (24) The first two terms are conditionally Gaussian with mean zero and, after multiplying by √𝑛 , have conditional variance 
+
+𝑇 2 
+
+> 𝑗 𝑗 ′
+
+(𝜌 ) = 𝑛𝜌 2 ˜𝜎 2 
+
+> 𝑗 ′
+
+ˆ𝜆 ⊤ 
+
+> 𝑗
+
+Ψ−1 
+
+> 𝑛, 𝑗 ′
+
+ˆ𝜆 𝑗 + 𝑛𝜌 2 ˜𝜎 2 
+
+> 𝑗
+
+ˆ𝜆 ⊤ 
+
+> 𝑗 ′
+
+Ψ−1 
+
+> 𝑛, 𝑗
+
+ˆ𝜆 𝑗 ′ .
+
+By proposition 1 and Lemma 10, with probability at least 1 − 𝑜 (1), we have 
+
+|| 𝐵 𝑢 − 𝐵 || ≲ 1
+
+√𝑛 + 1
+
+𝑛 2/5 ≍ 1
+
+𝑛 2/5 , (𝑢 = 𝑗, 𝑗 ′),
+
+where 𝐵 𝑢 and 𝐵 are defined in (21) and (22) respectively, which, together with 𝑙 𝑠𝑣𝑑,𝑢𝑢 𝑝𝑟 
+
+→ || 𝜆 0𝑢 || 2
+
+for 𝑢 = 𝑗, 𝑗 ′, implies 
+
+𝑛 ˆ𝜆 ⊤ 
+
+> 𝑢
+
+Ψ−1 
+
+> 𝑛,𝑢
+
+ˆ𝜆 𝑢 𝑝𝑟 
+
+→ || 𝜆 0𝑢 || 2, (𝑢 = 𝑗, 𝑗 ′).
+
+Moreover, by the proof of Theorem 1, we have ˜ 𝜎 2
+
+> 𝑢 𝑝𝑟
+
+→ 𝜎 20 . Thus, for 𝑗 ≠ 𝑗 ′, we have 𝑇 2 
+
+> 𝑗 𝑗 ′
+
+(𝜌 ) 𝑝𝑟 
+
+→
+
+𝜌 2𝜎 20
+
+ || 𝜆 0 𝑗 || 2 + || 𝜆 0 𝑗 ′ || 2, which implies the sum of the first two terms (scaled by √𝑛 ) is asymp-totically Normally distributed with zero-mean and variance 𝑇 20 𝑗 𝑗 ′ (𝜌 ). The last term in the expan-sion is negligible since || √𝑛𝜌 2 ˜𝜎 𝑗 ˜𝜎 𝑗 ′ 𝑧 ⊤ 
+
+> 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗 ′
+
+𝑧 𝑗 ′ || ≤ | 𝜌 2 ˜𝜎 𝑗 ˜𝜎 𝑗 ′ ||| √𝑛 Ψ−1/2 
+
+> 𝑛, 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗 ′
+
+|| 𝑧 𝑗 |||| 𝑧 𝑗 ′ || and 
+
+|| √𝑛 Ψ−1/2 
+
+> 𝑛, 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗 ′
+
+|| ≲ 1√𝑛 with probability at least 1 − 𝑜 (1). Therefore, by Lemma F.2 of Chattopad-hyay et al. (2024), we have sup  
+
+> 𝑥 ∈R
+
+Π
+
+( √𝑛 ( ˜𝜃 𝑗 𝑗 ′ − ˆ𝜃 𝑗 𝑗 ′ )
+
+𝑇 0 𝑗 𝑗 ′ (𝜌 ) ≤ 𝑥 
+
+)
+
+− Φ(𝑥 ) 𝑝𝑟 
+
+→ 0.
+
+Now suppose 𝑗 = 𝑗 ′. Then ˜𝜃 𝑗 𝑗 − ˆ𝜃 𝑗 𝑗 ′ = ∥ ˜𝜆 𝑗 ∥2 − ∥ ˆ𝜆 𝑗 ∥2 + ˜𝜎 2 
+
+> 𝑗
+
+− 𝛿 2
+
+> 𝑗
+
+= 2𝜌 ˜𝜎 𝑗 ˆ𝜆 ⊤ 
+
+> 𝑗
+
+Ψ−1/2 
+
+> 𝑛, 𝑗
+
+𝑧 𝑗 + 𝜌 2 ˜𝜎 2 
+
+> 𝑗
+
+𝑧 ⊤ 
+
+> 𝑗
+
+Ψ−1 
+
+> 𝑛, 𝑗
+
+𝑧 𝑗 + ˜𝜎 2 
+
+> 𝑗
+
+− 𝛿 2 
+
+> 𝑗
+
+, . 
+
+with 𝑧 𝑗 and ˜ 𝜎 𝑗 being independent. Similarly as above, the first term is conditionally Gaussian with mean zero and, after multiplying by √𝑛 , variance 
+
+𝑇 2 
+
+> 𝑗 𝑗
+
+(𝜌 ) = 4𝑛𝜌 2 ˜𝜎 2 
+
+> 𝑗
+
+ˆ𝜆 ⊤ 
+
+> 𝑗
+
+Ψ−1 
+
+> 𝑛, 𝑗
+
+ˆ𝜆 𝑗 𝑝𝑟 
+
+→ 4𝜌 2𝜎 20 ∥𝜆 0 𝑗 ∥2,
+
+while the second term is negligible, since |√𝑛𝜌 2 ˜𝜎 2 
+
+> 𝑗
+
+𝑧 ⊤ 
+
+> 𝑗
+
+Ψ−1 
+
+> 𝑛, 𝑗
+
+𝑧 𝑗 | ≤ | 𝜌 2 ˜𝜎 2 
+
+> 𝑗
+
+||| 𝑧 𝑗 |||| 𝑧 𝑗 |||| √𝑛 Ψ−1 
+
+> 𝑛, 𝑗
+
+|| and 
+
+|| √𝑛 Ψ−1 
+
+> 𝑛, 𝑗
+
+|| ≲ 1√𝑛 , with probability at least 1 − 𝑜 (1). We now handle the last term. Using the decomposition of the proof of Theorem 1, we write 
+
+√𝑛 ( ˜𝜎 2 
+
+> 𝑗
+
+− 𝛿 2 
+
+> 𝑗
+
+) = − 2√𝑛 Δ𝑗 
+
+𝑣 𝑛 
+
+𝜎 20 + G 𝑗 , ( 𝑗 = 1, . . . , 𝑝 )
+
+23 with 
+
+G𝑗 = − 2√𝑛 (𝛿 2 
+
+> 𝑗
+
+− 𝜎 20 )Δ𝑗 /𝑣 𝑛 
+
+1 + 2Δ𝑗 /𝑣 𝑛 
+
++ 4√𝑛𝜎 20 Δ2 
+
+> 𝑗
+
+/𝑣 2
+
+> 𝑛
+
+1 + 2Δ𝑗 /𝑣 𝑛 
+
+.
+
+Note that 2√𝑛 Δ𝑗  
+
+> 𝑣 𝑛
+
+𝜎 20 ⇒ 𝑁 (0, 2𝜎 40 ), due to the central limit theorem, which also implies |G 𝑗 | = 𝑜 (1)
+
+with probability at least 1 − 𝑜 (1). Note that by construction 𝑧 𝑗 is independent of 2√𝑛 Δ𝑗  
+
+> 𝑣 𝑛
+
+𝜎 20 . Hence, we can complete the proof using Lemmas F.1 and F.2 of Chattopadhyay et al. (2024), which give sup  
+
+> 𝑥 ∈R
+
+Π
+
+( √𝑛 ( ˜𝜃 𝑗 𝑗 − ˆ𝜃 𝑗 𝑗 )
+
+𝑇 0 𝑗 𝑗 (𝜌 ) ≤ 𝑥 
+
+)
+
+− Φ(𝑥 ) 𝑝𝑟 
+
+→ 0,
+
+with 𝑇 20 𝑗 𝑗 (𝜌 ) = 2𝜎 40 + 4𝜌 2𝜎 20 || 𝜆 0 𝑗 || 2.
+
+A.2 Auxiliary lemmas 
+
+Lemma 1. Let 𝐹 ∈ R𝑛 ×𝑘 be a matrix with independent standard Gaussian entries. Then, with probability at least 1 − 𝑜 (1), we have 
+
+√𝑛 − 𝐶 √𝑘 ≤ 𝑠 𝑙 (𝐹 ) ≤ √𝑛 + 𝐶 √𝑘, (𝑙 = 1, . . . , 𝑘 ),
+
+for a universal constant 𝐶 < ∞. Moreover, with probability at least 1 − 𝑜 (1), we have 
+
+𝐹 ⊤ 𝐹 𝑛 − 𝐼 𝑘 ≲√︂ log 𝑛 𝑛 .
+
+Proof of Lemma 1. See Corollary 5.35 and Lemma 5.36 of (Vershynin 2012). 
+
+Lemma 2. Suppose Assumptions 1 and 3 hold, then, with probability at least 1 − 𝑜 (1), we have 
+
+√𝑛𝑝 − 𝐶 √︁ 𝑘 𝑝 ≤ 𝑠 𝑙 (𝑀 Λ⊤ 
+
+> 0
+
+) ≤ √𝑛𝑝 + 𝐶 √︁ 𝑘 𝑝, (𝑙 = 1, . . . , 𝑘 ),
+
+for a universal constant 𝐶 < ∞.Proof of Lemma 2. It follows from Lemma 1 and Assumption 3 
+
+Lemma 3. Suppose Assumptions 1, 4 hold. Then, with probability at least 1 − 𝑜 (1),
+
+|| 𝐸 || ≲ √𝑛 + √𝑝. 
+
+Proof of Lemma 3. It follows from Corollary 3.11 of Bandeira & van Handel (2016). 
+
+Lemma 4. Suppose Assumptions 1–4 hold, then, for 𝑛 sufficiently large, with probability at least 
+
+1 − 𝑜 (1),
+
+𝑑 2
+
+> 𝑙
+
+𝑛𝑝 = 𝑂 (1{𝑙 ≤ 𝑘 } ) + 𝑜 (1{𝑙>𝑘 } ), (𝑙 = 1, . . . , 𝐻 )
+
+Proof of lemma 4. It follows from Lemmas 2 and 3 
+
+Lemma 5. Suppose Assumptions 1, 4 hold. Then, with probability at least 1 − 𝑜 (1),
+
+max  
+
+> 𝑗 =1,..., 𝑝
+
+|| 𝑦 ( 𝑗 ) || ≲ √𝑛, max  
+
+> 𝑗 =1,..., 𝑝
+
+|| 𝑒 ( 𝑗 ) || ≲ √𝑛. 
+
+24 Proof of Lemma 5. First, note that || 𝑒 ( 𝑗 ) || ≲ √𝑛 with probability at least 1 − 𝑜 (1), by Lemma 5. Then, note that || 𝑦 ( 𝑗 ) || ≤ || 𝑀 |||| 𝜆 𝑗 || + || 𝑒 ( 𝑗 ) || and max 𝑗 =1,..., 𝑝 || 𝑀 |||| 𝜆 𝑗 || ≲ √𝑛 max 𝑗 =1,..., 𝑝 || 𝜆 𝑗 || ≍ √𝑛 , since || 𝑀 || ≲ √𝑛 with probability at least 1 − 𝑜 (1), by Lemma 1 and max 𝑗 =1,..., 𝑝 || 𝜆 𝑗 || ≤ 𝑘𝐶 Λ <
+
+∞ by Assumption 3. 
+
+Lemma 6. Suppose Assumptions 1–4 hold. Let 𝑀 Λ⊤ 
+
+> 0
+
+= 𝑈 0,1: 𝑘 𝐷 0,1: 𝑘 𝑉 ⊤ 
+
+> 0,1: 𝑘
+
+be the singular value decomposition of the signal matrix, with 𝑈 0 ∈ R𝑛 ×𝑘 having orthonormal columns. Let 𝑈 1: 𝑘 be the matrix of left singular vectors of 𝑌 associated to its leading 𝑘 singular values. Then, 
+
+𝑝𝑟 
+
+
+
+𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+> 𝐶 
+
+ 1
+
+√𝑛 + 1
+
+√𝑝 
+
+ 
+
+→ 0,
+
+for some constant 𝐶 < ∞.Proof of Lemma 6. Let Δ = 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+. Since 𝑋 0 = 𝑀 0Λ⊤ 
+
+> 0
+
+,
+
+∥ 𝑋 ⊤ 
+
+> 0
+
+Δ𝑋 0 ∥ = ∥Λ0 𝑀 ⊤ 
+
+> 0
+
+Δ𝑀 0Λ⊤ 
+
+> 0
+
+∥ ≥ 𝑠 2 
+
+> 𝑘
+
+(Λ0)∥ 𝑀 ⊤ 
+
+> 0
+
+Δ𝑀 0 ∥,
+
+where the inequality follows because Λ0 has full column rank. We now lower bound the second factor. Since Λ0 has full column rank, col (𝑋 0) = col (𝑀 0); moreover, from the singular value decomposition 𝑋 0 = 𝑈 0,1: 𝑘 𝐷 0,1: 𝑘 𝑉 ⊤ 
+
+> 0,1: 𝑘
+
+, col (𝑋 0) = col (𝑈 0,1: 𝑘 ). Hence col (𝑀 0) = col (𝑈 0,1: 𝑘 ), and since both matrices have rank 𝑘 , there exists an invertible 𝑘 × 𝑘 matrix 𝑅 such that 𝑀 0 = 𝑈 0,1: 𝑘 𝑅 .Thus 
+
+∥𝑀 ⊤ 
+
+> 0
+
+Δ𝑀 0 ∥ = ∥𝑅 ⊤ (𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+Δ𝑈 0,1: 𝑘 )𝑅 ∥ ≥ 𝑠 2 
+
+> 𝑘
+
+(𝑅 )∥ 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+Δ𝑈 0,1: 𝑘 ∥ = 𝑠 2 
+
+> 𝑘
+
+(𝑀 0)∥ 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+Δ𝑈 0,1: 𝑘 ∥.
+
+Also, 𝑠 𝑘 (𝑅 ) = 𝑠 𝑘 (𝑀 0) because 𝑀 ⊤ 
+
+> 0
+
+𝑀 0 = 𝑅 ⊤𝑈 ⊤
+
+> 0,1: 𝑘
+
+𝑈 0,1: 𝑘 𝑅 = 𝑅 ⊤ 𝑅 . Since (𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+)𝑈 0,1: 𝑘 =
+
+𝑈 0,1: 𝑘 ,
+
+𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+(𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+)𝑈 0,1: 𝑘 = 𝑈 ⊤
+
+> 0,1: 𝑘
+
+𝑈 1: 𝑘 𝑈 ⊤
+
+> 1: 𝑘
+
+𝑈 0,1: 𝑘 − 𝐼 𝑘 = 𝐶 ⊤𝐶 − 𝐼 𝑘 ,
+
+where 𝐶 = 𝑈 ⊤
+
+> 1: 𝑘
+
+𝑈 0,1: 𝑘 . Let 𝛼 1, . . . , 𝛼 𝑘 be the principal angles between col (𝑈 1: 𝑘 ) and col (𝑈 0,1: 𝑘 ). The singular values of 𝐶 are cos (𝛼 1), . . . , cos (𝛼 𝑘 ), so the eigenvalues of 𝐶 ⊤𝐶 −𝐼 𝑘 are − sin 2 (𝛼 1), . . . , − sin 2 (𝛼 𝑘 ).Hence 
+
+∥𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+(𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+)𝑈 0,1: 𝑘 ∥ = max  
+
+> 𝑟 =1,...,𝑘
+
+sin 2 (𝛼 𝑟 ) = ∥𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+∥2,
+
+where the last equality uses the identity ∥𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+∥ = max 1≤𝑟 ≤ 𝑘 sin (𝛼 𝑟 ) (see Stewart & Sun (1990)). Moreover, 
+
+∥𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+Δ𝑈 0,1: 𝑘 ∥ = ∥𝑈 ⊤
+
+> 0,1: 𝑘
+
+𝑈 1: 𝑘 𝑈 ⊤
+
+> 1: 𝑘
+
+𝑈 0,1: 𝑘 − 𝐼 𝑘 ∥ = ∥𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+∥2.
+
+Combining the previous results gives 
+
+∥ 𝑋 ⊤ 
+
+> 0
+
+Δ𝑋 0 ∥ ≥ 𝑠 2 
+
+> 𝑘
+
+(Λ0)𝑠 2 
+
+> 𝑘
+
+(𝑀 0)∥ 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+∥2.
+
+We next upper bound the same quantity. Since 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝑋 0 = 𝑋 0,
+
+∥ 𝑋 ⊤ 
+
+> 0
+
+Δ𝑋 0 ∥ = ∥ 𝑋 ⊤ 
+
+> 0
+
+(𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝐼 𝑛 ) 𝑋 0 ∥ = ∥ 𝑋 ⊤ 
+
+> 0
+
+(𝐼 𝑛 − 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+) 𝑋 0 ∥ = ∥( 𝐼 𝑛 − 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+) 𝑋 0 ∥2.
+
+Because 𝑈 1: 𝑘 contains the leading 𝑘 left singular vectors of 𝑌 = 𝑋 0 + 𝐸 , 𝑈 1: 𝑘 𝑈 ⊤
+
+> 1: 𝑘
+
+𝑌 is a best rank-𝑘 
+
+approximation to 𝑌 in spectral norm. Hence 
+
+∥( 𝐼 𝑛 − 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+)𝑌 ∥ ≤ ∥( 𝐼 𝑛 − 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+)𝑌 ∥ = ∥( 𝐼 𝑛 − 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+)𝐸 ∥ ≤ ∥ 𝐸 ∥.
+
+25 It follows that 
+
+∥( 𝐼 𝑛 −𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+) 𝑋 0 ∥ = ∥( 𝐼 𝑛 −𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+)( 𝑌 −𝐸 )∥ ≤ ∥( 𝐼 𝑛 −𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+)𝑌 ∥+∥( 𝐼 𝑛 −𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+)𝐸 ∥ ≤ 2∥𝐸 ∥,
+
+and therefore ∥ 𝑋 ⊤ 
+
+> 0
+
+Δ𝑋 0 ∥ ≤ 4∥𝐸 ∥2. Combining this with the lower bound yields 
+
+∥𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+∥ ≤ 2∥𝐸 ∥
+
+𝑠 𝑘 (Λ0)𝑠 𝑘 (𝑀 0) .
+
+Using the fact that, with probability at least 1 − 𝑜 (1), ∥𝐸 ∥ ≲ √𝑛 + √𝑝 , 𝑠 𝑘 (𝑀 0) ≍ √𝑛 , by Lemma 3 and 1, respectively, and 𝑠 𝑘 (Λ0) ≍ √𝑝 , by Assumption 3, we obtain, with probability at least 1 − 𝑜 (1),
+
+∥𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+∥ ≲
+
+√𝑛 + √𝑝 
+
+√𝑛𝑝 ≍ 1
+
+√𝑛 + 1
+
+√𝑝 .
+
+Lemma 7. Suppose Assumptions 1–4 hold. Fix 𝑗, 𝑗 ′ ∈ 1, · · · 𝑝 , and denote by 𝑌 (− 𝑗 ) and 𝑌 (− 𝑗 𝑗 ′ )
+
+the matrices obtained by removing the 𝑗 -th and the 𝑗, 𝑗 ′-th columns from 𝑌 respectively. Let 
+
+𝑃 = 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+, 𝑃 (− 𝑗 ) = 𝑈 (− 𝑗 ) 
+
+> 1: 𝑘
+
+𝑈 (− 𝑗 )⊤  
+
+> 1: 𝑘
+
+, and 𝑃 (− 𝑗 𝑗 ′ ) = 𝑈 (− 𝑗 𝑗 ′ ) 
+
+> 1: 𝑘
+
+𝑈 (− 𝑗 𝑗 ′ )⊤  
+
+> 1: 𝑘
+
+, where 𝑈 (− 𝑗 ) 
+
+> 1: 𝑘
+
+∈ R𝑛 ×𝑘 and 
+
+𝑈 (− 𝑗 𝑗 ′ ) 
+
+> 1: 𝑘
+
+∈ R𝑛 ×𝑘 are the matrices of left singular vectors associated to the leading 𝑘 singular values of 𝑌 (− 𝑗 ) and 𝑌 (− 𝑗 𝑗 ′ ) , respectively. Then, with probability at least 1 − 𝑜 (1),
+
+∥𝑃 − 𝑃 (− 𝑗 ) ∥ ≲ 1
+
+𝑛 , ∥𝑃 − 𝑃 (− 𝑗 𝑗 ′ ) ∥ ≲ 1
+
+𝑛 
+
+Proof of Lemma 7. We only prove the second result, as the first one can be proven by the same steps. Let 
+
+𝐴 = 𝑌𝑌 ⊤, 𝐴 (− 𝑗 𝑗 ′ ) = 𝑌 (− 𝑗 𝑗 ′ )𝑌 (− 𝑗 𝑗 ′ )⊤ .
+
+Since 𝑌 (− 𝑗 𝑗 ′ ) is obtained from 𝑌 by deleting the 𝑗, 𝑗 ′-th columns, 
+
+𝐴 − 𝐴 (− 𝑗 𝑗 ′ ) = 𝑦 ( 𝑗 ) 𝑦 ( 𝑗 )⊤ + 𝑦 ( 𝑗 ′ ) 𝑦 ( 𝑗 ′ )⊤ .
+
+Therefore, with proabability at least 1 − 𝑜 (1)∥ 𝐴 − 𝐴 (− 𝑗 𝑗 ′ ) ∥ ≤ ∥ 𝑦 ( 𝑗 ) ∥2 + ∥ 𝑦 ( 𝑗 ′ ) ∥2 ≲ 𝑛 
+
+since max 𝑗 =1,..., 𝑝 || 𝑦 ( 𝑗 ) || ≲ √𝑛 , with probability at least 1 − 𝑜 (1), by Lemma 5. Note that the 𝑘 -th and 𝑘 + 1-th eigenvalues of 𝐴 are 𝑑 2 
+
+> 𝑘
+
+and 𝑑 2
+
+> 𝑘 +1
+
+, respectively and 𝑑 2 
+
+> 𝑘
+
+≍ 𝑛 2 and 
+
+𝑑 2 
+
+> 𝑘 +1
+
+≍ 𝑛 , with probability at least 1 − 𝑜 (1), by Lemma 4. Hence, since 𝐴 has a positive eigengap between the 𝑘 -th and 𝑘 + 1-th eigenvalues, with probability at least 1 − 𝑜 (1), by Lemma 4, by the Davis–Kahan theorem applied to the leading 𝑘 -dimensional eigenspaces of 𝐴 and 𝐴 (− 𝑗 𝑗 ′ ) , we have 
+
+∥𝑃 − 𝑃 (− 𝑗 𝑗 ′ ) ∥ ≤ 𝐶 ∥ 𝐴 − 𝐴 (− 𝑗 𝑗 ′ ) ∥
+
+𝑑 2 
+
+> 𝑘
+
+− 𝑑 2
+
+> 𝑘 +1
+
+≲ 𝑛 𝑛 2 = 1
+
+𝑛 ,
+
+with probability at least 1 − 𝑜 (1).
+
+Lemma 8. Suppose Assumption 1–4 hold and 𝐻 = O( 𝑛 2/5). Let ˆΛ1: 𝑘 ∈ R𝑝 ×𝑘 and ˆΛ𝑘 +1: 𝐻 ∈
+
+R𝑝 ×𝐻 −𝑘 be the matrices obtained by extracting the first 𝑘 columns and the remaining 𝐻 − 𝑘 ones of ˆΛ respectively. Then, with probability at least 1 − 𝑜 (1), we have 
+
+|| ˆΛ1: 𝑘 || 𝐹 ≲ √𝑛, || ˆΛ𝑘 +1: 𝐻 || 𝐹 ≲ 1
+
+𝑛 1/5 ,
+
+which, in turn, imply 
+
+|| ˆΛ|| 𝐹 ≲ √𝑛. 
+
+26 Proof of Lemma 8. Note 
+
+|| ˆΛ|| 𝐹 ≤ || ˆΛ1: 𝑘 || 𝐹 + || ˆΛ𝑘 +1: 𝐻 || 𝐹 .
+
+By Proposition 1, for 𝑙 > 𝑘 , we have max 𝑗 =1,..., 𝑝   
+
+> √𝑛 𝑛 +ˆ𝜓 −2
+> 𝑙 ˆ𝜏 −2
+> 𝑗
+
+≍ 1√𝑛 (1+𝑛 2/5 ) ≍ 1 
+
+> 𝑛 9/10
+
+, with probability at least 1 − 𝑜 (1). Thus, since, by Lemma 4, 𝑑 𝑙 ≲ √𝑛 for 𝑙 > 𝑘 , we have 
+
+|| ˆΛ𝑘 +1: 𝐻 || 𝐹 ≲ √𝐻 1
+
+𝑛 2/5 ≲ 1
+
+𝑛 1/5 ,
+
+with probability at least 1 − 𝑜 (1). Moreover, with probability at least 1 − 𝑜 (1), we have 
+
+|| ˆΛ1: 𝑘 || 𝐹 ≤ 𝑉 1: 𝐾 𝐷 1: 𝐾 
+
+√𝑛 𝐹 
+
+≤ 𝑘 𝑑 1
+
+√𝑛 ≲ 𝑘 √︂ 𝑝𝑛 𝑛 ≍ √𝑛, 
+
+since, by Lemma 4, 𝑑 1 = 𝑠 1 (𝑌 ) ≍ √𝑛𝑝 , with probability at least 1 − 𝑜 (1).
+
+Lemma 9. Suppose Assumptions 1–4 hold and 𝑟 = 𝑂 (𝑛 2/5), then 
+
+𝑑 2 
+
+> 𝑘 +1
+
+− 𝑑 2 
+
+> 𝑘 +𝑟
+
+= O𝑝𝑟 (𝑛 1/3𝑟 2/3).
+
+Proof of Lemma 9. Denote the marginal variance of each 𝑦 𝑖 with Θ0 = Λ 0Λ⊤ 
+
+> 0
+
++𝜎 20 𝐼 𝑝 . Let 𝑍 ∈ R𝑛 × 𝑝 
+
+have independent standard Gaussian entries. Then 𝑌 𝑑 
+
+= 𝑍 Θ1/20 . Define the normalized covariance ¯Θ0 = 𝜎 −20 Θ0 = 𝐼 𝑝 + 𝜎 −20 Λ0Λ⊤ 
+
+> 0
+
+,
+
+which is a rank-𝑘 perturbation of 𝐼 𝑝 . Its nontrivial eigenvalues are 
+
+𝛾 𝑙 = 1 + 𝑠 𝑙 (Λ0)2
+
+𝜎 20
+
+, (𝑙 = 1, . . . , 𝑘 ),
+
+so 𝛾 2 
+
+> 𝑙
+
+→ ∞ and the spikes are uniformly supercritical (Lee & Lee 2024). Denote by e𝛾 1 ≥ · · · ≥ e𝛾 𝑛 ≥
+
+0 the eigenvalues of 𝑆 = 1
+
+> 𝑛𝜎 20
+
+𝑌𝑌 ⊤, and note that for each 𝑙 = 1, . . . , 𝑛 , we have 𝑑 2 
+
+> 𝑙
+
+= 𝑛𝜎 20 e𝛾 𝑙 . Similarly, let e𝛾 (0) 
+
+> 1
+
+≥ · · · ≥ e𝛾 (0) 
+
+> 𝑛
+
+≥ 0 be the eigenvalues of e𝑆 0 = 1
+
+> 𝑛𝜎 20
+
+𝐸 𝐸 ⊤. Theorem 2.7 of Bloemendal et al. (2016) with 𝑛 ≍ 𝑝 gives 
+
+e𝛾 𝑘 +𝑟 = e𝛾 (0) 
+
+> 𝑟
+
++ O( 𝑛 −2),
+
+with probability at least 1 − 𝑜 (1).Let 𝛾 (0) 
+
+> 𝑙
+
+denote the 𝑙 /𝑝 -th upper-tail quantile of 𝜌 𝛾 (·) , defined as in Eq. (2.17) of Bloemendal et al. (2014), where 𝜌 𝛾 (·) is the Marchenko-Pastur law (Marchenko & Pastur 1967), for instance, defined in Eq. (2.4) of Bloemendal et al. (2014). Then, for each fixed 𝑟 , by Theorem 2.10 of Bloemendal et al. (2014), with probability at least 1 − 𝑜 (1),
+
+e𝛾 (0) 
+
+> 𝑟
+
+= 𝛾 (0) 
+
+> 𝑟
+
++ O  𝑛 −2/3𝑟 −1/3,
+
+and also e𝛾 (0) 
+
+> 1
+
+= 𝛾 (0) 
+
+> 1
+
++ O( 𝑛 −2/3). Therefore, with probability at least 1 − 𝑜 (1),
+
+e𝛾 (0) 
+
+> 1
+
+− e𝛾 (0) 
+
+> 𝑟
+
+= (𝛾 (0) 
+
+> 1
+
+− 𝛾 (0) 
+
+> 𝑟
+
+) + O( 𝑛 −2/3)
+
+From the explicit formula of 𝜌 𝛾 (·) , near the upper edge 𝛾 + the density vanishes like a square root, so there exists 𝐶 < ∞ such that for all sufficiently small 𝛿 > 0, 
+
+∫ 𝛾 +  
+
+> 𝛾 +−𝛿
+
+𝜌 𝛾 (𝑥 ) 𝑑𝑥 ≤ 𝐶 𝛿 3/2.
+
+27 By definition of 𝛾 (0) 
+
+> 𝑟
+
+as an upper-tail quantile, 
+
+𝑟 𝑝 =
+
+∫ 𝛾 + 
+
+> 𝛾 (0)
+> 𝑟
+
+𝜌 𝛾 (𝑥 ) 𝑑𝑥 ≤
+
+∫ 𝛾 +    
+
+> 𝛾 +− ( 𝛾 +−𝛾 (0)
+> 𝑟 )
+
+𝜌 𝛾 (𝑥 ) 𝑑𝑥 ≤ 𝐶 (𝛾 + − 𝛾 (0) 
+
+> 𝑟
+
+)3/2,
+
+so 𝛾 + − 𝛾 (0) 
+
+> 𝑟
+
+= 𝑂  (𝑟 /𝑛 )2/3 and hence 
+
+𝛾 (0) 
+
+> 1
+
+− 𝛾 (0) 
+
+> 𝑟
+
+= 𝑂  (𝑟 /𝑛 )2/3.
+
+Combining all of the above, with probability at least 1 − 𝑜 (1), we get 
+
+𝑑 2 
+
+> 𝑘 +1
+
+− 𝑑 2 
+
+> 𝑘 +𝑟
+
+= 𝑛𝜎 20 (e𝛾 𝑘 +1 − e𝛾 𝑘 +𝑟 ) = O 𝑛 1/3𝑟 2/3 = O( 𝑛 3/5),
+
+In particular, if 𝑟 ≍ 𝑛 2/5, with probability at least 1 − 𝑜 (1),
+
+𝑑 2 
+
+> 𝑘 +1
+
+− 𝑑 2 
+
+> 𝑘 +𝑟
+
+= O( 𝑛 3/5),
+
+Lemma 10. Suppose 𝐻 > 𝑘 , 𝐻 = O( 𝑛 2/5) and Assumptions 1–4 hold. Then, for each 𝑙 ≤ 𝑘 , with probability at least 1 − 𝑜 (1), we have 
+
+min 
+
+> 𝑗 =1,..., 𝑝
+
+ˆ𝜓 2 
+
+> 𝑙
+
+ˆ𝜏 2 
+
+> 𝑗
+
+≳ 1,
+
+where ˆ𝜓 2 
+
+> 𝑙
+
+and ˆ𝜏 2 
+
+> 𝑗
+
+are defined in Section 2.3. Proof of Lemma 10. Let 𝑙 ≤ 𝑘 , by Lemma 4, we have 𝑑 2 
+
+> 𝑙
+
+≍ 𝑛 2, 𝑑 2 
+
+> 𝐻 +1
+
+≍ 𝑛 , and Í𝐻 𝑙 =1 (𝑑 2 
+
+> 𝑙
+
+− 𝑑 2
+
+> 𝐻 +1
+
+) ≍ 
+
+𝑘𝑛𝑝 ≍ 𝑛 2, with probability at least 1 −𝑜 (1), implying (𝑑 2 
+
+> 𝑙
+
+−𝑑 2
+
+> 𝐻 +1
+
+)/ Í𝐻 𝑙 ′=1 (𝑑 2 
+
+> 𝑙 ′
+
+−𝑑 2
+
+> 𝐻 +1
+
+) ≍ 1. Moreover, we have max 𝑗 =1,..., 𝑝 ˆ𝜎 2 
+
+> 𝑗
+
+≤ max {|| 𝑦 ( 𝑗 ) || 2/( 𝑛 − 𝐻 ), 𝑐 𝜎 } ≲ 1, with probability at least 1 − 𝑜 (1), by Lemma 5. Moreover, let 𝑣 𝑗, 1: 𝑘 ∈ R𝑘 , 𝑣 𝑗, (𝑘 +1):𝐻 ∈ R𝐻 −𝑘 be the vectors obtained by taking leading 𝑘 
+
+entries and the remaining 𝐻 −𝑘 ones of 𝑣 𝑗, 1: 𝐻 respectively, and 𝐷 1: 𝑘 ∈ R𝑘 ×𝑘 , 𝐷 (𝑘 +1):𝐻 ∈ R𝐻 −𝑘 ×𝐻 −𝑘 
+
+be the diagonal matrices with the leading 𝑘 singular values and the remaining 𝐻 − 𝑘 of 𝑌 and note 
+
+𝑣 ⊤ 
+
+> 𝑗, 1: 𝐻
+
+(𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 )𝑣 𝑗, 1: 𝐻 =𝑣 ⊤ 
+
+> 𝑗, 1: 𝑘
+
+𝐷 21: 𝑘 𝑣 𝑗, 1: 𝑘 − 𝑣 ⊤ 
+
+> 𝑗, 1: 𝑘
+
+𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝑘 𝑣 𝑗, 1: 𝑘 
+
++ 𝑣 ⊤ 
+
+> 𝑗,𝑘 +1: 𝐻
+
+(𝐷 2 
+
+> (𝑘 +1):𝐻
+
+− 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 −𝑘 )𝑣 𝑗,𝑘 +1: 𝐻 .
+
+First, 
+
+𝑣 ⊤ 
+
+> 𝑗, 1: 𝑘
+
+𝐷 21: 𝑘 𝑣 𝑗, 1: 𝑘 = 𝑦 ( 𝑗 )⊤ 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+𝑦 ( 𝑗 ) = 𝑦 ( 𝑗 )⊤ 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝑦 ( 𝑗 ) + 𝑦 ( 𝑗 )⊤  𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤
+
+> 0,1: 𝑘
+
+ 𝑦 ( 𝑗 ) ,
+
+For the first term, we have 
+
+𝑦 ( 𝑗 )⊤ 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝑦 ( 𝑗 ) =𝜆 ⊤  
+
+> 0𝑗
+
+𝑀 ⊤ 𝑀𝜆 0 𝑗 + 𝜖 ⊤ 
+
+> 𝑗
+
+𝑀𝜆 0 𝑗 + 𝜆 ⊤  
+
+> 0𝑗
+
+𝑀 ⊤𝜖 𝑗 + 𝜖 ⊤ 
+
+> 𝑗
+
+𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝜖 𝑗 
+
+= 𝑛𝜆 ⊤  
+
+> 0𝑗
+
+𝜆 0 𝑗 + 𝜆 ⊤  
+
+> 0𝑗
+
+(𝑀 ⊤ 𝑀 − 𝑛𝐼 𝑘 )𝜆 0 𝑗 + 𝜖 ⊤ 
+
+> 𝑗
+
+𝑀𝜆 0 𝑗 + 𝜆 ⊤  
+
+> 0𝑗
+
+𝑀 ⊤𝜖 𝑗 + 𝜖 ⊤ 
+
+> 𝑗
+
+𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝜖 𝑗 
+
+and, with probability at least 1 − 𝑜 (1),1
+
+𝑛 || 𝜆 ⊤  
+
+> 0𝑗
+
+(𝑀 ⊤ 𝑀 − 𝑛𝐼 𝑘 )𝜆 0 𝑗 || ≲ 1
+
+𝑛 || 𝜆 0 𝑗 || 2 || 𝑀 ⊤ 𝑀 − 𝑛𝐼 𝑘 || ≲√︁ 𝑛 log 𝑛 𝑛 =√︂ log 𝑛 𝑛 , (25) since, with probability at least 1 − 𝑜 (1), || 𝑀 ⊤ 𝑀 − 𝑛𝐼 𝑘 || ≲√︁ 𝑛 log 𝑛 , by Lemma 1. max 
+
+> 𝑗 =1,..., 𝑝
+
+1
+
+𝑛 |𝜖 ⊤ 
+
+> 𝑗
+
+𝑀𝜆 0 𝑗 | = 1
+
+𝑛 |𝜆 ⊤  
+
+> 0𝑗
+
+𝑀 ⊤𝜖 𝑗 | = 1
+
+𝑛 
+
+> 𝑛
+
+∑︁ 
+
+> 𝑖 =1
+
+𝜆 ⊤  
+
+> 0𝑗
+
+(𝜂 ⊤ 
+
+> 𝑖
+
+𝜖 ( 𝑗 ) ) ≲ 1.
+
+28 Note that , uniformly over 𝑗 = 1, . . . , 𝑝 , conditional on 𝑀 0, 𝑒 ( 𝑗 )⊤ 𝑀 0𝜆 0 𝑗 ∼ 𝑁  0, 𝜎 20 ∥𝑀 0𝜆 0 𝑗 ∥2.Since, max 𝑗 =1,..., 𝑝 ∥𝑀 0𝜆 0 𝑗 ∥2 ≲ 𝑛 , because || 𝑀 0 || ≲ √𝑛 , by Lemma 1 and max 𝑗 =1,..., 𝑝 || 𝜆 0 𝑗 || by Assumption 3, then, for any 𝑡 > 0, 
+
+P
+
+
+
+max 
+
+> 𝑗 =1,..., 𝑝
+
+1
+
+𝑛 𝑒 ( 𝑗 )⊤ 𝑀 0𝜆 0 𝑗 > 𝑡 | 𝑀 0
+
+
+
+≤ 2𝑝 exp − 𝑛𝑡 2
+
+2𝜎 20 𝐶 1
+
+!
+
+,
+
+for some finite constant 𝐶 1. Taking 𝑡 = 𝐶 2√︁ log 𝑝 /𝑛 with 𝐶 2 large enough gives max 
+
+> 𝑗 =1,..., 𝑝
+
+1
+
+𝑛 𝑒 ( 𝑗 )⊤ 𝑀 0𝜆 0 𝑗 = O𝑝𝑟  √︂ log 𝑝 𝑛 
+
+!
+
+= 𝑜 𝑝𝑟 (1).
+
+Moreover, max  
+
+> 𝑗 =1,..., 𝑝
+
+𝜖 ⊤ 
+
+> 𝑗
+
+𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝜖 𝑗 = max  
+
+> 𝑗 =1,..., 𝑝
+
+|| 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝜖 𝑗 || 2 ≲ log 𝑛, (26) by Lemma 1, since 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+𝜖 𝑗 ∼ 𝑁 𝑘 (0, 𝜎 20 𝐼 𝑘 ). For the second term, with probability at least 1 − 𝑜 (1),we have max  
+
+> 𝑗 =1,..., 𝑝
+
+|𝑦 ( 𝑗 )⊤  𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤
+
+> 0,1: 𝑘
+
+ 𝑦 ( 𝑗 ) | ≤ max  
+
+> 𝑗 =1,..., 𝑝
+
+|| 𝑦 ( 𝑗 ) || 2 || 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+|| ≲ √𝑛, 
+
+since, with probability at least 1 − 𝑜 (1), max 𝑗 =1,..., 𝑝 || 𝑦 ( 𝑗 ) || ≲ √𝑛 by Lemma 5, || 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+−
+
+𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+|| ≲ 1√𝑛 . Thus, with probability at least 1 − 𝑜 (1), for each 𝑗 = 1, . . . , 𝑝 ,1
+
+𝑛 𝑣 ⊤ 
+
+> 𝑗, 1: 𝑘
+
+𝐷 21: 𝑘 𝑣 𝑗, 1: 𝑘 = || 𝜆 0 𝑗 || 2 + O  √︂ log 𝑛 𝑛 
+
+.
+
+Thus, since the diagonal entries of 𝐷 21: 𝐾 are ≍ 𝑛 2, with probability at least 1 − 𝑜 (1), by Lemma 4, the entries of 𝑣 𝑗, 1: 𝑘 are ≍ 1√𝑛 with probability at least 1 − 𝑜 (1). Hence, with probability at least 1 − 𝑜 (1), 1
+
+𝑛 𝑣 ⊤ 
+
+> 𝑗, 1: 𝑘
+
+𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝑘 𝑣 𝑗, 1: 𝑘 ≲ 1
+
+𝑛 ,
+
+since 𝑑 𝐻 +1 ≲ √𝑛 , with probability at least 1 − 𝑜 (1), by Lemma 4. Finally, with probability at least 1 − 𝑜 (1),1
+
+𝑛 𝑣 ⊤ 
+
+> 𝑗,𝑘 +1: 𝐻
+
+(𝐷 2 
+
+> (𝑘 +1):𝐻
+
+− 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 −𝑘 )𝑣 𝑗,𝑘 +1: 𝐻 ≲ 𝑛 3/5
+
+𝑛 = 𝑛 −2/5,
+
+since || 𝐷 2 
+
+> (𝑘 +1):𝐻
+
+− 𝑑 2 
+
+> 𝐻 +1
+
+|| ≲ 𝑛 3/5, with probability at least 1 − 𝑜 (1), by Lemma 9. Combining all of the above, together with max 𝑗 =1,..., 𝑝 || 𝜆 0 𝑗 || ≤ 𝐶 Λ 𝑘 , since ∥Λ∥∞ ≤ 𝐶 Λ by Assumption 3, we prove the desired result. 
+
+Lemma 11. Suppose 𝐻 ≲ 𝑛 2/5 and Assumptions 1–4. Then, with probability at least 1 − 𝑜 (1), we have 
+
+Π  || ˜Σ|| < 𝐶  ≥ 1 − 𝑜 (1),
+
+for some finite constant 𝐶 , where Π(·) denotes the probability measure induced by (6, 9). Proof of Lemma 11. Note that || ˜Σ|| = max 𝑗 =1,..., 𝑝 ˜𝜎 2 
+
+> 𝑗
+
+, where ˜ 𝜎 2 
+
+> 𝑗
+
+| 𝑌 , ˆ𝑀, 𝜏 𝑗 , Ψ ∼ 𝐼𝐺 
+
+ 𝑣 +𝑛  
+
+> 2
+
+, 𝑣𝑠 2+| | 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 | | 2
+
+> 2
+
+
+
+.Note that max 𝑗 =1,..., 𝑝 𝑣𝑠 2+| | 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 | | 2 
+
+> 2
+
+≍ max 𝑗 =1,..., 𝑝 || 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 || 2 ≤ max 𝑗 =1,..., 𝑝 || 𝑦 ( 𝑗 ) || 2 ≲ 𝑛 ,with probability at least 1 − 𝑜 (1), by Lemma 5. Theorem 5 of Zhang & Zhou (2020) concludes the proof. 29 Lemma 12. Let 𝛿 2 
+
+> 𝑗
+
+= 𝑣𝑠 2+| | 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 | | 2 
+
+> 𝑣 +𝑛
+
+. Under Assumptions 1–4, we have 
+
+𝛿 2 
+
+> 𝑗
+
+= 𝑠 2
+
+> 𝑗
+
+𝑛 + 𝐹 𝑗 ,
+
+where 𝑠 2
+
+> 𝑗
+> 𝜎 20
+
+∼ 𝜒 2 
+
+> 𝑛 −𝑘
+
+and max 𝑗 =1,..., 𝑝 |𝐹 𝑗 | ≲ 1 
+
+> 𝑛 2/5
+
+, with probability at least 1 − 𝑜 (1).Proof of Lemma 12. As in the proof of Theorem 2, let 𝐵 𝑗 = 𝑛 Ψ−1 
+
+> 𝑛, 𝑗
+
+= diag   𝑛 𝑛 + ˆ𝜏 −2 
+
+> 𝑗 ˆ𝜓 −21
+
+, . . . , 𝑛 𝑛 + ˆ𝜏 −2 
+
+> 𝑗 ˆ𝜓 −2
+> 𝐻
+
+.Consider the singular value decomposition of the true signal 𝑀 Λ⊤ 
+
+> 0
+
+= 𝑈 0,1: 𝑘 𝐷 0,1: 𝑘 𝑉 ⊤ 
+
+> 0,1: 𝑘
+
+and let 
+
+𝑃 0 = 𝑈 0,1: 𝑘 𝑈 ⊤ 
+
+> 0,1: 𝑘
+
+denote the projection onto its columns space. Let 𝛿 2 
+
+> 𝑗
+
+= 𝑣𝑠 2+| | 𝑦 ( 𝑗 ) − ˆ𝑀 ˆ𝜆 𝑗 | | 2 
+
+> 𝑣 𝑛
+
+=              
+
+> 𝑣𝑠 2+𝑦 (𝑗 )⊤ 𝑦 (𝑗 )−𝑦 (𝑗 )⊤ 𝑈 1: 𝐻 𝐵 𝑗 𝑈 ⊤
+> 1: 𝐻 𝑦 (𝑗 ),𝑣 𝑛
+
+, where 𝑣 𝑛 = 𝑣 + 𝑛 . Note that 
+
+𝑦 ( 𝑗 )⊤ (𝐼 𝑛 − 𝑈 1: 𝐻 𝐵 𝑗 𝑈 ⊤ 
+
+> 1: 𝐻
+
+)𝑦 ( 𝑗 ) =𝑦 ( 𝑗 )⊤ (𝐼 𝑛 − 𝑃 0)𝑦 ( 𝑗 ) + 𝑦 ( 𝑗 )⊤ (𝑃 0 − 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+)𝑦 ( 𝑗 )
+
++ 𝑦 ( 𝑗 )⊤ (𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 1: 𝐻 𝐵 𝑗 𝑈 ⊤ 
+
+> 1: 𝐻
+
+)𝑦 ( 𝑗 )
+
+Moreover, we have 
+
+𝑍 𝑗 = 𝑦 ( 𝑗 )⊤ (𝐼 𝑛 − 𝑃 0)𝑦 ( 𝑗 ) = 𝜖 ( 𝑗 )⊤ (𝐼 𝑛 − 𝑃 0)𝜖 ( 𝑗 ) ∼ 𝜎 20 𝜒 2 
+
+> 𝑛 −𝑘
+
+,
+
+since 𝐼 𝑛 − 𝑃 0 is an orthogonal projection of rank 𝑛 − 𝑘 , and, with probability at least 1 − 𝑜 (1), we have max  
+
+> 𝑗 =1,..., 𝑝
+
+|𝑦 ( 𝑗 )⊤ (𝑃 0 − 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+)𝑦 ( 𝑗 ) | ≤ max  
+
+> 𝑗 =1,..., 𝑝
+
+|| 𝑦 ( 𝑗 ) || 2 || 𝑃 0 − 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+|| ≲ √𝑛, 
+
+and max  
+
+> 𝑗 =1,..., 𝑝
+
+|| 𝑦 ( 𝑗 )⊤ (𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 1: 𝐻 𝐵 𝑗 𝑈 ⊤ 
+
+> 1: 𝐻
+
+)𝑦 ( 𝑗 ) || ≤ max  
+
+> 𝑗 =1,..., 𝑝
+
+|| 𝑦 ( 𝑗 ) || 2 || 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 1: 𝐻 𝐵 𝑗 𝑈 ⊤ 
+
+> 1: 𝐻
+
+|| 
+
+≲ 𝑛 3/5,
+
+since, with probability at least 1 − 𝑜 (1), max 𝑗 =1,..., 𝑝 || 𝑦 ( 𝑗 ) || ≲ √𝑛 by Lemma 5, || 𝑃 0 − 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+|| ≲ 
+
+> 1√𝑛
+
+, by Lemma 6, and || 𝑈 1: 𝑘 𝑈 ⊤ 
+
+> 1: 𝑘
+
+− 𝑈 1: 𝐻 𝐵 𝑗 𝑈 ⊤ 
+
+> 1: 𝐻
+
+|| ≲ 1 
+
+> 𝑛 2/5
+
+, since || 𝐵 𝑗 − 𝐵 || ≲ 1 
+
+> 𝑛 2/5
+
+by Proposition 1 and Lemma 10, where 𝐵 is defined in (22). Combining the results above with 1 
+
+> 𝑣 𝑛
+
+= 1 
+
+> 𝑛
+
++ 𝑂   1
+
+> 𝑛 2
+
+, we obtain the desired result. 
+
+# B Derivation of the shrinkage hyperparameters 
+
+We provide the derivation of the empirical Bayes shrinkage hyperparameters used in Section 2.3. Since 𝐻 is intentionally chosen as an upper bound on the true factor dimension, the ordinary spectral loading estimate 𝑉 1: 𝐻 𝐷 1: 𝐻 /√𝑛 contains contributions from overfitted noise directions. We therefore correct for such contribution and start from the initial loading estimate ¯Λ = 1
+
+√𝑛 𝑉 1: 𝐻 
+
+
+
+𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 
+
+1/2
+
+,
+
+so that ¯ Λ ¯Λ⊤ = 𝑛 −1𝑉 1: 𝐻 (𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 )𝑉 ⊤ 
+
+> 1: 𝐻
+
+. The subtraction of 𝑑 2 
+
+> 𝐻 +1
+
+removes the empirical bulk-noise contribution associated with overfitted components. 30 We use ¯ Λ to match prior expected loading magnitudes. Under the prior e𝜆 𝑗 | e𝜎 2 
+
+> 𝑗
+
+, 𝜏 2 
+
+> 𝑗
+
+, Ψ ∼
+
+𝑁 𝐻 (0, e𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+Ψ), with Ψ = diag (𝜓 21, . . . , 𝜓 2 
+
+> 𝐻
+
+)
+
+𝐸 {∥ e𝜆 𝑗 ∥2 | e𝜎 2 
+
+> 𝑗
+
+, 𝜏 2 
+
+> 𝑗
+
+, Ψ} = e𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+tr (Ψ) = e𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+𝐻, (27) where the last equality is due to the normalization condition tr (Ψ) = 𝐻 . The corresponding spectral estimate of ∥𝜆 𝑗 ∥2 is the squared norm of the 𝑗 -th row of ¯ Λ, namely 
+
+∥ ¯𝜆 𝑗 ∥2 = 1
+
+𝑛 𝑣 ⊤
+
+> 𝑗, 1: 𝐻
+
+
+
+𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 
+
+
+
+𝑣 𝑗, 1: 𝐻 .
+
+Matching this quantity with (27), after replacing e𝜎 2 
+
+> 𝑗
+
+by ˆ 𝜎 2 
+
+> 𝑗
+
+= ∥( 𝐼 𝑛 −𝑈 1: 𝐻 𝑈 ⊤ 
+
+> 1: 𝐻
+
+)𝑦 ( 𝑗 ) ∥2/( 𝑛 − 𝐻 ) ∨ 𝑐 𝜎 ,gives 
+
+b𝜏 2 
+
+> 𝑗
+
+= 𝑣 ⊤
+
+> 𝑗, 1: 𝐻
+
+ 𝐷 21: 𝐻 − 𝑑 2 
+
+> 𝐻 +1
+
+𝐼 𝐻 
+
+ 𝑣 𝑗, 1: 𝐻 
+
+𝑛𝐻 ˆ𝜎 2
+
+> 𝑗
+
+, 𝑗 = 1, . . . , 𝑝. 
+
+Similarly, matching the squared norm of the ℓ-th column of ¯ Λ ∥b𝜆 (ℓ ) ∥2 = (𝑑 2 
+
+> ℓ
+
+− 𝑑 2
+
+> 𝐻 +1
+
+)/ 𝑛 with 
+
+𝐸 [∥ e𝜆 (ℓ ) ∥2 | { e𝜎 2 
+
+> 𝑗
+
+, 𝜏 2 
+
+> 𝑗
+
+}𝑝 𝑗 =1, 𝜓 2 
+
+> ℓ
+
+] = 𝜓 2
+
+> ℓ
+
+Í𝑝 𝑗 =1 e𝜎 2 
+
+> 𝑗
+
+𝜏 2 
+
+> 𝑗
+
+and replacing the e𝜎 2 
+
+> 𝑗
+
+’s and 𝜏 2 
+
+> 𝑗
+
+’s with ˆ 𝜎 2 
+
+> 𝑗
+
+’s and b𝜏 𝑗 ’s, we obtain 
+
+b𝜓 2 
+
+> ℓ
+
+= 𝐻 𝑑 2 
+
+> ℓ
+
+− 𝑑 2
+
+> 𝐻 +1
+
+Í𝐻 𝑚 =1 (𝑑 2 
+
+> 𝑚
+
+− 𝑑 2
+
+> 𝐻 +1
+
+) , ℓ = 1, . . . , 𝐻. 
+
+Thus b𝜓 2 
+
+> ℓ
+
+controls global component-wise shrinkage according to the bias-corrected strength of the 
+
+ℓ-th empirical factor, while b𝜏 2 
+
+> 𝑗
+
+controls outcome-wise shrinkage according to the signal-to-noise ratio of the 𝑗 -th variable. 
+
+# C Additional details about the numerical experiments and the appli-cation 
+
+To estimate 𝜎 20 for constructing the approximation of the confidence and credible intervals, provided in equations (16) and (18) respectively, we take ˆ 𝜎 2 = 1
+
+> 𝑝
+
+Í𝑝 𝑗 =1 𝛿 𝑗 , where the 𝛿 𝑗 ’s are defined in Section 2.2. For MGSP , we obtain 3000 Monte Carlo samples and discard the first 1000 as burn-in. We fit 
+
+ROTATE and MGSP with default hyperparameters. For methods that do not provide an estimate for the residual error variances, we estimate them by the empirical variance of the fitted residuals obtained by subtracting the estimated signal from the data matrix. For BC , we estimate ΛΛ ⊤ via ˆ𝑋 ˆ𝑋 ⊤/𝑛 ,where ˆ 𝑋 is the estimate of the low-rank signal 𝑀 Λ⊤. Coverage results presented in Table 1 refer to a random 100 × 100 submatrix of Θ0.For the application reported in Section 5, we pre-processed the data by transforming each variable as ˜ 𝑦 𝑖 𝑗 = Φ −1 ( ˆ𝐹 𝑗 (𝑦 𝑚 𝑖 𝑗 )) , where ˆ 𝐹 𝑚 𝑗 (·) is the empirical cumulative distribution function of the 𝑗 -th variable. All experiments were run on a laptop with 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz and 16GB RAM. 31

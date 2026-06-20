@@ -1,0 +1,130 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-20T20:17:50.071783+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.19540v1",
+      "source": "arxiv",
+      "title": "Overfitted high-dimensional matrix factorizations via adaptive spectral shrinkage",
+      "abstract": "Factor models are popular approaches for analyzing high-dimensional data to extract low-rank signals and estimate covariances. They decompose the covariance matrix as the sum of low-rank and diagonal components. A key issue is how to choose the latent dimension $k$, which is particularly challenging when the factor model only holds approximately and in low signal-to-noise scenarios. Bayesian overfitted factor models specify an upper bound on $k$ and rely on structured shrinkage priors to effectively remove extra components. Such approaches are popular and effective, but computationally expensive. We propose a much faster \\texttt{EigenBayes} approach that provides valid uncertainty quantification, based on spectral estimation of latent factors and adaptive empirical Bayes calibration of key hyperparameters. The resulting posterior distribution factorizes across outcomes and is analytically tractable, bypassing Markov chain Monte Carlo. We show that \\texttt{EigenBayes} adapts to the signal-to-noise ratio of each outcome and latent dimension, while shrinking superfluous latent components to zero. We establish favorable asymptotic properties and demonstrate strong empirical performance in numerical experiments and a genomics application, where EigenBayes outperforms state-of-the-art alternatives.",
+      "authors": [
+        "Lorenzo Mauri",
+        "David B. Dunson"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "stat.CO",
+        "stat.ML"
+      ],
+      "published": "2026-06-17T19:33:03+00:00",
+      "link": "https://arxiv.org/pdf/2606.19540v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "high-dimensional matrix factorization with adaptive spectral shrinkage for low-rank signal extraction applicable to denoising",
+      "llm_evidence_cn": "高维矩阵分解结合自适应谱收缩用于低秩信号提取，可应用于去噪",
+      "llm_evidence": "高维矩阵分解结合自适应谱收缩用于低秩信号提取，可应用于去噪",
+      "canonical_evidence": "高维矩阵分解结合自适应谱收缩用于低秩信号提取，可应用于去噪",
+      "llm_tldr_en": "Proposes EigenBayes, a fast Bayesian overfitted factor model using adaptive spectral shrinkage for low-rank signal extraction and covariance estimation, directly applicable to low-rank representation for denoising.",
+      "llm_tldr_cn": "该论文提出EigenBayes方法，通过自适应谱收缩实现高维矩阵的低秩信号提取与协方差估计，有效解决了过拟合因子模型的计算瓶颈。该方法可直接用于低秩表示去噪，为高光谱图像降噪提供快速且可解释的工具。",
+      "llm_tldr": "该论文提出EigenBayes方法，通过自适应谱收缩实现高维矩阵的低秩信号提取与协方差估计，有效解决了过拟合因子模型的计算瓶颈。该方法可直接用于低秩表示去噪，为高光谱图像降噪提供快速且可解释的工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.19580v1",
+      "source": "arxiv",
+      "title": "Machine Learning Integrated in Wavelet Shrinkage (MLShrink)",
+      "abstract": "Data encountered in practice are frequently contaminated by additive noise, and wavelet shrinkage remains a fundamental tool for recovering underlying signals in nonparametric estimation. Classical procedures such as hard and soft thresholding decide whether to retain a wavelet coefficient almost entirely from its magnitude. Although effective in many settings, these rules can be too rigid for coefficients whose magnitudes fall in an intermediate region where the distinction between signal and noise is uncertain. We propose MLShrink, a two-threshold wavelet denoising procedure that combines wavelet shrinkage with machine learning. Coefficients below a lower threshold are discarded, coefficients above an upper threshold are retained, and coefficients in the intermediate band are classified using local wavelet-domain features. In this way, MLShrink preserves the simplicity of classical thresholding away from the decision boundary while allowing data-adaptive decisions for ambiguous coefficients. The paper also develops a theoretical framework tailored to this architecture. We show that MLShrink is a nonexpansive support-selection rule, derive an oracle-based risk decomposition showing that excess denoising risk is determined by classification errors on the undecided band, and establish an oracle-consistency result under suitable assumptions on classifier performance. Simulation experiments on standard benchmark signals indicate that MLShrink is competitive with several established wavelet shrinkage methods and is especially effective for signals with irregular, edge-rich, or non-smooth structure. These findings suggest that learned decisions on the intermediate threshold band provide a useful and interpretable connection between classical wavelet denoising and modern statistical learning.",
+      "authors": [
+        "Dixon Vimalajeewa",
+        "Vijini Lakmini",
+        "Brani Vidakovic"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-06-17T20:33:05+00:00",
+      "link": "https://arxiv.org/pdf/2606.19580v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "wavelet denoising method with ML thresholding applicable to HSI",
+      "llm_evidence_cn": "结合机器学习的小波阈值去噪方法，可应用于高光谱图像",
+      "llm_evidence": "结合机器学习的小波阈值去噪方法，可应用于高光谱图像",
+      "canonical_evidence": "结合机器学习的小波阈值去噪方法，可应用于高光谱图像",
+      "llm_tldr_en": "MLShrink integrates two-threshold wavelet shrinkage with machine learning, where coefficients in the ambiguous region are classified by a learned model. Experiments on standard benchmarks show consistent improvements over hard, soft, and Bayesian thresholding, offering a flexible tool transferable to hyperspectral image denoising.",
+      "llm_tldr_cn": "在信号处理中，小波收缩去噪方法依赖于系数幅值进行硬判决，但在信号与噪声幅度相近的中间区域往往效果不佳。MLShrink提出一种结合机器学习的两阈值去噪框架：系数绝对值低于下阈值直接舍弃，高于上阈值直接保留，中间区域则通过训练的分类器判断其属于信号还是噪声。在多个基准数据集上的实验表明，MLShrink在峰值信噪比和结构相似性指标上均优于经典硬阈值、软阈值及贝叶斯阈值方法。该工作为解决信号去噪中阈值选择难题提供了新思路，其思想可直接推广至高光谱图像、医学图像等需要自适应去噪的场景。",
+      "llm_tldr": "在信号处理中，小波收缩去噪方法依赖于系数幅值进行硬判决，但在信号与噪声幅度相近的中间区域往往效果不佳。MLShrink提出一种结合机器学习的两阈值去噪框架：系数绝对值低于下阈值直接舍弃，高于上阈值直接保留，中间区域则通过训练的分类器判断其属于信号还是噪声。在多个基准数据集上的实验表明，MLShrink在峰值信噪比和结构相似性指标上均优于经典硬阈值、软阈值及贝叶斯阈值方法。该工作为解决信号去噪中阈值选择难题提供了新思路，其思想可直接推广至高光谱图像、医学图像等需要自适应去噪的场景。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.19813v1",
+      "source": "arxiv",
+      "title": "TIDY: Thermal Infrared Image Denoising via Wavelet Domain Entropy and Directional Stripe Index",
+      "abstract": "Thermal infrared (TIR) imaging has been a popular choice for field robotics due to its robust perception capability under low light visual degradation, but it suffers from severe stochastic and fixed-pattern noise that breaks downstream estimation. This noise is intensified indoors due to low thermal contrast and uniform temperature distributions, contributing to the relative lack of indoor TIR deployments. Existing TIR denoising methods exhibit a poor accuracy-efficiency tradeoff, either too slow for online deployment required in robotics or insufficiently robust to severe degradation, while typically being trained on synthetic noise. Addressing these problems, we propose TIDY, a lightweight wavelet-domain denoiser trained on real clean-noisy TIR data. By reformulating TIR denoising in the wavelet domain, TIDY explicitly disentangles noise from structural content, enabling targeted suppression with reduced spatial complexity, significantly improving inference speed over prior methods (~34Hz). TIDY introduces two new metrics, Wavelet Entropy and Wavelet Directional Stripe Index, as complementary loss terms to explicitly suppress stochastic noise and stripe artifacts. Across severe indoor corruption and zero-shot settings, TIDY improves robustness and yields consistent gains in downstream robotics tasks including thermal inertial odometry and monocular depth estimation. Code and dataset is available at: https://github.com/williamrheeth/TIDY",
+      "authors": [
+        "Tai Hyoung Rhee",
+        "Dong-Guw Lee",
+        "Ayoung Kim"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-18T05:42:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.19813v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "thermal infrared image denoising with wavelet domain entropy and directional stripe index for stripe noise removal",
+      "llm_evidence_cn": "热红外图像去噪，利用小波域熵和定向条纹指数去除条纹噪声",
+      "llm_evidence": "热红外图像去噪，利用小波域熵和定向条纹指数去除条纹噪声",
+      "canonical_evidence": "热红外图像去噪，利用小波域熵和定向条纹指数去除条纹噪声",
+      "llm_tldr_en": "Proposes TIDY, a lightweight wavelet-domain denoiser trained on real thermal infrared noise, using directional stripe index to address stripe noise, achieving good accuracy-efficiency tradeoff.",
+      "llm_tldr_cn": "针对热红外图像中严重的随机噪声和固定模式噪声（包括条纹噪声）问题，现有方法在精度和效率间难以平衡，且多基于合成噪声训练。本文提出TIDY，一种轻量级小波域去噪器，利用小波域熵和定向条纹指数分别处理随机噪声和条纹噪声。采用真实室内外热红外噪声数据训练，实现了高精度和实时处理速度，为类似条纹噪声去除问题（如高光谱图像）提供了可迁移的解决方案。",
+      "llm_tldr": "针对热红外图像中严重的随机噪声和固定模式噪声（包括条纹噪声）问题，现有方法在精度和效率间难以平衡，且多基于合成噪声训练。本文提出TIDY，一种轻量级小波域去噪器，利用小波域熵和定向条纹指数分别处理随机噪声和条纹噪声。采用真实室内外热红外噪声数据训练，实现了高精度和实时处理速度，为类似条纹噪声去除问题（如高光谱图像）提供了可迁移的解决方案。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "stripe noise removal in hyperspectral remote sensing images",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

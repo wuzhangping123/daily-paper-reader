@@ -1,0 +1,300 @@
+Title: TIDY: Thermal Infrared Image Denoising via Wavelet Domain Entropy and Directional Stripe Index
+
+URL Source: https://arxiv.org/pdf/2606.19813v1
+
+Published Time: Fri, 19 Jun 2026 00:29:08 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# TIDY: Thermal Infrared Image Denoising via Wavelet Domain Entropy and Directional Stripe Index 
+
+Tai Hyoung Rhee 1, Dong-Guw Lee 1, and Ayoung Kim 1∗
+
+Abstract — Thermal infrared (TIR) imaging has been a popu-lar choice for field robotics due to its robust perception capabil-ity under low light visual degradation, but it suffers from severe stochastic and fixed-pattern noise that breaks downstream estimation. This noise is intensified indoors due to low thermal contrast and uniform temperature distributions, contributing to the relative lack of indoor TIR deployments. Existing TIR denoising methods exhibit a poor accuracy-efficiency tradeoff, either too slow for online deployment required in robotics or insufficiently robust to severe degradation, while typically being trained on synthetic noise. Addressing these problems, we propose TIDY, a lightweight wavelet-domain denoiser trained on real clean-noisy TIR data. By reformulating TIR denoising in the wavelet domain, TIDY explicitly disentangles noise from structural content, enabling targeted suppression with reduced spatial complexity, significantly improving inference speed over prior methods ( ∼34Hz). TIDY introduces two new metrics, Wavelet Entropy and Wavelet Directional Stripe Index, as complementary loss terms to explicitly suppress stochastic noise and stripe artifacts. Across severe indoor corruption and zero-shot settings, TIDY improves robustness and yields consistent gains in downstream robotics tasks including thermal inertial odometry and monocular depth estimation. Code and dataset is available at: https://github.com/williamrheeth/TIDY 
+
+I. I NTRODUCTION 
+
+Thermal infrared (TIR) imaging has emerged as a powerful sensing modality in robotics, capturing thermal patterns beyond the visible spectrum [1]. Unlike RGB cameras, TIR operates robustly in low-light and visually degraded environ-ments ( e.g., fog), enabling field robotics applications such as search-and-rescue [2], surveillance [3, 4], and hazardous inspection [5]. Despite these advantages, most successful robotic deployments of TIR remain concentrated in outdoor environments, yet indoor robot deployment is widespread with possible lack of lighting and various visual degradation. The narrow temperature variation of indoor scenes amplifies noise in uncooled microbolometer sensors inducing stochas-tic fluctuations and structured fixed pattern noise (FPN), which critically degrades downstream perception and state estimation in robotic systems [6, 7]. This stochasticity and structured nature of TIR noise present a challenge that classical filtering methods struggle to address. As a result, prior approaches [6–8] have resorted to task-specific end-to-end deep models that implicitly absorb                   
+
+> †This work was supported by the Institute of Information & commu-nications Technology Planning & Evaluation (IITP) grant funded by the Korea government(MSIT) No.2022-0-00480, Development of Training and Inference Methods for Goal-Oriented Artificial Intelligence Agents
+> 1T. H. Rhee, D.-G. Lee, and A. Kim are with the Dept. of Mechanical Engineering, SNU, Seoul, S. Korea
+
+[williamrhee, donkeymouse, ayoungk]@snu.ac.kr WE = 0.081   
+
+> WDSI = 0.319
+> WE = 0.509
+> WDSI = 0.461
+> Denoised TIR Image
+> Noisy TIR Image
+> Zoomed View
+> Zoomed View
+
+Fig. 1: TIDY performs TIR image denoising in the wavelet domain, reducing model complexity and effectively addressing severe noise. The proposed Wavelet Entropy (WE) and Wavelet Directional Stripe Index (WDSI) quantify random noise and FPN, respectively, with lower values indicating less noise. The visualizations demonstrate clear suppression of stochastic speckle noise and directional stripe artifacts after denoising. 
+
+thermal noise, but at the cost of feature suppression, in-creased sample complexity, and limited online feasibility. A more intuitive alternative is to explicitly denoise the TIR im-age prior to downstream processing, decoupling perception robustness from task-specific learning. This further enables direct leverage of large-scale RGB foundational models unavailable in the TIR domain. However, existing TIR denoising approaches face two critical limitations. First, the lack of real clean-noisy TIR datasets forces most methods to rely on synthetic noise generation or self-supervision, resulting in a substantial do-main gap between simulated and real sensor noise. Sec-ond, state-of-the-art denoising models fail to achieve an appropriate accuracy-latency tradeoff required for robotics, as recent high-performance models [9, 10] are infeasible for online execution, while lightweight models lack robustness in severely degraded indoor scenarios and exhibit weak zero-shot generalization across unseen scenes. Such limitations are particularly problematic in robotics, where labeled data is scarce and systems must operate reliably in unseen environ-ments under online constraints. These observations motivated us to rethink TIR denoising from a robotics perspective: prioritizing real-noise robustness, computational efficiency, and generalization capability. Robust denoising of real, severe thermal noise fundamen-tally requires explicit separation between structural content 
+
+> arXiv:2606.19813v1 [cs.RO] 18 Jun 2026
+
+and noise components. To this end, we leverage the wavelet domain, which enables spatially localized multi-scale fre-quency decomposition, naturally facilitating separation of high-frequency random disturbances and stripe artifacts from scene structure. Specifically, the directional detail subbands of the discrete wavelet transform (DWT) inherently align with the row-/column-wise structure of FPN, enabling ex-plicit modeling of its directional coherence. Building on this representation, we derive statistically grounded wavelet-domain metrics that explicitly model TIR stochastic noise and FPN, termed Wavelet Entropy (WE) and Wavelet Direc-tional Stripe Index (WDSI). These formulations enable direct quantification of thermal-specific noise characteristics, and can also additionally serve as a noise-aware supervisory loss, allowing explicit and robust suppression of thermal-specific noise with enhanced generalization capability. In this paper, we introduce TIDY : a lightweight yet robust Thermal Infrared Denoising model leveraging Entropy and Directional Stripe Index in the wavelet domain. To enable training on real TIR noise, we construct SCaN-TIR, the first real stereo clean-noisy paired TIR dataset. Through empirical analysis of real TIR noise, we verify that WE and WDSI reliably correlate with stochastic and directional FPN, re-spectively, as illustrated in Fig. 1 and Fig. 3, confirming their effectiveness as thermal-specific noise indicators. Guided by these loss terms within an efficient wavelet-domain architec-ture that reduces spatial complexity while preserving global context via lightweight conditioning, TIDY achieves online execution and strong zero-shot generalization, particularly in severely degraded indoor scenes, translating into consistent improvements in downstream tasks such as thermal inertial odometry (TIO) and monocular depth estimation (MDE). The main contributions are summarized as follows:  
+
+> •
+
+Lightweight Robust TIR Denoising Model for Robotics : We propose TIDY, a lightweight denois-ing network trained on real clean-noisy thermal pairs, achieving strong zero-shot generalization and online inference, with particularly robust performance in severely degraded indoor scenes.  
+
+> •
+
+Thermal-specific Metrics and Losses : We introduce WE and WDSI as complementary metrics and losses that explicitly capture and suppress stochastic noise and directional FPN in TIR imagery.  
+
+> •
+
+SCaN-TIR Dataset and Release : To the best of our knowledge, SCaN-TIR Dataset is the first real stereo clean-noisy paired and aligned TIR dataset to allow direct supervised learning of real sensor noise not synthetic approximations, with over 32.5k hardware-synced image pairs. We will publicly release both the source code and the dataset. II. RELATED WORK 
+
+A. Model-based Thermal Image Denoising 
+
+Before the adoption of deep learning, thermal image de-noising relied on spatial filtering and transform-based meth-ods. Spatial filters such as Gaussian, median, and bilateral [11] reduce noise locally but often blur thermal structures and degrade edges critical for robotic perception. Wavelet-based methods [12, 13] enable multi-scale noise suppres-sion across frequency bands, outperforming spatial filters. However, classical approaches remain limited when handling complex noise with severe random disturbances commonly observed in TIR sensors, motivating the development of more specialized and learning-based methods. 
+
+B. Data-driven Thermal Image Denoising 
+
+Advances in deep learning have led to significant progress in thermal image denoising. Early approaches [14] rely on basic convolutional neural network (CNN) models and synthetic noise patterns for supervised training, which fail to capture the complexity of real FPN, limiting generaliza-tion. Wavelet-based networks [15] aim to distinguish high-frequency noise via multi-scale decomposition, but often suffer from information loss during transform operations and require careful tuning of hand-crafted components. More recent frameworks attempt to overcome data scarcity using unsupervised or physics-inspired designs. DeepIR [16] integrates domain knowledge but remains constrained by model capacity and severity of random noise of TIR im-ages. DestripeCycleGAN [17] leverages simulated stripes for domain adaptation, yet introduces inconsistencies due to distribution mismatch. Methods such as TV-DIP [18], DEAL [19], and the recent PPFN [20] employ priors, adversarial learning, or prompt-based conditioning to handle complex degradations, but still rely on synthetic or augmented noise. All aforementioned models exhibit poor zero-shot general-ization performance. While heavier models including TIR-Diffusion [9] and TRNeRF [10] yield improved results, their computational complexity renders them unsuitable for online deployment in robotic applications. TIDY addresses these limitations with an efficient wavelet-domain design that separates noise from structure, enabling targeted removal of random and structured artifacts. Coupled with a lightweight architecture and training solely on real sensor noise, it achieves strong zero-shot generalization without synthetic data, delivering state-of-the-art online performance. III. M ETHODOLOGY 
+
+A. Model Architecture 
+
+TIDY’s model architecture is as illustrated in Fig. 2a. Given an 8-bit thermal infrared image input, TIDY first applies DWT to obtain multi-scale sub-band coefficients, where high-frequency noise and low-frequency information become spectrally separable. These coefficients are processed by a lightweight denoising backbone NAFNet [21] with FiLM modulation [22] to preserve global context and prevent information loss from DWT. The network predicts denoised wavelet coefficients ˆz, which are reconstructed into the image domain via inverse discrete wavelet transform (IDWT). As a plug-and-play network, TIDY only requires an image as input, and can be seamlessly attached in front of any TIR task. Architectural details are provided below. Input Image 𝐹𝑖𝐿𝑀  Features 
+
+(a) Model Architecture  (b) FiLM 
+
+Feature Map Fig. 2: (a) TIDY Model Architecture. ˜z, ˆz: wavelet coefficients of noisy, denoised image, respectively. (b) FiLM Feature Map : FiLM’s top-10% most strongly modulated spatial positions in the feature map in red. FiLM is trained to be strongly modulated in detailed regions prone to information loss from downsampling ( e.g., small ceiling lamp), alleviating information loss from DWT. 
+
+1) DWT and IDWT: The discrete wavelet transform (DWT) provides a multi-resolution representation of a signal by projecting it onto a set of scaled and translated basis functions. For a signal input x[n], the DWT can be expressed as convolution with a low-pass filter h[ · ] and a high-pass filter g[ · ] followed by dyadic downsampling, yielding the 1D approximation and detail coefficients a[n] and d[n],respectively [12]: 
+
+a[n] = X
+
+> k
+
+x[k] h[2 n − k] , d[n] = X
+
+> k
+
+x[k] g[2 n − k] (1) For an image input x, separable 2D DWT applies this op-eration along rows and columns, yielding an approximation subband cA and directional detail subbands cH, cV, cD , cor-responding to horizontal, vertical, and diagonal components. This decomposition preserves spatial locality while separat-ing structural content from high-frequency perturbations. As illustrated in Fig. 2a, TIDY utilizes DWT and IDWT as an encoder and decoder, allowing denoising within the wavelet domain. Operating in the wavelet domain not only enhances spectral separation between noise and content, but also reduces spatial resolution, yielding computational efficiency gains. DWT of level j leads to downsampling of the input image by a factor of 2j . For an input image of resolution [H, W ] and batch size of B, the DWT alters the input from [B, 1, H, W ] → [B, 4, H 
+
+> 2j
+
+, W 
+
+> 2j
+
+], leading to an approximate increase in computational efficiency of 4j as the time complexity of NAFNet for input size [B, C, H, W ]
+
+is O(B · C2 · H · W ), with the added channels ( 1 → 4) only affecting the first 1 ×1 point-wise convolution. TIDY utilizes the Haar wavelet [23] due to its orthogonality and compact support [9], and the DWT encoder utilizes the empirically optimal level of j = 1 .
+
+2) FiLM Conditioning: However, the efficiency gain from DWT comes at the cost of information and global con-text, a fundamental shortcoming of previous wavelet-based methods. To mitigate this informational loss, we integrate a lightweight FiLM [22] conditioner which injects global image-level information back into the wavelet feature space. Specifically, a global representation is extracted from the original noisy input and mapped to per-channel scale γ
+
+and shift parameter β, which modulate intermediate wavelet features. After the initial convolution compresses the four wavelet subbands to the network’s base width, FiLM adap-tively recalibrates each feature channel as 
+
+x ← γ ⊙ x + β (2) thereby restoring contextual awareness and selectively am-plifying structurally meaningful responses ( e.g., edges and fine details) that may be attenuated during wavelet decom-position. FiLM’s projector is trained end-to-end alongside NAFNet and seamlessly improves fine detail reconstruction without adding significant computational overhead. Fig. 2b shows the top-10% most strongly FiLM-modulated feature locations in red, which is concentrated on edges and small features like the light sources on the ceiling, preventing such features from being excluded via DWT. 
+
+B. Loss Targeting Thermal-specific Noise 
+
+As mentioned in §I, uncooled microbolometer TIR camera is typically corrupted by (i) Gaussian noise and (ii) FPN. We target these two noise types separately via Wavelet Entropy Clean Outdoor  Clean Indoor  SCaN -TIR (Clean)                       
+
+> WE 0.472 WE 0.651 WE 0.542
+> WDSI 0. 259 WDSI 0.282 WDSI 0.267
+> Noisy
+> Clean
+> Heavy Stochastic Heavy FPN SCaN -TIR (Noisy)
+> WE 0.811 WE 0.761 WE 0.763
+> WDSI 0. 311 WDSI 0. 370 WDSI 0.357
+
+Fig. 3: Comparison of WE and WDSI of various datasets [24–26]. Clean images yield lower WE and WDSI, whereas heavy stochastic noise markedly elevates WE and directional FPN increases WDSI, validating that WE primarily captures random noise intensity and WDSI responds to directional stripe artifacts. Noisy Clean   
+
+> Input Image 𝑊𝐸 Global Entropy High
+> Low Fig. 4: Comparison between global Shannon entropy and WE. WE exhibits superior sensitivity to thermal noise, yielding strong responses in noisy regions and minimal activation in clean scenes.
+
+(WE) and Wavelet Directional Stripe Index (WDSI), respec-tively. Both values also function as quantitative metrics of noise, as shown in Fig. 3, where clean images exhibit lower WE and WDSI, while heavy stochastic noise and directional FPN significantly increases WE and WDSI, respectively. 
+
+1) Wavelet Entropy (WE): WE loss is designed to sup-press stochastic Gaussian noise. Let the observed TIR image 
+
+I be corrupted with additive zero-mean Gaussian noise G ∼N (0 , σ 2). The differential entropy of the noise is: 
+
+H(G) = 12 log(2 πeσ 2) (3) where monotonicity in variance σ2 is immediate: 
+
+dd(σ2) H(G) = 12σ2 > 0 (4) implying that entropy increases strictly with variance. However, directly applying an entropy penalty in the pixel domain conflates noise randomness with natural image intensity variations, as visually observed in Fig. 4. Pixel-domain global entropy responds strongly to structural content and edges, even in clean images. To ensure that entropy targets noise not image content, we evaluate entropy in the wavelet detail domain. Applying a multi-level 2D DWT to 
+
+I, the resulting detail subbands K ∈ H, V, D have image content largely attenuated, making entropy a direct proxy for the variance of stochastic Gaussian noise. As shown in Fig. 4, wavelet entropy suppresses structured regions while amplifying stochastic noise patterns. Specifically, for each detail subband k ∈ K, entropy is computed by constructing a normalized histogram pkj =     
+
+> P|ckj|
+> P
+> k′∈K
+> P|ck′
+> j|
+
+, where ckj is the wavelet coefficients for sub-band k at decomposition level j. The WE loss is obtained by the normalized mean entropy across all three directional subbands and across J wavelet decomposition levels, which is scaled via power transform of γ:
+
+WE = 
+
+ 1
+
+J log(3) 
+
+> J
+
+X
+
+> j=1
+
+"
+
+− X
+
+> k∈K
+
+pkj log( pkj )
+
+#
+
+> γ
+
+(5) This quantity, normalized to the range (0 , 1) , measures the randomness of the wavelet coefficient distribution, with higher values indicating more noise-like behavior. Clean      
+
+> Noisy
+> (b) SCaN -TIR Sample (a) SCaN -TIR Setup
+> Fig. 5: SCaN-TIR. (a) Setup for SCaN-TIR Dataset, with the red box showing the two adjacently placed A65 TIR on an UGV. (b)
+> Comparison of clean and noisy sample from SCaN-TIR Dataset.
+
+2) Wavelet Directional Stripe Index: TIR images are also affected by structured FPN, most notably stripe artifacts aris-ing from row-/column-wise gain and offset non-uniformities in the sensor and readout chain. Unlike stochastic noise, stripe noise is spatially correlated and exhibits strong di-rectional coherence, which is not adequately captured by entropy. To quantify this directional coherence, we exploit the orientation selectivity of wavelet detail subbands, where row-aligned stripes primarily affect the horizontal subband 
+
+cH j and column-aligned stripes the vertical subband cV j .Based on this observation, the horizontal and vertical WDSI are defined as: 
+
+WDSI h(j) = σ(μrow (cH )) 
+
+σ(cH ) , WDSI v (j) = σ(μcol (cV )) 
+
+σ(cV ) (6) where μrow ( · ) and μcol ( · ) denote averaging across rows and columns, respectively, and σ( · ) denotes the standard deviation. This metric captures the relative prominence of directional patterns by measuring the variability of mean val-ues in each orientation, normalized by the overall coefficient variability. The net WDSI loss is averaged across multiple wavelet decomposition levels J as: 
+
+WDSI = 1
+
+J
+
+> J
+
+X
+
+> j=1
+
+12 (WDSI h(j) + WDSI v (j)) (7) WDSI loss targets directional non-uniformity by penal-izing imbalanced statistical variations along vertical and horizontal wavelet components, thereby reducing structured stripe artifacts commonly found in the TIR domain. Combined with the pixel-level PSNR loss LPSNR [21], the net loss is formulated as a weighted sum as below: 
+
+Lnet = LPSNR + λWE WE + λWDSI WDSI (8) Empirically optimal values of J = 3, λWE = 0.2 and 
+
+λWDSI = 0 .4 were utilized. IV. EXPERIMENT 
+
+A. The SCaN-TIR Dataset 
+
+SCaN-TIR dataset, the first ever Stereo Clean-and-Noisy Paired Thermal Infrared Dataset, is composed of 32.5k real paired and aligned TIR images of dimension 640 ×512 , with both indoor and outdoor sequences. As shown in Fig. 5a, two FLIR A65 IR cameras were placed adjacently, with non-uniformity correction (NUC) turned off for one camera. The two camera streams were geometrically aligned by stereo rectification based on the calibrated extrinsics obtained via DiscoCal [27]. Prior to data acquisition, noise was accumulated for over 4 hours with NUC off for the noisy camera, leading to real clean-noisy image pairs as shown in Fig. 5b. SCaN-TIR contains 9 continuous stereo sequences across diverse indoor and outdoor scenes, with each sequence recorded in a distinct real-world setting. 
+
+B. Experiment Setup 
+
+Datasets. For training and testing, two datasets were utilized separately: the IRE dataset [28], composed of artificial ad-ditive noise, and our SCaN-TIR dataset, composed of real noise, was used for comparing TIDY with existing methods. The official train-test split was adopted for IRE, while for SCaN-TIR the 303 floor7 sequence was designated as the test set and all remaining sequences were used for training. Models were further experimented on zero-shot cases of existing TIR datasets including OdomBeyondVision [26], Multi-Spectral dataset [24], and MS 2 dataset [29]. 
+
+Implementation Detail. TIDY was trained for 80k iterations with a batch size of 8, using the AdamW optimizer with an initial learning rate of 0.001 and a cosine annealing schedule applied over the first 40k iterations. All training was done on a single RTX 4090 GPU for approximately 4 hours, with a 
+
+TABLE I: Numerical Comparisons of Various Models on IRE [28] and our SCaN-TIR Dataset, and their operational FPS. Best results are highlighted in bold and second best are underlined.                                                           
+
+> Method IRE Dataset SCaN-TIR Dataset FPS ↑
+> PSNR ↑SSIM ↑PSNR ↑SSIM ↑
+> Median Filter 28.13 0.6884 11.38 0.2264 3264 Bilateral Filter 28.73 0.6614 11.43 0.2464 193.5 U2D2Net 23.63 0.7358 N.A. †N.A. †
+> Liu et al. 24.53 0.5335 N.A. †N.A. †
+> DeepIR N.A. *10.75 0.2104 0.05 TIR-Diffusion 27.97 0.8594 11.45 0.2615 0.9 DestripeCycleGAN 29.13 0.9007 11.30 0.2266 60.9
+> DEAL 18.25 0.2093 9.893 0.0347 20.1 PPFN 33.87 0.9242 12.39 0.2829 10.6
+> TIDY 36.49 0.9547 14.11 0.3578 34.3
+> *DeepIR requires sequential data, but the IRE dataset is non-sequential.
+> †No open-source code provided.
+
+mean inference rate of 34Hz for 640 ×512 input resolution. All experiments were conducted with the latest 8-bit tone mapping method Fieldscale [30]. 
+
+C. Benchmark Evaluation 
+
+For quantitative benchmark evaluation, TIDY was com-pared against thermal denoising baselines: PPFN [20], DEAL [19], TIR-Diffusion [9], DestripeCycleGAN [17], DeepIR [16], U 2D2Net [31], two-stage model by Liu et al. [28], and two classical filter-based methods, median filter and bilateral filter. All learning baselines were trained identically Noisy  TIR -Diffusion  DestripeCycleGAN  DEAL  PPFN  TIDY 
+
+(a) 
+
+(b) 
+
+(c) 
+
+Fig. 6: Zero-shot Performance. Denoising results on two indoor datasets and two outdoor datasets. Colored boxes denote zoomed views. TIDY produces cleaner textures and sharper structural details compared to prior methods, particularly in flat regions and fine edges. on the train split of the chosen test datasets, following the original training protocols and hyperparameters. Sequential input of five images were utilized for DeepIR. All reported FPS values were measured on Intel i9-10900X CPU and RTX 4090 GPU with SCaN-TIR data. As shown in Table. I, TIDY consistently outperforms all competing methods by a large margin, while maintaining online computational efficiency. TIDY’s FPS is over 2-3× higher than existing state-of-the-art models, and overall ranking second only to DestripeCycleGAN, a lightweight but legacy GAN-based model with limited representational capacity. These results not only set a new benchmark for thermal denoising performance but also highlight TIDY’s unique ability to handle both outdoor-indoor, synthetic-real, and mild-severe noise conditions with unmatched accuracy, robustness and efficiency. 
+
+D. Zero-shot Performance 
+
+To assess the generalization ability of each model, we conducted zero-shot evaluation. TIDY trained on the SCaN-TIR dataset was employed, and pretrained weights were used for PPFN, DEAL, DestripeCycleGAN, and TIR-Diffusion. As shown in Fig. 6, TIDY shows the cleanest output for both severely noisy indoor and outdoor sequences, showing clear details with minimal stripe and random noise. Flat regions, such as walls in Fig. 6a and Fig. 6c, object surfaces in Fig. 6b are effectively denoised, yielding uniform and consistent surface appearance. DestripeCycleGAN fails to recognize and retain severe noise, leading to minuscule change from the noisy image. PPFN, as the runner-up, shows decent performance in informative regions, but still fails to retain severe noise in flat regions as in Fig. 6a. DEAL introduces noisy artifacts, causing new complications and leading to downstream problems. Due to the overwhelming generalization power of diffusion, TIR-Diffusion leads to warping of original shapes as in Fig. 6a. These findings un-derscore TIDY’s strong zero-shot generalization, effectively handling diverse datasets and severe noise conditions without requiring dataset-specific retraining. 
+
+TABLE II: ATE [m] of VINS-Mono with OdomBeyondVision Dataset of Baselines and TIDY, as well as Comparison with DeepTIO [6]. Best results are highlighted in bold and second best are underlined.                                     
+
+> Sequence Noisy Destripe -CycleGAN DEAL PPFN DeepTIO TIDY
+> H atrium circle bright 2 73.94 12.16 397.31 5.00 N.A. †4.23
+> H atrium circle bright 1 568.38 57.91 250.05 3.35 7.24 2.78
+> H vicon circle dark 4 Fail* Fail* 61.85 2.88 1.24 1.35 H hallway circle bright 2 Fail* Fail* Fail* 9.19 13.39 5.99
+> G corridor linear bright 13 Fail* 3.78 6.28 1.81 1.32 1.20
+> *VINS failed to initialize.
+> †Results of sequence not provided in paper.
+
+E. Thermal Inertial Odometry 
+
+We conduct TIO evaluations by integrating noisy, baseline-denoised (DestripeCycleGAN, DEAL and PPFN), and TIDY-denoised thermal images into the standard VINS-Mono [32] framework, averaged over 3 trials to reduce stochasticity concerns. Additionally, we compare these results against DeepTIO [6], a deep learning-based TIO method leveraging deep neural networks trained explicitly for thermal-inertial feature extraction and pose regression. TIR-Diffusion and DeepIR were not implemented due to their lack of online capability, as TIR-Diffusion offers below 1 Hz inference, and DeepIR requires an iterative procedure for a single image. TIDY-denoised VINS-Mono achieves the best performance as shown in Table. II, resulting in the lowest Absolute Trajectory Error (ATE) in comparison to baseline denoising models and even DeepTIO for most sequences. As depicted in Fig. 7, noisy and the baseline-denoised images primarily guide feature extraction toward fixed-pattern noise, whose spatial position remains largely invariant despite system motion, thereby leading to severe pose estima-tion errors and degraded odometry performance. In numerous instances with noisy and the two baseline images, VINS-Mono initialization fails due to misalignment between visual structures and IMU measurements, resulting in complete system failure. In contrast, the TIDY-denoised images enable reliable extraction of motion-consistent features, improving visual-IMU alignment and ensuring stable initialization and accurate odometry estimation. Please refer to the supplemen-Noisy  DestripeCycleGAN  DEAL  PPF N
+
+> H_atrium_circle_bright_1 H_hallway_circle_bright_ 2
+> TIDY
+
+Fig. 7: TIO Performance. Comparison of extracted features from VINS-Mono with OdomBeyondVision data. Green: Persistently tracked features, Red: New features, Purple: Outliers. Features are extracted from the FPN in the noisy images, as well as in baseline-denoised images, leading to significant errors as the FPN is constant as the system moves. Such errors are substantially reduced via TIDY. Original Thermal Image    
+
+> Noisy + DepthAnything MonoTher -Depth TIDY + DepthAnything
+> TIDY Denoised RGB Image
+
+Fig. 8: MDE Performance. Depth Anything 3 results of original noisy image from OdomBeyondVision, zero-shot denoised image using TIDY as well as comparison with thermal-specific depth estimator, MonoTher-Depth. TABLE III: MDE results on ViViD++ [35] indoors sequences. Lower AbsRel is better ( ↓), higher δ1 is better ( ↑). Best results are highlighted in bold .                                
+
+> Sequence Noisy MonoTher-Depth TIDY -Denoised AbsRel ↓δ1↑AbsRel ↓δ1↑AbsRel ↓δ1↑
+> indoor-dark-aggresive 0.264 0.609 0.603 0.014 0.257 0.610
+> indoor-global-aggresive 0.241 0.691 0.599 0.016 0.217 0.711
+> indoor-local-aggresive 0.218 0.695 0.603 0.013 0.196 0.725
+
+tary video for the full TIO demonstration. 
+
+F. Monocular Depth Estimation 
+
+To further validate TIDY’s robotics application, we uti-lized the pretrained Depth Anything 3 [33] model to perform MDE directly from the raw noisy and TIDY-denoised images, as well as a thermal-specific monocular depth estimator, MonoTher-Depth [34]. As shown in Fig. 8, noisy inputs from OdomBeyondVision dataset severely degrade predicted depth maps, obscuring scene geometry and object boundaries, while MonoTher-Depth shows suboptimal results for indoor sequences with severe noise. In contrast, TIDY-denoised images yield significantly clearer and more accurate depth predictions by portraying the open path on the left and the rectangular object on the right, underscoring our model’s effectiveness in downstream thermal vision tasks. Quantita-tively, when evaluated on the ViViD++ dataset in zero-shot setting, TIDY consistently reduces absolute relative error (AbsRel) while improving δ1 accuracy as shown in Table. III, confirming systematic gains across sequences. TIDY with Depth Anything also demonstrates superior performance in MDE for input video sequences. Please refer to the supple-mentary video for demonstration. 
+
+TABLE IV: Ablation Study of Methods on IRE and SCaN-TIR Dataset. Best results are highlighted in bold and second best are underlined.                                                             
+
+> Method IRE Dataset SCaN-TIR Dataset GFLOPS ↓
+> DWT FiLM LWE LWDSI PSNR ↑SSIM ↑PSNR ↑SSIM ↑
+> 35.67 0.9496 13.39 0.351 509.06
+> ✓35.68 0.9386 13.35 0.342 128.64
+> ✓✓36.25 0.9503 13.56 0.357 129.66
+> ✓✓✓36.51 0.9546 13.58 0.355 129.66
+> ✓✓✓36.26 0.9501 13.83 0.357 129.66
+> ✓✓✓✓36.44 0.9519 14.11 0.358 129.66 Trained with  IRE Dataset
+> Noisy Only Pixel -wise Loss DWT Enc. + FiLM + ℒ𝑊𝐸
+> Trained with  SCaN -TIR
+> Only Pixel -wise Loss DWT Enc. + FiLM DWT Enc. + FiLM + All Loss
+
+Fig. 9: Qualitative Ablation Study on zero-shot results of Multi-Spectral dataset image. First Row: Models trained on IRE with only pixel-wise loss show minimal denoising due to the synthetic-real domain gap. Second Row: Adding DWT Enc. and FiLM improves suppression and structure preservation, with the proposed losses further enhancing clarity and reducing stripe artifacts. 
+
+G. Ablation Study 
+
+We perform comprehensive ablation studies to validate key components of our proposed framework, evaluating the impact of DWT encoder/decoder (DWT Enc.) framework, FiLM, and the two novel proposed loss functions. Table. IV shows the effectiveness of these components on the external dataset, indicating that the implementation of DWT, FiLM and LWE shows the best results on IRE dataset composed of only artificial stochastic noise, and adding the real FPN specific loss LWDSI for SCaN-TIR dataset shows significant improvement, all while notably reducing the computational cost by approximately a quarter of the original GFLOPS, similar to the theoretical decrease mentioned in §III-A.1. Furthermore, Fig. 9 shows qualitative ablation studies via zero-shot denoising results on Multi-Spectral dataset image. The first row presents results from the model trained on the IRE dataset, exhibiting minimal denoising efficacy due to the domain gap between synthetic and real-world noise characteristics. The second row shows results from TIDY trained on the SCaN-TIR dataset, demonstrating substantial denoising performance. The incorporation of DWT Enc. and FiLM yields stronger noise suppression, albeit with slightly softened image details. When all proposed loss functions are applied, the resulting output exhibits clearer denoising, suggesting the effectiveness of both the DWT encoder and FiLM in denoising performance accompanied by significant decrease in model complexity, and the capability of the novel losses to enhance structural preservation by distinguishing meaningful features from noise. V. F UTURE WORKS AND CONCLUSION 
+
+TIDY offers a lightweight solution for noisy TIR imaging in downstream robotic tasks, originally solved via heavy and complex methods. While TIDY shows robust denois-ing performance and online execution, several limitations remain. As with any data-driven model, performance could be further enhanced by access to larger volumes of real paired training data. Although TIDY already achieves robust per-frame denoising, incorporating sequential inputs and temporal consistency offer a promising direction to further improve stability and accuracy in video-based applications. REFERENCES 
+
+[1] D.-G. Lee, J. Kim, Y. Cho, and A. Kim, “Thermal chameleon: Task-adaptive tone-mapping for radiometric thermal-infrared images,” IEEE Robot. and Automat. Lett. , 2024. [2] C. Cruz Ulloa, G. Prieto S´ anchez, A. Barrientos, and J. Del Cerro, “Autonomous thermal vision robotic system for victims recognition in search and rescue missions,” Sensors ,vol. 21, no. 21, p. 7346, 2021. [3] W. K. Wong, P. N. Tan, C. K. Loo, and W. S. Lim, “An effective surveillance system using thermal camera,” in IEEE Intl. Conf. Signal Acquis. Process. , 2009, pp. 13–17. [4] D.-G. Lee, K.-S. Song, Y.-H. Nho, A. Kim, and D.-S. Kwon, “Sequential thermal image-based adult and baby detection robust to thermal residual heat marks,” in Proc. IEEE/RSJ Intl. Conf. on Intell. Robots and Sys. , 2022, pp. 13 120–13 127. [5] U. Shin, K. Lee, S. Lee, and I. S. Kweon, “Self-supervised depth and ego-motion estimation for monocular thermal video using multi-spectral consistency loss,” IEEE Robot. and Au-tomat. Lett. , vol. 7, no. 2, pp. 1103–1110, 2021. [6] M. R. U. Saputra et al. , “Deeptio: A deep thermal-inertial odometry with visual hallucination,” IEEE Robot. and Au-tomat. Lett. , vol. 5, no. 2, pp. 1672–1679, 2020. [7] U. Shin, K. Lee, B.-U. Lee, and I. S. Kweon, “Maximiz-ing self-supervision from thermal image for effective self-supervised learning of depth and ego-motion,” IEEE Robot. and Automat. Lett. , vol. 7, no. 3, pp. 7771–7778, 2022. [8] S. Zhao, P. Wang, H. Zhang, Z. Fang, and S. Scherer, “Tp-tio: A robust thermal-inertial odometry with deep thermalpoint,” in Proc. IEEE/RSJ Intl. Conf. on Intell. Robots and Sys. , 2020, pp. 4505–4512. [9] T. H. Rhee, D.-G. Lee, and A. Kim, “Tir-diffusion: Diffusion-based thermal infrared image denoising via latent and wavelet domain optimization,” in Proc. IEEE Intl. Conf. Robot. Autom. Workshops , 2025. [10] S. Carmichael, M. Bhat, M. Ramanagopal, A. Buchan, R. Va-sudevan, and K. A. Skinner, “Trnerf: Restoring blurry, rolling shutter, and noisy thermal images with neural radiance fields,” in Proc. IEEE Winter Conf. Appl. Comput. Vis. , 2025, pp. 7980–7990. [11] M. Zhang and B. K. Gunturk, “Multiresolution bilateral fil-tering for image denoising,” IEEE Trans. Image Processing ,vol. 17, no. 12, pp. 2324–2333, 2008. [12] R. S. Pathak, The wavelet transform . Springer Science & Business Media, 2009, vol. 4. [13] A. N. Skodras, “Discrete wavelet transform: an introduction,” 
+
+Tech. Rep., Hellenic Open Univ. , vol. 2, no. 1, pp. 1–26, 2003. [14] Z. He, Y. Cao, Y. Dong, J. Yang, Y. Cao, and C.-L. Tisse, “Single-image-based nonuniformity correction of uncooled long-wave infrared detectors: A deep-learning approach,” 
+
+Appl. Opt. , vol. 57, no. 18, pp. D155–D164, 2018. [15] J. Guan, R. Lai, and A. Xiong, “Wavelet deep neural network for stripe noise removal,” IEEE Access , vol. 7, pp. 44 544– 44 554, 2019. [16] V. Saragadam, A. Dave, A. Veeraraghavan, and R. G. Bara-niuk, “Thermal image processing via physics-inspired deep networks,” in Proc. IEEE Conf. on Comput. Vision and Pattern Recog. , 2021, pp. 4057–4065. [17] S. Yang, H. Qin, S. Yuan, X. Yan, and H. Rahmani, “De-stripecyclegan: Stripe simulation cyclegan for unsupervised infrared image destriping,” IEEE Trans. Instrum. and Meas. ,2024. [18] K. Liu, H. Chen, W. Bao, and J. Wang, “Thermal imaging spatial noise removal via deep image prior and step-variable total variation regularization,” Infrared Phys. Tech. , vol. 134, p. 104888, 2023. [19] Z. Liu, Z. Wang, J. Liu, F. Meng, L. Ma, and R. Liu, “Deal: Data-efficient adversarial learning for high-quality infrared imaging,” in Proc. IEEE Conf. on Comput. Vision and Pattern Recog. , 2025, pp. 28 198–28 207. [20] J. Liu, Z. Chen, Z. Liu, Z. Jiang, L. Ma, X. Fan, and R. Liu, “Enhancing infrared vision: Progressive prompt fusion network and benchmark,” in Adv. Neural Inf. Process. Syst. ,2025. [21] L. Chen, X. Chu, X. Zhang, and J. Sun, “Simple baselines for image restoration,” in Proc. European Conf. on Comput. Vision . Springer, 2022, pp. 17–33. [22] E. Perez, F. Strub, H. De Vries, V. Dumoulin, and A. Courville, “Film: Visual reasoning with a general condi-tioning layer,” in Proc. AAAI National Conf. on Art. Intell. ,vol. 32, no. 1, 2018. [23] A. Haar, “Zur theorie der orthogonalen funktionensysteme,” 
+
+Mathematische Annalen , vol. 71, no. 1, pp. 38–53, 1911. [24] W. Dai, Y. Zhang, S. Chen, D. Sun, and D. Kong, “A multi-spectral dataset for evaluating motion estimation systems,” in 
+
+Proc. IEEE Intl. Conf. on Robot. and Automat. , 2021, pp. 5560–5566. [25] S. Carmichael, A. Buchan, M. Ramanagopal, R. Ravi, R. Va-sudevan, and K. A. Skinner, “Dataset and benchmark: Novel sensors for autonomous vehicle perception,” Intl. J. of Robot. Research , vol. 44, no. 3, pp. 355–365, 2025. [26] P. Li, K. Cai, M. R. U. Saputra, Z. Dai, and C. X. Lu, “Odombeyondvision: An indoor multi-modal multi-platform odometry dataset beyond the visible spectrum,” in Proc. IEEE/RSJ Intl. Conf. on Intell. Robots and Sys. , 2022, pp. 3845–3850. [27] C. Song, J. Shin, M.-H. Jeon, J. Lim, and A. Kim, “Unbiased estimator for distorted conics in camera calibration,” in Proc. IEEE Conf. on Comput. Vision and Pattern Recog. , 2024, pp. 373–381. [28] G. Liu, J. Xu, Y. Cheng, Y. Su, and B. Yang, “A two-stage approach for single thermal image restoration,” Electron. Lett. ,vol. 61, no. 1, p. e70111, 2025. [29] U. Shin, J. Park, and I. S. Kweon, “Deep depth estimation from thermal image,” in Proc. IEEE Conf. on Comput. Vision and Pattern Recog. , 2023, pp. 1043–1053. [30] H. Gil, M.-H. Jeon, and A. Kim, “Fieldscale: Locality-aware field-based adaptive rescaling for thermal infrared image,” 
+
+IEEE Robot. and Automat. Lett. , 2024. [31] B. Ding, R. Zhang, L. Xu, G. Liu, S. Yang, Y. Liu, and Q. Zhang, “U2d2net: Unsupervised unified image dehazing and denoising network for single hazy image enhancement,” 
+
+IEEE Trans. Multimedia , vol. 26, pp. 202–217, 2023. [32] T. Qin, P. Li, and S. Shen, “Vins-mono: A robust and versatile monocular visual-inertial state estimator,” IEEE Trans. Robot. ,vol. 34, no. 4, pp. 1004–1020, 2018. [33] H. Lin, S. Chen, J. Liew, D. Y. Chen, Z. Li, G. Shi, J. Feng, and B. Kang, “Depth anything 3: Recovering the visual space from any views,” arXiv preprint arXiv:2511.10647 , 2025. [34] X. Zuo, N. Ranganathan, C. Lee, G. Gkioxari, and S.-J. Chung, “Monother-depth: Enhancing thermal depth estimation via confidence-aware distillation,” IEEE Robot. and Automat. Lett. , 2025. [35] A. J. Lee, Y. Cho, Y.-s. Shin, A. Kim, and H. Myung, “Vivid++: Vision for visibility dataset,” IEEE Robot. and Automat. Lett. , vol. 7, no. 3, pp. 6282–6289, 2022.

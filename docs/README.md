@@ -6,32 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-19
-- 运行时间：2026-06-19 20:41:30 UTC
+- 最新运行日期：2026-06-20
+- 运行时间：2026-06-20 20:21:06 UTC
 - 运行状态：成功
 - 本次总论文数：3
-- 精读区：0
-- 速读区：3
+- 精读区：1
+- 速读区：2
 
 ### 今日简报（AI）
-1) 今日三篇论文聚焦图像去噪与逆问题优化，涵盖小波统一框架、扩散噪声谱控制及流图失真-感知权衡。  
-2) 最值得关注的是《SCOPE Shrinkage》提出的通用小波去噪架构（7.0分），以及《Flow Map Denoisers》对逆问题失真-感知平面的探索（6.0分）。  
-3) 建议优先精读小波去噪框架，再结合流图方法理解逆问题中的质量权衡。
-- 详情：[/202606/19/README](/202606/19/README)
+今日精读1篇高分论文《Overfitted high-dimensional matrix factorizations via adaptive spectral shrinkage》（8.0），速读2篇小波去噪论文（MLShrink和TIDY）。最值得关注的是自适应谱收缩缓解高维矩阵过拟合，以及小波域熵与方向条纹指数用于热红外图像去噪。建议优先精读8分论文掌握方法，再结合速读中的小波技术拓展图像处理应用。
+- 详情：[/202606/20/README](/202606/20/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Overfitted high-dimensional matrix factorizations via adaptive spectral shrinkage](/202606/20/2606.19540v1-overfitted-high-dimensional-matrix-factorizations-via-adaptive-spectral-shrinkage)  
+   标签：评分：8.0/10、query:hsi-denoise
+   evidence：高维矩阵分解结合自适应谱收缩用于低秩信号提取，可应用于去噪
 
 ### 速读区论文标签
-1. [SCOPE Shrinkage: A Unified Framework for Wavelet Denoising](/202606/19/2606.19572v1-scope-shrinkage-a-unified-framework-for-wavelet-denoising)  
+1. [Machine Learning Integrated in Wavelet Shrinkage (MLShrink)](/202606/20/2606.19580v1-machine-learning-integrated-in-wavelet-shrinkage-mlshrink)  
    标签：评分：7.0/10、query:hsi-denoise
-   evidence：小波去噪框架可应用于高光谱图像去噪
-2. [Show the Signal, Hide the Noise: Spectral Forcing for Pixel-Space Diffusion](/202606/19/2606.15236v1-show-the-signal-hide-the-noise-spectral-forcing-for-pixel-space-diffusion)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：光谱强制用于扩散去噪器，与深度神经网络去噪相关
-3. [Flow Map Denoisers: Traversing the Distortion-Perception Plane for Inverse Problems](/202606/19/2606.19802v1-flow-map-denoisers-traversing-the-distortion-perception-plane-for-inverse-problems)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：流映射去噪器处理逆问题中的去噪，提供失真-感知权衡控制
+   evidence：结合机器学习的小波阈值去噪方法，可应用于高光谱图像
+2. [TIDY: Thermal Infrared Image Denoising via Wavelet Domain Entropy and Directional Stripe Index](/202606/20/2606.19813v1-tidy-thermal-infrared-image-denoising-via-wavelet-domain-entropy-and-directional-stripe-index)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：热红外图像去噪，利用小波域熵和定向条纹指数去除条纹噪声
 
 
 <div class="dpr-home-promo-card">
