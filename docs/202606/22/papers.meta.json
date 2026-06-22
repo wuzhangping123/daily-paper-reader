@@ -1,0 +1,69 @@
+{
+  "label": "2026-06-22",
+  "date": "2026-06-22",
+  "generated_at": "2026-06-22T22:43:34",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202606/22/2606.16050v1-alcl-an-adaptive-log-correntropy-loss-for-robust-learning-under-non-gaussian-noise",
+      "section": "deep",
+      "title_en": "ALCL: An Adaptive Log-Correntropy Loss for Robust Learning under Non-Gaussian Noise",
+      "authors": "Mainak Kundu, Ria Kanjilal, Ismail Uysal",
+      "date": "2026-06-14",
+      "pdf": "https://arxiv.org/pdf/2606.16050v1",
+      "score": "8.0",
+      "evidence": "自适应鲁棒损失用于去噪",
+      "tldr": "传统损失函数如MSE在非高斯噪声下敏感易发散，现有相关熵损失需手动固定核参数。本文提出自适应对数相关熵损失(ALCL)，通过可微重参数化与网络权重联合学习损失几何形状和尺度参数，动态抑制极端异常值。在四个含混合重尾脉冲噪声的基准数据集上，ALCL在重构保真度和分类准确率上一致优于MSE和最优调参的广义相关熵损失；高噪声下灰度图准确率提升4.75%，RGB提升4.51%。该工作提供了一种计算高效的自适应鲁棒损失，适用于非高斯环境的深度学习。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Robust deep learning under heavy-tailed and impulsive noise remains challenging because conventional losses such as mean squared error (MSE) exhibit unbounded sensitivity to outliers. Although correntropy-based objectives improve robustness, existing formulations rely on fixed kernel parameters that must be empirically tuned and remain static during training. To address these limitations, we propose an Adaptive Log-Correntropy Loss (ALCL), a heavy-tailed loss formulation that adaptively learns its robustness geometry during optimization. ALCL introduces a logarithmic residual model whose shape and scale parameters are learned jointly with network weights through differentiable reparameterization. This yields a principled maximum likelihood formulation whose influence function is formally bounded and redescending, allowing the loss geometry to adapt dynamically to evolving residual statistics while suppressing extreme outliers. Comparative experiments on four widely used benchmark datasets spanning grayscale and red-green-blue (RGB) image data under mixed heavy-tailed and impulsive noise demonstrate that ALCL consistently outperforms MSE and optimally tuned generalized correntropy losses in both reconstruction fidelity and downstream classification accuracy. While performance differences remain small under low-noise conditions, under high-noise regimes ALCL improves median accuracy by up to 4.75% on grayscale benchmarks and 4.51% on RGB datasets, with reduced variance across runs. These results demonstrate that adaptive robustness through joint learning of loss parameters provides a computationally efficient alternative to static correntropy-based losses for deep learning in non-Gaussian environments.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/22/2606.18115v1-hls-gpt-a-generative-pretrained-transformer-gpt-for-continental-scale-nasa-harmonized-landsat-and-sentinel-2-hls-reflectance-reconstruction-across-all-bands-on-arbitrary-dates",
+      "section": "quick",
+      "title_en": "HLS-GPT: A Generative Pretrained Transformer (GPT) for Continental-Scale NASA Harmonized Landsat and Sentinel-2 (HLS) Reflectance Reconstruction Across All Bands on Arbitrary Dates",
+      "authors": "Junjie Li, Hankui K. Zhang, David P. Roy",
+      "date": "2026-06-16",
+      "pdf": "https://arxiv.org/pdf/2606.18115v1",
+      "score": "7.0",
+      "evidence": "大规模遥感反射率重建",
+      "tldr": "现有遥感时间序列重建方法受限于光谱覆盖、地理扩展性或短时间上下文。HLS-GPT采用分层Transformer架构，基于单像素12个月时间序列，利用美国本土25万以上像素的9年HLS数据训练，通过随机裁剪和掩码策略重建所有波段的反射率。在6.2万测试像素上，留一法评估所有波段RMSE低于0.026，可见波段相对RMSE低于35%，其他波段低于13%。该方法在独立图像重建中优于传统方法和Prithvi模型。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Recent deep learning methods for Landsat and Sentinel-2 reflectance time series reconstruction remain limited by restricted spectral coverage, limited geographic scalability, or patch-based designs with short temporal contexts. We present HLS-GPT, a large-scale generative pretrained Transformer model for reconstructing NASA Harmonized Landsat Sentinel-2 30 m surface reflectance for all bands, any date, and any pixel location. HLS-GPT uses a hierarchical Transformer architecture to handle the different spectral band configurations of Landsat and Sentinel-2 and operates on single-pixel 12-month time series. To capture geographic and seasonal variability, the model was trained with nine years of HLS time series from more than 0.25 million training pixels across the conterminous United States. A random cropping and masking strategy extracts 12-month periods with varying start dates across epochs, masks 50% of valid observations, and trains the model to reconstruct the masked reflectance values from the remaining observations. Evaluation using more than 62,000 independent test pixels shows robust reconstruction under diverse land surface conditions, including complex crop phenology and sparse, irregular observations. Leave-one-observation-out evaluation achieved reconstruction RMSE below 0.026 for all HLS spectral bands, with relative RMSE below 35% for visible bands and below 13% for other bands. Red-edge band errors were comparable to red and near-infrared errors despite the absence of red-edge bands on Landsat. Sensitivity analyses that randomly masked 10% to 90% of test observations showed only modest degradation when 10% to 50% of observations were masked, with all-band RMSE below 0.028. Image reconstruction over nine independent 109 by 109 km CONUS HLS tiles further demonstrates that HLS-GPT outperforms two conventional methods and the NASA-IBM Prithvi model.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/22/2606.16388v1-robust-neural-tucker-factorization-with-bias-correction-and-adaptive-initialization",
+      "section": "quick",
+      "title_en": "Robust Neural Tucker Factorization with Bias Correction and Adaptive Initialization",
+      "authors": "Yuchao Su, Yixin Ran",
+      "date": "2026-06-15",
+      "pdf": "https://arxiv.org/pdf/2606.16388v1",
+      "score": "6.0",
+      "evidence": "用于高维张量恢复的神经Tucker分解",
+      "tldr": "高维稀疏张量补全因非线性动态和非平稳变化而困难，神经Tucker分解可建模高阶交互，但受初始化和偏置影响。提出KaBiN模型，采用Kaiming均匀初始化嵌入和Tucker参数，并在输出映射中加入偏置校正，解耦全局均值偏移与局部结构表示。在三个真实数据集上，KaBiN优于原方案且计算开销极小，提供了稳定优化的补全框架。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "High-dimensional incomplete (HDI) tensors are widely used in traffic and climate applications, but sparse observations make accurate completion difficult. The intrinsic non-linear dynamics and non-stationary variations across distinct multi-modal fields severely hinder the efficacy of conventional linear reconstruction frameworks. Neural Tucker factorization provides an effective framework for modeling high-order interactions among tensor modes. By parameterizing underlying structural characteristics into continuous latent spaces, neural representations circumvent the rigid low-rank constraints of classical algebra. However, its performance can still be affected by implementation-level choices, especially parameter initialization and the bias configuration of the final output mapping. Suboptimal initializations frequently lead to variance explosion across the cubically expanded interaction spaces, driving the subsequent non-linear activation boundaries into severe gradient saturation zones, while the omission of a dedicated translation parameter forces interaction weights to implicitly absorb global statistical deviations. This paper proposes a simple yet effective neural Tucker factorization model with Kaiming initialization and bias correction (KaBiN) for HDI tensor completion. The proposed model utilizes Kaiming uniform initialization for the embedding and Tucker linear parameters, and adopts a simple bias correction in output mapping. By elegantly decoupling global mean shifts from local structural representations, the framework provides a highly stable and well-conditioned optimization landscape. Experiments on three real-world HDI tensor datasets show that KaBiN achieves better performance than the original NeuTucF, while introducing minimal computational overhead.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/22/2606.18644v1-spiking-pyramid-wavelet-transformation-for-high-efficient-and-low-energy-image-restoration",
+      "section": "quick",
+      "title_en": "Spiking Pyramid Wavelet Transformation for High-efficient and Low-energy Image Restoration",
+      "authors": "Chen Zhao, Xiantao Hu, Song Wu, Qian Wang, Chen Wu, Rui Xie, Jian Yang, Ying Tai",
+      "date": "2026-06-17",
+      "pdf": "https://arxiv.org/pdf/2606.18644v1",
+      "score": "6.0",
+      "evidence": "基于脉冲神经网络的小波图像恢复",
+      "tldr": "图像恢复任务中，脉冲神经网络(SNN)受限于CNN感受野。本文提出Spiking Pyramid Wavelet Model (SPWM)，利用离散小波变换和Spiking Dual Pyramid Wavelet (SDPW)块建模长程依赖，利用小波域退化特性。实验表明，SPWM在多个基准上显著降低计算和能耗，同时保持图像质量。该工作展示了SNN在图像恢复中的潜力，为资源受限设备提供新思路。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Spiking neural networks (SNNs) have garnered significant interest in computer vision due to their potential for efficiency and biological inspiration. While spiking CNN-based methods have shown promise for image restoration (IR) tasks, their performance is constrained by the inherent receptive field limitations of CNN operations. In the paper, we explore the benefits of discrete wavelet transformation and propose a spiking pyramid wavelet-based model (SPWM) for high-efficient and low-energy target. Specifically, we develop a spiking dual pyramid wavelet (SDPW) block to model long-range dependency and exploit the properties of the degradation in the wavelet domain. Experimental results on several benchmarks demonstrate that SPWM significantly lowers computational costs and energy consumption while maintaining image quality. Our method showcases the potential of SNNs in the field of IR, offering new insights for future applications of resource-limited devices.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
