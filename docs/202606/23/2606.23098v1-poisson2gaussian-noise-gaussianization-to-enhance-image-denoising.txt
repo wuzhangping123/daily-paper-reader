@@ -1,0 +1,1653 @@
+Title: Poisson2Gaussian: Noise Gaussianization to Enhance Image Denoising
+
+URL Source: https://arxiv.org/pdf/2606.23098v1
+
+Published Time: Tue, 23 Jun 2026 02:56:46 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# Poisson2Gaussian: Noise Gaussianization to Enhance Image Denoising 
+
+## Xirou Zhou 1 Zijing Xu 1 Yibo Qu 2 Qi Zhang 2 Xiaowan Hu 3∗ Xinyang Li 1∗
+
+> 1
+
+College of AI, Tsinghua University, Beijing, China 
+
+> 2
+
+Department of Automation, Tsinghua University, Beijing, China 
+
+> 3
+
+School of Electronic and Information Engineering, Beihang University, Beijing, China 
+
+> ∗
+
+Correspondence: huxiaowan@buaa.edu.cn; xinyangli@tsinghua.edu.cn 42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+44 
+
+(a) 
+
+Trs. 
+
+Noisy 
+
+Ori. 
+
+Noisy 
+
+Denoising network 
+
+val  train 
+
+Noise intensity 
+
+3D 2D 
+
+Noise histogram 
+
+Intensity 
+
+Density 
+
+Ori. 
+
+-P 
+
+Trs. 
+
+-G 
+
+𝓛𝓛 𝒏𝒏𝒏𝒏𝒏𝒏 
+
+𝓛𝓛 𝒓𝒓𝒓𝒓𝒓𝒓 
+
+𝓛𝓛 𝒎𝒎𝒎𝒎𝒎𝒎          
+
+> 𝒓𝒓 𝝓𝝓 :𝒏𝒏 𝑷𝑷 ∈ ℝ 𝑫𝑫 ⟼ 𝒏𝒏 𝑮𝑮 =𝒓𝒓 𝝓𝝓 (𝒏𝒏 𝑷𝑷 )∈ ℝ 𝑫𝑫
+
+Coupling  CayleyMix  CayleyMix 
+
+global 
+
+Normalizing 
+
+𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 . 𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 .𝒏𝒏 .
+
+𝒑𝒑 𝒎𝒎 
+
+𝒑𝒑 𝒃𝒃 
+
+s
+
+t
+
+Coupling  CayleyMix  De-Normalizing 
+
+s
+
+t
+
+> ...  ...
+> ...  ...
+
+×n
+
+𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .
+
+Intensity 
+
+𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 .
+
+Intensity 
+
+Ori. 
+
+Noisy 
+
+Pseudo 
+
+Clean 
+
+𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝒏𝒏 .
+
+(b) 
+
+> Value Density
+
+44 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+UNet 
+
+1 4 16  64 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+32 
+
+30 
+
+NAFNet Restormer DnCNN 
+
+44 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+32 
+
+HomoG HeteroG  Poisson 
+
+1 4 16  64 
+
+Photon count (Q) 
+
+> PSNR (dB)
+
+(a)  (b) 
+
+w/o P2G 
+
+w/ P2G 
+
+Gaussian 
+
+SSIM ( ↑) KL ( ↓) 1 - SFM ( ↓)
+
+1.0 
+
+0.9 
+
+0.8 
+
+0.7 
+
+1.5 
+
+1.0 
+
+0.5  .02 
+
+.04 
+
+.06 
+
+PSNR ( ↑)
+
+45 
+
+40 
+
+35 
+
+N2N  P2G (Ours)  Reference Noisy  AP-BSN  MASH 
+
+MPGN  AWGN 
+
+Denoised Error map 
+
+-0.06 
+
+0.00 
+
+0.06 
+
+39.40 / 0.950 
+
+AC map Histogram 
+
+0.6 
+
+0.8 
+
+0.0 
+
+0.4 
+
+KL=0.042  1-SFM=0.011 
+
+1-SFM=0.003  40.66 / 0.956 KL=0.023 
+
+VST-BM3D 
+
+(a)  (b) 
+
+1 4 16  64  1 4 16  64 
+
+ISO 
+
+𝒏𝒏 ~𝓝𝓝 (𝟎𝟎 , 𝝈𝝈 𝟐𝟐 (𝒙𝒙 )), 𝝈𝝈 𝟐𝟐 (𝒙𝒙 ) = 𝜷𝜷 𝟏𝟏 𝒙𝒙 + 𝜷𝜷 𝟐𝟐 
+
+𝜷𝜷 𝟐𝟐 
+
+𝜷𝜷 𝟏𝟏 
+
+0.00 
+
+0.01 
+
+0.02 
+
+50  100  200  400  800  1600  3200  6400 
+
+0
+
+100 
+
+150 
+
+0.00  0.02 -0.02  0.0  0.2 -0.2 
+
+0
+
+15 
+
+5
+
+0.0 -0.3  0.3 
+
+0
+
+20 
+
+10 
+
+30 1 2 3
+
+50 
+
+10 
+
+Noise value 
+
+> 1
+> 2
+> 3
+> w/o P2G  w/
+
+Figure 1. P2G enhances denoising performance by noise Gaussianization. P2G aims to transform mixed Poisson-Gaussian noise (MPGN) into additive white Gaussian noise (AWGN), reducing the signal-dependency and heteroscedasticity of noise and making its distribution more symmetric simultaneously. In this way, P2G reshapes noise into a form that can be easier for denoisers to model, thereby improving denoising performance. 
+
+## Abstract 
+
+The quantum nature of light determines the inherent Pois-son stochasticity of photon detection, which is ubiquitous in photography, microscopy, and astronomy. However, our controlled numerical studies reveal that the signal-dependency, heteroscedasticity, and statistical asymmetry of Poisson-mixed noise make it challenging for existing de-noisers to learn. In contrast, i.i.d. Gaussian noise, with its statistical independence and symmetric distribution, is easier to model for networks. To address this gap, we propose Poisson2Gaussian (P2G), a noise Gaussianization method that explicitly converts complex real-world noise to i.i.d. Gaussian noise via probability density matching be-yond low-order moments. We also design an unbiased de-noising framework that synergizes P2G with downstream denoisers, ensuring convergence to the underlying signal without requiring paired clean data or explicit noise param-eters. Extensive experiments demonstrate that P2G consis-tently achieves state-of-the-art performance across diverse datasets. In challenging scenarios where noise strongly de-viates from Gaussian statistics, our method improves the PSNR by up to 0.75 dB. Notably, P2G is architecture-agnostic and can provide universal improvements for var-ious denoisers. The source code will be publicly available. 
+
+## 1. Introduction 
+
+Image denoising is a fundamental task in computer vision, serving as a critical preprocessing step for accurate visual-ization and analysis. Over the past few decades, denoising techniques have evolved from classical algorithms to intelli-gent methods [17, 37]. Although data-driven deep learning approaches have become the primary solution and demon-strate superior performance, their success is often built upon increasingly unrealistic noise assumptions [26, 48, 63]. Advancements in sensor and cooling technologies have greatly suppressed thermal and electronic noise, which fol-1
+
+> arXiv:2606.23098v1 [cs.CV] 22 Jun 2026
+
+lows a Gaussian distribution [7]. Consequently, Poisson noise, arising from the inherent stochasticity of photon de-tection, becomes increasingly prominent [11, 36, 38, 54]. Statistical analysis of SIDD dataset [1] (Fig. 2a) confirms this: higher ISO levels are associated with stronger signal-dependency ( β1) and more pronounced asymmetry, indicat-ing the dominant role of Poisson noise in low-light scenes. For image denoising, supervised methods rely heav-ily on paired noisy and clean images for training. Thus, when applied to demanding scenarios such as low-light photography and photon-limited scientific imaging, these methods encounter the difficulty of obtaining paired clean data [21, 25, 27, 36, 57, 59, 65]. To overcome this chal-lenge, self-supervised methods emerged as a promising and effective alternative. These methods can learn to de-noise solely from noisy images [30, 33]. However, re-gardless of the learning mechanism or network architec-ture, more complex noise is harder to represent and remove. Unlike AWGN, which is signal-independent, homoscedas-tic, and symmetric, MPGN exhibits signal correlation, het-eroscedasticity, and skewed distributions. Its sophisticated statistical characteristics present challenges to existing de-noising methods. We conducted controlled experiments to verify this assertion (Fig. 2b), revealing that transforming Poisson-dominant noise into AWGN can significantly en-hance the performance of various denoising methods. To handle MPGN, prior work often resorts to variance-stabilizing transformations (VSTs). However, VSTs pri-marily aim to homogenize variance and approximate Gaus-sianity, which effectively constrains the noise only through low-order statistics rather than the full density, and this approximation fidelity degrades intrinsically in the low-count regime [6, 9, 18]. Recently, several methods have been proposed to adapt observations to pretrained denois-ers by learning pixel-wise biases or monotone piecewise-linear mapping [23, 26] do not explicitly enforce a physi-cally interpretable target distribution. In contrast, we pro-pose Poisson2Gaussian (P2G), the first denoising-oriented noise Gaussianization method that learns an invertible flow with an exact likelihood objective to align the full residual density with an i.i.d. AWGN target, enforcing a probabil-ity density constraint rather than matching only low-order moments. Our key insight lies in decomposing the denoising of complex MPGN into two cascaded subtasks: (i) noise Gaus-sianization; (ii) learning to remove Gaussianized noise. For the former, we mitigate the heterogeneity and asymmetry of MPGN through an invertible flow. Furthermore, to ensure the two subtasks operate collaboratively, we propose a syn-ergistic denoising framework for unbiased learning. Noise Gaussianization and denoising are coupled in series and al-ternatively trained using the N2N strategy, thereby enhanc-ing overall performance. In summary, our main contribu-tions are as follows: • We propose Poisson2Gaussian (P2G), a denoising-oriented noise Gaussianization method that learns an in-vertible flow with an exact likelihood objective to align the residual density with an i.i.d. AWGN target. • We design an unbiased self-supervised framework that alternatively optimizes the Gaussianization flow and the denoiser, ensuring optimal convergence to the underlying signal. • Our method achieves state-of-the-art performance across diverse datasets, and can be seamlessly integrated with existing denoisers. 
+
+## 2. Related Work 
+
+2.1. Noise Models 
+
+Most image denoising methods assume the noise model to be AWGN [3, 8, 14, 58, 66]. With advances in imaging technologies, this assumption is increasingly invalid and is often violated in low-light photography and photon-limited scientific imaging [10, 11, 22, 38, 56]. A more physically grounded alternative is the MPGN model [18], which describes noise as a combination of pho-ton shot noise, thermal noise, and electronic noise, ex-hibiting signal-dependent variance [52]. Compared with AWGN, MPGN applies to a broader range of imaging sce-narios, particularly under Poisson-dominant conditions [46, 56]. The transition from AWGN to MPGN marks an evolu-tion toward a more physics-consistent noise model for im-age denoising. 
+
+2.2. Variance-Stabilizing Transformations 
+
+VSTs map Poisson noise or MPGN to an approximately ho-moscedastic distribution for subsequent processing [4, 18]. Early representative methods include the Anscombe trans-formation and its generalized form for MPGN [18], along with their corresponding exact and unbiased inverse trans-formations [41–43]. In practice, a common workflow in-volves first performing VST, followed by Gaussian denois-ing, and finally applying inverse transformations [14]. Recently, several learnable methods have also been pro-posed based on the workflow above. Noise2VST [23] addresses the mismatch between the AWGN-trained de-noiser and MPGN observations by freezing the pre-trained denoiser and learning a reversible VST mapping; FBI-denoiser [9] adopts a staged procedure that first estimates the noise parameters for GAT and inverse transformation, then trains the denoiser. Compared with GAT-based methods, P2G avoids large-count asymptotic approximations [4] and provides consis-tent gains across a wide range of photon-count regimes (Sec. 4.2). More importantly, P2G performs denoising-oriented Gaussianization via probability-density matching, 242                                                                                 
+
+> 40
+> 38
+> 36
+> 34
+> 44
+> 38.25
+> 38.75
+> 37.75
+> 37.25
+> 38.25
+> 38.75
+> 37.75
+> 37.25
+> Coupling CayleyMix CayleyMix
+> global
+> Normalizing
+> 𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 .𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 .𝒏𝒏 .
+> 𝒑𝒑 𝒎𝒎
+> 𝒑𝒑 𝒃𝒃
+> s
+> t
+> Coupling CayleyMix De-Normalizing
+> s
+> t
+> ...  ...
+> ...  ...
+> ×n
+> 𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝒏𝒏 .
+> (b)
+> 050 100 150 200
+> Iterations
+> PSNR
+> P2G + Denoiser
+> P2G Only
+> Denoiser Only
+> Pretrained
+> P2G
+> Coupling
+> CayleyMix
+> Pretrained
+> AllinOneBlock
+> (a) (b)
+> Value Density
+> 44
+> 42
+> 40
+> 38
+> 36
+> 34
+> UNet
+> 1416 64
+> 42
+> 40
+> 38
+> 36
+> 34
+> 32
+> 30
+> NAFNet Restormer DnCNN
+> 44
+> 42
+> 40
+> 38
+> 36
+> 34
+> 32
+> HomoG HeteroG Poisson
+> 1416 64
+> Photon count (Q)
+> PSNR (dB)
+> (a) (b)
+> w/o P2G
+> w/ P2G
+> Gaussian
+> SSIM ( ↑)KL ( ↓)1 - SFM ( ↓)
+> 1.0
+> 0.9
+> 0.8
+> 0.7
+> 1416 64
+> 1.5
+> 1.0
+> 0.5
+> 0.0 .00
+> .02
+> .04
+> .06
+> 1416 64 1416 64
+> PSNR ( ↑)
+> 1416 64
+> 45
+> 40
+> 35
+> 30
+> Photon count (Q)
+> MASH AP-BSN N2N P2G-NAFNet Reference
+> 34.41 / 0.916 32.61 / 0.910 36.73 / 0.923 PSNR/SSIM
+> PSNR/SSIM 50.28 / 0.995
+> 33.77 / 0.867
+> N2Nbr Noisy
+> 25.57 / 0.342
+> 49.69 / 0.988 47.22 / 0.972 49.53 / 0.969 46.01 / 0.979 35.75 / 0.932
+> 35.47 / 0.910
+> 0.6
+> 0.0
+> -0.6
+> Denoised Error map
+> -0.06
+> 0.00
+> 0.06
+> 39.40 / 0.950
+> AC map Histogram
+> 0.2
+> 0.6
+> 04-4
+> 0.8
+> 0.0
+> 0.4
+> KL=0.042 1-SFM=0.011
+> 1-SFM=0.003 40.66 / 0.956 KL=0.023
+> (a) (b)
+> 050 100 150 200
+> Iterations
+> PSNR
+> 1416 64 1416 64
+> ISO
+> 𝒏𝒏 ~𝓝𝓝 (𝟎𝟎 ,𝝈𝝈 𝟐𝟐 (𝒙𝒙 )), 𝝈𝝈 𝟐𝟐 (𝒙𝒙 ) = 𝜷𝜷 𝟏𝟏 𝒙𝒙 +𝜷𝜷 𝟐𝟐
+> 𝜷𝜷 𝟐𝟐
+> 𝜷𝜷 𝟏𝟏
+> 0.00
+> 0.01
+> 0.02
+> 50 100 200 400 800 1600 3200 6400
+> 0
+> 100
+> 150
+> 0.00 0.02 -0.02 0.0 0.2 -0.2
+> 0
+> 15
+> 5
+> 0.0 -0.3 0.3
+> 0
+> 20
+> 10
+> 30 123
+> 50
+> 10
+> Noise value
+> 1
+> 2
+> 3
+> w/o P2G  w/ P2G
+
+Figure 2. Rationale of noise Gaussianization. (a) Statistical analysis of SIDD reveals that higher ISO levels result in stronger signal-dependency ( β1) and higher skewness, suggesting that the Poisson component cannot be ignored. (b) In controlled experiments, we simulated noise components following Poisson, heteroscedastic Gaussian (HeteroG), and homogeneous Gaussian (HomoG) distributions with different photon counts (Q). Under the N2N training strategy, HomoG consistently outperforms HeteroG, reflecting the negative impact of signal-dependency. The gap between HeteroG and Poisson reveals the detriment of distribution asymmetry, which diminishes as Poisson distribution gradually approaches HeteroG at larger Q. 
+
+aligning the noise distribution with an i.i.d. AWGN target beyond variance or other low-order statistics. In contrast to Noise2VST, P2G keeps the denoiser trainable and updated during training; our ablations show that updating the de-noiser improves the final denoising performance (Sec. 4.4). 
+
+2.3. Noise Flow 
+
+As the foundation of noise flow, normalizing flows model complex distributions with invertible mappings that support exact likelihood computation [15, 16, 28]. In denoising, conditional normalizing flows have been used to model real sensor noise by mapping it to a standard Gaussian latent variable and enable realistic noise synthesis [2]. Subsequent extensions broaden noise flows to self-supervised settings, more complex imaging pipelines and more challenging con-ditions [10, 19, 29, 44]. Although P2G shares a similar architecture with prior noise flows and also operates on noise distributions, its role and objective are fundamentally different: noise flows learn to characterize noise statistics for modeling and synthesis, whereas P2G explicitly reshapes the noise distribution to make it more amenable to downstream denoising. 
+
+2.4. Self-Supervised Denoising 
+
+Self-supervised denoising can be implemented without re-quiring clean data. As one of the earliest and most basic self-supervised methods [34, 49], Noise2Noise (N2N) [33] learns to denoise by mapping one noisy observation to an-other independent observation of the same scene. Under the assumption of zero-mean noise, N2N converges un-biasedly to the underlying clean signal. Subsequent re-search focused on obtaining such noisy pairs from a sin-gle image, typically by downsampling to generate two sub-images [24, 45] or adding extra noise to simulate indepen-dent observations [47]. Another type of method is represented by Noise2Void (N2V) [30], which only requires a single noisy observation. N2V trains a blind-spot denoising network by predicting the masked pixel using its neighbors. Beyond the assumption of zero mean, N2V additionally requires signal continuity and noise conditional independence. Subsequent studies mainly address the information loss caused by masking and the lim-itations under spatially correlated noise via diverse mask-ing/aggregation/perturbation strategies [13, 32, 50, 55]. In summary, while N2V-based methods enable training with a single noisy image, they come at the cost of information loss and stronger noise assumptions. To make P2G as general as possible, we employ the most fundamental N2N as our self-supervised backbone, where the simplest assumption enables P2G to be extended to more scenarios. 
+
+## 3. Method 
+
+In this section, we first introduce the motivation for P2G in Sec. 3.1, then detail the P2G architecture and theory in Sec. 3.2, and finally present the synergistic denoising frame-work in Sec. 3.3. 
+
+3.1. Motivation 
+
+Notation. Given a noisy observation Y , a pretrained de-noiser fθ produces ˆX = fθ (Y ) and the residual Nori. =
+
+Y − ˆX. The residual is normalized by a per-sample scale 
+
+σ = std( Nori. ), yielding Nori.n. = Nori. /σ . P2G is instan-tiated as an invertible flow gϕ that maps Nori.n. to Ntrs.n. ∼N (0 , I ).The joint reparameterization-denoising operator is de-fined as 
+
+T (Y ) ≜   ˆX, N trs.n. , σ  =
+
+
+
+fθ (Y ), g ϕ
+
+  Y −fθ (Y )
+
+> σ
+
+, σ 
+
+
+
+,
+
+3where T : RN ×N → RN ×N × RN ×N × R. Mutual infor-mation is denoted by I(·; ·).
+
+Theoretical Model and Empirical Examination. Imag-ing noise is commonly modeled as MPGN, consisting of Poisson shot noise and Gaussian readout noise. With sen-sor gain α > 0 and expected photon count Xphoton = X/α ,the observation model can be written as 
+
+Y | X ∼ α Poisson   Xα
+
+ + N (0 , β ),
+
+E[ Y | X ] = X, Var[ Y | X ] = αX + β. 
+
+This model exhibits signal-dependency, heteroscedasticity, and asymmetry that AWGN does not capture. As empirical evidence, we analyze SIDD noise-level metadata (β1, β 2) under the variance model 
+
+σ2(X) = β1X + β2,
+
+where β1 parameterizes the signal-dependent component and β2 the signal-independent one 1. As shown in Fig. 2a, increasing ISO elevates β1 while β2 remains largely con-stant. Meanwhile, the noise histogram exhibits more pro-nounced skewness and kurtosis, indicating inconsistency with the constant-variance and symmetry properties of AWGN assumption. 
+
+Hypothesis and Verification on Poisson Noise. Pois-son noise exhibits regime-dependent characteristics: at low photon counts, the distribution is heteroscedastic and non-Gaussian, with pronounced skewness and kurtosis; as pho-ton counts increase, it approaches a heteroscedastic Gaus-sian distribution. Based on this observation, we hypothesize that performance degradation is attributable to both signal dependence and the low-count distributional shape. To validate this, we simulated Poisson, heteroscedastic Gaussian, and homoscedastic Gaussian noise on FMDD, with PSNR matched across noise types for each Q (see supplementary materials for details) and evaluated the ef-fectiveness of N2N-based training across four representa-tive architectures. The results (Fig. 2b) refine our hypoth-esis: both distributional shape effects and signal-dependent variance contribute, with the former dominating in the low-count regime and the latter becoming the main limitation at higher counts. These observations motivate our design of Pois-son2Gaussian, an information-preserving, invertible noise Gaussianization flow for subsequent denoising that miti-gates signal dependence and low-count non-Gaussianity.    
+
+> 1These are not in one-to-one correspondence with (α, β ), so we use SIDD-provided parameters (β1, β 2)directly.
+
+3.2. Poisson2Gaussian 
+
+Overview. P2G aims to transform the variance-normalized residual map Nori.n. into Ntrs.n. and constrains the elements of Ntrs.n. to be i.i.d. standard normal. This con-straint is implemented via the NLL objective, accounting for per-dimension (pixel) marginals and cross-dimension dependencies. Specifically, we construct an invertible residual flow gϕ by stacking affine Coupling layers with CayleyMix layers. As shown in Sec. 3.3, we freeze the denoiser during the P2G update step, leading to the following formulation. 
+
+Notation. In practice, we partition the residual map 
+
+Nori. ∈ RN ×N into K patches {P (k)}Kk=1 and flatten each patch to a D-dimensional vector p(k) ∈ RD . In the follow-ing, the same transformation is applied to each patch vector independently. For simplicity, we omit the superscript and write p ∈ RD .
+
+Information Preservation. Under an invertible residual flow and σ > 0, the augmented mapping 
+
+T (Y ) =   ˆX, N trs.n. , σ 
+
+is information-preserving, i.e., 
+
+I(X; T (Y )) = I(X; Y ).
+
+A formal proof based on the data processing inequality is provided in the supplementary materials. 
+
+Assumptions. ˆX = fθ (Y ) and σ(Y ) > 0 are determinis-tic functions of Y included in T (Y ), and gϕ is bijective. Under these assumptions, Y is uniquely determined from 
+
+T (Y ) via Y = ˆX + σ · g−1 
+
+> ϕ
+
+(Ntrs.n. ), so the mapping 
+
+Y → T (Y ) is left-invertible. 
+
+From Theory to Implementation. In practice, these as-sumptions are satisfied by freezing the denoiser during P2G optimization, constructing gϕ as a bijective flow, and com-puting a per-sample σ(Y ) from Nori. . To instantiate gϕ, we stack affine Coupling layers and interleave them with Cay-leyMix layers. Coupling layers have block-triangular Jacobians and up-date only part of the coordinates in each block, so in-terleaved mixing is commonly used to promote cross-coordinate interaction [16, 28]. In our implementation, we adopt CayleyMix as a convenient orthogonal mixer with a closed-form inverse, identity initialization, and continu-ously tunable mixing strength. 442 
+
+40 
+
+38 
+
+36 
+
+34 
+
+44 
+
+38.25 
+
+38.75 
+
+37.75 
+
+37.25 
+
+38.25 
+
+38.75 
+
+37.75 
+
+37.25 
+
+(a) 
+
+Trs. 
+
+Noisy 
+
+Ori. 
+
+Noisy 
+
+Denoising network 
+
+val  train 
+
+Noise intensity 
+
+3D 2D 
+
+Noise histogram 
+
+Intensity 
+
+Density 
+
+Ori. 
+
+-P 
+
+Trs. 
+
+-G 
+
+𝓛𝓛 𝑵𝑵𝑵𝑵𝑵𝑵 
+
+𝓛𝓛 𝒓𝒓𝒓𝒓𝒓𝒓 
+
+𝓛𝓛 𝒎𝒎𝒎𝒎𝒎𝒎          
+
+> 𝒓𝒓 𝝓𝝓 :𝒏𝒏 𝑷𝑷 ∈ ℝ 𝑫𝑫 ⟼ 𝒏𝒏 𝑮𝑮 =𝒓𝒓 𝝓𝝓 (𝒏𝒏 𝑷𝑷 )∈ ℝ 𝑫𝑫
+
+Coupling  CayleyMix  CayleyMix 
+
+global 
+
+Normalizing 
+
+𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 . 𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 .𝒏𝒏 .
+
+𝒑𝒑 𝒎𝒎 
+
+𝒑𝒑 𝒃𝒃 
+
+s
+
+t
+
+Coupling  CayleyMix  De-Normalizing 
+
+s
+
+t
+
+> ...  ...
+> ...  ...
+
+×n
+
+𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .
+
+Intensity 
+
+𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 .
+
+Intensity 
+
+Ori. 
+
+Noisy 
+
+Pseudo 
+
+Clean 
+
+𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝒏𝒏 .
+
+(b) 
+
+0 50  100  150  200 
+
+Iterations 
+
+> PSNR
+
+P2G + Denoiser 
+
+P2G Only 
+
+Denoiser Only 
+
+Pretrained 
+
+P2G 
+
+Coupling 
+
+CayleyMix 
+
+Pretrained 
+
+AllinOneBlock 
+
+(a)  (b) 
+
+> Value Density
+
+44 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+UNet 
+
+1 4 16  64 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+32 
+
+30 
+
+NAFNet Restormer DnCNN 
+
+44 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+32 
+
+HomoG HeteroG  Poisson 
+
+1 4 16  64 
+
+Photon count (Q) 
+
+> PSNR (dB)
+
+(a)  (b) 
+
+w/o P2G 
+
+w/ P2G 
+
+Gaussian 
+
+SSIM ( ↑) KL ( ↓) 1 - SFM ( ↓)
+
+1.0 
+
+0.9 
+
+0.8 
+
+0.7 
+
+1 4 16  64 
+
+1.5 
+
+1.0 
+
+0.5 
+
+0.0  .00 
+
+.02 
+
+.04 
+
+.06 
+
+1 4 16  64  1 4 16  64 
+
+PSNR ( ↑)
+
+1 4 16  64 
+
+45 
+
+40 
+
+35 
+
+30 
+
+Photon count (Q) 
+
+N2N  P2G (Ours)  Reference Noisy  AP-BSN  MASH 
+
+MASH  AP-BSN  N2N-NAF  P2G-NAF  Reference 
+
+34.41 / 0.916  32.61 / 0.910  36.73 / 0.923  PSNR/SSIM 33.77 / 0.867 
+
+N2Nbr Noisy 
+
+25.57 / 0.342  35.47 / 0.910 
+
+0.6 
+
+0.0 
+
+-0.6 
+
+Denoised Error map 
+
+-0.06 
+
+0.00 
+
+0.06 
+
+39.40 / 0.950 
+
+AC map Histogram 
+
+0.2 
+
+0.6 
+
+0 4-4 
+
+0.8 
+
+0.0 
+
+0.4 
+
+KL=0.042  1-SFM=0.011 
+
+1-SFM=0.003  40.66 / 0.956 KL=0.023 
+
+VST-BM3D 
+
+(a)  (b) 
+
+0 50  100  150  200 
+
+Iterations 
+
+> PSNR
+
+1 4 16  64  1 4 16  64 
+
+ISO 
+
+𝒏𝒏 ~𝓝𝓝 (𝟎𝟎 , 𝝈𝝈 𝟐𝟐 (𝒙𝒙 )), 𝝈𝝈 𝟐𝟐 (𝒙𝒙 ) = 𝜷𝜷 𝟏𝟏 𝒙𝒙 + 𝜷𝜷 𝟐𝟐 
+
+𝜷𝜷 𝟐𝟐 
+
+𝜷𝜷 𝟏𝟏 
+
+0.00 
+
+0.01 
+
+0.02 
+
+50  100  200  400  800  1600  3200  6400 
+
+0
+
+100 
+
+150 
+
+0.00  0.02 -0.02  0.0  0.2 -0.2 
+
+0
+
+15 
+
+5
+
+0.0 -0.3  0.3 
+
+0
+
+20 
+
+10 
+
+30 1 2 3
+
+50 
+
+10 
+
+Noise value 
+
+> 1
+> 2
+> 3
+> w/o P2G  w/ P2G
+
+Figure 3. Overview of the denoising framework synergistic with P2G. The proposed denoising framework consists of P2G and a cas-caded denoiser. (a) Before training, a pseudo-clean estimate is obtained via a single forward pass of a pretrained denoiser for initialization. During training, P2G first transforms the residual between raw observations and pseudo-clean images to approximate white Gaussian noise. Then, the denoiser is trained on transformed noisy images for denoising. An alternating training strategy is adopted, and the NLL loss is detached during denoiser training. (b) P2G is composed of multiple stacked Coupling layers and CayleyMix layers. 
+
+Coupling Layer. Following RealNVP [5, 16], we employ affine Coupling layers. An input p is split into (pa, pb),where pb is transformed using scale s(·) and shift t(·) de-rived from pa (⊙ denotes the element-wise product). 
+
+Forward: 
+
+p 7 → (pa, pb ⊙ es(pa) + t(pa)) .
+
+The Jacobian is lower triangular, yielding log | det JCp | =
+
+1⊤s(pa).
+
+Inverse: 
+
+p′ 7 → (p′
+
+> a
+
+, (p′ 
+
+> b
+
+− t(p′
+
+> a
+
+)) ⊙ e−s(p′
+
+> a)
+
+).
+
+Correspondingly, log | det JCp −1 | = −1⊤s(p′
+
+> a
+
+).
+
+CayleyMix Layer. CayleyMix is used as an interleaved orthogonal change of basis between coupling blocks. Let 
+
+Q ∈ RD×D be orthogonal ( Q⊤Q = I), so Q−1 = Q⊤ and 
+
+log | det Q| = 0 .Partition the index set {1, . . . , D } into disjoint groups 
+
+{I g }Gg=1 with sizes {dg }. For each group, build a Cayley block 
+
+Qg (τg ) = ( I + τg Ag )−1(I − τg Ag )
+
+from a skew-symmetric A⊤ 
+
+> g
+
+= −Ag . Define the block-diagonal mixer 
+
+Qblk (τ ) = diag  Q1(τ1), . . . , Q G(τG) ∈ RD×D,
+
+which satisfies Q⊤
+
+> blk
+
+Qblk = I and det Qblk = 1 .
+
+Forward and Inverse: 
+
+p′ = Qblk (τ ) p, p = Qblk (τ )⊤ p′, log |det JCayleyMix | = 0 .
+
+We apply grouped mixing with staggered channel re-ordering across layers and warm up τ from identity to stronger mixing. This scheduling scheme initializes P2G to an identity state and allows the model to progressively depart from it. 
+
+Negative Log-Likelihood (NLL). With the above nota-tion, we apply the negative log-likelihood 
+
+LNLL (ϕ) = 12 Ntrs.n.  
+
+> 22
+
+− log det Jgϕ
+
+ Nori.n. 
+
+ + const. 
+
+where const represents D 
+
+> 2
+
+log(2 π).Minimizing this objective is equivalent to minimizing the KL divergence between the transformed residual distri-bution and the target standard normal N (0 , I ). Crucially, this constrains the entire high-dimensional density rather than merely matching low-order moments. Notably, or-thogonal mixing contributes log | det J| = 0 , so the log-determinant term in LNLL is determined by the coupling layers in our implementation. 
+
+3.3. Self-Supervised Synergistic Framework 
+
+To achieve synergistic gains between noise Gaussianiza-tion and denoising, we propose an integrated framework that couples P2G with an existing denoiser and trains them through alternating updates. This modular coupling design is consistent with the N2N unbiased fixed point under stan-dard assumptions and significantly enhances performance in practice. 5Noise2Noise Revisit. Noise2Noise trains from paired ob-servations (Y1, Y 2) of the same underlying signal X. As-sume conditional unbiasedness and conditional indepen-dence, 
+
+E[Y2 | X] = X, Y2 ⊥⊥ Y1 | X. 
+
+Then minimizing the ℓ2 risk yields the posterior mean, 
+
+fθ (Y1) = arg min  
+
+> f
+
+E∥f (Y1) − Y2∥22 = E[X | Y1].
+
+Synergistic Denoising Strategy. At the denoiser step (freeze gϕ), we replace the input by a deterministic, invert-ible representation 
+
+Tϕ(Y1) =   ˆX1, N (1) 
+
+> trs.n.
+
+, σ (1) , ˆX1 = fθ (Y1),Tϕ(Y2) =   ˆX2, N (2) 
+
+> trs.n.
+
+, σ (2) , ˆX2 = fθ (Y2),
+
+Since Tϕ(·) is left-invertible under the assumptions in Sec. 3.2, Tϕ(Yi) and Yi are in one-to-one correspondence. Consequently, conditioning on Tϕ(Yi) is equivalent to con-ditioning on Yi, i.e., 
+
+Y2 ⊥⊥ Tϕ(Y1) X, E[ Y2 | X] = X, Y1 ⊥⊥ Tϕ(Y2) X, E[ Y1 | X] = X, 
+
+so the ℓ2-optimum is unchanged when Yi is replaced by 
+
+Tϕ(Yi). We therefore minimize the matching loss 
+
+min  
+
+> θ
+
+Lmat (θ) = fθ
+
+  ˆY1
+
+ − Y2 
+
+> 22
+
++ fθ
+
+  ˆY2
+
+ − Y1
+
+> 22
+
+.
+
+where ˆYi = ˆXi + σ(i) · N (i) 
+
+> trs.n.
+
+With fθ kept in evaluation mode, we update ϕ by minimizing the sum of the N2N matching loss and the flow NLL (details in Sec. 3.2): 
+
+min  
+
+> ϕ
+
+Lflow (ϕ; θ) = Lmat (θ, ϕ ) + LNLL (ϕ).
+
+As demonstrated above, the theoretically optimal solu-tion remains unchanged regardless of whether the input is the transformed ˆY or the original observation Y . How-ever, P2G empirically facilitates learning by transforming the residual in ˆY toward i.i.d. AWGN, which is easier for denoisers to model. Therefore, it can achieve a solution closer to the theoretical optimum compared to the original N2N architecture. In practice, we optimize θ and ϕ via alternating mini-mization, updating θ with ϕ fixed and vice versa, repeating these two stages throughout training. Furthermore, follow-ing prior works [24, 38], we additionally include an ℓ1 term and a mild regularizer Lreg = ∥fθ
+
+  ˆY1
+
+ − fθ
+
+  ˆY2
+
+∥1 in both stages (P2G and the denoiser) to stabilize training and ac-celerate convergence. 
+
+## 4. Experiments 
+
+We first introduce the experimental setup (Sec. 4.1), then demonstrate P2G’s transformation effects under various photon counts (Sec. 4.2). After that, we validate model performance against other methods (Sec. 4.3) and conclude with ablation studies (Sec. 4.4). 
+
+4.1. Settings 
+
+Datasets. Following previous work, we use SIDD Raw, FMDD, and W2S datasets. (i) SIDD Raw [1]: provides 4-channel (Bayer) RAW data from SIDD-small; we crop 
+
+256 × 256 patches with a 90/10 train/val split per scene. (ii) FMDD [62] contains single-channel microscopy data from 12 samples; we use FOV 3-20 for training and FOV 1-2 for validation. (iii) W2S [64] includes single-channel wide-field microscopy images at three wavelengths; we train on samples 1-80 (400 shots each) and validate on images 249/250 from samples 81-120. Additionally, to compare with VST-based methods, we follow their protocol [23] and report fine-grained results on FMDD and W2S. 
+
+Implementations. We adopt the N2N framework [33] with UNet [53] and NAFNet [12] as the denoiser backbone. The denoiser is first pretrained under N2N and P2G is ini-tialized as the identity, after which alternating optimization is performed: 25 iterations updating P2G (LR 1 × 10 −6)with the denoiser frozen, followed by 25 iterations updating the denoiser (LR 1 × 10 −7) with P2G frozen. For FMDD, we use 96 ×96 patches and set Lmatching , LNLL , Lreg weights to (1 , 1, 1) . For SIDD and W2S, memory constraints neces-sitate smaller 32 ×32 patches; we therefore use (100 , 1, 1) 
+
+to compensate for the higher variance of patch-wise NLL under smaller patches. 
+
+Method Comparison. In Tab. 1, we compare PSNR/SSIM against other self-supervised methods, incorporating traditional and supervised results for ref-erence. All methods use their original hyperparameters, with minor adaptations for dataloaders, and were trained to convergence. Following prior VST-based methods, we further report fine-grained results on FMDD, trained separately on Confocal FISH (CFF), Confocal MICE (CFM), and Two-photon MICE (TPM) subsets (Tab. 2a), as well as per-channel results on W2S (Tab. 2b). 
+
+4.2. Evaluations 
+
+Across photon-count regimes, we report denoising perfor-mance together with direct quantitative metrics assessing the Gaussianization effect of P2G. As shown in Fig. 4a, we employ the KL divergence to measure deviation from the standard Gaussian distribu-tion, where lower values indicate greater similarity. The 638                                                                  
+
+> 36
+> 34
+> 38.25
+> 38.75
+> 37.75
+> 37.25
+> 38.25
+> 38.75
+> 37.75
+> 37.25 050 100 150 200
+> Iterations
+> PSNR
+> P2G + Denoiser
+> P2G Only
+> Denoiser Only
+> Pretrained
+> P2G
+> Coupling
+> CayleyMix
+> Pretrained
+> AllinOneBlock
+> (a) (b)
+> Density  38
+> 36
+> 34
+> 1416 64
+> 38
+> 36
+> 34
+> 32
+> 30
+> 38
+> 36
+> 34
+> 32 1416 64
+> Photon count (Q)
+> PSNR (
+> w/o P2G
+> w/ P2G
+> Gaussian
+> SSIM ( ↑)KL ( ↓)1 - SFM ( ↓)
+> 1.0
+> 0.9
+> 0.8
+> 0.7
+> 1416 64
+> 1.5
+> 1.0
+> 0.5
+> 0.0 .00
+> .02
+> .04
+> .06
+> 1416 64 1416 64
+> PSNR ( ↑)
+> 1416 64
+> 45
+> 40
+> 35
+> 30
+> Photon count (Q)
+> MASH AP-BSN N2N P2G-NAFNet Reference
+> 34.41 / 0.916 32.61 / 0.910 36.73 / 0.923 PSNR/SSIM
+> PSNR/SSIM 50.28 / 0.995
+> 33.77 / 0.867
+> N2Nbr Noisy
+> 25.57 / 0.342
+> 49.69 / 0.988 47.22 / 0.972 49.53 / 0.969 46.01 / 0.979 35.75 / 0.932
+> 35.47 / 0.910
+> 0.6
+> 0.0
+> -0.6
+> Denoised Error map
+> -0.06
+> 0.00
+> 0.06
+> 39.40 / 0.950
+> AC map Histogram
+> 0.2
+> 0.6
+> 04-4
+> 0.8
+> 0.0
+> 0.4
+> KL=0.042 1-SFM=0.011
+> 1-SFM=0.003 40.66 / 0.956 KL=0.023
+> (a) (b)
+> 050 100 150 200
+> Iterations
+> PSNR
+> 1416 64 1416 64
+> ISO
+> 50 100 200 400 800 1600 3200 6400
+> 0
+> 100
+> 150
+> 0.00 0.02 -0.02 0.0 0.2 -0.2
+> 0
+> 15
+> 5
+> 0.0 -0.3 0.3
+> 0
+> 20
+> 10
+> 30 123
+> 50
+> 10
+> Noise value
+> w/o P2G  w/ P2G
+
+Figure 4. Quantitative and qualitative evaluation under different photon counts. (a) Lower KL and (1-SFM) indicate that the residual noise conforms more closely to i.i.d. AWGN. (b) The histogram shows the residual distribution versus the standard Gaussian reference (dashed line). The AC map shows the spatial autocorrelation of residuals, where fewer structural patterns reflect weaker spatial correlation. 
+
+complementary spectral flatness metric (1-SFM) evaluates noise uniformity, with lower values indicating weaker spa-tial correlation. P2G significantly reduces both KL diver-gence and (1-SFM) values, confirming that the transformed noise approaches AWGN, thereby creating better condi-tions for denoising. Moreover, P2G consistently improves PSNR/SSIM across the tested photon-count regimes. As a visual supplement, Fig. 4b displays autocorrelation (AC) maps, histograms, denoised results, and error maps. After P2G, the AC maps are more point-like and even, in-dicating weaker spatial correlation. Simultaneously, his-tograms align better with a standard Gaussian distribution, denoised textures are sharper, and structural residuals in er-ror maps are suppressed. This confirms that the quantitative gains are consistent with the qualitative visual comparisons. Collectively, these improvements hold across all tested photon-count regimes, indicating that P2G consistently Gaussianizes MPGN toward i.i.d. AWGN and yields sta-ble denoising gains. 
+
+4.3. Comparisons 
+
+Quantitative Results. Quantitative results are shown in Tab. 1. P2G significantly improves over standard N2N training with the same backbone. On UNet, PSNR in-creases by 0.6–0.8 dB; on NAFNet, it increases by 0.5–0.6 dB, demonstrating P2G’s universal applicability across ar-chitectures. Among self-supervised methods, P2G achieves the highest PSNR/SSIM on all datasets. P2G-NAF sur-passes AP-BSN by 0.42 dB on SIDD. P2G-U surpasses N2N by 0.75 dB on FMDD and 0.56 dB on W2S. This confirms that P2G consistently outperforms competing self-supervised methods across diverse datasets. To further compare with related VST-based methods, we also report fine-grained results in Tab. 2. Across all sub-sets, P2G achieves the best PSNR and consistently outper-forms other VST-based methods (VST-BM3D, Noise2VST, FBI-D, and VST-N2N). Moreover, P2G remains supe-rior to N2N and its scaled variants N2N-Flo. and N2N-Lat.(see Sec. 4.4 for details), suggesting that the improve-ments are not merely due to increased model capacity. 
+
+Qualitative Results. Qualitative comparisons are shown in Fig. 5. P2G shows improved detail preservation over other methods (including the N2N baseline with shared backbone). It produces clearer edges and finer lines, more faithful to the ground truth. In contrast, other methods either under-denoise or oversmooth, blurring details. This sug-gests that P2G effectively reduces the difficulty of learning real noise. 
+
+4.4. Ablations 
+
+Mechanism Analysis. As shown in Fig. 6a, fine-tuning the denoiser alone yields negligible gains (37.91 vs 37.90 dB), indicating that simply updating network weights does not resolve the mismatch to signal-dependent MPGN. Training P2G alone improves performance to 38.53 dB but rapidly saturates and becomes unstable, as the flow is op-timized against a frozen denoiser and cannot benefit from co-adaptation. In contrast, alternating optimization couples Gaussianization and denoising, enabling mutual adaptation and leading to stable convergence and the best performance (38.81 dB). 
+
+Architecture Ablation. To validate the architecture, Fig. 6b reports ablations that compare P2G against AllI-nOneBlock (with hard permutation) [5] baseline and two degenerate variants that retain only Coupling or only Cay-leyMix. The fitting curves show that the proposed architec-ture attains the highest PSNR (38.81 dB), exceeding AllI-nOneBlock (38.44 dB), whereas removing either compo-nent degrades performance (38.69 dB/38.67 dB). In addi-tion, AllInOneBlock suffers a performance drop at initial-ization, which further motivates our use of CayleyMix to enable identity initialization. 7Table 1. Quantitative comparisons on SIDD Raw, FMDD, and W2S datasets. For self-supervised denoising methods, the best and second-best results for PSNR/SSIM are highlighted in bold and underlined, respectively. Results for classical and supervised methods are also provided as references. 
+
+Category Method SIDD [1] FMDD [62] W2S [64] 
+
+Classical VST-BM3D [14] 48.60 / 0.985 34.25 / 0.804 33.19 / 0.904 PURE-LET [40] 39.31 / 0.990 33.23 / 0.777 29.97 / 0.826 Supervised DnCNN [60] 48.19 / 0.980 36.96 / 0.924 32.41 / 0.836 UNet [53] 45.50 / 0.972 37.08 / 0.931 34.94 / 0.909 Restormer [58] – 37.22 / 0.932 34.71 / 0.904 NAFNet [12] 51.05 / 0.989 36.50 / 0.917 33.98 / 0.875 Self-Supervised MASH [13] 49.86 / 0.985 35.25 / 0.894 32.46 / 0.833 AP-BSN [32] 50.11 / 0.961 33.71 / 0.858 –SA-SSL [35] 47.23 / 0.972 34.35 / 0.883 31.17 / 0.797 SDAP [50] 45.17 / 0.955 33.38 / 0.858 32.32 / 0.843 B2UB [55] 49.38 / 0.990 34.21 / 0.793 30.99 / 0.870 N2Nbr [24] 47.85 / 0.981 34.38 / 0.869 34.04 / 0.892 N2V [30] 43.91 / 0.975 33.71 / 0.819 32.92 / 0.859 AMSNet [39] 45.89 / 0.951 32.74 / 0.834 34.75 / 0.876 N2N [33] 45.63 / 0.971 36.79 / 0.929 34.74 / 0.902 N2N-NAF [12] 49.94 / 0.986 36.21 / 0.913 33.78 / 0.868 
+
+P2G-U 46.45 / 0.984 37.54 / 0.939 35.44 / 0.910 P2G-NAF 50.53 / 0.992 36.85 / 0.925 34.27 / 0.875 Table 2. Fine-grained evaluation on FMDD and W2S. Following previous methods, we report PSNR (dB) on (a) different FMDD samples and (b) different W2S channels. 
+
+> (a) FMDD [62]
+
+Method CFF CFM TPM 
+
+VST-BM3D [14] 32.16 37.93 33.83 VST-DRU [61] 32.18 38.11 34.01 VST-N2N [43] 32.34 38.17 34.00 N2V [30] 32.08 37.49 33.38 ZS-N2N [45] 30.62 36.15 32.66 SSDN [31] 31.62 37.82 33.09 B2UB [55] 32.74 38.44 34.03 FBI-D [9] 32.22 38.32 33.95 N2N [33] 33.05 38.48 34.35 N2N-Flo. [33] 33.06 38.52 34.20 N2N-Lat. [33] 32.74 38.02 33.84 Noise2VST [23] 32.88 38.27 34.06 
+
+P2G-U 33.90 39.19 34.88 
+
+> (b) W2S [64]
+
+Method CH0 CH1 CH2 
+
+VST-BM3D [14] 33.33 31.16 34.50 VST-DRU [61] 32.54 30.15 33.75 VST-N2N [43] – 32.42 34.34 N2V [30] 34.30 31.80 34.65 ZS-N2N [45] 32.26 30.56 32.79 B2UB [55] 30.12 28.93 33.90 DivNoising [51] 34.13 32.28 35.18 DecoNoising [20] 34.90 32.31 35.09 N2N [33] 35.06 32.97 36.23 N2N-Flo. [33] 35.27 33.24 36.41 N2N-Lat. [33] 35.04 32.08 35.28 Noise2VST [23] 35.65 33.43 36.88 
+
+P2G-U 35.95 33.52 36.90 
+
+Computational Efficiency. As shown in Tab. 3, P2G has higher latency than a single-pass N2N due to an additional Gaussianization-denoising pass. This overhead is a reason-able trade-off given the consistent gains in Tab. 1 and Tab. 2. To rule out the effect of increased compute, we widen the UNet backbone to match P2G in FLOPs (N2N-Flo., 1.3 ×)and latency (N2N-Lat., 3.6 ×). As shown in Tab. 2, these compute-matched baselines remain inferior, indicating that the gains stem from proposed Gaussianization rather than a larger backbone. 
+
+## 5. Discussion 
+
+A detailed comparison between P2G and prior methods (NFs and VSTs) can be found in Sec. 2; here we focus on 838.25 
+
+37.75 
+
+37.25 
+
+38.25 
+
+37.75 
+
+37.25  0 50  100  150  200 
+
+Iterations 
+
+> PSNR
+
+P2G Only 
+
+Denoiser Only 
+
+Pretrained 
+
+CayleyMix 
+
+Pretrained 
+
+AllinOneBlock 
+
+MASH  AP-BSN  N2N-NAF  P2G-NAF  Reference 
+
+34.41 / 0.916  32.61 / 0.910  36.73 / 0.923  PSNR/SSIM 
+
+PSNR/SSIM 50.28 / 0.995 
+
+33.77 / 0.867 
+
+N2Nbr Noisy 
+
+25.57 / 0.342 
+
+49.69 / 0.988 47.22 / 0.972 49.53 / 0.969 46.01 / 0.979 35.75 / 0.932 
+
+35.47 / 0.910 
+
+0 50  100  150  200 
+
+Iterations 
+
+> PSNR
+
+Figure 5. Visual comparison on SIDD Raw and FMDD datasets. Compared to other methods, P2G demonstrates superior detail restoration capability while suppressing oversmoothing and artifacts (Additional HFEN results are provided in the supplementary materials.). Images from SIDD were converted from raw Bayer to sRGB for visualization .42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+44 
+
+38.25 
+
+38.75 
+
+37.75 
+
+37.25 
+
+38.25 
+
+38.75 
+
+37.75 
+
+37.25 
+
+Ori. 
+
+-P 
+
+Trs. 
+
+-G          
+
+> 𝒓𝒓 𝝓𝝓 :𝒏𝒏 𝑷𝑷 ∈ ℝ 𝑫𝑫 ⟼ 𝒏𝒏 𝑮𝑮 =𝒓𝒓 𝝓𝝓 (𝒏𝒏 𝑷𝑷 )∈ ℝ 𝑫𝑫
+
+Coupling  CayleyMix  CayleyMix 
+
+global 
+
+Normalizing 
+
+𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 . 𝑵𝑵 𝒐𝒐 𝒓𝒓 𝒐𝒐 .𝒏𝒏 .
+
+𝒑𝒑 𝒎𝒎 
+
+𝒑𝒑 𝒃𝒃 
+
+s
+
+t
+
+Coupling  CayleyMix  De-Normalizing 
+
+s
+
+t
+
+> ...  ...
+> ...  ...
+
+×n
+
+𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝑵𝑵 𝒎𝒎𝒓𝒓 𝒕𝒕 .𝒏𝒏 .
+
+(b) 
+
+0 50  100  150  200 
+
+Iterations 
+
+> PSNR
+
+P2G + Denoiser 
+
+P2G Only 
+
+Denoiser Only 
+
+Pretrained 
+
+P2G 
+
+Coupling 
+
+CayleyMix 
+
+Pretrained 
+
+AllinOneBlock 
+
+(a)  (b) 
+
+> Value Density
+
+44 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+UNet 
+
+1 4 16  64 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+32 
+
+30 
+
+NAFNet Restormer DnCNN 
+
+44 
+
+42 
+
+40 
+
+38 
+
+36 
+
+34 
+
+32 
+
+HomoG HeteroG  Poisson 
+
+1 4 16  64 
+
+Photon count (Q) 
+
+> PSNR (dB)
+
+(a)  (b) 
+
+w/o P2G 
+
+w/ P2G 
+
+Gaussian 
+
+SSIM ( ↑) KL ( ↓) 1 - SFM ( ↓)
+
+1.0 
+
+0.9 
+
+0.8 
+
+0.7 
+
+1 4 16  64 
+
+1.5 
+
+1.0 
+
+0.5 
+
+0.0  .00 
+
+.02 
+
+.04 
+
+.06 
+
+1 4 16  64  1 4 16  64 
+
+PSNR ( ↑)
+
+1 4 16  64 
+
+45 
+
+40 
+
+35 
+
+30 
+
+Photon count (Q) 
+
+MASH  AP-BSN  N2N-NAF  P2G-NAF  Reference 
+
+34.41 / 0.916  32.61 / 0.910  36.73 / 0.923  PSNR/SSIM 
+
+PSNR/SSIM 50.28 / 0.995 
+
+33.77 / 0.867 
+
+N2Nbr Noisy 
+
+25.57 / 0.342 
+
+49.69 / 0.988 47.22 / 0.972 49.53 / 0.969 46.01 / 0.979 35.75 / 0.932 
+
+35.47 / 0.910 
+
+0.6 
+
+0.0 
+
+-0.6 
+
+Denoised Error map 
+
+-0.06 
+
+0.00 
+
+0.06 
+
+39.40 / 0.950 
+
+AC map Histogram 
+
+0.2 
+
+0.6 
+
+0 4-4 
+
+0.8 
+
+0.0 
+
+0.4 
+
+KL=0.042  1-SFM=0.011 
+
+1-SFM=0.003  40.66 / 0.956 KL=0.023 
+
+(a)  (b) 
+
+0 50  100  150  200 
+
+Iterations 
+
+> PSNR
+
+1 4 16  64  1 4 16  64 
+
+ISO 
+
+𝒏𝒏 ~𝓝𝓝 (𝟎𝟎 , 𝝈𝝈 𝟐𝟐 (𝒙𝒙 )), 𝝈𝝈 𝟐𝟐 (𝒙𝒙 ) = 𝜷𝜷 𝟏𝟏 𝒙𝒙 + 𝜷𝜷 𝟐𝟐 
+
+𝜷𝜷 𝟐𝟐 
+
+𝜷𝜷 𝟏𝟏 
+
+0.00 
+
+0.01 
+
+0.02 
+
+50  100  200  400  800  1600  3200  6400 
+
+0
+
+100 
+
+150 
+
+0.00  0.02 -0.02  0.0  0.2 -0.2 
+
+0
+
+15 
+
+5
+
+0.0 -0.3  0.3 
+
+0
+
+20 
+
+10 
+
+30 1 2 3
+
+50 
+
+10 
+
+Noise value 
+
+> 1
+> 2
+> 3
+> w/o P2G  w/ P2G
+
+Figure 6. Results of ablation studies. (a) Alternating training of P2G and the denoiser is crucial for convergence and performance. (b) The combination of Coupling and CayleyMix (our P2G) layers ensures optimal performance, consistent with the conclusions in Sec. 3.2. Table 3. Computational efficiency on 512 × 512 × 1 inputs. FLOPs and latency are measured under the same implementation setting. N2N-Flo./N2N-Lat. are compute-matched N2N variants whose denoising performance is reported in Tab. 2. 
+
+Method FLOPs (G) Latency (ms) 
+
+N2N 44.9 3.6 N2N-Lat. 1161.1 18.3 N2N-Flo. 154.1 3.9 VST-N2N 139.6 8.0 FBI-D 104.9 16.1 
+
+P2G-U 145.0 18.1 
+
+limitations and future directions. Despite achieving signifi-cant improvements, a gap between the transformed resid-ual and i.i.d. AWGN remains (Fig. 4). Moreover, P2G involves a performance-efficiency trade-off, as Gaussian-ization comes with additional computational and memory overhead. Addressing this trade-off while achieving more accurate conversions remains a key direction for future re-search. 
+
+## 6. Conclusion 
+
+We propose P2G, a self-supervised noise Gaussianiza-tion method that transforms real-image noise into i.i.d. AWGN, thereby improving denoising performance. Exten-sive experiments across diverse regimes confirm that our architecture-agnostic approach consistently delivers state-of-the-art performance. 9References 
+
+[1] Abdelrahman Abdelhamed, Stephen Lin, and Michael S. Brown. A high-quality denoising dataset for smartphone cameras. In 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 1692–1700, 2018. 2, 6, 8 [2] Abdelrahman Abdelhamed, Marcus Brubaker, and Michael Brown. Noise flow: Noise modeling with conditional nor-malizing flows. In 2019 IEEE/CVF International Conference on Computer Vision (ICCV) , pages 3165–3173, 2019. 3 [3] M. Aharon, M. Elad, and A. Bruckstein. K-svd: An al-gorithm for designing overcomplete dictionaries for sparse representation. IEEE Transactions on Signal Processing , 54 (11):4311–4322, 2006. 2 [4] F. J. ANSCOMBE. The transformation of poisson, binomial and negative-binomial data. Biometrika , 35(3-4):246–254, 1948. 2 [5] Lynton Ardizzone, Till Bungert, Felix Draxler, Ullrich K¨ othe, Jakob Kruse, Robert Schmier, and Peter Sorren-son. Framework for Easily Invertible Architectures (FrEIA), 2018-2022. 5, 7 [6] Lucio Azzari and Alessandro Foi. Variance stabilization for noisy+estimate combination in iterative poisson denoising. 
+
+IEEE Signal Processing Letters , 23(8):1086–1090, 2016. 2 [7] Liheng Bian, Haoze Song, Lintao Peng, Xuyang Chang, Xi Yang, Roarke Horstmeyer, Lin Ye, Chunli Zhu, Tong Qin, Dezhi Zheng, et al. High-resolution single-photon imaging with physics-informed deep learning. Nature Communica-tions , 14(1):5902, 2023. 2 [8] A. Buades, B. Coll, and J.-M. Morel. A non-local algo-rithm for image denoising. In 2005 IEEE Computer Soci-ety Conference on Computer Vision and Pattern Recognition (CVPR’05) , pages 60–65 vol. 2, 2005. 2 [9] Jaeseok Byun, Sungmin Cha, and Taesup Moon. Fbi-denoiser: Fast blind image denoiser for poisson-gaussian noise. In 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 5764–5773, 2021. 2, 8 [10] Yue Cao, Ming Liu, Shuai Liu, Xiaotao Wang, Lei Lei, and Wangmeng Zuo. Physics-guided iso-dependent sen-sor noise modeling for extreme low-light photography. In 
+
+2023 IEEE/CVF Conference on Computer Vision and Pat-tern Recognition (CVPR) , pages 5744–5753, 2023. 2, 3 [11] Catxere A Casacio, Lars S Madsen, Alex Terrasson, Muham-mad Waleed, Kai Barnscheidt, Boris Hage, Michael A Tay-lor, and Warwick P Bowen. Quantum-enhanced nonlinear microscopy. Nature , 594(7862):201–206, 2021. 2 [12] Liangyu Chen, Xiaojie Chu, Xiangyu Zhang, and Jian Sun. Simple baselines for image restoration. In Computer Vision – ECCV 2022 , pages 17–33, Cham, 2022. Springer Nature Switzerland. 6, 8 [13] Hamadi Chihaoui and Paolo Favaro. Masked and shuf-fled blind spot denoising for real-world images. In 2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 3025–3034, 2024. 3, 8 [14] Kostadin Dabov, Alessandro Foi, Vladimir Katkovnik, and Karen Egiazarian. Image denoising by sparse 3-d transform-domain collaborative filtering. IEEE Transactions on Image Processing , 16(8):2080–2095, 2007. 2, 8 [15] Laurent Dinh, David Krueger, and Yoshua Bengio. Nice: Non-linear independent components estimation. arXiv preprint arXiv:1410.8516 , 2014. 3 [16] Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio. Density estimation using real nvp. 2017. 3, 4, 5 [17] Michael Elad, Bahjat Kawar, and Gregory Vaksman. Image denoising: The deep learning revolution and beyond – a sur-vey paper –. 2023. 1 [18] Alessandro Foi, Mejdi Trimeche, Vladimir Katkovnik, and Karen Egiazarian. Practical poissonian-gaussian noise mod-eling and fitting for single-image raw-data. IEEE Transac-tions on Image Processing , 17(10):1737–1754, 2008. 2 [19] Zixuan Fu, Lanqing Guo, and Bihan Wen. srgb real noise synthesizing with neighboring correlation-aware noise model. In 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 1683–1691, 2023. 3 [20] Anna S. Goncharova, Alf Honigmann, Florian Jug, and Alexander Krull. Improving blind spot denoising for mi-croscopy. In Computer Vision – ECCV 2020 Workshops ,pages 380–393, Cham, 2020. Springer International Publish-ing. 8 [21] Shi Guo, Zifei Yan, Kai Zhang, Wangmeng Zuo, and Lei Zhang. Toward convolutional blind denoising of real pho-tographs. In 2019 IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) , pages 1712–1722, 2019. 2 [22] Yuduo Guo, Hao Zhang, Mingyu Li, Fujiang Yu, Yunjing Wu, Yuhan Hao, Song Huang, Yongming Liang, Xiaojing Lin, Xinyang Li, Jiamin Wu, Zheng Cai, and Qionghai Dai. Deeper detection limits in astronomical imaging us-ing self-supervised spatiotemporal denoising. Science , 0(0): eady9404, 2026. 2 [23] S´ ebastien Herbreteau and Michael Unser. Self-calibrated variance-stabilizing transformations for real-world image denoising. In ICCV , 2025. 2, 6, 8 [24] Tao Huang, Songjiang Li, Xu Jia, Huchuan Lu, and Jianzhuang Liu. Neighbor2neighbor: Self-supervised de-noising from single noisy images. In 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 14776–14785, 2021. 3, 6, 8 [25] Geonwoon Jang, Wooseok Lee, Sanghyun Son, and Ky-oungmu Lee. C2n: Practical generative noise modeling for real-world denoising. In 2021 IEEE/CVF International Conference on Computer Vision (ICCV) , pages 2330–2339, 2021. 2 [26] Changjin Kim, Tae Hyun Kim, and Sungyong Baik. Lan: Learning to adapt noise for image denoising. In 2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 25193–25202, 2024. 1, 2 [27] Yoonsik Kim, Jae Woong Soh, Gu Yong Park, and Nam Ik Cho. Transfer learning from synthetic to real-noise denois-ing with adaptive instance normalization. In 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 3479–3489, 2020. 2 [28] Diederik P. Kingma and Prafulla Dhariwal. Glow: Genera-tive flow with invertible 1x1 convolutions, 2018. 3, 4 
+
+10 [29] Shayan Kousha, Ali Maleky, Michael S. Brown, and Mar-cus A. Brubaker. Modeling srgb camera noise with normal-izing flows. In 2022 IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) , pages 17442–17450, 2022. 3 [30] Alexander Krull, Tim-Oliver Buchholz, and Florian Jug. Noise2void - learning denoising from single noisy images. In 2019 IEEE/CVF Conference on Computer Vision and Pat-tern Recognition (CVPR) , pages 2124–2132, 2019. 2, 3, 8 [31] Samuli Laine, Tero Karras, Jaakko Lehtinen, and Timo Aila. High-quality self-supervised deep image denoising. In Ad-vances in Neural Information Processing Systems . Curran Associates, Inc., 2019. 8 [32] Wooseok Lee, Sanghyun Son, and Kyoung Mu Lee. Ap-bsn: Self-supervised denoising for real-world images via asymmetric pd and blind-spot network. In 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 17704–17713, 2022. 3, 8 [33] Jaakko Lehtinen, Jacob Munkberg, Jon Hasselgren, Samuli Laine, Tero Karras, Miika Aittala, and Timo Aila. Noise2noise: Learning image restoration without clean data. 
+
+arXiv preprint arXiv:1803.04189 , 2018. 2, 3, 6, 8 [34] Victor Lempitsky, Andrea Vedaldi, and Dmitry Ulyanov. Deep image prior. In 2018 IEEE/CVF Conference on Com-puter Vision and Pattern Recognition , pages 9446–9454, 2018. 3 [35] Junyi Li, Zhilu Zhang, Xiaoyu Liu, Chaoyu Feng, Xiao-tao Wang, Lei Lei, and Wangmeng Zuo. Spatially adaptive self-supervised learning for real-world image denoising. In 
+
+2023 IEEE/CVF Conference on Computer Vision and Pat-tern Recognition (CVPR) , pages 9914–9924, 2023. 8 [36] Xinyang Li, Guoxun Zhang, Jiamin Wu, Yuanlong Zhang, Zhifeng Zhao, Xing Lin, Hui Qiao, Hao Xie, Haoqian Wang, Lu Fang, et al. Reinforcing neuron extraction and spike in-ference in calcium imaging using deep self-supervised de-noising. Nature Methods , 18(11):1395–1400, 2021. 2 [37] Xinyang Li, Xiaowan Hu, Xingye Chen, Jiaqi Fan, Zhifeng Zhao, Jiamin Wu, Haoqian Wang, and Qionghai Dai. Spatial redundancy transformer for self-supervised fluorescence im-age denoising. Nature Computational Science , 3(12):1067– 1080, 2023. 1 [38] Xinyang Li, Yixin Li, Yiliang Zhou, Jiamin Wu, Zhifeng Zhao, Jiaqi Fan, Fei Deng, Zhaofa Wu, Guihua Xiao, Jing He, et al. Real-time denoising enables high-sensitivity flu-orescence time-lapse imaging beyond the shot-noise limit. 
+
+Nature Biotechnology , 41(2):282–292, 2023. 2, 6 [39] Xiangyu Liao, Tianheng Zheng, Jiayu Zhong, Pingping Zhang, and Chao Ren. Asymmetric mask scheme for self-supervised real image denoising. In Computer Vision – ECCV 2024 , pages 199–215, Cham, 2025. Springer Nature Switzerland. 8 [40] Florian Luisier, Thierry Blu, and Michael Unser. Image de-noising in mixed poisson–gaussian noise. IEEE Transactions on Image Processing , 20(3):696–708, 2011. 8 [41] Markku Makitalo and Alessandro Foi. A closed-form ap-proximation of the exact unbiased inverse of the anscombe variance-stabilizing transformation. IEEE Transactions on Image Processing , 20(9):2697–2698, 2011. 2 [42] Markku Makitalo and Alessandro Foi. Optimal inversion of the anscombe transformation in low-count poisson image de-noising. IEEE Transactions on Image Processing , 20(1):99– 109, 2011. [43] Markku Makitalo and Alessandro Foi. Optimal inversion of the generalized anscombe transformation for poisson-gaussian noise. IEEE Transactions on Image Processing , 22 (1):91–103, 2013. 2, 8 [44] Ali Maleky, Shayan Kousha, Michael S. Brown, and Mar-cus A. Brubaker. Noise2noiseflow: Realistic camera noise modeling without clean images. In 2022 IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition (CVPR) ,pages 17611–17620, 2022. 3 [45] Youssef Mansour and Reinhard Heckel. Zero-shot noise2noise: Efficient image denoising without any data. In 
+
+2023 IEEE/CVF Conference on Computer Vision and Pat-tern Recognition (CVPR) , pages 14018–14027, 2023. 3, 8 [46] Kristina Monakhova, Stephan R. Richter, Laura Waller, and Vladlen Koltun. Dancing under the stars: video denoising in starlight. In 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 16220–16230, 2022. 2[47] Nick Moran, Dan Schmidt, Yu Zhong, and Patrick Coady. Noisier2noise: Learning to denoise from unpaired noisy data. In 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 12061–12069, 2020. 3[48] Reyhaneh Neshatavar, Mohsen Yavartanoo, Sanghyun Son, and Kyoung Mu Lee. Cvf-sid: Cyclic multi-variate function for self-supervised image denoising by disentangling noise from image. In 2022 IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) , pages 17562–17570, 2022. 1 [49] Han V. Nguyen, Magnus O. Ulfarsson, and Johannes R. Sveinsson. Hyperspectral image denoising using sure-based unsupervised convolutional neural networks. IEEE Transac-tions on Geoscience and Remote Sensing , 59(4):3369–3382, 2021. 3 [50] Yizhong Pan, Xiao Liu, Xiangyu Liao, Yuanzhouhan Cao, and Chao Ren. Random sub-samples generation for self-supervised real image denoising. In 2023 IEEE/CVF In-ternational Conference on Computer Vision (ICCV) , pages 12116–12125, 2023. 3, 8 [51] Mangal Prakash, Alexander Krull, and Florian Jug. Fully un-supervised diversity denoising with convolutional variational autoencoders. In International Conference on Learning Rep-resentations , 2021. 8 [52] Meisam Rakhshanfar and Maria A. Amer. Estimation of gaussian, poissonian–gaussian, and processed visual noise and its level function. IEEE Transactions on Image Process-ing , 25(9):4172–4185, 2016. 2 [53] Olaf Ronneberger, Philipp Fischer, and Thomas Brox. U-net: Convolutional networks for biomedical image segmen-tation. In Medical Image Computing and Computer-Assisted Intervention – MICCAI 2015 , pages 234–241, Cham, 2015. Springer International Publishing. 6, 8 [54] Nigam Samantaray, Ivano Ruo-Berchera, Alice Meda, and Marco Genovese. Realization of the first sub-shot-noise 
+
+11 wide field microscope. Light: Science & Applications , 6(7): e17005–e17005, 2017. 2 [55] Zejin Wang, Jiazheng Liu, Guoqing Li, and Hua Han. Blind2unblind: Self-supervised image denoising with visi-ble blind spots. In 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 2017–2026, 2022. 3, 8 [56] Kaixuan Wei, Ying Fu, Jiaolong Yang, and Hua Huang. A physics-based noise formation model for extreme low-light raw denoising. In 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 2755–2764, 2020. 2 [57] Syed Waqas Zamir, Aditya Arora, Salman Khan, Munawar Hayat, Fahad Shahbaz Khan, Ming-Hsuan Yang, and Ling Shao. Cycleisp: Real image restoration via improved data synthesis. In 2020 IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) , pages 2693–2702, 2020. 2 [58] Syed Waqas Zamir, Aditya Arora, Salman Khan, Mu-nawar Hayat, Fahad Shahbaz Khan, and Ming–Hsuan Yang. Restormer: Efficient transformer for high-resolution image restoration. In 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 5718–5729, 2022. 2, 8 [59] Guoxun Zhang, Xiaopeng Li, Yuanlong Zhang, Xiaofei Han, Xinyang Li, Jinqiang Yu, Boqi Liu, Jiamin Wu, Li Yu, and Qionghai Dai. Bio-friendly long-term subcellular dy-namic recording by self-supervised image enhancement mi-croscopy. Nature Methods , 20(12):1957–1970, 2023. 2 [60] Kai Zhang, Wangmeng Zuo, Yunjin Chen, Deyu Meng, and Lei Zhang. Beyond a gaussian denoiser: Residual learning of deep cnn for image denoising. IEEE Transactions on Image Processing , 26(7):3142–3155, 2017. 8 [61] Kai Zhang, Yawei Li, Wangmeng Zuo, Lei Zhang, Luc Van Gool, and Radu Timofte. Plug-and-play image restora-tion with deep denoiser prior. IEEE Transactions on Pat-tern Analysis and Machine Intelligence , 44(10):6360–6376, 2021. 8 [62] Yide Zhang, Yinhao Zhu, Evan Nichols, Qingfei Wang, Siyuan Zhang, Cody Smith, and Scott Howard. Apoisson-gaussian denoising dataset with real fluorescence microscopy images. In 2019 IEEE/CVF Conference on Com-puter Vision and Pattern Recognition (CVPR) , pages 11702– 11710, 2019. 6, 8 [63] Yi Zhang, Dasong Li, Ka Lung Law, Xiaogang Wang, Hong-wei Qin, and Hongsheng Li. Idr: Self-supervised image de-noising via iterative data refinement. In 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 2088–2097, 2022. 1 [64] Ruofan Zhou, Majed El Helou, Daniel Sage, Thierry Laroche, Arne Seitz, and Sabine S¨ usstrunk. W2s: mi-croscopy data with joint denoising and super-resolution for widefield to sim mapping. In European Conference on Com-puter Vision , pages 474–491. Springer, 2020. 6, 8 [65] Yuqian Zhou, Jianbo Jiao, Haibin Huang, Yang Wang, Jue Wang, Honghui Shi, and Thomas Huang. When awgn-based denoiser meets real noises. In Proceedings of the AAAI Con-ference on Artificial Intelligence , pages 13074–13081, 2020. 2[66] Daniel Zoran and Yair Weiss. From learning models of nat-ural image patches to whole image restoration. In 2011 In-ternational Conference on Computer Vision , pages 479–486, 2011. 2 
+
+12

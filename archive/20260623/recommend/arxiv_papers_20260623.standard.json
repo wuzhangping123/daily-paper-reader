@@ -1,0 +1,132 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-23T21:59:36.053357+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.23098v1",
+      "source": "arxiv",
+      "title": "Poisson2Gaussian: Noise Gaussianization to Enhance Image Denoising",
+      "abstract": "The quantum nature of light determines the inherent Poisson stochasticity of photon detection, which is ubiquitous in photography, microscopy, and astronomy. However, our controlled numerical studies reveal that the signal-dependency, heteroscedasticity, and statistical asymmetry of Poisson-mixed noise make it challenging for existing denoisers to learn. In contrast, i.i.d. Gaussian noise, with its statistical independence and symmetric distribution, is easier to model for networks. To address this gap, we propose Poisson2Gaussian (P2G), a noise Gaussianization method that explicitly converts complex real-world noise to i.i.d. Gaussian noise via probability density matching beyond low-order moments. We also design an unbiased denoising framework that synergizes P2G with downstream denoisers, ensuring convergence to the underlying signal without requiring paired clean data or explicit noise parameters. Extensive experiments demonstrate that P2G consistently achieves state-of-the-art performance across diverse datasets. In challenging scenarios where noise strongly deviates from Gaussian statistics, our method improves the PSNR by up to 0.75 dB. Notably, P2G is architecture-agnostic and can provide universal improvements for various denoisers. The source code will be publicly available.",
+      "authors": [
+        "Xirou Zhou",
+        "Zijing Xu",
+        "Yibo Qu",
+        "Qi Zhang",
+        "Xiaowan Hu",
+        "Xinyang Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-22T09:41:59+00:00",
+      "link": "https://arxiv.org/pdf/2606.23098v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "general image denoising method via noise Gaussianization",
+      "llm_evidence_cn": "通过噪声高斯化的通用图像去噪方法",
+      "llm_evidence": "通过噪声高斯化的通用图像去噪方法",
+      "canonical_evidence": "通过噪声高斯化的通用图像去噪方法",
+      "llm_tldr_en": "Proposes Poisson2Gaussian to convert complex noise to i.i.d. Gaussian for easier denoising, enhancing existing denoisers.",
+      "llm_tldr_cn": "现有去噪网络在处理泊松混合噪声时面临信号依赖性和异方差性挑战，而独立同分布高斯噪声更易建模。本文提出Poisson2Gaussian（P2G）方法，通过概率密度匹配将复杂真实噪声显式转化为高斯噪声，并设计无偏去噪框架。实验表明该方法能显著提升多种去噪器在真实噪声下的性能，为图像去噪提供了一种通用的预处理策略。",
+      "llm_tldr": "现有去噪网络在处理泊松混合噪声时面临信号依赖性和异方差性挑战，而独立同分布高斯噪声更易建模。本文提出Poisson2Gaussian（P2G）方法，通过概率密度匹配将复杂真实噪声显式转化为高斯噪声，并设计无偏去噪框架。实验表明该方法能显著提升多种去噪器在真实噪声下的性能，为图像去噪提供了一种通用的预处理策略。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.17521v1",
+      "source": "arxiv",
+      "title": "DiffPC: Diffusion-Based Projector Photometric Compensation",
+      "abstract": "Projector photometric compensation corrects color distortions introduced by surface texture, reflection, and ambient lighting. Existing deep learning-based methods usually require professional scene-specific data collection and lack consideration for perceptual quality. To address this limitation, we present a diffusion-based photometric compensation method that reconstructs compensation images under photometric and content-aware guidance. Specifically, we first model the photometric distortions introduced during projection as environment-dependent additive noise, thereby reformulating the photometric compensation problem as a denoising task with physical constraints. Next, we introduce a diffusion model, which generates compensation images by following an additive trajectory to iteratively remove the noise. Finally, to accurately estimate the noise at each timestep, by analyzing the factors that contribute to distortions in the physical process of projection and capturing, we design a noise estimation network that incorporates features of both photometry-aware and content conditions. Experiments show that our method achieves superior visual performance in unknown scenarios, thereby exhibiting significant practical advantages over prior methods.",
+      "authors": [
+        "Yuxi Wang",
+        "Haibin Ling",
+        "Bingyao Huang"
+      ],
+      "primary_category": "cs.MM",
+      "categories": [
+        "cs.MM"
+      ],
+      "published": "2026-06-16T05:02:11+00:00",
+      "link": "https://arxiv.org/pdf/2606.17521v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "diffusion-based denoising for photometric compensation; methodology transferable to HSI denoising",
+      "llm_evidence_cn": "基于扩散的去噪方法用于光度补偿，方法论可迁移至高光谱去噪",
+      "llm_evidence": "基于扩散的去噪方法用于光度补偿，方法论可迁移至高光谱去噪",
+      "canonical_evidence": "基于扩散的去噪方法用于光度补偿，方法论可迁移至高光谱去噪",
+      "llm_tldr_en": "DiffPC reformulates projector photometric compensation as a denoising task with physical constraints and uses a diffusion model to generate compensation images, demonstrating state-of-the-art results.",
+      "llm_tldr_cn": "DiffPC将投影仪光度补偿问题重新建模为受物理约束的去噪任务，并引入扩散模型生成补偿图像。该方法避免了专业场景数据收集，提升了感知质量。实验表明其在色差校正上优于现有方法，为图像去噪提供了新视角，可迁移至遥感图像领域。",
+      "llm_tldr": "DiffPC将投影仪光度补偿问题重新建模为受物理约束的去噪任务，并引入扩散模型生成补偿图像。该方法避免了专业场景数据收集，提升了感知质量。实验表明其在色差校正上优于现有方法，为图像去噪提供了新视角，可迁移至遥感图像领域。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.22801v1",
+      "source": "arxiv",
+      "title": "Learning Adaptive Dynamical Features via Multi-$τ$ Liquid-Mamba for All-in-one Image Restoration",
+      "abstract": "Image restoration aims to recover high-quality images from degraded observations. Recent Mamba-based image restoration models have demonstrated strong potential in modeling long-range dependencies with linear complexity. However, most existing designs still rely on a single state-evolution timescale, which limits their adaptability to spatially heterogeneous and task-dependent degradation patterns in all-in-one image restoration. In this paper, we propose Multi-$τ$ Liquid-Mamba, an adaptive state space module that introduces input-conditioned multi-timescale liquid discretization into selective state space modeling. Instead of changing the overall selective scan pipeline, the proposed module modulates the effective discretization steps of multiple dynamical branches and adaptively fuses their responses according to degradation-aware gating weights. This design allows the model to capture both fast-varying local details and slowly evolving global structures while preserving the linear scaling property of Mamba with respect to sequence length. Importantly, Multi-$τ$ Liquid-Mamba modulates the effective transition dynamics while preserving the original selective parameterization and hardware-efficient selective scan mechanism, making it a plug-and-play module that can be seamlessly integrated into existing Mamba-based architectures. Built upon this framework, we develop a Multi-$τ$ Liquid-Mamba Image Restoration Network (MLMIR) for all-in-one image restoration. Extensive experiments on a wide range of restoration benchmarks demonstrate that MLMIR consistently achieves state-of-the-art performance in all-in-one image restoration while remaining highly competitive in task-aligned restoration settings.",
+      "authors": [
+        "Hu Gao",
+        "Changshuo Wang",
+        "Yulong Chen",
+        "Lizhuang Ma"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-22T03:20:18+00:00",
+      "link": "https://arxiv.org/pdf/2606.22801v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "all-in-one image restoration including denoising with adaptive Mamba",
+      "llm_evidence_cn": "包含去噪的全能图像恢复方法，采用自适应Mamba",
+      "llm_evidence": "包含去噪的全能图像恢复方法，采用自适应Mamba",
+      "canonical_evidence": "包含去噪的全能图像恢复方法，采用自适应Mamba",
+      "llm_tldr_en": "Proposes Multi-tau Liquid-Mamba for all-in-one image restoration, using adaptive multi-timescale discretization to handle heterogeneous degradation.",
+      "llm_tldr_cn": "现有Mamba图像恢复模型依赖单一时间尺度，难以适应空间异质和任务依赖的退化模式。本文提出多τ液态Mamba模块，引入输入条件化的多时间尺度液态离散化，在不改变扫描流程的前提下自适应调节状态演化。在多种图像退化（包括去噪）任务上，该方法取得了优于现有方法的性能，为全能恢复提供了新思路。",
+      "llm_tldr": "现有Mamba图像恢复模型依赖单一时间尺度，难以适应空间异质和任务依赖的退化模式。本文提出多τ液态Mamba模块，引入输入条件化的多时间尺度液态离散化，在不改变扫描流程的前提下自适应调节状态演化。在多种图像退化（包括去噪）任务上，该方法取得了优于现有方法的性能，为全能恢复提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
