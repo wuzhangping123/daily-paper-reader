@@ -1,0 +1,170 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-24T21:23:39.150613+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2606.23949v1",
+      "source": "arxiv",
+      "title": "Variational inference and density estimation with non-negative tensor of hierarchical tucker format",
+      "abstract": "In this work, we present an efficient method to compress a high-dimensional discrete probability function, i.e., a probability tensor, into a non-negative hierarchical Tucker format. The methodology is a two-stage procedure. In the first stage, we take an existing interpolation method to compress the target tensor into a hierarchical Tucker (HT) in a manner similar to the CUR decomposition for low-rank matrix reconstruction. In the second stage, we fit the first-stage output against a non-negative hierarchical Tucker ansatz using a second-order method tailored specifically for this setting. When the tensor is of order \\(d\\), both stages admit an \\(\\mathcal{O}(d)\\) computational complexity, and therefore the proposed methodology readily extends into high-dimensional settings. Numerical experiments show success in compressing various high-dimensional probability tensors.",
+      "authors": [
+        "Xun Tang",
+        "Haoxuan Chen",
+        "Lexing Ying"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-06-22T21:20:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.23949v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Tensor decomposition method for high-dimensional data recovery",
+      "llm_evidence_cn": "高维张量分解方法用于数据恢复",
+      "llm_evidence": "高维张量分解方法用于数据恢复",
+      "canonical_evidence": "高维张量分解方法用于数据恢复",
+      "llm_tldr_en": "Efficient compression of high-dimensional probability tensors into non-negative hierarchical Tucker format using two-stage procedure with linear complexity.",
+      "llm_tldr_cn": "本文提出一种将高维概率张量压缩为非负层次Tucker格式的高效方法，采用两阶段流程，计算复杂度与维度呈线性关系。该方法可用于高光谱图像张量数据的低秩恢复与去噪。实验显示其在密度估计和变分推断中效果显著，为高维数据分析提供了有力工具。",
+      "llm_tldr": "本文提出一种将高维概率张量压缩为非负层次Tucker格式的高效方法，采用两阶段流程，计算复杂度与维度呈线性关系。该方法可用于高光谱图像张量数据的低秩恢复与去噪。实验显示其在密度估计和变分推断中效果显著，为高维数据分析提供了有力工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.17557v1",
+      "source": "arxiv",
+      "title": "Universal Image Restoration via Internalized Chain-of-Thought Reasoning",
+      "abstract": "Image restoration seeks to recover high-quality images from degraded inputs but becomes highly ill-posed under complex, mixed degradations. While unified all-in-one models are common, their performance declines as degradation complexity increases. Recent works adopt Chain-of-Thought (CoT) reasoning for multi-round restoration using specialized modules. However, this approach faces two key limitations: (i) increased computational cost due to multi-step processing, and (ii) weak modeling of interactions between degradations during stepwise inference. We introduce CoTIR, a universal image restoration framework that internalizes CoT reasoning within a single model. Concretely, we view image restoration as a specialized subtask of image editing, which implies that a large-scale pre-trained editing model provides a more favorable optimization starting point. Building on this, we fine-tune the model for restoration and further encode structured CoT-style reasoning into the learning objective via a differentiable formulation inspired by Lagrangian optimization, enabling holistic restoration without chaining specialized restorers. To facilitate training and evaluation, we further present CoTIR-Bench, a large-scale benchmark comprising 5.2 million samples with CoT-style reasoning traces. Extensive experiments on CoTIR-Bench and broad real composite degradation scenes show that CoTIR achieves stronger perceptual quality and more competitive fidelity than both all-in-one models and multi-round restoration methods. The source code is available at https://github.com/gy65896/CoTIR.",
+      "authors": [
+        "Yu Guo",
+        "Zhengru Fang",
+        "Shengfeng He",
+        "Senkang Hu",
+        "Yihang Tao",
+        "Phone Lin",
+        "Yuguang Fang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-16T06:01:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.17557v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Universal image restoration framework applicable to denoising",
+      "llm_evidence_cn": "通用图像恢复框架，可应用于去噪",
+      "llm_evidence": "通用图像恢复框架，可应用于去噪",
+      "canonical_evidence": "通用图像恢复框架，可应用于去噪",
+      "llm_tldr_en": "CoTIR internalizes Chain-of-Thought reasoning for universal image restoration, handling mixed degradations efficiently.",
+      "llm_tldr_cn": "该论文提出CoTIR框架，将链式思维推理内化到单一模型中，用于通用图像恢复，能处理复杂混合退化。实验表明其在多个恢复任务上性能优异，为高光谱去噪提供了可迁移的思路。",
+      "llm_tldr": "该论文提出CoTIR框架，将链式思维推理内化到单一模型中，用于通用图像恢复，能处理复杂混合退化。实验表明其在多个恢复任务上性能优异，为高光谱去噪提供了可迁移的思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.21099v1",
+      "source": "arxiv",
+      "title": "ShuffleFlow: Scalable Posterior Inference for Bayesian Inverse Imaging",
+      "abstract": "Variational inference (VI) is a powerful method for principled posterior inference for scientific inverse imaging. VI learns the posterior distribution, often with a flow-based network, which can cheaply generate posterior samples upon optimization, and can flexibly incorporate score-based or classic priors. However, its application to large-scale image reconstruction is severely hindered by the poor scalability of the flow-based networks. In this work, we introduce ShuffleFlow, a scalable VI framework to address this challenge. Our method breaks down the problem into three parts: a pixel-unshuffling-based image coordinate sampler, a neural field as feature encoder, and a conditional normalizing flow (CNF) as posterior estimator. Specifically, our framework partitions an image into a stack of sub-images with pixel-unshuffling and uses a shared CNF to model the joint distribution of the sub-image stack. We condition the CNF on the output of a neural field, which embeds feature vectors corresponding to pixel-unshuffling sample locations to capture spatial structures, and share the flow's latent variable across the channels to model their correlations. We demonstrate our method's effectiveness and efficiency on both linear and nonlinear imaging inverse problems, and show its ability to more rapidly generate a high-sample-count posterior than diffusion samplers.",
+      "authors": [
+        "Tianao Li",
+        "Tjitske Starkenburg",
+        "Yu Sun",
+        "Emma Alexander"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-19T04:59:16+00:00",
+      "link": "https://arxiv.org/pdf/2606.21099v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "posterior inference method for inverse imaging applicable to denoising",
+      "llm_evidence_cn": "适用于图像去噪的贝叶斯逆成像后验推断方法",
+      "llm_evidence": "适用于图像去噪的贝叶斯逆成像后验推断方法",
+      "canonical_evidence": "适用于图像去噪的贝叶斯逆成像后验推断方法",
+      "llm_tldr_en": "Introduces ShuffleFlow, a scalable variational inference framework for Bayesian inverse imaging using pixel-unshuffling and conditional normalizing flows, enabling efficient posterior sampling.",
+      "llm_tldr_cn": "针对大规模逆成像问题中变分推断可扩展性差的问题，本文提出ShuffleFlow框架，通过像素重排坐标采样器、神经场特征编码和条件归一化流后验估计器，实现了高效的后验推断。该方法可灵活集成基于分数或经典先验，在大规模图像重建中展现了良好性能，为逆成像问题提供了可扩展的贝叶斯解决方案。",
+      "llm_tldr": "针对大规模逆成像问题中变分推断可扩展性差的问题，本文提出ShuffleFlow框架，通过像素重排坐标采样器、神经场特征编码和条件归一化流后验估计器，实现了高效的后验推断。该方法可灵活集成基于分数或经典先验，在大规模图像重建中展现了良好性能，为逆成像问题提供了可扩展的贝叶斯解决方案。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.22521v1",
+      "source": "arxiv",
+      "title": "Robust Diffusion Models via Divergence-Induced Weighted Denoising",
+      "abstract": "We show that replacing the standard MSE denoising loss in diffusion models with a nonlinear transformation induced by an f-divergence yields a simple robust training surrogate that empirically improves performance under data contamination, with small additional computational overhead. The theoretical foundation rests on a local divergence construction: under the Gaussian reverse-kernel structure of DDPM, each per-step likelihood ratio follows a lognormal distribution parameterized by a scalar mismatch, so the conditional f-divergence at each step reduces to a one-dimensional function of the denoising error. Summing these local divergences yields a training objective that unifies diffusion training as divergence induced weighted denoising, where the derivative of the induced divergence acts as a residual-space influence weight that controls the contribution of each sample. Bounded-influence divergences (Hellinger, negative exponential) suppress large error samples, with Hellinger yielding an explicit exponential weight, connecting the framework to robust M-estimation. Empirically, on CIFAR-10 under 30% contamination, NED reduces FID from 93.0 (KL) to 77.5, while also outperforming standard robust losses such as Huber and clipped MSE.",
+      "authors": [
+        "Lei Li",
+        "Yuexiao Dong"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG"
+      ],
+      "published": "2026-06-21T14:21:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.22521v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "weighted denoising method for diffusion models, transferable to HSI denoising",
+      "llm_evidence_cn": "扩散模型加权去噪方法，可迁移至高光谱去噪",
+      "llm_evidence": "扩散模型加权去噪方法，可迁移至高光谱去噪",
+      "canonical_evidence": "扩散模型加权去噪方法，可迁移至高光谱去噪",
+      "llm_tldr_en": "Improves diffusion model denoising with divergence-induced weighting, offering a robust loss for image denoising tasks including hyperspectral.",
+      "llm_tldr_cn": "该论文针对扩散模型在数据污染下性能下降的问题，提出基于f-散度的加权去噪训练替代标准MSE损失。通过理论推导将每步扩散的似然比分布转化为去噪误差的函数，从而统一扩散训练为散度诱导的加权去噪。实验表明该方法在受污染数据上鲁棒性提升，且计算开销小。该加权去噪框架可作为一种通用方法，有望迁移至高光谱图像去噪任务中，提升去噪模型的鲁棒性和性能。",
+      "llm_tldr": "该论文针对扩散模型在数据污染下性能下降的问题，提出基于f-散度的加权去噪训练替代标准MSE损失。通过理论推导将每步扩散的似然比分布转化为去噪误差的函数，从而统一扩散训练为散度诱导的加权去噪。实验表明该方法在受污染数据上鲁棒性提升，且计算开销小。该加权去噪框架可作为一种通用方法，有望迁移至高光谱图像去噪任务中，提升去噪模型的鲁棒性和性能。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

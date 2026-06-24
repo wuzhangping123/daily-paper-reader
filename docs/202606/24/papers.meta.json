@@ -1,0 +1,69 @@
+{
+  "label": "2026-06-24",
+  "date": "2026-06-24",
+  "generated_at": "2026-06-24T21:27:20",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202606/24/2606.23949v1-variational-inference-and-density-estimation-with-non-negative-tensor-of-hierarchical-tucker-format",
+      "section": "deep",
+      "title_en": "Variational inference and density estimation with non-negative tensor of hierarchical tucker format",
+      "authors": "Xun Tang, Haoxuan Chen, Lexing Ying",
+      "date": "2026-06-22",
+      "pdf": "https://arxiv.org/pdf/2606.23949v1",
+      "score": "8.0",
+      "evidence": "高维张量分解方法用于数据恢复",
+      "tldr": "高维概率张量压缩面临维度灾难。本文提出两阶段方法：先用类似CUR分解的插值法压缩为层级塔克格式，再用专用二阶方法拟合非负约束。两阶段复杂度均为O(d)，可扩展到高维。实验成功压缩多种高维概率张量，为变分推断与密度估计提供了高效工具。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "In this work, we present an efficient method to compress a high-dimensional discrete probability function, i.e., a probability tensor, into a non-negative hierarchical Tucker format. The methodology is a two-stage procedure. In the first stage, we take an existing interpolation method to compress the target tensor into a hierarchical Tucker (HT) in a manner similar to the CUR decomposition for low-rank matrix reconstruction. In the second stage, we fit the first-stage output against a non-negative hierarchical Tucker ansatz using a second-order method tailored specifically for this setting. When the tensor is of order \\(d\\), both stages admit an \\(\\mathcal{O}(d)\\) computational complexity, and therefore the proposed methodology readily extends into high-dimensional settings. Numerical experiments show success in compressing various high-dimensional probability tensors.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/24/2606.17557v1-universal-image-restoration-via-internalized-chain-of-thought-reasoning",
+      "section": "quick",
+      "title_en": "Universal Image Restoration via Internalized Chain-of-Thought Reasoning",
+      "authors": "Yu Guo, Zhengru Fang, Shengfeng He, Senkang Hu, Yihang Tao, Phone Lin, Yuguang Fang",
+      "date": "2026-06-16",
+      "pdf": "https://arxiv.org/pdf/2606.17557v1",
+      "score": "6.0",
+      "evidence": "通用图像恢复框架，可应用于去噪",
+      "tldr": "图像复原在复杂混合退化下高度不适定，统一模型性能下降，多轮CoT方法计算成本高且退化交互建模弱。提出CoTIR，将CoT推理内化到单一模型中，基于预训练编辑模型微调，利用拉格朗日优化编码结构化推理。在5.2M样本的CoTIR-Bench和真实场景中，CoTIR在感知质量和保真度上优于现有方法，并开源代码。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Image restoration seeks to recover high-quality images from degraded inputs but becomes highly ill-posed under complex, mixed degradations. While unified all-in-one models are common, their performance declines as degradation complexity increases. Recent works adopt Chain-of-Thought (CoT) reasoning for multi-round restoration using specialized modules. However, this approach faces two key limitations: (i) increased computational cost due to multi-step processing, and (ii) weak modeling of interactions between degradations during stepwise inference. We introduce CoTIR, a universal image restoration framework that internalizes CoT reasoning within a single model. Concretely, we view image restoration as a specialized subtask of image editing, which implies that a large-scale pre-trained editing model provides a more favorable optimization starting point. Building on this, we fine-tune the model for restoration and further encode structured CoT-style reasoning into the learning objective via a differentiable formulation inspired by Lagrangian optimization, enabling holistic restoration without chaining specialized restorers. To facilitate training and evaluation, we further present CoTIR-Bench, a large-scale benchmark comprising 5.2 million samples with CoT-style reasoning traces. Extensive experiments on CoTIR-Bench and broad real composite degradation scenes show that CoTIR achieves stronger perceptual quality and more competitive fidelity than both all-in-one models and multi-round restoration methods. The source code is available at https://github.com/gy65896/CoTIR.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/24/2606.21099v1-shuffleflow-scalable-posterior-inference-for-bayesian-inverse-imaging",
+      "section": "quick",
+      "title_en": "ShuffleFlow: Scalable Posterior Inference for Bayesian Inverse Imaging",
+      "authors": "Tianao Li, Tjitske Starkenburg, Yu Sun, Emma Alexander",
+      "date": "2026-06-19",
+      "pdf": "https://arxiv.org/pdf/2606.21099v1",
+      "score": "6.0",
+      "evidence": "适用于图像去噪的贝叶斯逆成像后验推断方法",
+      "tldr": "贝叶斯反成像中变分推理使用流网络但可扩展性差。ShuffleFlow通过像素逆洗牌将图像分割为子图像堆，用神经场编码空间特征，条件归一化流建模联合分布并跨通道共享潜变量。在线性和非线性反问题中有效，比扩散采样器更快生成高样本数后验。提供了可扩展的贝叶斯反成像后验推断框架。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Variational inference (VI) is a powerful method for principled posterior inference for scientific inverse imaging. VI learns the posterior distribution, often with a flow-based network, which can cheaply generate posterior samples upon optimization, and can flexibly incorporate score-based or classic priors. However, its application to large-scale image reconstruction is severely hindered by the poor scalability of the flow-based networks. In this work, we introduce ShuffleFlow, a scalable VI framework to address this challenge. Our method breaks down the problem into three parts: a pixel-unshuffling-based image coordinate sampler, a neural field as feature encoder, and a conditional normalizing flow (CNF) as posterior estimator. Specifically, our framework partitions an image into a stack of sub-images with pixel-unshuffling and uses a shared CNF to model the joint distribution of the sub-image stack. We condition the CNF on the output of a neural field, which embeds feature vectors corresponding to pixel-unshuffling sample locations to capture spatial structures, and share the flow's latent variable across the channels to model their correlations. We demonstrate our method's effectiveness and efficiency on both linear and nonlinear imaging inverse problems, and show its ability to more rapidly generate a high-sample-count posterior than diffusion samplers.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/24/2606.22521v1-robust-diffusion-models-via-divergence-induced-weighted-denoising",
+      "section": "quick",
+      "title_en": "Robust Diffusion Models via Divergence-Induced Weighted Denoising",
+      "authors": "Lei Li, Yuexiao Dong",
+      "date": "2026-06-21",
+      "pdf": "https://arxiv.org/pdf/2606.22521v1",
+      "score": "6.0",
+      "evidence": "扩散模型加权去噪方法，可迁移至高光谱去噪",
+      "tldr": "扩散模型标准MSE去噪损失在数据污染场景下鲁棒性不足。本文提出用f-散度诱导的非线性变换替代MSE，理论揭示在DDPM高斯逆核结构下每步f-散度可简化为去噪误差的一维函数，从而将训练统一为散度诱导加权去噪，其中具有有限影响力的散度（如Hellinger、负指数）能自动抑制大误差样本。在CIFAR-10上30%污染率下，负指数散度（NED）将FID从93.0（KL）降至77.5，优于Huber和截断MSE等鲁棒损失。该方法计算开销小，为扩散模型的鲁棒训练提供了统一的理论框架和实用方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We show that replacing the standard MSE denoising loss in diffusion models with a nonlinear transformation induced by an f-divergence yields a simple robust training surrogate that empirically improves performance under data contamination, with small additional computational overhead. The theoretical foundation rests on a local divergence construction: under the Gaussian reverse-kernel structure of DDPM, each per-step likelihood ratio follows a lognormal distribution parameterized by a scalar mismatch, so the conditional f-divergence at each step reduces to a one-dimensional function of the denoising error. Summing these local divergences yields a training objective that unifies diffusion training as divergence induced weighted denoising, where the derivative of the induced divergence acts as a residual-space influence weight that controls the contribution of each sample. Bounded-influence divergences (Hellinger, negative exponential) suppress large error samples, with Hellinger yielding an explicit exponential weight, connecting the framework to robust M-estimation. Empirically, on CIFAR-10 under 30% contamination, NED reduces FID from 93.0 (KL) to 77.5, while also outperforming standard robust losses such as Huber and clipped MSE.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
