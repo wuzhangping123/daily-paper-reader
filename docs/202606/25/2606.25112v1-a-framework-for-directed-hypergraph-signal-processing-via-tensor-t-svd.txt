@@ -1,0 +1,229 @@
+Title: A Framework for Directed Hypergraph Signal Processing via tensor t-SVD
+
+URL Source: https://arxiv.org/pdf/2606.25112v1
+
+Published Time: Thu, 25 Jun 2026 00:11:00 GMT
+
+Number of Pages: 4
+
+Markdown Content:
+# A Framework for Directed Hypergraph Signal Processing via tensor t-SVD 
+
+Carlos Mundo-Levano, Nicol´ as Bello, Daniel L. Lau, Gonzalo R. Arce 
+
+Abstract —We introduce Directed Hypergraph Signal Processing 
+
+(DHGSP), a unified framework that extends graph signal process-ing to accommodate both higher-order (polyadic) and asymmetric (directional) relationships simultaneously. Using the tensor sin-gular value decomposition (t-SVD) within the t-product algebra, we define a novel adjacency tensor for directed hypergraphs, a topologically faithful shift operator, and a lossless Directed Hypergraph Fourier Transform (t-DHGFT). Experiments on real traffic networks demonstrate that DHGSP outperforms matrix-based (graph and digraph) and undirected tensor-based (hypergraph) baselines in denoising tasks. 
+
+Index Terms —directed hypergraphs, tensor signal processing, t-SVD, hypergraph Fourier transform, spectral denoising. 
+
+I. I NTRODUCTION 
+
+Graph Signal Processing (GSP) extends classical signal pro-cessing to data on irregular, non-Euclidean domains [1], [2]. Spectral tools derived from symmetric graph operators enable filtering, sampling, and frequency analysis on networks [3], [4]. However, two structural features of real-world systems remain outside standard GSP. Directionality. Many networks are inherently asymmetric: citations flow from source to target, nutrients cascade through metabolic pathways, and traffic propagates along one-way roads. Directed GSP (DGSP) handles these via asymmetric operators [5], but asymmetry may yield complex eigenvalues, non-orthogonal eigenvectors, or non-diagonalizable operators, complicating a consistent, lossless Fourier transform. Higher-order interactions. Pair-wise edges cannot capture group-level dependencies such as multi-author collaborations or multi-vehicle intersection dynamics. Hypergraph Signal Processing (HGSP) allows hy-peredges connecting arbitrary node sets [6], [7], but remains fundamentally undirected. No current framework handles both 
+
+simultaneously. Consider information diffusion where a coali-tion of influencers collectively targets one individual: neither a digraph nor an undirected hypergraph can model this. This paper introduces DHGSP, closing this gap with three contributions: 1) A tensor adjacency descriptor built on a canonical B-hyperarc decomposition, resolving identifiability 
+
+C. Mundo-Levano and G. R. Arce are with the Department of Electrical and Computer Engineering, University of Delaware, Newark, DE 19716, USA. N. Bello is with the Institute for Financial Services Analytics, University of Delaware, Newark, DE 19716, USA. D. L. Lau is with the Department of Electrical and Computer Engineering, University of Kentucky, Lexington, KY 40506, USA. This work was partially supported by the National Science Foundation under grants 2230161, 1815992, and 1816003, by the Air Force Office of Scientific Research (AFOSR) under award FA9550-22-1-0362, and by the Institute of Financial Services Analytics, co-sponsored by JP Morgan Chase & Co. This work was presented as an oral presentation at the 9th Graph Signal Processing Workshop (GSP 2026), June 8-10, 2026, Madrid, Spain. 
+
+and signal cross-talk in prior representations. 2) A lossless t-DHGFT via t-SVD [8], [9] of the in-degree Laplacian, guar-anteed invertible and Parseval-preserving. 3) Experimental validation on real traffic data showing superior denoising over graph, digraph, and undirected-hypergraph baselines. DHGSP subsumes GSP, DGSP, and HGSP as special cases (Fig. 1), providing a unified spectral framework for asymmetric, higher-order networks. II. D IRECTED HYPERGRAPH ALGEBRAIC DESCRIPTOR 
+
+A directed hypergraph DH = ( V, E ) consists of a vertex set V (|V | = N ) and a set of hyperarcs E. Each hyperarc 
+
+e = (T (e), H (e)) is an ordered pair of disjoint vertex subsets: the tail (source set) T (e) ⊂ V and the head (target set) H(e) ⊂ V [10]. A directed graph is the special case 
+
+|T (e)| = |H(e)| = 1 ; an undirected hypergraph results from symmetrizing directions. 
+
+A. From Directed Hyperarcs to B-Hyperarcs 
+
+Fig. 1. Hierarchy of frameworks: GSP ⊂ DGSP /HGSP ⊂ DHGSP .Nodes represent data points; edges/hyperarcs encode pairwise, directed-pairwise, undirected-polyadic, or directed-polyadic relationships. DHGSP unifies GSP, DGSP, and HGSP as special cases. 
+
+Prior tensor representations of directed hypergraphs assign multiple tensor indices to head nodes, causing two fundamen-tal problems [11], [12]: (i) identifiability , it is impossible to determine from the tensor alone whether a node is a source or target, and (ii) signal cross-talk , shift operations incorrectly mix information among distinct targets. The most principled prior approach focuses on Uniform B-hypergraphs (many-to-one hyperarcs) [13], where the first tensor index exclusively encodes the single head node; but this does not generalize to non-uniform cardinalities. Our key insight is that any directed hyperarc can be 
+
+canonically decomposed into a collection of B-hyperarcs, one per head node (Fig. 2 in the Appendix). This decomposition isolates each target’s incoming flow, preventing cross-talk by design. 
+
+B. Proposed Adjacency Tensor 
+
+Definition 1 (Adjacency Tensor for Directed Hypergraphs) .
+
+Let DH have N nodes and maximum hyperarc cardinality 
+
+> arXiv:2606.25112v1 [cs.LG] 23 Jun 2026
+
+M , and assume the canonical B-hyperarc decomposition, so every hyperarc has a single head. The adjacency tensor 
+
+A ∈ RN M
+
+is built as follows. For each B-hyperarc ei =(T (ei), {vk}) with tail set T (ei) and unique head vk, we set 
+
+ak, p 2,...,p M = |T (ei)|/α i, where the first index k is reserved for the head node, the remaining indices {p2, . . . , p M } range over all length-(M −1) permutations (with repetition) of the tail nodes in which each tail appears at least once, and the multinomial normalization factor αi is the total number of these permutations (given explicitly, with a worked example, in the Appendix; see also Fig. 3). 
+
+By reserving the first index exclusively for head nodes and treating each head independently (B-hyperarc decomposition), this definition solves both identifiability and cross-talk. At 
+
+M = 2 , A reduces to the standard N ×N adjacency matrix of a directed graph. The in-degree and in-Laplacian tensors follow, with Din carrying the in-degrees din (vk) on its superdiagonal: 
+
+din (vk) = P 
+
+> i2,...,i M
+
+Ak,i 2,...,i M , Lin = Din − A .
+
+III. S HIFT OPERATOR AND TOPOLOGICAL LOCALIZATION 
+
+Building on the t-product algebra [8], the directed hyper-graph shift is defined as ⃗ Y = F ∗ ⃗ X , where F is typically 
+
+A or Lin , and ⃗ X ∈ RN ×1×N M −2
+
+is a tensor signal formed from the underlying node signal x ∈ RN as its (M −1) -fold outer product, ⃗ X = x ⊙ · · · ⊙ x (⊙: outer product), encoding polyadic interactions [6], [7]. A symmetrization step [7] is applied along the higher (mode ≥ 3) dimensions to ensure t-product tractability without discarding directional information: it appends a zero slice and reflects entries into a palindrome, yielding Fs ∈ RN ×N ×N M −2 
+
+> s
+
+with Ns = 2 N + 1 . Because the reflection touches only modes ≥ 3, the frontal slices are left intact, so the symmetrized shift ⃗ Ys = Fs ∗⃗ Xs preserves all directional structure; the palindromic mode-3 structure renders the DFT slices real, yielding real tubal singular values. 
+
+Theorem 1 (Topological Localization) . Let ⃗ X be localized at node v (i.e., xv = 1 , xu = 0 for u̸ = v). The first-order shifted signal Y(1)  
+
+> s
+
+= As ∗ X s is non-zero only at nodes u for which 
+
+∃ e ∈ E with v ∈ T (e) and u ∈ H(e). More generally, after 
+
+ℓ shifts, the signal is non-zero only at nodes reachable from v
+
+in exactly ℓ directed hyperarc steps. 
+
+The proof follows directly from the B-hyperarc construction and the definition of the t-product. This theorem guarantees that our algebraically defined shift respects the directed topol-ogy, a prerequisite for meaningful spectral analysis and causal modeling on directed hypergraphs. IV. D IRECTED HYPERGRAPH FOURIER TRANSFORM 
+
+The asymmetry of Lin (Fig. 4 in the Appendix) prevents direct t-eigendecomposition, which requires symmetry for a real orthonormal basis. We resolve this by extending the self-adjoint dilation technique from directed GSP [14] to tensors. 
+
+A. Self-Adjoint Dilation and t-SVD 
+
+For Lin s ∈ RN ×N ×N M −2 
+
+> s
+
+, construct the symmetric dilation 
+
+S(Lin s ) := 
+
+ O Lin s
+
+LH 
+
+> in s
+
+O
+
+
+
+∈ R2N ×2N ×N M −2 
+
+> s
+
+. (1) This is symmetric under the t-product by construction, guar-anteeing a complete orthonormal eigenbasis with real tubal eigenvalues, avoiding the complex spectra of naive directed decompositions. The t-SVD of Lin s = U ∗ S ∗ V H (with U, V
+
+t-orthogonal and S f-diagonal, singular values in ascending order) yields the eigenbasis of the dilation: 
+
+S(Lin s ) = W ∗ 
+
+S 00 −S 
+
+
+
+∗W H, W = 1
+
+√2
+
+U UV −V 
+
+
+
+. (2) 
+
+B. t-DHGFT and Inverse 
+
+Embedding Xs isometrically into the dilated space as X s = 
+
+> 1√2
+
+(Is; Is)H ∗ X s (with Is the symmetrized identity tensor; the embedding preserves energy for Parseval’s identity), we define the t-DHGFT :⃗
+
+XFs = WH ∗ X s = 12
+
+(UH + VH) ∗ X s
+
+(UH − V H) ∗ X s
+
+
+
+, (3) and the inverse t-DHGFT :⃗
+
+Xs = 12
+
+
+
+U ∗ (⃗XFs, 1 +⃗ XFs, 2 ) + V ∗ (⃗ XFs, 1 −⃗ XFs, 2 )
+
+
+
+. (4) The orthogonality of W guarantees perfect reconstruction and Parseval’s identity. Frequency is ordered by the directed hypergraph total variation TV( ⃗ Xs) = ∥L in ∗⃗ Xs∥2: for a right singular vector ⃗ Vj , TV( ⃗ Vj ) = σ2 
+
+> j
+
+, so the singular values 
+
+σ1 ≤ σ2 ≤ · · · ≤ σNs order the modes from smooth (small σj )to rapidly oscillating (large σj ; see Fig. 5 in the Appendix). V. S PECTRAL DENOISING EXPERIMENTS 
+
+We validate DHGSP via spectral denoising on a real traffic dataset (Macheng, China: 153 nodes) [15], comparing against (i) undirected GSP (symmetric Laplacian), (ii) DGSP (SVD of directed Laplacian), and (iii) undirected HGSP via t-product [7]. Directed hypergraphs are constructed by grouping directed edges into hyperarcs following [16]. Method. The signal is corrupted with additive white Gaussian noise and reconstructed via low-pass hard-thresholding in the t-DHGFT domain: only the K lowest-frequency components are re-tained. The cutoff K is varied across the full spectrum, follow-ing the protocol in [7]. Results. Fig. 6 in the Appendix shows MAE vs. conserved frequencies on the Macheng dataset. DHGSP consistently achieves lower MAE than all baselines across the full frequency range, with the improvement most pronounced at intermediate bandwidths (50–60% of spectrum). The gain over undirected HGSP confirms that directionality provides informative structure beyond higher-order topology alone; the gain over DGSP confirms that polyadic interactions capture dependencies missed by pairwise edges. VI. C ONCLUSION 
+
+We have introduced Directed Hypergraph Signal Processing (DHGSP), a unified framework built on the t-SVD algebra that models both directional and higher-order relationships. Three core contributions: a semantically faithful adjacency tensor, a topologically localizing shift operator, and a lossless Fourier transform via self-adjoint dilation, constitute a coherent spec-tral theory for directed hypergraphs. Experimental results on real traffic networks validate the framework’s advantage over graph, digraph, and undirected hypergraph baselines. Future work includes: sampling theory for directed hyper-graphs, compression bounds, spectral clustering algorithms, and directed hypergraph neural networks based on learned t-product filter banks. REFERENCES [1] D. I. Shuman, S. K. Narang, P. Frossard, A. Ortega, and P. Van-dergheynst, “The emerging field of signal processing on graphs: Ex-tending high-dimensional data analysis to networks and other irregular domains,” IEEE signal processing magazine , vol. 30, no. 3, pp. 83–98, 2013. [2] A. Ortega, P. Frossard, J. Kovaˇ cevi´ c, J. M. Moura, and P. Vandergheynst, “Graph signal processing: Overview, challenges, and applications,” Pro-ceedings of the IEEE , vol. 106, no. 5, pp. 808–828, 2018. [3] A. Sandryhaila and J. M. Moura, “Discrete signal processing on graphs,” 
+
+IEEE transactions on signal processing , vol. 61, no. 7, pp. 1644–1656, 2013. [4] ——, “Discrete signal processing on graphs: Frequency analysis,” IEEE Transactions on signal processing , vol. 62, no. 12, pp. 3042–3054, 2014. [5] A. G. Marques, S. Segarra, and G. Mateos, “Signal processing on directed graphs: The role of edge directionality when processing and learning from network data,” IEEE Signal Processing Magazine , vol. 37, no. 6, pp. 99–116, 2020. [6] S. Zhang, Z. Ding, and S. Cui, “Introducing hypergraph signal process-ing: Theoretical foundation and practical applications,” IEEE Internet of Things Journal , vol. 7, no. 1, pp. 639–660, 2019. [7] K. Pena-Pena, D. L. Lau, and G. R. Arce, “T-hgsp: Hypergraph signal processing using t-product tensor decompositions,” IEEE Transactions on Signal and Information Processing over Networks , vol. 9, pp. 329– 345, 2023. [8] M. E. Kilmer and C. D. Martin, “Factorization strategies for third-order tensors,” Linear Algebra and its Applications , vol. 435, no. 3, pp. 641– 658, 2011. [9] M. E. Kilmer, K. Braman, N. Hao, and R. C. Hoover, “Third-order tensors as operators on matrices: A theoretical and computational framework with applications in imaging,” SIAM Journal on Matrix Analysis and Applications , vol. 34, no. 1, pp. 148–172, 2013. [10] G. Gallo, G. Longo, S. Pallottino, and S. Nguyen, “Directed hypergraphs and applications,” Discrete applied mathematics , vol. 42, no. 2-3, pp. 177–201, 1993. [11] Z. Chen and L. Qi, “Circulant tensors with applications to spectral hyper-graph theory and stochastic process,” arXiv preprint arXiv:1312.2752 ,2013. [12] A. Banerjee and A. Char, “On the spectrum of directed uniform and non-uniform hypergraphs,” arXiv preprint arXiv:1710.06367 , 2017. [13] L. Gallo, R. Muolo, L. V. Gambuzza, V. Latora, M. Frasca, and T. Car-letti, “Synchronization induced by directed higher-order interactions,” 
+
+Communications Physics , vol. 5, no. 1, p. 263, 2022. [14] Y. Chen, C. Cheng, and Q. Sun, “Graph fourier transform based on singular value decomposition of the directed laplacian,” Sampling Theory, Signal Processing, and Data Analysis , vol. 21, no. 2, p. 24, 2023. [15] R. Kumagai, H. Kojima, H. Higashi, and Y. Tanaka, “Gsp-traffic dataset: Graph signal processing dataset based on traffic simulation,” in Graph Signal Processing Workshop 2024, Delft, The Netherlands , Jun 2024. [16] W. Zhao, Z. Ma, and Z. Yang, “Dhmconv: Directed hypergraph momen-tum convolution framework,” in International Conference on Artificial Intelligence and Statistics . PMLR, 2024, pp. 3385–3393. 
+
+APPENDIX 
+
+APPENDIX : F IGURES AND TABLES 
+
+Fig. 2. Decomposition of a many-to-many hyperarc (left) into a collection of B-hyperarcs, one per head node (right). This canonical decomposition prevents signal cross-talk between targets (e.g., v6 and v7). 
+
+Fig. 3. Worked example of the adjacency tensor for M = 3 , so A ∈ 
+
+RN ×N ×N with indices (i1, i 2, i 3) and i1 reserved for the head node. For the hyperarcs shown: e1 : {v1, v 4} → { v6} gives a6,1,4 = a6,4,1 = 1 ;
+
+e21 : {v5} → { v6} gives a6,5,5 = 1 ; e22 : {v5} → { v7} gives a7,5,5 = 1 ;
+
+e3 : {v3, v 7} → { v2} gives a2,3,7 = a2,7,3 = 1 . The in-degree of v6 is 
+
+d6,6,6 = a6,1,4 + a6,4,1 + a6,5,5 = 3 .
+
+The normalization αi in the Definition is the total number of ordered length-(M −1) permutations of the ci = |T (ei)|
+
+distinct tail nodes in which each tail appears at least once: 
+
+αi = X   
+
+> k2,...,k ci≥1
+> k2+··· +kci=M−1
+
+(M − 1)! 
+
+k2! · · · kci ! .
+
+For example, at M = 3 : a hyperarc with |T | = 2 gives α =2! /(1! 1!) = 2 , so a = |T |/α = 1 ; a hyperarc with |T | = 1 
+
+gives α = 2! /2! = 1 , so a = 1 .
+
+Fig. 4. Frontal slices of the adjacency tensor: undirected hypergraph (left, symmetric) versus directed hypergraph (right, asymmetric). The asym-metry requires the t-SVD and dilation operators rather than a simple t-eigendecomposition. Fig. 5. First frontal slices of the eigenmatrices for traffic data from Bogot´ a, Colombia (689 nodes) [15], modeled as a directed hypergraph by grouping edges into hyperarcs [16]. Left: low-frequency modes ( ∼5% of the spectrum); Right: high-frequency modes ( ∼95% of the spectrum). Higher frequencies exhibit substantially greater spatial variation. 40 60 80 100 120 
+
+> Threshold
+> 0.55
+> 0.68
+> 0.80
+> MAE  Original MAE
+> Graph
+> Directed Graph
+> Hypergraph
+> DHG (Ours)
+
+Fig. 6. Mean absolute error (MAE) versus total conserved frequencies for spectral denoising on Macheng, China traffic data (153 nodes) [15]. DHGSP (red) consistently outperforms GSP (blue), DGSP (orange), and HGSP (green) across all bandwidths. Shaded region shows the 40th–60th percentile over 100 trials.

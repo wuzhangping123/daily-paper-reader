@@ -1,0 +1,94 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-25T22:07:30.405440+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.21907v1",
+      "source": "arxiv",
+      "title": "Nonparametric Deconvolution and Denoising using Simulation Based Inference",
+      "abstract": "Latent signals are often obscured by measurement noise, yet encode the underlying laws and dynamics of complex systems; learning both the signals and their distributions remains a central challenge in scientific inference. The noise is often non-negligible, and the likelihoods for expressive generative models are often intractable. We utilize a convolutional maximum mean discrepancy (convMMD) loss and propose a likelihood-free framework for nonparametric density deconvolution and empirical Bayes denoising under additive measurement error. Our method learns a latent generative model by matching the observed data distribution to the noise-convolved model distribution. This yields a differentiable, simulation-based objective for multivariate homoscedastic or heteroscedastic noise, compatible with expressive sieve classes such as Gaussian mixtures and normalizing flows. The learned density then serves as an empirical prior for posterior denoising of individual latent values. Theoretically, we extend convMMD from parametric to nonparametric estimation, proving finite-sample bounds for empirical sieve minimizers and $L_2$ convergence rates under Sobolev smoothness. These rates recover the classical inverse-problem dependence: polynomial for ordinary-smooth and logarithmic for super-smooth noises. Our method provides a practical, theoretically grounded approach to deconvolution and denoising under generative latent distribution models.",
+      "authors": [
+        "Ritwik Vashistha",
+        "Abhra Sarkar",
+        "Arya Farahi"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-06-20T07:03:37+00:00",
+      "link": "https://arxiv.org/pdf/2606.21907v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Nonparametric deconvolution and denoising framework using simulation based inference applicable to hyperspectral denoising",
+      "llm_evidence_cn": "基于模拟推理的非参数去卷积与去噪框架，可应用于高光谱去噪",
+      "llm_evidence": "基于模拟推理的非参数去卷积与去噪框架，可应用于高光谱去噪",
+      "canonical_evidence": "基于模拟推理的非参数去卷积与去噪框架，可应用于高光谱去噪",
+      "llm_tldr_en": "Proposes a likelihood-free framework for nonparametric density deconvolution and empirical Bayes denoising using convMMD loss, applicable to various signal denoising including hyperspectral images.",
+      "llm_tldr_cn": "本文针对信号被测量噪声掩盖的问题，提出了一种基于模拟推理的非参数去卷积与去噪框架。利用卷积最大均值差异（convMMD）损失，在不依赖可处理似然的情况下学习潜在生成模型。该方法在多元同方差噪声场景下有效，为包括高光谱图像在内的去噪任务提供了通用工具。",
+      "llm_tldr": "本文针对信号被测量噪声掩盖的问题，提出了一种基于模拟推理的非参数去卷积与去噪框架。利用卷积最大均值差异（convMMD）损失，在不依赖可处理似然的情况下学习潜在生成模型。该方法在多元同方差噪声场景下有效，为包括高光谱图像在内的去噪任务提供了通用工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.25112v1",
+      "source": "arxiv",
+      "title": "A Framework for Directed Hypergraph Signal Processing via tensor t-SVD",
+      "abstract": "We introduce Directed Hypergraph Signal Processing (DHGSP), a unified framework that extends graph signal processing to accommodate both higher-order (polyadic) and asymmetric (directional) relationships simultaneously. Using the tensor singular value decomposition (t-SVD) within the t-product algebra, we define a novel adjacency tensor for directed hypergraphs, a topologically faithful shift operator, and a lossless Directed Hypergraph Fourier Transform (t-DHGFT). Experiments on real traffic networks demonstrate that DHGSP outperforms matrix-based (graph and digraph) and undirected tensor-based (hypergraph) baselines in denoising tasks.",
+      "authors": [
+        "Carlos Mundo-Levano",
+        "Nicolás Bello",
+        "Daniel L. Lau",
+        "Gonzalo R. Arce"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "eess.SP"
+      ],
+      "published": "2026-06-23T19:40:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.25112v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "tensor t-SVD framework for denoising tasks",
+      "llm_evidence_cn": "基于张量t-SVD的去噪框架适用于高维数据恢复",
+      "llm_evidence": "基于张量t-SVD的去噪框架适用于高维数据恢复",
+      "canonical_evidence": "基于张量t-SVD的去噪框架适用于高维数据恢复",
+      "llm_tldr_en": "Proposes Directed Hypergraph Signal Processing via tensor t-SVD, achieving superior denoising on traffic networks. The tensor-based framework is general and applicable to high-dimensional tensor recovery tasks such as hyperspectral image denoising.",
+      "llm_tldr_cn": "该论文提出了基于张量t-SVD的有向超图信号处理框架，用于处理高阶非对称关系。在交通网络去噪任务中，该方法优于矩阵和传统张量基线。由于采用了张量分解和t-SVD，该框架可直接迁移至高光谱图像的高维张量恢复和去噪任务中，具有重要的方法学价值。",
+      "llm_tldr": "该论文提出了基于张量t-SVD的有向超图信号处理框架，用于处理高阶非对称关系。在交通网络去噪任务中，该方法优于矩阵和传统张量基线。由于采用了张量分解和t-SVD，该框架可直接迁移至高光谱图像的高维张量恢复和去噪任务中，具有重要的方法学价值。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "tensor based approaches for hyperspectral image anomaly detection and restoration",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
