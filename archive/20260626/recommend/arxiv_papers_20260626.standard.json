@@ -1,0 +1,208 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-26T21:34:37.286534+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2606.26688v1",
+      "source": "arxiv",
+      "title": "Adaptive Randomized Pivoting for Tensor Singular Value Decomposition Model",
+      "abstract": "This paper studies how adaptive randomized pivoting (ARP), recently introduced for matrix column subset selection, can be extended to tensors in the t-product framework. We propose two constructions. The first one, called ARP-T-CUR, applies matrix ARP independently to the frontal slices of the tensor in the Fourier domain. This gives a Fourier-slicewise CUR approximation and leads to a direct expected-error bound inherited from the matrix theory. The second construction, called T-ARP, selects common lateral and horizontal slices for the whole tensor. This produces a genuine tensor cross approximation in the t-product sense, but also introduces a new difficulty: the same pivot indices must be used across all Fourier slices. We make this coupling explicit and prove an expected-error bound under a frequency-alignment condition measuring how far the common tensor-level sampling rule is from the slice-wise ARP sampling rules. This condition recovers the usual $r+1$-type factor when the leverage-score distributions are aligned across frequencies. We also discuss the resulting tensor cross approximation and its connection with t-DEIM. Numerical experiments on synthetic tensors, images, and videos illustrate the behavior of the proposed methods and show the benefit of common-index tensor sampling over standard tensor cross baselines.",
+      "authors": [
+        "Ahmadsho Akdodshoev",
+        "Valentin Leplat",
+        "Salman Ahmadi-Asl"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-06-25T07:18:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.26688v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Tensor SVD and CUR approximations for data recovery",
+      "llm_evidence_cn": "张量奇异值分解与CUR近似用于数据恢复",
+      "llm_evidence": "张量奇异值分解与CUR近似用于数据恢复",
+      "canonical_evidence": "张量奇异值分解与CUR近似用于数据恢复",
+      "llm_tldr_en": "Proposes adaptive randomized pivoting for tensor SVD, enabling efficient tensor cross approximation with theoretical guarantees, relevant to high-dimensional data recovery.",
+      "llm_tldr_cn": "该论文针对张量t-product框架提出自适应随机枢轴（ARP）方法，包括两种构造：ARP-T-CUR对傅里叶域正面切片独立处理，T-ARP选择全局公共侧面切片。方法提供可证明误差界，适用于高维张量数据恢复任务，如高光谱图像恢复。实验验证了近似效果。",
+      "llm_tldr": "该论文针对张量t-product框架提出自适应随机枢轴（ARP）方法，包括两种构造：ARP-T-CUR对傅里叶域正面切片独立处理，T-ARP选择全局公共侧面切片。方法提供可证明误差界，适用于高维张量数据恢复任务，如高光谱图像恢复。实验验证了近似效果。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.26965v1",
+      "source": "arxiv",
+      "title": "Holistic Multivariance Decomposition: Adapting Mode Interrelations in Low-Rank Tensor Approximations",
+      "abstract": "Low-rank tensor approximation is a foundational tool for multidimensional data analysis in scientific computing, classically dominated by Tucker and Canonical Polyadic (CP) decompositions. While widely adopted, these standard approximation schemes represent data as sums of rank-1 tensors formed via mode-wise outer products. This inherent mathematical structure captures the independent variations of individual modes but systematically neglects the mutual interactions and coupled dimensional interdependencies natively embedded within the tensor. To overcome this structural limitation, we introduce the Holistic Multivariance Decomposition (HMD) framework. HMD provides a novel tensor decomposition algorithm that explicitly models both isolated mode effects and higher order mutual relationships through specialized projection operators. Numerical evaluations focusing on three distinct benchmarks from various fields demonstrate that the proposed HMD framework consistently yields significantly lower reconstruction errors compared to both Tucker and CP decomposition. These results establish HMD as a robust, high fidelity computational method for resolving complex, deeply coupled multidimensional data structures in science and engineering applications.",
+      "authors": [
+        "Süha Tuna"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE",
+        "math.NA"
+      ],
+      "published": "2026-06-25T12:38:55+00:00",
+      "link": "https://arxiv.org/pdf/2606.26965v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "proposes a novel low-rank tensor decomposition for high-dimensional data recovery",
+      "llm_evidence_cn": "提出一种新的低秩张量分解方法用于高维数据恢复",
+      "llm_evidence": "提出一种新的低秩张量分解方法用于高维数据恢复",
+      "canonical_evidence": "提出一种新的低秩张量分解方法用于高维数据恢复",
+      "llm_tldr_en": "Holistic Multivariance Decomposition (HMD) introduces a tensor decomposition that explicitly models mode interrelations, overcoming the limitations of standard Tucker and CP decomposition. This enables more accurate recovery of high-dimensional tensor data, directly applicable to hyperspectral image restoration tasks such as denoising and inpainting.",
+      "llm_tldr_cn": "针对标准张量分解忽视模式间相互作用的局限，本文提出整体多元分解（HMD）框架，通过显式建模维度间耦合关系，实现更精确的低秩张量近似。实验表明，HMD在合成和真实张量数据恢复任务中优于传统方法，为高光谱图像去噪、补全等应用提供了有效工具。",
+      "llm_tldr": "针对标准张量分解忽视模式间相互作用的局限，本文提出整体多元分解（HMD）框架，通过显式建模维度间耦合关系，实现更精确的低秩张量近似。实验表明，HMD在合成和真实张量数据恢复任务中优于传统方法，为高光谱图像去噪、补全等应用提供了有效工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.24011v1",
+      "source": "arxiv",
+      "title": "Low-rank Updates in Slowly Time-varying Graphs for Spatial-Temporal Signal Interpolation",
+      "abstract": "A crucial assumption in graph signal processing (GSP) is the existence of an underlying graph that captures the pairwise similarities between nodes, allowing filters to be designed based on this graph for tasks such as denoising. For spatial-temporal data in which node-to-node similarities evolve over time, a static spatial graph is insufficient. In this paper, to represent slowly time-varying pairwise relationships, we model the graph changes in two consecutive adjacency matrices $P = W^{(2)} - W^{(1)}$ across time as a low-rank matrix. % Specifically, given an initial adjacency matrix $W^{(1)}$ at time $t=1$, we jointly interpolate a signal $x_2$ and estimate $W^{(2)}$ at $t=2$ using both a graph signal smoothness prior for $x_2$ and a low-rank prior on $¶$. We alternate optimization steps. With $W^{(2)}$ fixed, $x_2$ is interpolated by solving a linear system. Alternatively, holding $x_2$ fixed, $W^{(2)}$ is updated via proximal gradient descent (PGD). The proximal mapping of the rank term $Gamma(W^{(2)} - W^{(1)})$ is approximated in linear time using a fast orthogonal matching pursuit (OMP) algorithm that selects a sparse combination of atoms from a dictionary $cR$ formed by the outer products of $W^{(1)}$'s eigenvectors. We unroll iterations of our algorithm into layers to build a lightweight neural network for limited data-driven parameter tuning. Experiments show that our joint optimization achieves better signal interpolation compared to existing time-varying graph models.",
+      "authors": [
+        "Saghar Bagheri",
+        "Gene Cheung",
+        "Tim Eadie",
+        "Antonio Ortega"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP",
+        "cs.LG"
+      ],
+      "published": "2026-06-22T23:33:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.24011v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "models graph changes as low-rank for denoising and interpolation",
+      "llm_evidence_cn": "将图变化建模为低秩以用于去噪和插值",
+      "llm_evidence": "将图变化建模为低秩以用于去噪和插值",
+      "canonical_evidence": "将图变化建模为低秩以用于去噪和插值",
+      "llm_tldr_en": "Models adjacency matrix differences as low-rank for spatial-temporal signal denoising and interpolation, using graph smoothness prior.",
+      "llm_tldr_cn": "针对时空信号中节点相似性随时间缓慢变化的问题，提出将相邻时刻图邻接矩阵的差建模为低秩矩阵，结合图信号平滑先验联合插值信号并估计新图。该方法通过低秩更新有效捕捉时变关系，可用于时空信号的去噪与插值，为高光谱图像序列中的噪声去除提供了低秩建模思路。",
+      "llm_tldr": "针对时空信号中节点相似性随时间缓慢变化的问题，提出将相邻时刻图邻接矩阵的差建模为低秩矩阵，结合图信号平滑先验联合插值信号并估计新图。该方法通过低秩更新有效捕捉时变关系，可用于时空信号的去噪与插值，为高光谱图像序列中的噪声去除提供了低秩建模思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.23083v1",
+      "source": "arxiv",
+      "title": "Stable Image Reconstruction via Two-Parameter Power-Scale Variation Minimization",
+      "abstract": "In this article, we introduce a power-scale variation (PSV$_{a,p}$) with two tunable parameters: the sparsity-inducing exponent $p\\in(0,1]$ and the scaling factor $a\\in(0,\\infty)$. By minimizing the PSV$_{a,p}$, we establish stable reconstructions in both the gradient and the image domains under the restricted isometry property (RIP) framework. Furthermore, we design an iteratively re-weighted least squares algorithm IRLSPSV to solve the unconstrained PSV$_{a,p}$ minimization. Numerical experiments demonstrate its superior performance and broad applicability. The main novelties are: (i) the PSV$_{a,p}$ minimization enjoys great flexibility and wide applicability due to its two tunable parameters $a$ and $p$, (ii) as $a\\to\\infty$, the PSV$_{a,p}$ minimization reduces to the $p$-th power total variation (TV$_p$) minimization and, even in this limiting case, the established RIP condition for image reconstruction is also new, (iii) the derived RIP upper bound $\\overlineδ$ is proved to be asymptotically optimal in $a$ for gradient recovery, (iv) sensitivity analysis confirms the distinct roles of $a$ and $p$, thereby motivating a practical parameter tuning scheme for the proposed model.",
+      "authors": [
+        "Ziwei Li",
+        "Wengu Chen",
+        "Huanmin Ge",
+        "Limei Huo",
+        "Dachun Yang"
+      ],
+      "primary_category": "cs.IT",
+      "categories": [
+        "cs.IT",
+        "math.FA",
+        "math.NA"
+      ],
+      "published": "2026-06-22T09:31:04+00:00",
+      "link": "https://arxiv.org/pdf/2606.23083v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "image reconstruction with sparsity and denoising via power-scale variation minimization",
+      "llm_evidence_cn": "通过幂尺度变分最小化进行图像重建和去噪",
+      "llm_evidence": "通过幂尺度变分最小化进行图像重建和去噪",
+      "canonical_evidence": "通过幂尺度变分最小化进行图像重建和去噪",
+      "llm_tldr_en": "Introduces a two-parameter power-scale variation minimization for stable image reconstruction under RIP, with an IRLS algorithm showing broad applicability.",
+      "llm_tldr_cn": "该论文提出一种双参数幂尺度变分（PSV）最小化方法，用于在受限等距性质下实现稳定的图像重建。通过设计迭代重加权最小二乘算法（IRLSPSV），该方法在梯度域和图像域均能有效去噪和重建，数值实验证明了其优越性能和广泛适用性，可迁移至高光谱图像去噪等任务。",
+      "llm_tldr": "该论文提出一种双参数幂尺度变分（PSV）最小化方法，用于在受限等距性质下实现稳定的图像重建。通过设计迭代重加权最小二乘算法（IRLSPSV），该方法在梯度域和图像域均能有效去噪和重建，数值实验证明了其优越性能和广泛适用性，可迁移至高光谱图像去噪等任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.24989v1",
+      "source": "arxiv",
+      "title": "Low-Cost High-Order Singular Value Decomposition for Tensor-Based Reconstruction from Sparse Sensor Measurements: Urban Flow and Air-Quality Applications",
+      "abstract": "Urban flow and air-quality simulations generate high-dimensional datasets describing velocity and pollutant transport across multiple spatial, temporal, and physical-variable dimensions. Reconstructing these fields from sparse sensor measurements is a fundamental challenge in environmental monitoring, digital twins, forecasting, and data assimilation. Existing low-cost reconstruction approaches are commonly based on matrix decompositions, which require multidimensional datasets to be flattened into two-dimensional snapshot matrices, thereby discarding important structural information. This work introduces the low-cost High-Order Singular Value Decomposition (lcHOSVD), a novel tensor-based sparse-sensing reconstruction framework for high-dimensional environmental fields. To the authors' knowledge, this is the first methodology that combines sparse sensing and HOSVD for field reconstruction. Unlike matrix-based approaches, lcHOSVD preserves the natural tensor structure of the data, enabling the exploitation of correlations across spatial, temporal, and physical-variable dimensions while substantially reducing the computational requirements of conventional HOSVD. The methodology is applied to urban flow and air-quality datasets, where three-dimensional velocity and pollutant concentration fields are reconstructed using only 1-4% of the available spatial locations. While lcSVD provides larger computational speed-ups, lcHOSVD consistently achieves lower reconstruction errors in configurations characterized by strong multidimensional coupling and heterogeneous dynamics across dimensions. Additional sensor-anisotropy analyses demonstrate that the tensor formulation is significantly more robust to uneven sensor distributions, a common situation in practical environmental monitoring networks.",
+      "authors": [
+        "Arindam Sengupta",
+        "Paul Jeanney",
+        "Ricardo Vinuesa",
+        "Jose Miguel Perez",
+        "Soledad Le Clainche"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-23T14:39:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.24989v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "tensor-based reconstruction using HOSVD applicable to hyperspectral image denoising",
+      "llm_evidence_cn": "基于HOSVD的张量重建方法可用于高光谱图像去噪",
+      "llm_evidence": "基于HOSVD的张量重建方法可用于高光谱图像去噪",
+      "canonical_evidence": "基于HOSVD的张量重建方法可用于高光谱图像去噪",
+      "llm_tldr_en": "Proposes a low-cost High-Order SVD for reconstructing high-dimensional tensor data from sparse measurements, preserving multi-dimensional structure; applicable to hyperspectral image restoration.",
+      "llm_tldr_cn": "针对现有基于矩阵分解的重建方法丢失多维结构的问题，提出一种低成本高阶奇异值分解（lcHOSVD）方法，直接从稀疏传感器测量中重建高维张量数据。该方法通过保持数据的高维结构特征，在环境监测应用中有效提升了重建精度。由于张量分解天然适用于高光谱图像恢复，lcHOSVD可迁移至高光谱去噪与恢复任务，为高维数据恢复提供了新思路。",
+      "llm_tldr": "针对现有基于矩阵分解的重建方法丢失多维结构的问题，提出一种低成本高阶奇异值分解（lcHOSVD）方法，直接从稀疏传感器测量中重建高维张量数据。该方法通过保持数据的高维结构特征，在环境监测应用中有效提升了重建精度。由于张量分解天然适用于高光谱图像恢复，lcHOSVD可迁移至高光谱去噪与恢复任务，为高维数据恢复提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

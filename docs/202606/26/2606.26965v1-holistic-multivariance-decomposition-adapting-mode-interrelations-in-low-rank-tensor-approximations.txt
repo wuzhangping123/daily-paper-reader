@@ -1,0 +1,582 @@
+Title: Holistic Multivariance Decomposition: Adapting Mode Interrelations in Low-Rank Tensor Approximations
+
+URL Source: https://arxiv.org/pdf/2606.26965v1
+
+Published Time: Fri, 26 Jun 2026 00:56:20 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+# Holistic Multivariance Decomposition: Adapting Mode Interrelations in Low-Rank Tensor Approximations 
+
+## Süha Tuna ∗
+
+Informatics Institute, Department of Computational Science and Engineering, İstanbul Technical University, İstanbul 34469, Türkiye 
+
+suhatuna@itu.edu.tr 
+
+Abstract 
+
+Low-rank tensor approximation is a foundational tool for multidimensional data analysis in scientific computing, classically dominated by Tucker and Canonical Polyadic (CP) decompositions. While widely adopted, these standard approximation schemes represent data as sums of rank-1 tensors formed via mode-wise outer products. This inherent mathematical structure captures the independent variations of individual modes but systematically neglects the mutual interactions and coupled dimensional interdependencies natively embedded within the tensor. To overcome this structural limitation, we introduce the Holistic Multivariance Decomposition (HMD) framework. HMD provides a novel tensor decomposition algorithm that explicitly models both isolated mode effects and higher order mutual relationships through specialized projection operators. Numerical evaluations focusing on three distinct benchmarks from various fields demonstrate that the proposed HMD framework consistently yields significantly lower reconstruction errors compared to both Tucker and CP decomposition. These 
+
+> ∗
+
+Corresponding author. 
+
+1
+
+> arXiv:2606.26965v1 [cs.CE] 25 Jun 2026 results establish HMD as a robust, high fidelity computational method for resolving complex, deeply coupled multidimensional data structures in science and engineering applications.
+
+# 1 Introduction 
+
+Modern scientific and engineering applications generate vast amounts of multidimensional data, requiring a crucial need for advanced mathematical frameworks that can preserve inherent data geometries. Across disciplines ranging from signal processing [Sidiropoulos et al., 2017] to earth observation [Wang et al., 2023, Tuna et al., 2020, Şen and Tuna, 2025], and biomedical engineering [Sedighin, 2024] to spectroscopy [Vu et al., 2017], data is naturally captured across multiple coupled modes. In hyperspectral imaging, for example, scenes are recorded across two spatial dimensions and hundreds of contiguous spectral bands, forming massive, intrinsically 3-D structures [Wang et al., 2023]. Similarly, in fluorescence spectroscopy, tensors naturally emerge when analyzing chemical mixtures; here, the first dimension tracks the individual samples, while the second and third dimensions represent the emission and excitation wavelengths, respectively [Vu et al., 2017]. Historically, analytical techniques have relied on matricization (unfolding) to process these datasets. However, flattening multidimensional arrays into 2-D matrices inevitably disrupts vital spatial-spectral correlations, leading to significant information loss and suboptimal pattern extraction [De Lathauwer, 2009]. To prevent this, multiway arrays, or tensors, have emerged as the standard mathematical framework for representing and analyzing multidimensional data. The central challenge in multilinear algebra lies in identifying and extracting latent patterns within a given tensor through computationally efficient decompositions. The foundations of this domain rest on the Tucker decomposition [Kolda and Bader, 2009, Sidiropoulos et al., 2017] and the Canonical Polyadic (CP) decomposition [Kolda and Bader, 2009, Sidiropoulos et al., 2017]. The CP model expresses a tensor as a minimal sum of rank-1 components 2[Kolda and Bader, 2009, Sidiropoulos et al., 2017], while the Tucker model decomposes a tensor into a core tensor multiplied by orthogonal projection matrices along each mode, effectively isolating the principal subspaces of the multidimensional data [Kolda and Bader, 2009, Sidiropoulos et al., 2017]. A substantial portion of modern multi-way data analysis focuses on low-rank approx-imation phenomena, which fundamentally aim to reconstruct a high dimensional tensor using a truncated summation of elementary components [Lin, 2016]. In classical CP and Tucker frameworks, these components are structurally established by computing the outer product of individual vectors drawn from each independent dimension (mode, way). While mathematically elegant and computationally tractable, this classical paradigm suffers from a severe structural limitation. Because the underlying terms are rigidly tied to pure multilinear outer products, each rank-1 component is only capable of capturing the isolated, independent variations of individual modes. Consequently, traditional low-rank approximations inherently overlook the complex, mutual relationships and highly coupled interdependencies that char-acterize real world physical systems [Lin, 2016]. When applied to complex datasets, this independence assumption forces the decomposition to sacrifice structural fidelity, failing to encapsulate the shared cross-mode dynamics that define multidimensional phenomena. To address the limitations of assuming strictly decoupled modal behaviors, researchers have turned to multivariance analysis frameworks explicitly designed to map higher order interactions. Originating in function approximation, techniques such as High Dimensional Model Representation (HDMR) decompose complex input-output systems by systematically separating independent variable influences from their cooperative, multivariable interactions [Tuna et al., 2022, Tunga and Demiralp, 2011]. Bridging this concept to discrete datasets, the Enhanced Multivariance Product Representation (EMPR) was developed to provide a more descriptive, non-local expansion of multi-way arrays (tensors). Unlike standard decompositions that rely purely on rigid basis matrices, EMPR integrates flexible 1-D support vectors directly into its representation, allowing the framework to inherently scale from 3independent modal behaviors up to intricate, multidimensional cooperative terms [Tuna et al., 2020, Şen and Tuna, 2025, Tuna et al., 2023, Yılmaz and Tuna, 2025]. Recent literature demonstrates the exceptional efficacy of EMPR in solving highly complex, tensor focused engineering problems where traditional methods fail. For instance, the framework has been successfully deployed for the lossy compression of high dimensional hyperspectral images, where it achieves high compression ratios by explicitly and iteratively resolving intense spatial-spectral correlations [Tuna et al., 2020]. Beyond data reduction, EMPR has shown superior performance in robust feature extraction schemes for remote sensing data, utilizing strategic support optimization to isolate target signatures from dense background noise [Şen and Tuna, 2025]. Extending these capabilities to the genomics domain, researchers have also established efficient EMPR based feature selection schemes to untangle the highly correlated pathways within gene expression networks [Tuna et al., 2023]. Moreover, in deep learning architectures, EMPR has been utilized to compress the dense weight tensors of Convolutional Neural Networks (CNNs), drastically lowering structural redundancy to optimize both training and inference efficiency across various image analysis tasks [Yılmaz and Tuna, 2025]. While EMPR offers vastly superior variance mapping attributes compared to baseline models, integrating these cooperative multivariance structures directly into a generalized, unified low-rank tensor decomposition framework remains a highly challenging computational and algebraic task. To bridge the theoretical gap between discrete multivariance representa-tions and formal multilinear algebra, we introduce the Holistic Multivariance Decomposition (HMD) method in this work. HMD introduces a novel, hierarchical approximation scheme that simultaneously accounts for both the isolated effects of individual modes and the mutual, synergistic relationships between dimensions. By formulating specialized projection operators, our framework iso-lates and retains the dimensional synergy that standard rank-1 outer product summations inherently omit. We demonstrate that, across a diverse range of multidimensional data 4characteristics spanning hyperspectral imaging, dynamic video sequences and chemomet-rics, HMD significantly outperforms traditional Tucker and CP decompositions in both reconstruction accuracy and structural quality. Notably, in existing multivariance literature, researchers frequently must resort to complex, computationally demanding second order EMPR approximants to outperform state-of-the-art (SoTA) methods [Tuna et al., 2020, 2022, Ngadiran et al., 2010]. In contrast, the mathematical elegance of the HMD framework enables it to decisively surpass SoTA tensor decomposition techniques while only taking its first level terms into account, representing a major leap forward in computational efficiency and structural expression. The remainder of this paper is organized as follows. Section 2 establishes the mathematical notation and briefly reviews foundational tensor operations alongside with the Tucker decom-position and EMPR. Section 3 details the theoretical derivation of the Holistic Multivariance Decomposition framework, which is followed in Section 4 by a rigorous mathematical analysis of its associated truncation and projection errors. We discuss our numerical experiments and benchmark the proposed technique against classical methods using relevant engineering datasets herein. Finally, Section 5 concludes the paper and outlines future directions for research. 
+
+# 2 Background 
+
+## 2.1 Tucker Decomposition 
+
+Tucker decomposition is one of the foundational tensor decomposition techniques in multi-linear algebra [Kolda and Bader, 2009, Kolda, 2006, De Lathauwer, 2009]. It enables the representation of a given multiway array as a linear combination of rank-1 terms, which are constructed via the outer products of the columns of specific factor matrices. These factor matrices are typically tall (vertically oriented), meaning their number of columns is strictly and substantially smaller than their number of rows. 5To be precise, let X denote a D-dimensional tensor of size n1 × n2 × · · · × nD, and let 
+
+A(k) represent the k-th factor matrix of size nk × rk, such that 
+
+X ∈ Rn1×n2×···× nD , A(k) ∈ Rnk ×rk ; rk < n k, k = 1 , 2, . . . , D (1) The Tucker decomposition of the tensor X is explicitly defined as follows 
+
+X ≈ G × 1 A(1) ×2 A(2) ×3 · · · × D A(D) =
+
+> r1
+
+X
+
+> i1=1
+> r2
+
+X
+
+> i2=1
+
+· · · 
+
+> rD
+
+X 
+
+> iD=1
+
+gi1i2...i D a(1)  
+
+> i1
+
+◦ a(2)  
+
+> i2
+
+◦ . . . ◦ a(D) 
+
+> iD
+
+(2) where G is the core tensor of size r1 × r2 × · · · × rD, and ×k denotes the mode-k product operator along the k-th mode whose explicit definition is as follows 
+
+(X × n A)i1,...,i n−1j i n+1 ,...,i N =
+
+> In
+
+X
+
+> in=1
+
+Xi1i2··· iN Aji n . (3) Moreover, a(k) 
+
+> ik
+
+stands as the ik-th column vector of the k-th factor matrix A(k). The choice of the ranks rk determines the overall rank order of the Tucker approximation for the given tensor X .A graphical illustration of the Tucker decomposition for a representative 3 dimensional tensor X is displayed in Fig. 1 . 
+
+Figure 1: Tucker decomposition demonstration for 3D tensors As can be observed from both Eqn. 2 and Fig. 1, the classical approach initially isolates the effect of each mode before attempting to ensemble them via outer product and addition operations. Consequently, this architectural framework inherently fails to explicitly reflect the mutual interrelations among modes when reconstructing the underlying tensor structure. 62.2 Enhanced Multivariance Products Representation 
+
+Enhanced Multivariance Products Representation (EMPR) is an efficient tensor decomposition technique that represents a given tensor in terms of lower dimensional entities such as scalers, vectors and matrices. By uniquely accounting for the cross-interrelations among modes, EMPR has found numerous applications across various fields ranging from data compression to feature extraction where high dimensionality is inevitable. The EMPR expansion of a given D-dimensional tensor X is explicitly defined as follows 
+
+Xi1...i D = X (0) 
+
+> D
+
+Y
+
+> j=1
+
+s(j)
+
+> ij
+
+!
+
++
+
+> D
+
+X
+
+> j1=1
+
+X (j1)
+
+> ij1
+
+
+
+> D
+
+Y 
+
+> j=1
+> j̸=j1
+
+s(j)
+
+> ij
+
+ +
+
+> D
+
+X
+
+> j1,j 2=1
+> j1<j 2
+
+X (j1j2) 
+
+> ij1,i j2
+
+
+
+> D
+
+Y 
+
+> j=1
+> j̸=j1,j 2
+
+s(j)
+
+> ij
+
+ (4) 
+
++ · · · + X (j1j2...j D )  
+
+> ij1ij2...i jD
+
+ij = 1 , 2, . . . , n j , j = 1 , 2, . . . , D 
+
+where the subscripts denote indices and the superscripts within parantheses indicate the modes to which the corresponding entity relates. In Eqn. 4, s(j)’s are called support vectors since they depend on a single index while X (0) , X (j1), X (j1,j 2), . . . are designated as EMPR components. The graphical illustration of the EMPR expansion for a 3-D tensor X is presented in Fig. 2 where the blue elements depict the EMPR components while the red 
+
+Figure 2: Enhanced Multivariance Products Representation demonstration for 3D tensors vectors represent the support vectors. As shown in Fig. 2, x0 is the scalar EMPR component; 7x1, x2 and x3 are the vector EMPR components while X1,2, X1,3 and X2,3 constitute the matrix EMPR components. The final yellow term X1,2,3 is the residual term which shares the same size and dimensions as the original tensor to be decomposed X . In practical applications, the residual term is typically truncated because it is highly susceptible to high dimensionality, correlation and noise [Tuna et al., 2020, Şen and Tuna, 2025, Tunga and Demiralp, 2010]. To regulate the contribution of each entity within the EMPR framework, normalized weight vectors along each dimension are applied such as 
+
+> nj
+
+X 
+
+> ij=1
+
+W (j) 
+
+> ij
+
+= 1 , Wi1...i N ≡
+
+> D
+
+Y
+
+> j=1
+
+W (j) 
+
+> ij
+
+; j = 1 , 2, . . . , D (5) where an overall purely multiplicative weight tensor is established as described in Eqn. 5. Support vectors are critical to EMPR decomposition since they directly affect the quality of the resulting representation. These preselected one-dimensional elements are integrated into the decomposition framework, where each support vector must satisfy the following normalization condition under the weight vector of its respective mode 
+
+> nj
+
+X 
+
+> ij=1
+
+W (j)
+
+> ij
+
+
+
+s(j)
+
+> ij
+
+2
+
+= 1; j = 1 , 2, . . . , D (6) To ensure unique EMPR expansion terms for a given set of weight vectors and preselected support vectors, each term must satisfy the following vanishing conditions 
+
+> njℓ
+
+X 
+
+> ijℓ=1
+
+W (jℓ)
+
+> ijℓ
+
+s(jℓ)
+
+> ijℓ
+
+X (ij1 ...i jk ) 
+
+> ij1...i jk
+
+= 0; ℓ = 1 , 2, . . . , k, k = 1 , 2, . . . , D (7) By virtue of the conditions in Eqn. 7, the EMPR terms become mutually orthogonal under the specified weight vectors [Tuna et al., 2020, 2023]. Consequently, by combining the conditions 8from Eqn. 5, Eqn. 6 and Eqn. 7, the scalar EMPR term X0 can be calculated as 
+
+X (0) =
+
+> n1
+
+X
+
+> j1=1
+
+· · · 
+
+> nD
+
+X 
+
+> jD=1
+> D
+
+Y
+
+> ℓ=1
+
+W (jℓ)
+
+> ijℓ
+
+s(jℓ)
+
+> ijℓ
+
+!
+
+X (ij1 ...i jD ) 
+
+> ij1...i jD
+
+(8) Evidently, X0 represents a weighted average of the entries of tensor X . As a result, X0 is typically treated as either a bias term or the coarsest approximation of tensor X .Following the calculation of the scalar term, the one-way (vector) EMPR terms are determined by taking the weighted average of the entries of X accross alldimensions except the k-th one and subtracting the influence of the k-th support vector scaled by the constant scalar term as follows 
+
+X (k) 
+
+> ik
+
+=
+
+> n1
+
+X
+
+> j1=1
+
+· · · 
+
+> nk−1
+
+X
+
+> jk−1=1
+> nk+1
+
+X
+
+> jk+1 =1
+
+· · · 
+
+> nD
+
+X 
+
+> jD=1
+
+
+
+> D
+
+Y
+
+> ℓ=1
+> ℓ̸=k
+
+W (ℓ) 
+
+> jℓ
+
+s(ℓ)
+
+> iℓ
+
+ Xj1...j D − X (0) s(k) 
+
+> ik
+
+;
+
+ik = 1 , 2, . . . , n k, k = 1 , 2, . . . , D (9) The k-th one-way EMPR term reflects the attitude of the multidimensional tensor X
+
+along the k-th dimension isolated from the rest of the all dimensions. Therefore, the one-way terms capture the individual model behaviour exclusive of joint interactions. Similarly, the two-way (matrix) terms isolate the specific interactions between pairs of distinct modes, while higher dimensional EMPR terms capture interactions across multiple modes. This capability uniquely distinguishes EMPR from the methods like Tucker and CP decompositions, which do not inherently capture the cross-interrelational behavior across all dimensions of a given tensor. Following a strategy similar to the one outlined in Eqn. 8 and Eqn. 9, the two-way and higher dimensional EMPR terms can be uniquely computed under the aforementioned conditions. As previously noted, the selection of support vectors is crucial for establishing highly effective EMPR representations. To address this, Averaged Directional Supports (ADS) are widely used in various applications [Tuna et al., 2020, 2023]. Alternatively, several methods 9for determining optimal supports have been explored in the literature [Şen and Tuna, 2025]. The ADS approach computes the weighted average of a tensor along a target mode, with its explicit definition formulated as follows in 
+
+s(j) 
+
+> ij
+
+=
+
+> n1
+
+X
+
+> i1=1
+
+· · · 
+
+> nj−1
+
+X
+
+> ij−1=1
+> nj+1
+
+X
+
+> ij+1 =1
+
+· · · 
+
+> nD
+
+X 
+
+> iD=1
+
+
+
+> nℓ
+
+Y
+
+> ℓ=1
+> ℓ̸=j
+
+W (ℓ)
+
+> iℓ
+
+ Xi1,...,i D
+
+> nj
+
+X 
+
+> ij=1
+
+W (j)
+
+> ij
+
+
+
+> n1
+
+X
+
+> i1=1
+
+· · · 
+
+> nj−1
+
+X
+
+> ij−1=1
+> nj+1
+
+X
+
+> ij+1 =1
+
+· · · 
+
+> nD
+
+X 
+
+> iD=1
+
+
+
+> nℓ
+
+Y
+
+> ℓ=1
+> ℓ̸=j
+
+W (ℓ)
+
+> iℓ
+
+ Xi1,...,i D
+
+
+
+> 2
+
+
+
+> 12
+
+; j = 1 , . . . , D 
+
+(10) where each support vector s(j) is properly normalized to comply with Eqn. 6. 
+
+# 3 Holistic Multivariance Decomposition 
+
+Classical low-rank approximation techniques based on the Tucker and CP methods are not well suited to handle cross-interrelational behaviors among tensor modes. Conversely, while EMPR can account for these behaviors, it possesses limited representation capability because the rank of its expansion is unadjustable due to the one-dimensional structure of the support vectors defined in 6. To combine the interrelational, intrinsic feature extraction capability of EMPR with the rank adjustment flexibility of the Tucker decomposition, we propose a novel and efficient tensor decomposition method named Holistic Multivariance Decomposition (HMD). Let X ∈ Rn1×···× nD is a D-dimensional tensor and Si be matrices such that 
+
+Si ∈ Rni×ri ; ri < n i , i = 1 , . . . , D (11) where each Si satisfies the following condition, 
+
+STi Si = ni Iri×ri ; i = 1 , . . . , D (12) 10 Evidently, each Si is a scaled semi-orthogonal vertically rectangular matrix. To simplify the notation, let N denote the product of the sizes of the tensor X . We define 
+
+N (i) as the product of all mode sizes except the i-th dimension, and N (i,j ) as the product of all mode sizes excluding both the i-th and j-th dimensions. Their explicit definitions can be written as follows 
+
+N =
+
+> D
+
+Y
+
+> k=1
+
+nk, N (i) =
+
+> D
+
+Y 
+
+> k=1
+> k̸=i
+
+nk, N (i,j ) =
+
+> D
+
+Y 
+
+> k=1
+> k̸=i,j
+
+nk, · · · (13) Let S represent the set of matrices described in Eqn. 11 and 12 as 
+
+S = {S1, . . . , S D} (14) Following the same logic as in Eqn. 13, the subset of S that excludes the i-th matrix, or both the i-th, j-th matrices are defined as 
+
+S(i) = {S1, . . . , S i−1, S i+1 , . . . , S D} (15) and 
+
+S(i,j ) = {S1, . . . , S i−1, S i+1 , . . . , S j−1, S j+1 , . . . , S D} (16) respectively. Consider the following definition, 
+
+[[ X ; S]] = [[ X ; {S1, . . . , S D}]] = X × 1 S1 ×2 · · · × D SD (17) where X is a D-dimensional tensor and Si’s are the matrices that enable mode-n product of tensor X with the corresponding Si matrix. The notation [[ •]] is widely referred as the Tucker operator in the literature [Kolda, 2006]. Utilizing the Tucker operator, the Holistic Multivariance Decomposition of a given tensor 11 X is defined as follows 
+
+X = [[ X0 ; S]] + 
+
+> D
+
+X
+
+> i=1
+
+ Xi ; S(i) +
+
+> D
+
+X
+
+> i,j =1
+> i<j
+
+ Xi,j ; S(i,j ) + . . . (18) In Eqn. 18, X0 is denoted as the zeroth level HMD component while Xi’s are the first level HMD components. Xi,j ’s represent the second level HMD components and all higher level components can be named in an analogous fashion. In contrast to EMPR, the HMD components do not consist of scalars, vectors, matrices and so on. Instead, they are all D-dimensional tensors contain a relatively small number of entries due to condition in 11. A 3-D illustration of the HMD expansion is displayed in Fig. 3, where the blue blocks represent the HMD components and the red entities denote the 
+
+Figure 3: Holistic Multivariance Decomposition demonstration for 3D tensors support matrices. The dimensions of each entity can be observed in Fig. 3. Since the number of columns in each support matrix is strictly less than its number of rows, each HMD term is a tensor whose total number of entries is significantly lower than the original tensor X .Consequently, the zeroth level tensor X0in Fig. 3 has dimensions of r1 × r2 × r3, whereas the first level HMD terms X1, X2 and X3 have sizes of n1 × r2 × r3, r1 × n2 × r3 and r1 × r2 × n3,respectively. In Subsection 2.2, we discussed the use of weight to adjust contributions along each tensor mode. A similar approach can be adapted for HMD. To simplify the subsequent analysis, we 12 fix the weight elements across each mode to be invariant, setting W (i) = 1 
+
+> ni
+
+for i = 1 , . . . , D .Tensors and matrices obey the following properties with respect to the mode-n product [Kolda and Bader, 2009]. The first is the commutativity property and expressed as 
+
+X × m A ×n B = X × n B ×m A, m̸ = n (19) while the second identity (benefiting from Eqn. 12) yields 
+
+X × n S ×n S = X × n
+
+ ST S (20) If we apply the Tucker operator from Eqn. 17 using the complete set of support matrices 
+
+S to both sides of the expansion in Eqn. 18, and multiply by all constant W (i) weights, the zeroth level HMD term X0 can be computed as 
+
+X0 = 1
+
+N [[ X ; S]] (21) The zeroth level HMD term serves as the direct multilinear analog to the scalar EMPR term 
+
+x0. However, their geometric treatments of the data are fundamentally different. While EMPR strictly collapses the entire multidimensional block into a single, dimensionless point, HMD compresses the tensor space into a dense core tensor of size r1 × r2 · · · × rD. This approach ensures that the global multidimensional architecture of the data is safely preserved within a downsampled geometric subspace, rather than being completely flattened. Following the same strategy, the first level HMD terms are obtained as 
+
+Xi = 1
+
+N (i)
+
+ X ; S(i) − [[ X0 ; Si]] ; i = 1 , . . . , D (22) 13 while the second level HMD terms are determined as follows 
+
+Xi,j = 1
+
+N (i,j )
+
+ X ; S(i,j ) − [[ X0 ; Si, S j ]] − [[ Xi ; Sj ]] − [[ Xj ; Si]] ; i, j = 1 , . . . , D, i < j 
+
+(23) Higher level HMD terms can be obtained in a similar fashion. The first level HMD terms defined in 22 conceptually mirror the one-way vector components of EMPR. Geometrically, EMPR reduces variations along a single mode into rigid, one-dimensional lines. In contrast, 22 executes a partial projection and deflation to isolate a full D-dimensional tensor subspace. Within this specific subspace, the informational rank is exclusively dictated by linear deviations along the i-th axis. It behaves geometrically much like a bundle of parallel fibers oriented along a single dimension, maintaining the full tensor structure instead of degrading it to a simple vector. The second level HMD terms in 23 expand upon the concept of the two-way EMPR matrix components. Where EMPR forces pairwise relationships to flatten into standard two-dimensional matrices, HMD preserves the geometry as an adjustable multidimensional tensor block. By systematically deflating the core and first level terms, this equation geometrically isolates a relational manifold embedded directly within the higher-dimensional tensor architecture. By defining the index set ND = {1, . . . , D } and considering all of its all subsets, the HMD expansion in Eqn. 18 can be reexpressed in a more elegant and compact form 
+
+X =
+
+# X 
+
+> I ⊆ ND
+
+ XI ; S(I) ; ND = {1, . . . , D } (24) where I is a subset of ND and the empty set corresponds to the zeroth level HMD term X0.In practice, computing the complete expansion formulated in 24 is computationally demanding and often unnecessary for high dimensional data. By systematically truncating the expansion and omitting higher level interaction terms, we obtain a highly efficient 14 approximation. This approach retains the essential multivariance features of the tensor while completely avoiding combinatorial complexity. 
+
+# 4 Experimental Results 
+
+To evaluate the efficiency of the proposed HMD method, we employ three 3-D tensor datasets spanning distinct scientific fields. The first dataset is obtained from Hyperspectral Imagery, the second comprises video analysis, and the final dataset is drawn from chemometrics. Furthermore, we benchmark our method against Tucker and CP decompositions to highlight the performance gains of HMD. As previously noted, it is computationally impractical to include all terms of the full expansion in 24. Therefore, we systematically truncate the expansion at specific structural levels. Initially, we consider only the zeroth level HMD term to establish a baseline zeroth level approximation. We then incorporate the three first level HMD terms to form the first level HMD approximation. Finally, adding the three second level terms yields the second level HMD approximant. To provide a comprehensive comparative analysis, all three of these sequential approximation levels are explicitly plotted. For the numerical experiments, the support matrices Si’s are constructed by extracting the dominant right singular vectors from the corresponding mode-n unfolding of the target tensor. To ensure compliance with the essential semi-orthogonality requirements outlined in Eq. (12), each resulting matrix is subsequently scaled by a factor of √ni.The first validation case utilizes the Indian Pines hyperspectral image dataset, which was captured via the NASA AVIRIS sensor [Baumgardner et al., 1995]. The original Indian Pines dataset consists of 220 spectral bands. In this study, 20 water absorption and low SNR bands were removed, resulting in a total of 200 spectral bands used for experiments. Therefore, the tensor dimensions are 145 × 145 × 200 , with each spectral value stored at a 16 -bit precision. In this structure, the first two modes represent the spatial domain along the x and y axes, respectively, while the third mode contains the continuous spectral information. 15 Figure 4: RMSE comparison as a function of rank ri for the Indian Pines hyperspectral dataset The capacity of the HMD method to preserve the structural fidelity of the original data is evaluated by analyzing the Root Mean Squared Error (RMSE) between the target dataset and its corresponding approximant. The RMSE metrics are calculated for the Tucker and CP methods, as well as for our sequential zeroth, first, and second level HMD expansions. For all tested methods, the rank values ri are varied from 2 to 10 . Although the HMD framework incorporates three distinct support matrices each governed by its own independent rank parameter ( r1, r2, and r3), we fix these ranks to an identical value across all trials for a fair comparison. As demonstrated in Fig. 4, the resulting RMSE values decrease consistently as the rank ri increases. The CP method exhibits the highest reconstruction error, while the Tucker decomposition yields a marginal improvement over CP. Interestingly, even the highly compressed zeroth level HMD approximation performs competitively, tracking between the CP and Tucker baselines. More notably, the first level HMD approximant clearly outperforms both classical Tucker and CP decompositions. While the performance gap between the first level HMD and Tucker methods remains narrow at lower ranks, it widens significantly as 16 ri grows. Specifically, at ri = 10 , the first level HMD achieves a reduced RMSE of 183 .39 ,whereas the Tucker decomposition yields a higher error value of 231 .77 . Beyond these initial observations, a striking performance gap emerges when evaluating the second level HMD against the alternative frameworks. The numerical results indicate that even at a highly compressed rank of ri = 2 , the second level HMD achieves a significantly lower reconstruction error than both the Tucker and CP decompositions managed at their maximum tested rank of ri = 10 . Consequently, the trends illustrated in Fig. 4 emphasize that by incorporating pairwise mode interactions, the second level HMD provides a substantial performance boost, vastly outperforming traditional tensor decomposition paradigms. Given that the Indian Pines dataset originates from the signal processing domain, it is highly instructive to investigate how effectively the proposed framework preserves signal quality and manages reconstruction distortion. To this end, we analyze the Peak Signal-to-Noise Ratio (PSNR) metrics across the different methods. 
+
+Figure 5: PSNR (dB) performance across varying ranks ri for the Indian Pines hyperspectral dataset As illustrated in Fig. 5, the resulting trends closely mirror those observed in the RMSE analysis. The zeroth level HMD consistently tracks between the CP and Tucker decomposition 17 baselines. Moving up the hierarchy, the first level HMD clearly outperforms both classical approaches, yielding higher PSNR values across all tested rank conditions. Most notably, the second level HMD delivers an exceptional performance leap relative to the other methods. It achieves a remarkable signal fidelity of 37 .41 dB at a very low rank of ri = 2 , and further boosts this quality to 43 .31 dB as the rank reaches ri = 10 .Beyond their purely signal-oriented nature, hyperspectral datasets fundamentally preserve spatial image structures. Consequently, assessing the structural fidelity between the original image data and its reconstructed counterpart is crucial. This objective is effectively met by evaluating the Structural Similarity Index Measure (SSIM), a metric bounded between 0
+
+and 1. An SSIM value approaching 1 signifies that the reconstructed image is structurally nearly identical to the reference image, directly reflecting the superior performance of the underlying tensor decomposition framework. According to the metrics presented in Fig. 6, 
+
+Figure 6: SSIM structural evaluation under different rank configurations ri for the Indian Pines hyperspectral dataset the zeroth level HMD consistently tracks between the classical Tucker and CP baselines. Moving up the hierarchy, the first level HMD clearly outperforms both traditional methods, it achieves an SSIM value of 0.71 at a modest rank of ri = 4 , whereas the Tucker decomposition 18 requires its maximum tested rank of ri = 10 to match this performance. Echoing the trends observed in the RMSE and PSNR analyses in Fig. 4 and Fig. 5, respectively, Fig. 6 vividly highlights the exceptional performance leap delivered by the second level HMD. Initiating with a remarkably high structural similarity of 0.83 at a minimal rank of ri = 2 , it increases steadily to reach a commanding 0.94 at ri = 10 .The second experiment utilizes the running action sequences from the publicly available KTH human action database developed by Schuldt, Laptev, and Caputo [Schuldt et al., 2004]. The dataset comprises video recordings of 25 subjects performing the specified action across four distinct environmental scenarios. All sequences were captured using a static camera at a frame rate of 25 fps against homogeneous backgrounds, and subsequently downsampled to a spatial resolution of 160 × 120 pixels. For the specific sample under consideration, the video duration spans approximately 13 seconds, yielding a 3-D data tensor of size 160 × 120 × 345 
+
+encoded at an 8-bit precision. 
+
+Figure 7: RMSE comparison as a function of rank ri for the KTH video dataset The RMSE evaluations in Fig. 7 illustrate the clear advantage of the HMD framework when processing dynamic video data, where spatial geometry is intricately coupled with temporal motion. While classical CP and Tucker decompositions struggle to compress this 19 multimode variance, our hierarchical approach systematically lowers the approximation error. The zeroth and first level HMDs establish solid competitive baselines, but the second level HMD delivers a profound performance leap. By explicitly capturing the synergistic pairwise interactions between the spatial coordinates and the moving temporal frames, it preserves the underlying mechanics of the action sequence. This allows the second-level HMD to minimize residual error drastically, achieving exceptional accuracy even under aggressive low-rank conditions. 
+
+Figure 8: PSNR (dB) performance across varying ranks ri for the KTH video dataset Analyzing the PSNR in Fig. 8 further emphasizes the robust signal fidelity of the proposed framework. In video processing, maintaining high signal quality requires effectively isolating active foreground movement from static background noise under tight compression constraints. While CP, Tucker, and the lower level HMDs cluster at the lower performance boundaries, the second level HMD completely redefines the experiment’s limits. Because its mathematical structure isolates coupled spat-temporal interactions while deflating independent background variance, it inherently suppresses noise. This algebraic advantage translates to an exceptional initial fidelity of roughly 32 .5 dB at a minimal rank of ri = 2 , soaring to nearly 39 dB at 
+
+ri = 10 .20 Figure 9: SSIM structural evaluation under different rank configurations ri for the KTH video dataset SSIM metric in Fig. 9 provides critical insight into the preservation of the video’s spatio-temporal geometry. Retaining structural boundaries across consecutive frames is paramount to preventing the blurring artifacts typical of traditional low-rank methods. While the classical models struggle or even experience slight structural degradation at lower ranks, the second level HMD immediately secures a commanding advantage. Starting with a highly intact SSIM of approximately 0.89 at ri = 2 , it climbs smoothly to nearly 0.94 at ri = 10 .Geometrically, this confirms that mapping the two-dimensional relational manifolds between spatial structures and temporal shifts ensures the reconstructed action remains strictly faithful to the original recording. In the final experiment, the RMSE evaluation for the amino acid dataset [Bro, 1997] presents a structural challenge. To this end, we deliberately constrained the first mode’s rank ( r1) to 2, while varying the remaining ranks ( ri) from 2 to 10 . Because the dataset is composed of exactly three chemical compounds, this rank-2 bottleneck prevents classical CP and Tucker methods from ever resolving the independent signatures, trapping their errors at high plateaus. This is where the second-level HMD truly shines. By explicitly 21 Figure 10: RMSE comparison as a function of rank ri for the amino acid dataset capturing the coupled excitation-emission interactions between the remaining dimensions, it seamlessly bypasses this mathematical limitation. Rather than being restricted by the deficient concentration mode, it successfully maps the underlying spectroscopic fingerprints to minimize residual error. Ultimately, the second-level HMD achieves an accurate, physical reconstruction that traditional models simply cannot match under the same tight constraints. 
+
+# 5 Concluding Remarks 
+
+In this paper, we introduced a novel tensor decomposition method named Holistic Multivari-ance Decomposition (HMD). The proposed framework operates as an adjustable low-rank approximation technique similar to the Tucker decomposition, while simultaneously capturing complex cross-mode interrelations in a manner inspired by EMPR. By uniquely addressing both challenges within a unified algebraic structure, HMD achieves exceptional success in reconstructing multivariate datasets across distinct domains. Architecturally, HMD adopts multiple core tensors whose individual parameter counts remain significantly smaller than that of the original tensor, and it utilizes support matrices 22 with an adjustable number of columns. This inherent structural flexibility allows researchers to tune the number of parameters included in the representation, enabling them to achieve the desired balance between computational complexity and high reconstruction quality. Our numerical experiments demonstrate that HMD provides a robust and dependable tensor decomposition framework. When evaluated on benchmark applications spanning hyperspectral imagery, dynamic video analysis, and chemometrics, HMD consistently yields superior reconstruction accuracy and signal fidelity, even when the factor (support) matrices are constrained to fixed low ranks. The selection of these support matrices remains a crucial step for tailoring HMD to specific data characteristics and achieving exclusive modeling success. Consequently, any contextually relevant semi-orthogonal matrix set, such as incomplete Fourier or wavelet bases, can be seamlessly integrated into the framework to further enhance reconstruction quality. Given its versatile attributes, structural flexibility, and strong numerical performance, the proposed HMD framework emerges as a highly competitive and efficient tensor decomposi-tion alternative for resolving complex multidimensional data structures across science and engineering. 
+
+# References 
+
+Marion F. Baumgardner, Larry L. Biehl, and David A. Landgrebe. 220 band AVIRIS hyperspectral image data set: June 12, 1992 indian pine test site 3, 1995. URL https: //purr.purdue.edu/publications/1947/1 .Rasmus Bro. PARAFAC: Tutorial and applications. Chemometrics and Intelligent Laboratory Systems , 38(2):149–171, 1997. doi: 10.1016/S0169-7439(97)00032-4. Lieven De Lathauwer. A survey of tensor methods. In 2009 IEEE international symposium on circuits and systems , pages 2773–2776. IEEE, 2009. 23 Tamara G Kolda and Brett W Bader. Tensor decompositions and applications. SIAM review ,51(3):455–500, 2009. Tamara Gibson Kolda. Multilinear operators for higher-order decompositions. Technical report, Sandia National Laboratories, 2006. Zhouchen Lin. A review on low-rank models in data analysis. Big Data & Information Analytics , 1(2/3):139–161, 2016. Ruzelita Ngadiran, Said Boussakta, Ahmed Bouridane, and Bayan Syarif. Hyperspectral image compression with modified 3d speck. In 2010 7th International Symposium on Communication Systems, Networks & Digital Signal Processing (CSNDSP 2010) , pages 806–810. IEEE, 2010. C. Schuldt, I. Laptev, and B. Caputo. Recognizing human actions: a local svm approach. In Proceedings of the 17th International Conference on Pattern Recognition, 2004. ICPR 2004. , volume 3, pages 32–36, 2004. doi: 10.1109/ICPR.2004.1334462. Farnaz Sedighin. Tensor methods in biomedical image analysis. Journal of Medical Signals & Sensors , 14(6):16, 2024. Muhammed Enis Şen and Süha Tuna. A new feature extraction scheme based on support optimization in enhanced multivariance products representation for hyperspectral imagery. 
+
+Journal of the Franklin Institute , 362(2):107464, 2025. Nicholas D Sidiropoulos, Lieven De Lathauwer, Xiao Fu, Kejun Huang, Evangelos E Pa-palexakis, and Christos Faloutsos. Tensor decomposition for signal processing and machine learning. IEEE Transactions on signal processing , 65(13):3551–3582, 2017. Süha Tuna, Behçet Uğur Töreyin, Metin Demiralp, Jinchang Ren, Huimin Zhao, and Stephen Marshall. Iterative enhanced multivariance products representation for effective compression 24 of hyperspectral images. IEEE Transactions on Geoscience and Remote Sensing , 59(11): 9569–9584, 2020. Süha Tuna, Evrim Korkmaz Özay, Burcu Tunga, Ercan Gürvit, and M Alper Tunga. An efficient feature extraction approach for hyperspectral images using wavelet high dimensional model representation. International Journal of Remote Sensing , 43(19-24):6899–6920, 2022. Suha Tuna, Cagri Gulec, Emrah Yucesan, Ayse Cirakoglu, and Yelda Tarkan Arguden. Gene teams are on the field: Evaluation of variants in gene-networks using high dimensional modelling. IEEE/ACM Transactions on Computational Biology and Bioinformatics , 20(5): 2959–2969, 2023. B Tunga and M Demiralp. An iterative enhanced multivariance product representation scheme for multivariate function decomposition. In Proceedings of the International Conference on Applied Computer Science , volume 1, pages 247–253, 2010. Burcu Tunga and Metin Demiralp. Constancy maximization based weight optimization in high dimensional model representation for multivariate functions. Journal of mathematical chemistry , 49(9):1996–2012, 2011. Xuan Vu, Caroline Chaux, Nadège Thirion-Moreau, Sylvain Maire, and Elfrida Mihaela Carstea. A new penalized nonnegative third-order tensor decomposition using a block coordinate proximal gradient approach: Application to 3d fluorescence spectroscopy. Journal of Chemometrics , 31(4):e2859, 2017. Minghua Wang, Danfeng Hong, Zhu Han, Jiaxin Li, Jing Yao, Lianru Gao, Bing Zhang, and Jocelyn Chanussot. Tensor decompositions for hyperspectral data processing in remote sensing: A comprehensive review. IEEE Geoscience and Remote Sensing Magazine , 11(1): 26–72, 2023. Berna Yılmaz and Süha Tuna. Compression of convolutional neural networks employing tensor 25 train and high dimensional model representation. In 2025 9th International Symposium on Innovative Approaches in Smart Technologies (ISAS) , pages 1–6. IEEE, 2025. 26

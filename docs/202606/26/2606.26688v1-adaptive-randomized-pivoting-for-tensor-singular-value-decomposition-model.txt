@@ -1,0 +1,2646 @@
+Title: Adaptive Randomized Pivoting for Tensor Singular Value Decomposition Model
+
+URL Source: https://arxiv.org/pdf/2606.26688v1
+
+Published Time: Fri, 26 Jun 2026 00:36:44 GMT
+
+Number of Pages: 36
+
+Markdown Content:
+# Adaptive Randomized Pivoting for Tensor Singular Value Decomposition Model 
+
+Ahmadsho Akdodshoev a, Valentin Leplat †b, Salman Ahmadi-Asl ∗† c 
+
+> aInnopolis University, 420500„ Innopolis, Russia,
+> bInnopolis University, 420500, Russia, valentin.leplat@gmail.com,
+> cInnopolis University, 420500, Russia, s.ahmadiasl@innopolis.ru
+> ∗Corresponding author, †Equal contribution,
+
+Abstract 
+
+This paper studies how adaptive randomized pivoting (ARP), recently introduced for matrix column subset selection, can be extended to tensors in the t-product framework. We propose two constructions. The first one, called ARP-T-CUR, applies matrix ARP independently to the frontal slices of the tensor in the Fourier domain. This gives a Fourier-slicewise CUR approximation and leads to a direct expected-error bound inherited from the matrix theory. The second construction, called T-ARP, selects common lateral and horizontal slices for the whole tensor. This produces a genuine tensor cross approximation in the t-product sense, but also introduces a new difficulty: the same pivot indices must be used across all Fourier slices. We make this coupling explicit and prove an expected-error bound under a frequency-alignment condition measuring how far the common tensor-level sampling rule is from the slice-wise ARP sampling rules. This condition recovers the usual r + 1 -type factor when the leverage-score distributions are aligned across frequencies. We also discuss the resulting tensor cross approximation and its connection with t-DEIM. Numerical experiments on synthetic tensors, images, and videos illustrate the behavior of the proposed methods and show the benefit of common-index tensor sampling over standard tensor cross baselines. 
+
+Keywords: Tensor singular value decomposition (T-SVD), Adaptive randomized pivoting (ARP), Column subset selection problem (CSSP), t-product, Randomized numerical linear algebra. 
+
+2000 MSC: 65F55, 15A69, 65Y20, 68W20, 65F30 
+
+1. Introduction 
+
+The analysis of multi-dimensional data across modern scientific and engineering do-mains frequently relies on tensor factorization techniques to reveal underlying latent struc-tures. Widely adopted frameworks such as the Higher-Order Singular Value Decomposition (HOSVD) [1], the tensor singular value decomposition (T-SVD) in the t-product formal-ism [2], tensor train (TT) decompositions [3], and tensor ring (TR) representations [4] have proven indispensable in areas including image completion [5, 6], biomedical signal inter-pretation [7], many-body quantum simulations [8, 9], and large-scale collaborative filtering systems [10, 11]. Despite their diverse formulations, these methods share a common com-
+
+> arXiv:2606.26688v1 [math.NA] 25 Jun 2026
+
+putational kernel: the singular value decomposition applied to various matricizations of the original tensor. As tensors grow in size and dimensionality, exact deterministic SVD computations be-come increasingly untenable. For a d-mode tensor, traditional algorithms typically incur 
+
+O(nd) operations and demand multiple passes over the entire data array. These scalability challenges have catalyzed the emergence of randomized numerical linear algebra techniques that can produce high-fidelity approximations with significantly reduced resource require-ments. Such probabilistic approaches generally fall into three categories: those constructing low-dimensional sketches of the tensor, those adaptively sampling along important modes, and those employing randomized projections to extract dominant multilinear components. Within the more established context of matrix approximation, the paradigm of selecting a subset of actual columns to represent the entire matrix has gained substantial traction. The Adaptive Randomized Pivoting (ARP) methodology recently proposed by Cortinovis and Kressner [12] offers a particularly elegant solution. This technique sequentially selects columns according to a carefully designed randomization procedure, achieving expected ap-proximation errors in the Frobenius norm that saturate theoretical lower bounds. Notably, ARP accomplishes this without the prohibitive computational cost of volume sampling or re-lated column selection strategies, making it especially attractive for large-scale applications. Motivated by its success in this paper we extend it the T-product framework. Previously, several approaches were proposed in [13, 14, 15, 16]. Our main contributions can be summarized as follows: 
+
+• Extending the ARP method to tensors in the T-product framework (two extensions are presented, one is a Fourier-domain slice-wise adaptation (ARP-T-CUR) and the other is a native t-product extension (T-ARP)). 
+
+• Detailed theoretical analyses of the proposed extensions for low-tubal-rank approxima-tion of tensors. 
+
+• Implementing the algorithms in Python using JAX. To the best of our knowledge, this is the first such implementation. 
+
+• Validating the theoretical results by extensive simulations on real-world datasets, in-cluding images and videos. Throughout the paper we focus on third order tensors but our results can be straightfor-wardly extended to tensor of order higher than 3. This paper is organized as follows: Section 2 reviews tensor notations and decompositions. The ARP method is discussed in Section 3. In Section 4, we show how the ARP method can be extended to the t-product framework. Extensive simulations are given in Section 5. Finally a conclusion is presented in Section highlighting future research direction in Section 6. 
+
+2. Preliminaries 
+
+In this section, we establish the necessary notation and mathematical foundations for the T-SVD. Tensors, matrices, and vectors are denoted by calligraphic, uppercase, and lowercase letters, respectively. The Frobenius norm of a tensor or a matrix is denoted by ∥.∥F . Unlike 2the classical matrix SVD or the HOSVD, the T-SVD is built upon the t-product framework, a powerful algebraic structure for third-order tensors introduced by Kilmer and Martin [2]. This framework treats tensors as operators on matrices, analogous to how matrices act as operators on vectors. Throughout the paper, we use bold lowercase letters to denote vectors, bold uppercase letters to denote matrices, and calligraphic letters to denote tensors. Let X ∈ Rn1×n2×n3 denote a third-order tensor. We adopt the following standard nota-tion: 
+
+• Fibers: A fiber is a one-dimensional slice obtained by fixing all indices but one. For a third-order tensor, we have: 
+
+– Column fiber (mode-1): X (: , j, k ).
+
+– Row fiber (mode-2): X (i, :, k ).
+
+– Tube fiber (mode-3): X (i, j, :) .
+
+• Slices: A slice is a two-dimensional section of a tensor: 
+
+– Frontal slice (mode-1): X(k) = X (: , :, k ) for k = 1 , 2, . . . , n 3.
+
+– Lateral slice (mode-2): X (: , j, :) for j = 1 , 2, . . . , n 2.
+
+– Horizontal slice (mode-3): X (i, :, :) for i = 1 , 2, . . . , n 1.The t-product is a multiplication operation between two third-order tensors of appropriate dimensions. To define it, we first need the concepts of block circulant matrices and the unfold operator. 
+
+Definition 2.1 (Unfold and Fold Operators) . For a tensor X ∈ Rn1×n2×n3 , the unfold 
+
+operator maps X to a block matrix of size n1n3 × n2:
+
+unfold (X ) = 
+
+
+
+X(1) 
+
+X(2) 
+
+...
+
+X(n3)
+
+ , (1) 
+
+where X(k) is the k-th frontal slice. The inverse fold operator, fold (unfold (X )) = X ,reshapes the block matrix back into a tensor. 
+
+Definition 2.2 (Block Circulant Matrix) . The block circulant matrix of a tensor X ∈
+
+Rn1×n2×n3 is an n1n3 × n2n3 block matrix defined as: 
+
+bcirc (X ) = 
+
+
+
+X(1) X(n3) X(n3−1) . . . X(2) 
+
+X(2) X(1) X(n3) . . . X(3) 
+
+... ... ... . . . ...
+
+X(n3) X(n3−1) X(n3−2) . . . X(1) 
+
+ . (2) 
+
+Definition 2.3 (T-Product) . Let X ∈ Rn1×n2×n3 and Y ∈ Rn2×ℓ×n3 . The t-product Z =
+
+X ∗ Y ∈ Rn1×ℓ×n3 is defined as: 
+
+Z = fold (bcirc (X ) · unfold (Y)) . (3) 3The t-product can be understood as matrix multiplication in which the scalar multipli-cation operation is replaced by circular convolution between tube fibers. More precisely, the t-product between tensors X ∈ Rm×n×p and Y ∈ Rn×q×p yields Z ∈ Rm×q×p defined via: 
+
+Z(i, j, :) = 
+
+> n
+
+X
+
+> k=1
+
+X (i, k, :) ∗ Y (k, j, :) , (4) where ∗ denotes circular convolution between tubes (vectors of length p). Equivalently, by the convolution theorem, the t-product corresponds to face-wise matrix multiplication in the Fourier domain. A fundamental insight that makes the t-product computationally tractable is its equiva-lence to face-wise multiplication in the transform domain. Let bX denote the tensor obtained by taking the Discrete Fourier Transform (DFT) along each tube fiber (mode-3) of A. Specif-ically, for each (i, j ), we compute: 
+
+bX (i, j, :) = fft (X (i, j, :)) . (5) 
+
+Theorem 2.4 (Block Diagonalization) . Applying the DFT along the third dimension block diagonalizes the block circulant matrix: 
+
+(Fn3 ⊗ In1 ) · bcirc (X ) · (F∗ 
+
+> n3
+
+⊗ In2 ) = 
+
+bX(1) 
+
+bX(2) 
+
+. . .
+
+bX(n3)
+
+ , (6) 
+
+where Fn3 is the n3 × n3 DFT matrix, ⊗ denotes the Kronecker product, and bX(k) are the frontal slices of bX .
+
+This property implies that the t-product in the spatial domain reduces to face-wise matrix multiplication in the Fourier domain: 
+
+\X ∗ Y = bX ⊙ bY, (7) where ⊙ denotes face-wise multiplication: bZ(k) = bX (k) bY (k) for k = 1 , 2, . . . , n 3. Moreover, the Frobenius norm satisfies: 
+
+∥X ∥ 2 
+
+> F
+
+= 1
+
+p
+
+> p
+
+X
+
+> ℓ=1
+
+∥ ˆX(ℓ)∥2 
+
+> F
+
+, (8) due to the unitary nature of the DFT. 4Algorithm 1 T-Product via Fourier Domain 
+
+Input: Tensors X ∈ Rn1×n2×n3 , Y ∈ Rn2×n3×n3
+
+Output: Tensor Z = X ∗ Y ∈ Rn1×n3×n3 
+
+> 1:
+
+Compute bX = fft (X , [] , 3) ▷ DFT along mode-3  
+
+> 2:
+
+Compute bY = fft (Y, [] , 3)  
+
+> 3:
+
+for i = 1 , 2, . . . , n 3 do  
+
+> 4:
+
+bZ(i) = bX(i) bY (i) ▷ Matrix multiplication per frontal slice  
+
+> 5:
+
+end for  
+
+> 6:
+
+bZ ← assemble from { bZ(i)}n3 
+
+> i=1
+> 7:
+
+Z = ifft ( bZ, [] , 3) ▷ Inverse DFT along mode-3  
+
+> 8:
+
+return Z
+
+Definition 2.5 (Tensor Transpose) . The transpose of a tensor X ∈ Rn1×n2×n3 , denoted X ⊤,is the n2 × n1 × n3 tensor obtained by transposing each frontal slice and then reversing the order of slices 2 through n3. More formally, for k = 1 :
+
+(X⊤)(1) = ( X(1) )⊤, (9) 
+
+and for k = 2 , 3, . . . , n 3:
+
+(X⊤)(k) = ( X(n3−k+2) )⊤. (10) 
+
+Definition 2.6 (Identity Tensor) . The identity tensor In ∈ Rn×n×n3 is a tensor whose first frontal slice is the n × n identity matrix, and all other frontal slices are zero matrices. For any tensor X of compatible dimensions, X ∗ I n = X and In ∗ X = X .
+
+Definition 2.7 (Orthogonal Tensor) . A tensor Q ∈ Rn×n×n3 is orthogonal if it satisfies: 
+
+Q⊤ ∗ Q = Q ∗ Q ⊤ = I. (11) 
+
+In the Fourier domain, this is equivalent to each frontal slice bQ(k) being an orthogonal matrix for all k.
+
+Definition 2.8 (f-diagonal Tensor) . A tensor is called f-diagonal if each of its frontal slices is a diagonal matrix. For a third-order tensor S ∈ Rn1×n2×n3 , this means S(k) is diagonal for all k = 1 , 2, . . . , n 3.
+
+Definition 2.9 (Upper Triangular Tensor) . A tensor R ∈ Rn1×n2×n3 is upper triangular if each of its frontal slices is an upper triangular matrix. 
+
+Definition 2.10 (Inverse of a Tensor) . Let A ∈ Rn×n×n3 be a tensor. The inverse of A
+
+under the t-product, denoted A−1 ∈ Rn×n×n3 , is the unique tensor satisfying 
+
+A ∗ A −1 = In and A−1 ∗ A = In,
+
+where In ∈ Rn×n×n3 is the identity tensor as defined in Definition 1. The tensor A is said to be invertible if such an inverse exists. See Algorithm 2 for its calculation. 
+
+5Algorithm 2 Tensor Inverse via Fourier Domain 
+
+Input: Tensor A ∈ Rn×n×n3 (square in first two dimensions); 
+
+Output: Tensor A−1 ∈ Rn×n×n3 such that A ∗ A −1 = In; 
+
+> 1:
+
+Compute bA = fft (A, [] , 3) ; 
+
+> 2:
+
+for i = 1 , 2, . . . , n 3 do  
+
+> 3:
+
+if bA(i) is singular then  
+
+> 4:
+
+error : Tensor is not invertible;  
+
+> 5:
+
+else  
+
+> 6:
+
+dA−1(i)
+
+= ( bA(i))−1 ▷ Matrix inverse;  
+
+> 7:
+
+end if  
+
+> 8:
+
+end for  
+
+> 9:
+
+dA−1 ← assemble from { dA−1(i)
+
+}n3
+
+> i=1
+
+; 
+
+> 10:
+
+A−1 = ifft ( dA−1, [] , 3) ; 
+
+> 11:
+
+return A−1;
+
+Definition 2.11 (Pseudoinverse of a Tensor) . Let A ∈ Rn1×n2×n3 be a tensor. The pseu-doinverse of A under the t-product, denoted A† ∈ Rn2×n1×n3 , is the unique tensor satisfying the following four Moore-Penrose conditions: 
+
+A ∗ A † ∗ A = A,
+
+A† ∗ A ∗ A † = A†,
+
+(A ∗ A †)∗ = A ∗ A †,
+
+(A† ∗ A )∗ = A† ∗ A ,
+
+where (·)∗ denotes the conjugate transpose (Hermitian) operation under the t-product frame-work (i.e., the tensor conjugate transpose). When A has linearly independent frontal slices in the Fourier domain, A† can be computed via the t-product as A† = ( AT ∗ A )−1 ∗ A T or 
+
+A† = AT ∗ (A ∗ A T )−1 for full column or row rank, respectively. See Algorithm 3 for its calculation. 
+
+Algorithm 3 Tensor Pseudoinverse via Fourier Domain 
+
+Input: Tensor A ∈ Rn1×n2×n3 ;
+
+Output: Tensor A† ∈ Rn2×n1×n3 (Moore-Penrose pseudoinverse);  
+
+> 1:
+
+Compute bA = fft (A, [] , 3) ; 
+
+> 2:
+
+for i = 1 , 2, . . . , n 3 do  
+
+> 3:
+
+Compute matrix pseudoinverse: cA†(i)
+
+= ( bA(i))† ; ▷ Using matrix SVD or QR  
+
+> 4:
+
+end for  
+
+> 5:
+
+cA† ← assemble from {cA†(i)
+
+}n3
+
+> i=1
+
+; 
+
+> 6:
+
+A† = ifft (cA†, [] , 3) ; 
+
+> 7:
+
+return A†;With the t-product framework established, we can now define the T-SVD. 6Definition 2.12 (T-SVD) . Let X ∈ Rn1×n2×n3 . The T-SVD of A is given by: 
+
+X = U ∗ S ∗ V ⊤, (12) 
+
+where: 
+
+• U ∈ Rn1×n1×n3 and V ∈ Rn2×n2×n3 are orthogonal tensors (left and right singular tensors). 
+
+• S ∈ Rn1×n2×n3 is an f-diagonal tensor (its frontal slices are diagonal matrices). 
+
+Remark 2.13 (Computation via Fourier Domain) . The T-SVD can be efficiently computed by applying the matrix SVD to each frontal slice in the Fourier domain: 
+
+1. Compute bX = fft (X , [] , 3) , i.e., apply the FFT along each tube fiber. 
+
+2. For each k = 1 , 2, . . . , n 3, compute the matrix SVD of the frontal slice bX(k):
+
+bX(k) = bU (k) bS(k)( bV (k))⊤. (13) 3. Reconstruct bU, bS, bV from their frontal slices. 
+
+4. Apply the inverse FFT along the third dimension to obtain U , S, and V :
+
+U = ifft ( bU, [] , 3) , S = ifft ( bS, [] , 3) , V = ifft (bV, [] , 3) . (14) 
+
+Definition 2.14 (Tubal Rank) . The tubal rank of a tensor X is defined as the number of non-zero singular tubes of S, or equivalently, the maximum rank of the frontal slices bX(k) in the Fourier domain: rank t(X ) = max  
+
+> k
+
+rank ( bX(k)). (15) 
+
+More practically, it is the number of non-zero diagonal entries in S after the inverse FFT. 
+
+The best tubal rank-r approximation of A in the Frobenius norm is obtained by truncating the T-SVD to keep only the first r singular tubes, analogous to the Eckart-Young theorem for matrices: 
+
+Xr = Ur ∗ S r ∗ V ⊤ 
+
+> r
+
+, (16) or 
+
+Xr = U(: , 1 : r, :) ∗ S (1 : r, 1 : r, :) ∗ V (: , 1 : r, :) T , (17) where Ur ∈ Rn1×r×n3 , Vr ∈ Rn2×r×n3 , and Sr ∈ Rr×r×n3 is f-diagonal, provides the optimal solution to the following optimization problem 
+
+Xr = arg min 
+
+> rank t(B)≤r
+
+∥X − B∥ F , (18) with approximation error: 
+
+∥X − X r∥2 
+
+> F
+
+=
+
+> min( m,n )
+
+X
+
+> k=r+1
+
+∥S (k, k, :) ∥22, (19) where ∥S (k, k, :) ∥2 denotes the ℓ2 norm of the tube S(k, k, :) , see Figure 1, for graphical illustration of the T-SVD and its truncated model. The T-QR decomposition is a factorization that expresses a tensor as the t-product of an orthogonal tensor and an upper triangular tensor. 7Figure 1: Tensor SVD and its truncated version. 
+
+Definition 2.15 (T-QR Decomposition) . Let X ∈ Rn1×n2×n3 with n1 ≥ n2. The T-QR decomposition of X is given by 
+
+X = Q ∗ R ,
+
+where: 
+
+• Q ∈ Rn1×n2×n3 is a tensor with orthonormal lateral slices: Q⊤ ∗ Q = I (the identity tensor of size n2 × n2 × n3); 
+
+• R ∈ Rn2×n2×n3 is an upper triangular tensor (each frontal slice is upper triangular). If n1 > n 2, the decomposition is often called the thin or economy T-QR. 
+
+Algorithm 4, summarizes this process. 
+
+Algorithm 4 T-QR Decomposition via Householder Transformations 
+
+Input: Tensor X ∈ Rn1×n2×n3 with n1 ≥ n2
+
+Output: Orthogonal tensor Q ∈ Rn1×n2×n3 and upper triangular tensor R ∈ Rn2×n2×n3 
+
+> 1:
+
+Compute bX = fft (X , [] , 3) ▷ DFT along mode-3  
+
+> 2:
+
+for k = 1 , 2, . . . , n 3 do  
+
+> 3:
+
+bA ← bX (: , :, k ) ▷ Extract k-th frontal slice  
+
+> 4:
+
+[ bQ(k), bR(k)] ← householder_qr ( bA) ▷ Matrix QR using Householder  
+
+> 5:
+
+end for  
+
+> 6:
+
+bQ ← assemble from { bQ(k)}pk=1  
+
+> 7:
+
+bR ← assemble from { bR(k)}pk=1  
+
+> 8:
+
+Q = ifft ( bQ, [] , 3)  
+
+> 9:
+
+R = ifft ( bR, [] , 3)  
+
+> 10:
+
+return Q, R
+
+83. Adaptive Randomized Pivoting (ARP) 
+
+Adaptive Randomized Pivoting (ARP) is a randomized algorithm for the Column Sub-set Selection Problem (CSSP) proposed by Cortinovis and Kressner [12]. Given a matrix 
+
+X ∈ Rm×n and a target rank r ≪ min {m, n }, CSSP aims to select r column indices 
+
+J = ( j1, j 2, . . . , j r) such that the selected columns X(: , J ) approximately span the column space of X. The approximation error is measured as 
+
+∥X − ΠJ X∥F ,
+
+where 
+
+ΠJ = C(CT C)†CT , C = X(: , J ),
+
+is the orthogonal projector onto span( X(: , J )) and ∥ · ∥ F denotes the Frobenius norm. ARP relies on two key ideas: 1. Subspace sampling : Sampling probabilities are derived from an orthonormal basis 
+
+V ∈ Rn×r that approximates the row space of X;2. Adaptive updating : After each selection, the basis is orthogonalized against the selected row, making the sampling adaptive. A crucial advantage of ARP is that it operates obliviously to the data matrix X: the index selection process only requires access to the row space basis V , not to X itself. This makes ARP particularly attractive for applications such as the Discrete Empirical Interpolation Method (DEIM) [17], where the function to be approximated is not known in advance. The ARP algorithm processes the orthonormal basis V ∈ Rn×r iteratively. At each step k = 1 , 2, . . . , r , it samples a row index jk with probability proportional to the squared norm of the current row, then removes that row’s contribution via an orthogonal projection. Algorithm 5 presents the stable Householder-based implementation. 
+
+Algorithm 5 Adaptive Randomized Pivoting for CSSP (ARP) 
+
+Input: Orthonormal basis V ∈ Rn2×r (row space approximation); 
+
+Output: Index set J = ( j1, j 2, . . . , j r) 
+
+> 1:
+
+Initialize J = () and W0 = V ; 
+
+> 2:
+
+for k = 1 , 2, . . . , r do  
+
+> 3:
+
+Compute probabilities: pj = ∥Wk−1(j,k :r)∥22 
+
+> r−k+1
+
+for j = 1 , 2, . . . , n 2; 
+
+> 4:
+
+Sample jk ∼ Categorical( p1, p 2, . . . , p n); 
+
+> 5:
+
+Append jk to J; 
+
+> 6:
+
+Update Wk ← Wk−1Qk, where Qk is a Householder reflector that annihilates 
+
+Wk−1(jk, k + 1 : r); 
+
+> 7:
+
+end for 
+
+The algorithm maintains a transformed basis Wk that remains orthonormal throughout. The probabilities in Line 3 satisfy Pn2 
+
+> j=1
+
+pj = 1 because ∥Wk−1(: , k : r)∥2 
+
+> F
+
+= r − k + 1 . The Householder update ensures numerical stability and prevents the same index from being selected twice. 9Algorithm 6 Adaptive Randomized Pivoting for cross approximation (ARPcross) 
+
+Input: Matrix X ∈ Rn1×n2 and an orthonormal basis V ∈ Rn2×r defining a row space approximation; 
+
+Output: Index sets I = ( i1, i 2, . . . , i r) and J = ( j1, j 2, . . . , j r) defining a cross approximation 
+
+X ≈ X(: , J )X(I, J )−1X(I, :) ; 
+
+> 1:
+
+Obtain index set J by applying Algorithm 5 to V ; 
+
+> 2:
+
+Compute an orthonormal basis QJ of X(: , J ) by a QR decomposition;  
+
+> 3:
+
+Obtain index set I by applying Algorithm 5 to QJ ;The main theoretical result of Cortinovis and Kressner is an optimal error bound in expectation. Define the oblique projector 
+
+eΠJ = I − EJ (V T EJ )−1V T ,
+
+where EJ = [ ej1 , e j2 , . . . , e jr ]. The next theorem summarizes the main results shown in [12]. 
+
+Theorem 3.1 (Cortinovis & Kressner, 2024) . Let X ∈ Rn1×n2 and let V ∈ Rn2×r be an orthonormal basis. The random index set J returned by Algorithm 5 satisfies 
+
+E ∥X − ΠJ X∥2
+
+> F
+
+ ≤ E ∥X − X(: , J )V (J, :) −T V T ∥2
+
+> F
+
+ = ( r + 1) ∥X − XV V T ∥2 
+
+> F
+
+.
+
+Several important consequences follow: 
+
+• By Jensen’s inequality, E(∥X − ΠJ X∥F ) ≤ √r + 1 ∥X − XV V T ∥F .
+
+• When V = Vopt (the right singular vectors of X), the bound becomes (r + 1)( σ2 
+
+> r+1
+
++
+
+· · · + σ2
+
+> n
+
+), matching the optimal existence result of Deshpande et al. [18]. 
+
+• Markov’s inequality yields tail bounds: with probability ≥ 0.99 , the error is at most 
+
+10 √r + 1 ∥X − XV V T ∥F .The ARP framework extends naturally to several related problems: 
+
+• DEIM (Discrete Empirical Interpolation Method): For a function f ≈ V V T f , ARP selects indices I such that f ≈ V (ETI V )−1f (I). Corollary 3.1 of the paper shows 
+
+E[∥(ETI V )−1∥2 
+
+> F
+
+] = r(n2 − r + 1) , E[∥(ETI V )−1∥22] ≤ 1 + r(n2 − r).
+
+• Cross (Skeleton) Approximation: For general matrices, selecting both rows and columns yields the approximation X ≈ X(: , J )X(I, J )−1X(I, :) . Using ARP twice (once with 
+
+V for columns, once with an orthonormal basis of X(: , J ) for rows) gives 
+
+E[∥X − X(: , J )X(I, J )−1X(I, :) ∥2 
+
+> F
+
+] ≤ (r + 1) 2∥X − XV V T ∥2 
+
+> F
+
+.
+
+10 • Nyström Approximation for SPSD Matrices: For symmetric positive semidefinite X,choosing I = J yields the Nyström approximation. The Gram correspondence ∥X−X(: 
+
+, J )X(J, J )−1X(J, :) ∥∗ = ∥(I −ΠJ )B∥2 
+
+> F
+
+(where BT B = X and ∥·∥ ∗ is the nuclear norm) leads to 
+
+E[∥X − X(: , J )X(J, J )−1X(J, :) ∥∗] ≤ (r + 1) ∥(I − V V T )X(I − V V T )∥∗.
+
+The Householder-based implementation of ARP (Algorithm 5) requires O(n2r2) opera-tions. This is significantly cheaper than the deterministic derandomized version (Osinsky’s algorithm), which requires O(n1n2r) operations and full access to X. The lower cost makes ARP suitable for large-scale problems where X cannot be accessed repeatedly. A deterministic version is obtained by replacing the random sampling step with a greedy selection: 
+
+jk ∈ arg min 
+
+> j
+
+∥ eXk−1(: , j )∥22
+
+∥Wk−1(j, k : r)∥22
+
+,
+
+where eXk is a residual matrix. This recovers Osinsky’s algorithm [19] and guarantees 
+
+∥X − X(: , J )V (J, :) −T V T ∥2 
+
+> F
+
+≤ (r + 1) ∥X − XV V T ∥2
+
+> F
+
+deterministically, at the cost of higher computational complexity. For the SPSD case, the authors derive a novel deterministic algorithm (Algorithm 5.1) that avoids explicit computation of a square root factor B by operating directly on X while maintaining O(n2r2) complexity plus the cost of forming XV .
+
+Remark 3.2. Theorem 3.1 extends straightforwardly to complex-valued matrices. In the complex setting, all transposes (·)T are replaced by conjugate transposes (·)H , and orthogonal projectors are defined using Hermitian inner products. We will apply the ARP in the Fourier domain in one of our proposed algorithms. 
+
+4. ARP for Tensor SVD (T-SVD) 
+
+In this section we provide two extensions of ARP to tensors in the t-product framework. The first variant (ARP-T-CUR) operates in the Fourier domain by applying the matrix ARP to each frontal slice independently. The second variant (T-ARP) provides a native tensor extension that directly selects lateral and horizontal slices using the algebraic structure of the t-product. 
+
+4.1. ARP Adaptation (Variant I) 
+
+We first describe a Fourier-slicewise extension of ARP. The idea is simple: after applying the FFT along the third mode, the t-product decouples into independent matrix products on the frontal slices. We can therefore apply the matrix ARP-cross procedure to each Fourier slice separately. This variant should be understood as a Fourier-domain CUR approximation. Since the selected row and column indices may depend on the frequency, it does not necessarily pro-duce a tensor cross approximation with common lateral and horizontal slices in the original domain. The common-index tensor version is discussed in the next subsection. 11 Algorithm 7 Fourier-slicewise ARP-T-CUR 
+
+Input: Tensor X ∈ Rn1×n2×n3 , target rank r, and orthonormal bases V (ℓ) ∈ Cn2×r, ℓ =1, 2, . . . , n 3, approximating the row spaces of the Fourier slices bX(ℓ).
+
+Output: Approximation XTCUR .
+
+1: Compute bX = fft (X , [] , 3) .
+
+2: for ℓ = 1 , 2, . . . , n 3 do 
+
+3: Let bX(ℓ) = bX (: , :, ℓ ) ∈ Cn1×n2 .
+
+4: Apply matrix ARP-cross to the pair ( bX(ℓ), V (ℓ)), obtaining row and column index sets Iℓ and Jℓ, both of cardinality r.
+
+5: Set 
+
+bC(ℓ) = bX(ℓ)(: , J ℓ), bR(ℓ) = bX(ℓ)(Iℓ, :) , bU (ℓ) =
+
+ bX(ℓ)(Iℓ, J ℓ)
+
+†
+
+.
+
+6: Define bX(ℓ)TCUR = bC(ℓ) bU (ℓ) bR(ℓ).
+
+7: end for 
+
+8: Assemble bXTCUR from the slices bX(ℓ)TCUR .
+
+9: Compute XTCUR = ifft ( bXTCUR , [] , 3) .
+
+10: return XTCUR .The bases V (ℓ) may be obtained in different ways, for example by an exact SVD, a randomized range finder, or another row-space approximation method. The theorem below is conditional on the quality of these bases. 
+
+Theorem 4.1 (Error bound for Fourier-slicewise ARP-T-CUR) . Let X ∈ Rn1×n2×n3 , and let bX = fft (X , [] , 3) .
+
+For each ℓ = 1 , 2, . . . , n 3, let V (ℓ) ∈ Cn2×r be an orthonormal basis approximating the row space of bX(ℓ). Let XTCUR be the approximation computed by Algorithm 7. Then 
+
+E ∥X − X TCUR ∥2
+
+> F
+
+ ≤ (r + 1) 2
+
+n3
+
+> n3
+
+X
+
+> ℓ=1
+
+bX(ℓ) − bX(ℓ)V (ℓ)  V (ℓ)H 2
+
+> F
+
+.
+
+In particular, if V (ℓ) contains the top r right singular vectors of bX(ℓ) for every ℓ, then 
+
+E ∥X − X TCUR ∥2
+
+> F
+
+ ≤ (r + 1) 2 ∥X − X r∥2 
+
+> F
+
+,
+
+where Xr is the best tubal-rank-r approximation of X obtained by truncating the T-SVD. Proof. By Parseval’s identity for the FFT convention used here, 
+
+∥X − X TCUR ∥2 
+
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> ℓ=1
+
+bX(ℓ) − bX(ℓ)TCUR 
+
+> 2
+> F
+
+.
+
+12 For each fixed frequency ℓ, the approximation 
+
+bX(ℓ)TCUR = bC(ℓ) bU (ℓ) bR(ℓ)
+
+is exactly the matrix ARP-cross approximation applied to bX(ℓ) with row-space basis V (ℓ).Therefore, the matrix ARP-cross bound gives 
+
+E
+
+bX(ℓ) − bX(ℓ)TCUR 
+
+> 2
+> F
+
+
+
+≤ (r + 1) 2 bX(ℓ) − bX(ℓ)V (ℓ)  V (ℓ)H 2
+
+> F
+
+.
+
+Summing this estimate over all frequencies and using the Fourier norm identity yields the first claim. If V (ℓ) contains the top r right singular vectors of bX(ℓ), then 
+
+bX(ℓ) − bX(ℓ)V (ℓ)  V (ℓ)H 2
+
+> F
+
+= X
+
+> j>r
+
+σ2
+
+> j
+
+ bX(ℓ)
+
+
+
+.
+
+Hence 
+
+1
+
+n3
+
+> n3
+
+X
+
+> ℓ=1
+
+bX(ℓ) − bX(ℓ)V (ℓ)  V (ℓ)H 2
+
+> F
+
+= ∥X − X r∥2 
+
+> F
+
+,
+
+which proves the second claim. Thus, Theorem 4.1 shows the ARP-T-CUR algorithm achieves, in expectation, an error within factor (r + 1) 2 of the optimal T-SVD error. 
+
+4.2. ARP Adaptation (Variant II) 
+
+We now describe a second extension of ARP to the t-product framework. In contrast with ARP-T-CUR, which applies matrix ARP independently to the Fourier frontal slices, the goal here is to select common indices for the whole tensor. More precisely, for a tensor 
+
+X ∈ Rn1×n2×n3 ,
+
+we aim to select lateral slices indexed by 
+
+J = ( j1, j 2, . . . , j r) ⊂ { 1, 2, . . . , n 2},
+
+and horizontal slices indexed by 
+
+I = ( i1, i 2, . . . , i r) ⊂ { 1, 2, . . . , n 1}.
+
+The corresponding tensor cross approximation has the form 
+
+X ≈ X (: , J, :) ∗ X (I, J, :) † ∗ X (I, :, :) ,
+
+where the pseudoinverse is taken in the t-product sense. If the intersection tensor X (I, J, :) 
+
+is invertible, then X (I, J, :) † can be replaced by X (I, J, :) −1. We refer to this common-index extension as T-ARP; see Figure 2 for an illustration. 13 Figure 2: Tensor approximation based on sampling lateral and horizontal slices. 
+
+Similar to the matrix case, Algorithm 8 can be used in two stages to build a tensor cross approximation. We first use a right basis to select lateral slices. We then compute an orthonormal basis of the selected lateral slices and apply T-ARP again to select horizontal slices. This gives the approximation described in Algorithm 9. For a fixed index set J, let 
+
+C = X (: , J, :) ,
+
+and let QJ be an orthonormal basis of span t(C), that is, 
+
+Q⊤ 
+
+> J
+
+∗ Q J = Ir.
+
+The corresponding orthogonal projection error is 
+
+X − Q J ∗ Q ⊤ 
+
+> J
+
+∗ X 2 
+
+> F
+
+.
+
+By the optimality of the truncated T-SVD, this error is always bounded below by the best tubal-rank-r approximation error: 
+
+∥X − X r∥2 
+
+> F
+
+=
+
+> min( n1,n 2)
+
+X
+
+> k=r+1
+
+∥S (k, k, :) ∥22 ≤ X − Q J ∗ Q ⊤ 
+
+> J
+
+∗ X 2 
+
+> F
+
+.
+
+The algebraic update in Algorithm 8 is written in a form that is convenient for the analysis. In practice, one should not recompute the projector from scratch at each step. As in the matrix ARP algorithm, the update can be implemented more stably by applying Householder transformations in the Fourier domain. This gives an efficient implementation while preserving the same selected indices and the same algebraic residual basis. We keep the abstract form in Algorithm 8, since it is the one needed for the proof. The next lemma records the algebraic form of the iterates produced by the T-ARP orthogonalization step, for a fixed sequence of selected indices. This is only an algebraic statement; it does not address the probabilistic issue in Theorem 4.8. 
+
+Lemma 4.2 (Compact representation of the T-ARP updates) . Let V ∈ Rn×r×p satisfy 
+
+V⊤ ∗ V = Ir.
+
+For clarity, denote the T-ARP iterates by 
+
+W(0) = V,
+
+14 Algorithm 8 Tubal Adaptive Randomized Pivoting (T-ARP) 
+
+Input: A tensor V ∈ Rn×r×p with orthonormal lateral slices under the t-product, that is, 
+
+V⊤ ∗ V = Ir,
+
+and a target tubal rank r.
+
+Output: An index set J = ( j1, j 2, . . . , j r). 
+
+> 1:
+
+Initialize J0 = () and W(0) = V. 
+
+> 2:
+
+for k = 1 , 2, . . . , r do  
+
+> 3:
+
+Compute the tensor leverage scores 
+
+ω(k) 
+
+> j
+
+= W(k−1) (j, :, :) 2 
+
+> F
+
+, j = 1 , 2, . . . , n.  
+
+> 4:
+
+Normalize 
+
+p(k) 
+
+> j
+
+= ω(k)
+
+> j
+
+Pni=1 ω(k)
+
+> i
+
+. 
+
+> 5:
+
+Sample jk from {1, 2, . . . , n } according to the probabilities p(k) 
+
+> j
+
+. 
+
+> 6:
+
+Set Jk = ( Jk−1, j k). 
+
+> 7:
+
+Define 
+
+EJk = In(: , J k, :) , Ak = E⊤ 
+
+> Jk
+
+∗ V . 
+
+> 8:
+
+Update 
+
+W(k) = V ∗ 
+
+
+
+Ir − A † 
+
+> k
+
+∗ A k
+
+
+
+. 
+
+> 9:
+
+end for  
+
+> 10:
+
+return J = Jr.15 Algorithm 9 T-Cross approximation based on T-ARP 
+
+Input: A tensor X ∈ Rn1×n2×n3 , a target tubal rank r ≤ min( n1, n 2), and a right basis 
+
+VR ∈ Rn2×r×n3 , V⊤ 
+
+> R
+
+∗ V R = Ir,
+
+approximating the row space of X in the t-product sense. 
+
+Output: A tensor cross approximation bX . 
+
+> 1:
+
+Select lateral slice indices 
+
+J ← T-ARP( VR, r ). 
+
+> 2:
+
+Form 
+
+C = X (: , J, :) . 
+
+> 3:
+
+Compute a thin T-QR factorization 
+
+C = QJ ∗ R J , Q⊤ 
+
+> J
+
+∗ Q J = Ir. 
+
+> 4:
+
+Select horizontal slice indices 
+
+I ← T-ARP( QJ , r ). 
+
+> 5:
+
+Form 
+
+R = X (I, :, :) , U = X (I, J, :) †. 
+
+> 6:
+
+Set bX = C ∗ U ∗ R . 
+
+> 7:
+
+return bX .16 and let Jk = ( j1, j 2, . . . , j k) be the indices selected after k steps. Let 
+
+EJk = In(: , J k, :) ∈ Rn×k×p, Ak = E⊤ 
+
+> Jk
+
+∗ V ∈ Rk×r×p.
+
+Then 
+
+W(k) = V ∗ 
+
+
+
+Ir − A † 
+
+> k
+
+∗ A k
+
+
+
+, k = 0 , 1, 2, . . . , r. 
+
+Equivalently, in the Fourier domain, for every frequency ℓ = 1 , 2, . . . , p ,
+
+cW (k,ℓ ) = bV (ℓ)
+
+
+
+Ir −
+
+
+
+(EJk )H bV (ℓ)
+
+† 
+
+(EJk )H bV (ℓ)
+
+
+
+,
+
+where 
+
+EJk = ej1 ej2 · · · ejk
+
+ ∈ Rn×k.
+
+Proof. We work in the Fourier domain, where the t-product becomes ordinary matrix mul-tiplication. Fix a frequency ℓ. For simplicity, write 
+
+V = bV (ℓ), W (k) = cW (k,ℓ ), EJk = ej1 ej2 · · · ejk
+
+ .
+
+The matrix ARP orthogonalization updates the basis by multiplying on the right by orthog-onal projectors that remove the contribution of the selected rows. Therefore, after k selected indices, the iterate is 
+
+W (k) = V
+
+
+
+Ir −  EHJk V †  EHJk V 
+
+.
+
+Indeed, EHJk V ∈ Ck×r, so  EHJk V †  EHJk V  ∈ Cr×r
+
+is the orthogonal projector onto the row space of EHJk V . Hence 
+
+Ir −  EHJk V †  EHJk V 
+
+is the orthogonal projector onto its null space. This is precisely the subspace that makes the selected rows vanish: 
+
+EHJk W (k) = EHJk V
+
+
+
+Ir −  EHJk V †  EHJk V 
+
+= 0 .
+
+The same identity holds for every frequency ℓ. Applying the inverse FFT gives the stated t-product formula. 
+
+Corollary 4.3 (Selected slices are annihilated) . For every k = 0 , 1, . . . , r ,
+
+E⊤ 
+
+> Jk
+
+∗ W (k) = 0 .
+
+Equivalently, 
+
+W(k)(j, :, :) = 0 for every j ∈ Jk.
+
+17 Proof. Using the notation of Lemma 4.2, we have 
+
+E⊤ 
+
+> Jk
+
+∗ W (k) = Ak ∗
+
+
+
+Ir − A † 
+
+> k
+
+∗ A k
+
+
+
+.
+
+For any tensor Ak, the Moore–Penrose identity gives 
+
+Ak ∗ A † 
+
+> k
+
+∗ A k = Ak.
+
+Therefore, 
+
+Ak ∗
+
+
+
+Ir − A † 
+
+> k
+
+∗ A k
+
+
+
+= 0 .
+
+This proves the claim. 
+
+Remark 4.4 (Correct normalization of the sampling probabilities) . The identity 
+
+W(k) 2 
+
+> F
+
+= r − k
+
+does not hold automatically for the common-index tensor algorithm. In the Fourier domain, 
+
+W(k) 2 
+
+> F
+
+= r − 1
+
+p
+
+> p
+
+X
+
+> ℓ=1
+
+rank 
+
+
+
+EHJk
+
+bV (ℓ)
+
+
+
+.
+
+Hence W(k) 2 
+
+> F
+
+= r − k only under the additional condition that 
+
+rank 
+
+
+
+EHJk
+
+bV (ℓ)
+
+
+
+= k for every ℓ = 1 , 2, . . . , p. 
+
+For this reason, the probabilities in the common-index T-ARP algorithm should be defined by explicit normalization: 
+
+p(k) 
+
+> j
+
+= W(k−1) (j, :, :) 2
+
+> F
+
+∥W (k−1) ∥2
+
+> F
+
+, j = 1 , 2, . . . , n. 
+
+This is the correct tensor-level sampling rule. It should not be replaced by a denominator 
+
+r − k + 1 unless the above frequency-wise rank condition has been verified. 
+
+Remark 4.5 (Computational Interpretation) . Lemma 4.2 shows that W(k) is obtained from 
+
+V by projecting out the components corresponding to the selected lateral slices. In the Fourier domain, this is equivalent to performing k successive Householder reflections, which can be implemented efficiently with O(n3n2r2) operations. 
+
+The indices J = ( j1, j 2, . . . , j r) selected by T-ARP can also be used to define an oblique interpolation operator. Let 
+
+EJ = In(: , J, :) ∈ Rn×r×p,
+
+and assume that 
+
+V⊤ ∗ E J ∈ Rr×r×p
+
+18 is invertible in the t-product sense. We define 
+
+eΠJ = In − E J ∗  V⊤ ∗ E J
+
+−1 ∗ V ⊤.
+
+Then 
+
+X ∗ eΠJ = X − X (: , J, :) ∗  V⊤ ∗ E J
+
+−1 ∗ V ⊤.
+
+Since 
+
+V(J, :, :) ⊤ = V⊤ ∗ E J ,
+
+this can also be written as 
+
+X ∗ eΠJ = X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤.
+
+Lemma 4.6 (Algebraic properties of the tensor oblique projector) . Let V ∈ Rn×r×p satisfy 
+
+V⊤ ∗ V = Ir,
+
+and let J be an index set of cardinality r such that 
+
+V⊤ ∗ E J
+
+is invertible in the t-product sense. Then the tensor 
+
+eΠJ = In − E J ∗  V⊤ ∗ E J
+
+−1 ∗ V ⊤
+
+satisfies the following properties: 
+
+1. eΠJ is a projector: eΠJ ∗ eΠJ = eΠJ .
+
+2. The cancellation is on the left: 
+
+V⊤ ∗ eΠJ = 0 .
+
+3. The selected coordinates are interpolated: 
+
+eΠJ ∗ E J = 0 .
+
+Consequently, 
+
+X ∗ eΠJ
+
+
+
+(: , J, :) = 0 .
+
+4. We have  In − V ∗ V ⊤ ∗ eΠJ = eΠJ .
+
+Proof. All identities can be verified in the Fourier domain. Fix a frequency ℓ, and write 
+
+V = bV (ℓ), E = EJ , eΠ = In − E  V H E−1 V H .
+
+First, 
+
+eΠ2 =
+
+
+
+In − E  V H E−1 V H
+
+2
+
+.
+
+19 Expanding gives 
+
+eΠ2 = In − 2E  V H E−1 V H + E  V H E−1 V H E  V H E−1 V H .
+
+Since 
+
+V H E  V H E−1 = Ir,
+
+the last term is equal to 
+
+E  V H E−1 V H .
+
+Hence eΠ2 = eΠ.
+
+Second, 
+
+V H eΠ = V H − V H E  V H E−1 V H = V H − V H = 0 .
+
+Third, 
+
+eΠE = E − E  V H E−1 V H E = E − E = 0 .
+
+Therefore, 
+
+X ∗ eΠJ
+
+
+
+(: , J, :) = X ∗ eΠJ ∗ E J = 0 .
+
+Finally, 
+
+ In − V V H  eΠ = In − V V H − E  V H E−1 V H + V V H E  V H E−1 V H .
+
+Using again 
+
+V H E  V H E−1 = Ir,
+
+the last term becomes V V H , which cancels the term −V V H . Thus 
+
+ In − V V H  eΠ = In − E  V H E−1 V H = eΠ.
+
+Since the same identities hold for every frequency ℓ, applying the inverse FFT gives the tensor identities. 
+
+Remark 4.7 (About the factorization into elementary oblique projectors) . If we need the factorization of eΠJ into elementary oblique projectors, it should be written with the same left/right convention as above. With the notation of Lemma 4.2, let 
+
+Zk = W(k−1) (jk, :, :) ∈ R1×r×p.
+
+The elementary factor should be written as 
+
+eΠk = In − E jk ∗  Zk ∗ Z ⊤
+
+> k
+
+† ∗ Z k ∗  W(k−1) ⊤ .
+
+In the Fourier domain, this is 
+
+beΠ 
+
+> (ℓ)
+> k
+
+= In − ejk
+
+bZ(ℓ)
+
+> k
+
+cW (k−1,ℓ )
+
+H
+
+bZ(ℓ)
+
+> k
+> 22
+
+,
+
+20 with the convention that the fraction is zero when 
+
+bZ(ℓ) 
+
+> k
+
+= 0 .
+
+This is the frequency-wise matrix ARP factorization. It is important not to replace the denominator by the global Frobenius norm 
+
+∥Z k∥2 
+
+> F
+
+,
+
+because the exact t-product factorization requires frequency-wise normalization. 
+
+The previous lemmas give the algebraic identities needed to describe the oblique inter-polation residual. In particular, for a fixed index set J, the tensor 
+
+eΠJ = In − E J ∗  V⊤ ∗ E J
+
+−1 ∗ V ⊤
+
+satisfies 
+
+X ∗ eΠJ = X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤.
+
+The remaining question is probabilistic: we need to understand the expected size of this residual when J is generated by the common-index T-ARP sampling rule. 
+
+A frequency-alignment condition.. The main difference between matrix ARP and the common-index T-ARP algorithm is that, in T-ARP, the same index is selected for all Fourier slices. We therefore need to measure how different the common tensor-level sampling rule is from the sampling rule that would be used by matrix ARP on each Fourier slice. Let Jk−1 be the indices selected after k − 1 steps, and let W(k−1) be the corresponding residual basis generated by Algorithm 8. For each frequency ℓ = 1 , 2, . . . , p , define 
+
+a(ℓ) 
+
+> j,k
+
+= cW (k−1,ℓ )(j, :) 22
+
+, j = 1 , 2, . . . , n, 
+
+and 
+
+Aj,k =
+
+> p
+
+X
+
+> ℓ=1
+
+a(ℓ)
+
+> j,k
+
+.
+
+The common-index T-ARP algorithm samples from the tensor-level probabilities 
+
+qj,k = Aj,k 
+
+Pni=1 Ai,k 
+
+.
+
+On the other hand, matrix ARP applied only to frequency ℓ would sample according to probabilities proportional to a(ℓ)
+
+> j,k
+
+. We assume that there exist constants ηk ≥ 1, for k =1, 2, . . . , r , such that, for every possible history Jk−1 generated by the algorithm, 
+
+qj,k ≤ ηk
+
+a(ℓ)
+
+> j,k
+
+Pni=1 a(ℓ)
+
+> i,k
+
+for all indices j such that a(ℓ) 
+
+> j,k
+
+> 0, and for all ℓ = 1 , . . . , p . If a(ℓ) 
+
+> j,k
+
+= 0 , then the corresponding elementary update has no effect on the ℓ-th Fourier slice, and this index is omitted from the frequency-wise sum in the proof. 21 We also assume that the selected indices preserve the expected rank decrease at every frequency. More precisely, for every possible history Jk−1 generated by the algorithm and for every ℓ = 1 , . . . , p , we assume 
+
+rank 
+
+
+
+(EJk−1 )H bV (ℓ)
+
+
+
+= k − 1.
+
+Equivalently, the residual basis at frequency ℓ has rank r − k + 1 after k − 1 selected indices. This assumption ensures that nX
+
+> i=1
+
+a(ℓ) 
+
+> i,k
+
+= r − k + 1 .
+
+We finally assume that the final matrices 
+
+(EJ )H bV (ℓ)
+
+are nonsingular for all ℓ = 1 , 2, . . . , p , so that the final oblique interpolation operator is well defined. 
+
+Theorem 4.8 (Expected error for common-index T-ARP under frequency alignment) . Let 
+
+X ∈ Rm×n×p, and let V ∈ Rn×r×p satisfy 
+
+V⊤ ∗ V = Ir.
+
+Let J be the random index set returned by Algorithm 8. Assume that the frequency-alignment condition above holds with constants η1, . . . , η r. Assume also that the frequency-wise rank condition and the final nonsingularity condition stated above hold for every possible history generated by Algorithm 8. In other words, for every k = 1 , . . . , r and every frequency ℓ =1, . . . , p ,
+
+rank 
+
+
+
+(EJk−1 )H bV (ℓ)
+
+
+
+= k − 1,
+
+so that nX
+
+> i=1
+
+a(ℓ) 
+
+> i,k
+
+= r − k + 1 ,
+
+and the final matrices (EJ )H bV (ℓ) are nonsingular. Then 
+
+E
+
+h
+
+X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤ 2
+
+> F
+
+i
+
+≤
+
+> r
+
+Y
+
+> k=1
+
+
+
+1 + ηk
+
+r − k + 1 
+
+!
+
+X − X ∗ V ∗ V ⊤ 2 
+
+> F
+
+.
+
+In particular, if the leverage-score distributions are perfectly aligned across the Fourier slices, so that ηk = 1 for all k, then 
+
+E
+
+h
+
+X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤ 2
+
+> F
+
+i
+
+≤ (r + 1) X − X ∗ V ∗ V ⊤ 2 
+
+> F
+
+.
+
+Proof. We work in the Fourier domain. For each frequency ℓ = 1 , 2, . . . , p , write 
+
+bX(ℓ) = bX (: , :, ℓ ), bV (ℓ) = bV(: , :, ℓ ).
+
+22 Let 
+
+beX
+
+> (0 ,ℓ )
+
+= bX(ℓ) − bX(ℓ) bV (ℓ)
+
+ bV (ℓ)
+
+H
+
+.
+
+For a fixed history Jk−1, let beX
+
+> (k−1,ℓ )
+
+denote the residual obtained after the first k−1 common-index oblique updates at frequency ℓ.We first recall the one-step matrix identity behind ARP. If, at step k, the index j is selected and a(ℓ) 
+
+> j,k
+
+> 0, then for each fixed frequency ℓ,
+
+beX 
+
+> (k,ℓ )2
+> F
+
+= beX 
+
+> (k−1,ℓ )2
+> F
+
++
+
+beX
+
+> (k−1,ℓ )
+
+(: , j )
+
+> 22
+
+a(ℓ)
+
+> j,k
+
+.
+
+If a(ℓ) 
+
+> j,k
+
+= 0 , the corresponding update has no effect on this Fourier slice. Hence, conditionally on the past, 
+
+E
+
+"beX 
+
+> (k,ℓ )2
+> F
+
+| Jk−1
+
+#
+
+≤ beX 
+
+> (k−1,ℓ )2
+> F
+
++
+
+> n
+
+X 
+
+> j=1
+> a(ℓ)
+> j,k >0
+
+qj,k 
+
+beX
+
+> (k−1,ℓ )
+
+(: , j )
+
+> 22
+
+a(ℓ)
+
+> j,k
+
+.
+
+By the frequency-alignment assumption, 
+
+qj,k ≤ ηk
+
+a(ℓ)
+
+> j,k
+
+Pni=1 a(ℓ)
+
+> i,k
+
+.
+
+Moreover, under the full-rank condition at step k − 1,
+
+> n
+
+X
+
+> i=1
+
+a(ℓ) 
+
+> i,k
+
+= r − k + 1 .
+
+Therefore, 
+
+E
+
+"beX 
+
+> (k,ℓ )2
+> F
+
+| Jk−1
+
+#
+
+≤ beX 
+
+> (k−1,ℓ )2
+> F
+
++ ηk
+
+r − k + 1 
+
+> n
+
+X 
+
+> j=1
+> a(ℓ)
+> j,k >0
+
+beX
+
+> (k−1,ℓ )
+
+(: , j )
+
+> 22
+
+.
+
+Since nX 
+
+> j=1
+> a(ℓ)
+> j,k >0
+
+beX
+
+> (k−1,ℓ )
+
+(: , j )
+
+> 22
+
+≤ beX 
+
+> (k−1,ℓ )2
+> F
+
+,
+
+we obtain 
+
+E
+
+"beX 
+
+> (k,ℓ )2
+> F
+
+| Jk−1
+
+#
+
+≤
+
+
+
+1 + ηk
+
+r − k + 1 
+
+ beX 
+
+> (k−1,ℓ )2
+> F
+
+.
+
+23 Averaging over all frequencies and using Parseval’s identity gives 
+
+E
+
+eX (k) 2
+
+> F
+
+| Jk−1
+
+
+
+≤
+
+
+
+1 + ηk
+
+r − k + 1 
+
+eX (k−1) 2
+
+> F
+
+.
+
+Iterating this inequality for k = 1 , . . . , r yields 
+
+E
+
+eX (r) 2
+
+> F
+
+
+
+≤
+
+> r
+
+Y
+
+> k=1
+
+
+
+1 + ηk
+
+r − k + 1 
+
+!eX (0) 2
+
+> F
+
+.
+
+Finally, eX (0) = X − X ∗ V ∗ V ⊤,
+
+and, by the oblique interpolation identity, 
+
+eX (r) = X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤.
+
+This proves the result. If ηk = 1 for every k, then 
+
+> r
+
+Y
+
+> k=1
+
+
+
+1 + 1
+
+r − k + 1 
+
+
+
+=
+
+> r
+
+Y
+
+> k=1
+
+r − k + 2 
+
+r − k + 1 = r + 1 .
+
+This gives the last statement. 
+
+Consequences of Theorem 4.8.. For compactness, we denote the alignment factor in Theo-rem 4.8 by 
+
+Γη =
+
+> r
+
+Y
+
+> k=1
+
+
+
+1 + ηk
+
+r − k + 1 
+
+
+
+.
+
+When the leverage-score distributions are perfectly aligned across the Fourier slices, we have 
+
+Γη = r + 1 .
+
+Corollary 4.9 (Jensen’s inequality bound) . Under the assumptions of Theorem 4.8, we have 
+
+E  X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤
+
+> F
+
+ ≤ pΓη X − X ∗ V ∗ V ⊤ 
+
+> F
+
+.
+
+Proof. This follows directly from Jensen’s inequality applied to the concave function t 7 → √t,together with Theorem 4.8. 
+
+Corollary 4.10 (Orthogonal projection bound) . Let ΠJ denote the orthogonal projector onto 
+
+span t (X (: , J, :)) .
+
+Under the assumptions of Theorem 4.8, we have 
+
+E ∥X − ΠJ ∗ X ∥ 2
+
+> F
+
+ ≤ Γη X − X ∗ V ∗ V ⊤ 2 
+
+> F
+
+.
+
+Proof. For a fixed index set J, the orthogonal projection onto span t(X (: , J, :)) gives the smallest Frobenius-norm error among all approximations whose lateral slices belong to this tensor subspace. In particular, 
+
+∥X − ΠJ ∗ X ∥ F ≤ X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤ 
+
+> F
+
+.
+
+Squaring this inequality and taking expectations gives the result by Theorem 4.8. 24 4.3. Optimality for an exact row-space basis 
+
+When V contains the first r right singular tensors from the T-SVD of X , the residual term in Theorem 4.8 is exactly the optimal tubal-rank-r approximation error. This gives the following consequence. 
+
+Corollary 4.11 (Optimal t-CSSP bound under frequency alignment) . Let 
+
+X = U ∗ S ∗ V ⊤
+
+> opt
+
+be the T-SVD of X , and let 
+
+V = Vopt (: , 1 : r, :) 
+
+contain the first r right singular tensors. Assume that the frequency-alignment condition in Theorem 4.8 holds for this basis. Then 
+
+E ∥X − ΠJ ∗ X ∥ 2
+
+> F
+
+ ≤ Γη
+
+> min( n1,n 2)
+
+X
+
+> k=r+1
+
+∥S (k, k, :) ∥22 .
+
+In particular, if the leverage-score distributions are perfectly aligned across the Fourier slices, then 
+
+E ∥X − ΠJ ∗ X ∥ 2
+
+> F
+
+ ≤ (r + 1) 
+
+> min( n1,n 2)
+
+X
+
+> k=r+1
+
+∥S (k, k, :) ∥22 .
+
+Proof. For 
+
+V = Vopt (: , 1 : r, :) ,
+
+we have 
+
+X ∗ V ∗ V ⊤ = Xr,
+
+where Xr is the truncated T-SVD approximation of tubal rank r. Hence 
+
+X − X ∗ V ∗ V ⊤ 2 
+
+> F
+
+= ∥X − X r∥2 
+
+> F
+
+=
+
+> min( n1,n 2)
+
+X
+
+> k=r+1
+
+∥S (k, k, :) ∥22 .
+
+The result follows from Corollary 4.10. We now turn to tensor cross approximation. The first application of T-ARP selects the lateral slices, while the second application selects the horizontal slices. Since the second sampling step is itself a common-index T-ARP procedure, it may have its own frequency-alignment factor. We denote it by 
+
+Γθ =
+
+> r
+
+Y
+
+> k=1
+
+
+
+1 + θk
+
+r − k + 1 
+
+
+
+,
+
+where the constants θk control the frequency alignment for the second T-ARP call, condi-tionally on the selected lateral slices. 25 Theorem 4.12 (T-Cross approximation error under frequency alignment) . Let J be obtained by applying T-ARP to the right basis V, and let 
+
+C = X (: , J, :) .
+
+Let 
+
+C = QJ ∗ R J
+
+be a thin T-QR factorization. Then apply T-ARP to QJ to obtain horizontal indices I.Assume that the intersection tensor X (I, J, :) has full tubal rank with probability one. In particular, when it is square and invertible in the t-product sense, the pseudoinverse in the cross approximation coincides with the inverse. Assume in addition that the first T-ARP call satisfies the assumptions of Theorem 4.8 with factor Γη, and that the second T-ARP call satisfies the analogous assumptions with a uniform factor Γθ. Then 
+
+E
+
+h
+
+X − X (: , J, :) ∗ X (I, J, :) † ∗ X (I, :, :) 2
+
+> F
+
+i
+
+≤ ΓθΓη X − X ∗ V ∗ V ⊤ 2 
+
+> F
+
+.
+
+In the perfectly aligned case for both T-ARP calls, this reduces to 
+
+E
+
+h
+
+X − X (: , J, :) ∗ X (I, J, :) † ∗ X (I, :, :) 2
+
+> F
+
+i
+
+≤ (r + 1) 2 X − X ∗ V ∗ V ⊤ 2 
+
+> F
+
+.
+
+Proof. We use the law of total expectation. Fix the lateral index set J. Since C = QJ ∗ R J
+
+is a thin T-QR factorization of the selected lateral slices, the second T-ARP call selects horizontal indices using the basis QJ . Moreover, 
+
+X (I, J, :) = E⊤ 
+
+> I
+
+∗ C = E⊤ 
+
+> I
+
+∗ Q J ∗ R J .
+
+Hence, when X (I, J, :) has full tubal rank, the corresponding cross approximation is the row-interpolation approximation associated with the basis QJ , written in the original selected-slice coordinates. Applying the one-sided bound in Theorem 4.8, conditionally on J, gives 
+
+EI
+
+h
+
+X − X (: , J, :) ∗ X (I, J, :) † ∗ X (I, :, :) 2 
+
+> F
+
+| J
+
+i
+
+≤ Γθ X − Q J ∗ Q ⊤ 
+
+> J
+
+∗ X 2 
+
+> F
+
+.
+
+The tensor 
+
+QJ ∗ Q ⊤ 
+
+> J
+
+∗ X 
+
+is the orthogonal projection of X onto the tensor subspace spanned by the selected lateral slices. Therefore, 
+
+X − Q J ∗ Q ⊤ 
+
+> J
+
+∗ X 2 
+
+> F
+
+≤ X − X (: , J, :) ∗ V (J, :, :) −T ∗ V ⊤ 2 
+
+> F
+
+.
+
+Taking expectation over J and applying Theorem 4.8 to the first T-ARP call gives 
+
+E
+
+h
+
+X − X (: , J, :) ∗ X (I, J, :) † ∗ X (I, :, :) 2
+
+> F
+
+i
+
+≤ ΓθΓη X − X ∗ V ∗ V ⊤ 2 
+
+> F
+
+.
+
+The perfectly aligned case follows by setting 
+
+Γη = Γ θ = r + 1 .
+
+26 The Discrete Empirical Interpolation Method (DEIM) selects indices to approximate a function from a reduced basis. The same argument gives a tensor analogue with the frequency-alignment factor. 
+
+Corollary 4.13 (t-DEIM error bound under frequency alignment) . Let V ∈ Rn×r×p satisfy 
+
+V⊤ ∗ V = Ir.
+
+Let F ∈ Rn×1×p, and let I be the index set returned by T-ARP applied to V. Assume that the frequency-alignment condition of Theorem 4.8 holds with factor Γη. Then 
+
+E
+
+
+
+F − V ∗  E⊤ 
+
+> I
+
+∗ V −1 ∗ E ⊤ 
+
+> I
+
+∗ F 2
+
+> F
+
+
+
+≤ Γη F − V ∗ V ⊤ ∗ F 2 
+
+> F
+
+.
+
+In the perfectly aligned case, this becomes 
+
+E
+
+
+
+F − V ∗  E⊤ 
+
+> I
+
+∗ V −1 ∗ E ⊤ 
+
+> I
+
+∗ F 2
+
+> F
+
+
+
+≤ (r + 1) F − V ∗ V ⊤ ∗ F 2 
+
+> F
+
+.
+
+Proof. Apply Theorem 4.8 to the transposed tensor 
+
+X = F⊤.
+
+The resulting oblique interpolation formula is exactly the tensor DEIM approximation after transposing back. This gives the stated bound. 
+
+5. Numerical experiments 
+
+In this section we document the numeric evaluation of the proposed algorithms on syn-thetic and real-world visual datasets. All experiments are conducted on a MacBook Air M3 chip with 8GB of RAM, using Python 3.11.14 and JAX 0.9.0.1. All implementations are available on https://github.com/ah-haqqdod/T-ARP , and all experimental results are available in the “experiments” branch of the repository, https://github.com/ah-haqqdod/ T-ARP/tree/experiments .All experiments are evaluated using relative error measure, whereas visual data is addi-tionally evaluated using PSNR and SSIM measures, all defined in Section 5.1. The baseline methods are described in Section 5.2. Detailed comparison of methods on visual data is provided in Section 5.3, and comparison of methods on synthetic data is provided in Sec-tion 5.4. Examples of image and video reconstruction results are shown in Figure 3 and Figure 4, respectively. In this section lateral slices are referred to as columns, and horizon-tal slices are referred to as rows; all T-ARP results are reported for derandomized T-ARP 
+
+which is equivalent to a t-product implementation of Osinsky’s deterministic column subset selection algorithm [19]. Let us first introduce the metrics that we use in our simulations. 
+
+5.1. Metrics Relative Error. For two tensors X , Y ∈ Rm×n×k, the relative error is defined as RE (X , Y) = ∥X − Y∥ F
+
+∥X ∥ F
+
+,
+
+where ∥X ∥ F is the Frobenius norm of X .27 Peak Signal-to-Noise Ratio (PSNR). For two images X and Y of size m × n × 3 with L being the dynamic range of pixel values (e.g., L = 255 for 8-bit images), PSNR (in dB) is defined as PSNR (X , Y) = 10 log 10 
+
+ L2
+
+MSE (X , Y)
+
+
+
+,
+
+where MSE (X , Y) = ∥X − Y∥ 2/(3 mn ) is the mean squared error; PSNR is used to measure the quality of a reconstructed image compared to a reference. 
+
+Structural Similarity Index (SSIM). SSIM is a perception-based model that considers changes in structural information, luminance, and contrast. The SSIM between two images X and     
+
+> (a) ARP-T-CUR (b) Uniform sampling (c) Lev. scores sampling
+> (d) T-ARP (e) T-SVD (f) Original image
+
+Figure 3: Reconstructions of an image from Kodak dataset, kodim9.png , with t-rank = 60 using M ≈ C ∗ C + ∗ M ∗ R + ∗ R , where M ∈ R512 ×768 ×3 is the original image, C ∈ R512 ×60 ×3 is the column subset, and 
+
+R ∈ R60 ×768 ×3 is the row subset of the decomposition. All Kodak image decomposition examples can be seen on https://github.com/ah-haqqdod/T-ARP/tree/experiments/src/benchmarks/kodak/results/ reconstructions .
+
+28 (a) Uniform sampling (b) Lev. scores sampling  
+
+> (c) T-ARP (d) Original frame
+
+Figure 4: Frame #15 of reconstructions of a video from YUV dataset, stefan_cif.yuv , with t-rank = 50 
+
+using M ≈ C ∗ C + ∗ M ∗ R + ∗ R , where M ∈ R288 ×352 ×3×90 is the original video, C ∈ R288 ×50 ×3×90 is the column subset, and R ∈ R50 ×352 ×3×90 is the row subset of the decomposition. All YUV video decomposition examples can be seen on https://github.com/ah-haqqdod/T-ARP/tree/experiments/src/benchmarks/ yuv/results .
+
+Y is computed as SSIM (X , Y) = (2 μxμy + C1)(2 σxy + C2)(μ2 
+
+> x
+
++ μ2 
+
+> y
+
++ C1)( σ2 
+
+> x
+
++ σ2 
+
+> y
+
++ C2),
+
+where μx, μy are the mean intensities, σ2
+
+> x
+
+, σ2 
+
+> y
+
+are the variances, and σxy is the covariance. The constants C1 = ( K1L)2 and C2 = ( K2L)2 are used to avoid instability when the denominators are close to zero; typically K1 = 0 .01 , K2 = 0 .03 , and L is the dynamic range of pixel values. 
+
+5.2. Decomposition Baselines 
+
+In this section we describe the decomposition baselines used in the experiments. The simplest decomposition baseline is T Uniform sampling baseline, which selects a subset of column indices, J ⊆ { 1, 2, . . . , m } : |J| = k, and row indices, I ⊆ { 1, 2, . . . , n } : |I| = k,from uniform distribution, without replacement, over the input tensor X ∈ Rm×n×p, such that C = X (: , J, :) ∈ Rm×k×p and R = X (I, :, :) ∈ Rk×n×p.
+
+T Lengths Squared sampling baseline is similar to the uniform sampling baseline, but it uses a different probability distribution for selecting the sets of indices J and I. To sample columns J we define the length-squared probability distribution 
+
+pj = ∥X (: , j, :) ∥2
+
+Pni=1 ∥X (: , i, :) ∥2 ,
+
+29 and sample k indices of this distribution without replacement. A similar procedure is used to select rows I using the transpose of X .
+
+T Leverage Scores sampling baseline uses the same structure as the T-ARP algorithm, but without the adaptive pivoting step; as is outlined in Algorithm 10 and Algorithm 11. 
+
+Algorithm 10 T-LevScoresSampling 
+
+Input: A tensor V ∈ Rn1×r×n3 with orthonormal columns under the t-product, i.e., V⊤ ∗V =
+
+I, and a target rank r;
+
+Output: Indices J = ( j1, j 2, . . . , j r) for column subset selection;  
+
+> 1:
+
+Initialize J = () ; 
+
+> 2:
+
+Set pj = ∥V (j, :, :) ∥2 
+
+> F
+
+for j = 1 , 2, . . . , n 1 ▷ Compute tubal row leverage scores  
+
+> 3:
+
+Normalize pj = pj / Pn1 
+
+> i=1
+
+pi; 
+
+> 4:
+
+Sample r distinct indices, J = ( j1, j 2, . . . , j r), from {1, . . . , n 1} with probabilities pi
+
+(without replacement);  
+
+> 5:
+
+return J
+
+Algorithm 11 T-Cross Leverage Scores 
+
+Input: A tensor X ∈ Rn1×n2×n3 , target rank r ≤ min( n1, n 2), an initial basis V ∈ Rn1×r×n3
+
+with orthonormal columns under the t-product (i.e., V⊤ ∗ V = I); 
+
+Output: A reconstructed tensor X ≈ ˆX = C ∗ U ∗ R of the same size;  
+
+> 1:
+
+J ← T-LevScoresSampling (V, r ); 
+
+> 2:
+
+C = AJ ← X (: , J, :) ; 
+
+> 3:
+
+[QJ , ∼] ← T-QR (AJ ); 
+
+> 4:
+
+I ← T-LevScoresSampling (QJ , r ); 
+
+> 5:
+
+R = AI ← X (I, :, :) ; 
+
+> 6:
+
+U ← C + ∗ X ∗ R +; 
+
+> 7:
+
+˜X ← C ∗ U ∗ R ; 
+
+> 8:
+
+return ˜X ;All the baselines outlined above are used to approximate the input tensor X as a low-rank tensor by using tubal cross-approximation achieved by 
+
+X ≈ C ∗ C + ∗ X ∗ R + ∗ R ,
+
+as demonstrated in Algorithm 11. The optimal tensor decomposition is achieved via tubal SVD (T-SVD ), introduced Kilmer et al. [2], which is defined as 
+
+X = U ∗ S ∗ V ⊤,
+
+where U and V are tensors of the left and right singular vectors, and S is the f-diagonal tensor of singular values. In the next section, we present the results on a visual dataset. 30 5.3. Results on Kodak dataset 
+
+The Kodak dataset includes 24 images, each is either in landscape orientation Mi ∈
+
+R768 ×512 ×3 or portrait orientation Mj ∈ R512 ×768 ×3. The images are represented using RGB color scheme with pixel values in the range [0 , 255] ; in the experiment the images are scaled to the range [0 , 1] before processing. The dataset is accessible at https://r0k.us/graphics/ kodak/ .In this experiment we evaluated the performance of the proposed algorithms ARP T-CUR , T-ARP and T-ARP with Householder reflections against the established baselines 
+
+T-SVD , T Uniform sampling, T Length Squared sampling and T Leverage Scores sampling that are defined in Section 5.2. The algorithms are compared using relative error , PSNR and SSIM ; the corresponding results are reported in Table 1, Table 2, and Table 3, respectively. These metrics are defined in Section 5.1. Their mean values are also displayed in Figure 5, and examples of image reconstructions are shown in Figure 3. The results show that the proposed T-ARP variants improve over the common-index tensor cross-approximation baselines. In particular, T-ARP and its Householder implementation give lower relative errors and higher PSNR than uniform sampling and leverage-score sampling for all tested ranks. The SSIM values are comparable at small ranks and become better for moderate and larger ranks. As expected, the truncated T-SVD remains the best method in terms of approximation error, since it is not constrained to use actual tensor slices. Figure 4 shows an additional example of video reconstruction. This experiment uses the t-product generalization to arbitrary-order tensors proposed by Martin et al. [20].The input is a fourth-order tensor M ∈ RH×W ×C×T , where H, W , C, and 
+
+T denote height, width, number of channels, and number of frames. In this example, T-ARP 
+
+captures visually relevant dynamic regions, including the faces in the background and the tennis player. The YUV dataset is accessible at https://media.xiph.org/video/derf/ .In the next section, we present the results on synthetic data.                                                                                                   
+
+> Table 1: Statistics of relative error measures on Kodak dataset (mean ±std) # Slices T-SVD T Uniform Sampling T Leverage Scores Sampling T-ARP T-ARP (Householder) 10 0.171 ±0.070 0.286 ±0.103 0.286 ±0.104 0.276 ±0.096 0.276 ±0.096 20 0.137 ±0.060 0.235 ±0.089 0.235 ±0.091 0.226 ±0.087 0.226 ±0.087 40 0.106 ±0.049 0.192 ±0.076 0.189 ±0.078 0.179 ±0.076 0.179 ±0.076 60 0.088 ±0.042 0.170 ±0.069 0.162 ±0.070 0.151 ±0.068 0.151 ±0.068 80 0.075 ±0.037 0.148 ±0.063 0.142 ±0.064 0.132 ±0.061 0.132 ±0.061 100 0.064 ±0.033 0.133 ±0.058 0.127 ±0.058 0.117 ±0.056 0.116 ±0.056
+
+31 Table 2: Statistics of PSNR measures on Kodak dataset (mean ± std) # Slices T-SVD T Uniform Sampling T Leverage Scores Sampling T-ARP T-ARP (Householder) 10 22.907 ± 2.585 18.528 ± 2.233 18.552 ± 2.210 18.759 ± 2.179 18.759 ± 2.179 20 24.825 ± 2.773 20.154 ± 2.320 20.207 ± 2.433 20.530 ± 2.468 20.530 ± 2.468 40 27.142 ± 3.013 21.851 ± 2.516 22.095 ± 2.620 22.551 ± 2.702 22.551 ± 2.702 60 28.830 ± 3.203 22.939 ± 2.585 23.435 ± 2.771 24.104 ± 2.932 24.101 ± 2.932 80 30.278 ± 3.360 24.116 ± 2.665 24.590 ± 2.881 25.272 ± 3.071 25.286 ± 3.071 100 31.605 ± 3.484 25.085 ± 2.754 25.546 ± 2.900 26.435 ± 3.273 26.442 ± 3.272 Table 3: Statistics of SSIM measures on Kodak dataset (mean ± std) # Slices T-SVD T Uniform Sampling T Leverage Scores Sampling T-ARP T-ARP (Householder) 10 0.589 ± 0.128 0.433 ± 0.136 0.427 ± 0.134 0.417 ± 0.126 0.417 ± 0.126 20 0.643 ± 0.113 0.469 ± 0.130 0.461 ± 0.129 0.457 ± 0.125 0.457 ± 0.125 40 0.718 ± 0.094 0.521 ± 0.121 0.517 ± 0.123 0.522 ± 0.119 0.522 ± 0.119 60 0.771 ± 0.080 0.563 ± 0.113 0.565 ± 0.116 0.574 ± 0.116 0.574 ± 0.116 80 0.812 ± 0.070 0.608 ± 0.105 0.611 ± 0.109 0.621 ± 0.110 0.621 ± 0.110 100 0.844 ± 0.060 0.647 ± 0.097 0.650 ± 0.100 0.665 ± 0.104 0.666 ± 0.104 
+
+5.4. Results on Synthetic Data 
+
+The experiments using synthetic data are designed to evaluate the performance of T-ARP 
+
+algorithms to find an accurate low-rank approximation of a tensor with known or imprecise t-rank. Here, we evaluated the performance of the proposed algorithms against T-SVD, TUniform sampling and T Leverage Scores sampling baselines, that are defined in Section 5.2. 
+
+Function-based tensor. We define a third-order function-based tensor X ∈ Rm×n×k with each entry being 
+
+X (i, j, k ) = 1(i + j + k)1/p ,
+
+where p ≥ 1 is the exponent parameter; all such tensors have very low, but imprecise t-rank. The results for this experiment are shown in Figure 6(a), where it can be observed that 
+
+T-ARP algorithms outperform the tubal cross-approximation baselines in terms of relative error. In this experiment, we used a function-based tensor X ∈ R60 ×60 ×60 parametrized by 
+
+p = 2 , where each entry is computed as described above. 
+
+Random tensor. A random third-order tensor Y ∈ Rm×n×k with t-rank = r is defined as 
+
+Y = A ∗ B ,
+
+where A ∈ Rm×r×k and B ∈ Rr×n×k are random tensors whose entries are drawn indepen-dently from the uniform distribution on [0 , 1] ; both A and B have t-rank = r by construction. The results for a random tensor Y ∈ R60 ×60 ×60 with t-rank = 7 are demonstrated in Figure 6(b). 32 10 20 30 40 50 60 70 80 90 100 
+
+10 −1.2
+
+10 −1
+
+10 −0.8
+
+10 −0.6
+
+# Slices 
+
+> Relative Error (log scale)
+
+Reconstruction Relative Error – Lower is better 
+
+ARP T-CUR 
+
+T-SVD 
+
+T Uniform Sampling 
+
+T Lengths Squared Sampling 
+
+T Leverage Scores Sampling 
+
+T-ARP 
+
+T-ARP (Householder) 
+
+(a) Relative error 
+
+10 20 30 40 50 60 70 80 90 100 
+
+18 
+
+20 
+
+22 
+
+24 
+
+26 
+
+28 
+
+30 
+
+32 
+
+# Slices 
+
+> PSNR (dB)
+
+Peak Signal-to-Noise Ratio (PSNR) – Higher is better 
+
+ARP T-CUR 
+
+T-SVD 
+
+T Uniform Sampling 
+
+T Lengths Squared Sampling 
+
+T Leverage Scores Sampling 
+
+T-ARP 
+
+T-ARP (Householder) 
+
+(b) PSNR 
+
+10 20 30 40 50 60 70 80 90 100 
+
+0.4
+
+0.5
+
+0.6
+
+0.7
+
+0.8
+
+# Slices 
+
+> SSIM
+
+Structural Similarity Index (SSIM) – Higher is better 
+
+ARP T-CUR 
+
+T-SVD 
+
+T Uniform Sampling 
+
+T Lengths Squared Sampling 
+
+T Leverage Scores Sampling 
+
+T-ARP 
+
+T-ARP (Householder) 
+
+(c) SSIM 
+
+Figure 5: Visualization of mean values of metrics on the Kodak dataset. Relative error , PSNR , and SSIM 
+
+are shown in subfigures (a), (b), and (c), respectively. 
+
+33 5 10 15 20 
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+# Slices 
+
+> Relative Error (log scale)
+
+Reconstruction Relative Error – Lower is better 
+
+> ARP T-CUR
+> T-SVD
+> T Uniform Sampling
+> T Leverage Scores Sampling
+> T-ARP
+> T-ARP (Householder)
+> (a) function-based tensor
+
+5 10 15 20 
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+# Slices 
+
+> Relative Error (log scale)
+
+Reconstruction Relative Error – Lower is better 
+
+> ARP T-CUR
+> T-SVD
+> T Uniform Sampling
+> T Leverage Scores Sampling
+> T-ARP
+> T-ARP (Householder)
+> (b) random tensor
+
+Figure 6: Visualization of reconstruction relative error on synthetic data. Subfigure (a) shows the results for a function-based tensor X ∈ R60 ×60 ×60 parametrized by p = 2 , while subfigure (b) shows the results for a random tensor Y ∈ R60 ×60 ×60 with t-rank = 7 .
+
+6. Conclusion and future work 
+
+We have studied how Adaptive Randomized Pivoting can be extended to the tensor SVD framework based on the t-product. We proposed two complementary constructions. The first one, ARP-T-CUR, applies matrix ARP independently to the frontal slices in the Fourier domain. This gives a direct tensor extension of the matrix theory and leads to a rigorous expected-error bound. The second one, T-ARP, selects common lateral and hori-zontal slices for the whole tensor. This is more natural from the point of view of tensor cross approximation, since it produces a genuine common-index tensor skeleton. The main theoretical point is that the common-index constraint in T-ARP introduces an additional difficulty compared to the matrix case. Indeed, the same sampled indices must be used across all Fourier slices. To address this issue, we introduced a frequency-alignment factor that measures the mismatch between the tensor-level sampling probabilities and the frequency-wise ARP probabilities. Under this condition, we obtained an expected-error bound for T-ARP, together with consequences for tensor cross approximation and t-DEIM. In particular, the factor reduces to the usual r + 1 behavior when the leverage-score distributions are perfectly aligned across the Fourier slices. The numerical experiments support the distinction between the two tensor extensions. ARP-T-CUR follows directly from matrix ARP and comes with a direct slicewise theory, but its frequency-dependent indices do not necessarily produce a coherent tensor skeleton in the original domain. In contrast, T-ARP enforces common lateral and horizontal indices. On synthetic tensors, images, and videos, this common-index strategy generally improves over uniform and leverage-score tensor cross baselines, while remaining below the truncated T-SVD benchmark, as expected. The experiments also show that the Householder imple-mentation preserves the behavior of the algebraic version. These results suggest that T-ARP is useful when one wants an approximation based on actual tensor slices, whereas T-SVD remains the reference method when only the best low-tubal-rank approximation error is 34 sought. Several directions remain open. First, it would be useful to better understand the frequency-alignment condition and to identify classes of tensors for which it holds natu-rally, or approximately. Second, adaptive rank selection strategies should be developed so that the target tubal rank does not need to be fixed in advance. Third, faster implemen-tations based on structured sketches, warm starts, or efficient Householder updates in the Fourier domain could make the methods more scalable. Finally, the extension to higher-order tensors and applications to tensor completion, video compression, and feature extraction in machine learning are promising directions for future work. 
+
+References 
+
+[1] L. D. Lathauwer, B. D. Moor, J. Vandewalle, A multilinear singular value decomposi-tion, SIAM Journal on Matrix Analysis and Applications 21 (4) (2000) 1253–1278. [2] M. E. Kilmer, C. D. Martin, Factorization strategies for third-order tensors, Linear Algebra and its Applications 435 (3) (2011) 641–658. [3] I. V. Oseledets, Tensor-train decomposition, SIAM Journal on Scientific Computing 33 (5) (2011) 2295–2317. [4] Q. Zhao, G. Zhou, S. Xie, L. Zhang, A. Cichocki, Tensor ring decomposition, arXiv preprint (2016). arXiv:1606.05535 .[5] Q. Song, H. Ge, J. Caverlee, X. Hu, Tensor completion algorithms in big data analytics, ACM Transactions on Knowledge Discovery from Data (TKDD) 13 (1) (2019) 1–48. [6] M. G. Asante-Mensah, A. H. Phan, S. Ahmadi-Asl, Z. Al Aghbari, A. Cichocki, Image reconstruction using superpixel clustering and tensor completion, Signal Processing 212 (2023) 109158. [7] L. Duan, L. Yang, Y. Guo, Paramps: Convolutional neural networks based on tensor de-composition for heart sound signal analysis and cardiovascular disease diagnosis, Signal Processing 227 (2025) 109716. [8] M. Bortone, Y. Rath, G. H. Booth, Simple fermionic backflow states via a systematically improvable tensor decomposition, Communications Physics 8 (1) (2025) 169. [9] K. T. Brice, M. Melgaard, M. Pavlidou, H. Cox, Numerical tensor method for atomic and exotic three-particle systems, Physical Review A 111 (2) (2025) 022812. [10] J. De Pauw, B. Goethals, Weighted tensor decompositions for context-aware collabora-tive filtering, arXiv preprint arXiv:2503.08393 (2025). [11] F. Zhou, X. Fu, Z. Lu, Tensor ring decomposition based collaborative filtering recommendation with differential privacy, in: 2023 IEEE International Conference on High Performance Computing & Communications, Data Science & Systems, Smart City & Dependability in Sensor, Cloud & Big Data Systems & Application (HPCC/DSS/SmartCity/DependSys), IEEE, 2023, pp. 788–794. 35 [12] A. Cortinovis, D. Kressner, Adaptive randomized pivoting for column subset selection, DEIM, and low-rank approximation, arXiv preprint (2024). arXiv:2412.13992v2 .[13] D. A. Tarzanagh, G. Michailidis, Fast randomized algorithms for t-product based tensor operations and decompositions with applications to imaging data, SIAM Journal on Imaging Sciences 11 (4) (2018) 2629–2664. [14] S. Ahmadi-Asl, A. H. Phan, A. Cichocki, A. Sozykina, Z. Al Aghbari, J. Wang, I. Os-eledets, Adaptive cross tubal tensor approximation, Linear Algebra and its Applications 695 (2024) 168–190. [15] S. Ahmadi-Asl, A.-H. Phan, C. F. Caiafa, A. Cichocki, Robust low tubal rank tensor recovery using discrete empirical interpolation method with optimized slice/feature se-lection: S. ahmadi-asl et al., Advances in Computational Mathematics 50 (2) (2024) 23. [16] S. Ahmadi-Asl, A.-H. Phan, A. Cichocki, A randomized algorithm for tensor singular value decomposition using an arbitrary number of passes, Journal of Scientific Comput-ing 98 (1) (2024) 23. [17] S. Chaturantabut, D. C. Sorensen, Nonlinear model reduction via discrete empirical interpolation, SIAM Journal on Scientific Computing 32 (5) (2010) 2737–2764. [18] A. Deshpande, L. Rademacher, S. S. Vempala, G. Wang, Matrix approximation and projective clustering via volume sampling, Theory of Computing 2 (1) (2006) 225–247. [19] A. Osinsky, Close to optimal column approximations with a single svd, arXiv preprint arXiv:2308.09068 (2023). [20] C. D. Martin, R. Shafer, B. LaRue, An order-p tensor factorization with applications in imaging, SIAM Journal on Scientific Computing 35 (1) (2013) A474–A490. doi: 10.1137/110841229 .36
