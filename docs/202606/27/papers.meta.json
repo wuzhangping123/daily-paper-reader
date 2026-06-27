@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-27",
+  "date": "2026-06-27",
+  "generated_at": "2026-06-27T20:59:55",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/27/2606.26763v1-calibrated-harmonic-overlaid-implicit-neural-representations-for-multi-dimensional-data",
+      "section": "quick",
+      "title_en": "Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data",
+      "authors": "Honghang Chen, Xiujun Zhang, Xiaoli Sun, Mingqing Xiao",
+      "date": "2026-06-25",
+      "pdf": "https://arxiv.org/pdf/2606.26763v1",
+      "score": "6.0",
+      "evidence": "多维数据隐式神经表示用于恢复，类似于高光谱张量恢复",
+      "tldr": "隐式神经表示（INR）使用周期性激活函数时，因函数组合导致深度网络优化不稳定，且缺乏物理先验缓解频谱偏差。提出CHOIR，以协调谐波叠加替代函数组合确保深度扩展稳定性，并引入感知频谱校准，嵌入自然图像幂律频谱先验调整至对数均匀分布。在多维数据恢复任务中，CHOIR性能优于现有最先进方法。该工作为稳定高效的多维数据INR表示提供了新范式。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Implicit neural representation (INR) has emerged as a powerful prior for multi-dimensional data (e.g., multispectral images and videos). However, most INR methods employing periodic activation functions (e.g., Sine) predominantly rely on function composition. This mechanism introduces optimization instability as network depth increases, thereby limiting their performance. Meanwhile, these methods fail to incorporate proper physical priors to effectively alleviate spectrum bias. To address these issues, inspired by the commonalities between deep periodic networks and generalized Fourier series, we propose a novel Calibrated Harmonic Overlaid Implicit Neural Representation (CHOIR). Specifically, we utilize Coordinated Harmonic Superposition (CHS) to replace the conventional function composition used in most INRs, thereby ensuring optimization stability when scaling network depth. Furthermore, we introduce a Perceptual Spectrum Calibration (PSC) to mitigate spectrum bias. This calibration embeds the ubiquitous power-law spectrum prior of natural images and adjusts the globally fixed spectrum towards a physically plausible log-uniform distribution. Extensive experiments on various multidimensional data recovery problems demonstrate that our method achieves superior performance over state-of-the-art approaches. Code is available at https://github.com/chorl0229/CHOIR.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

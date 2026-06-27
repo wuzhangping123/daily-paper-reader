@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-27T20:59:02.975268+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.26763v1",
+      "source": "arxiv",
+      "title": "Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data",
+      "abstract": "Implicit neural representation (INR) has emerged as a powerful prior for multi-dimensional data (e.g., multispectral images and videos). However, most INR methods employing periodic activation functions (e.g., Sine) predominantly rely on function composition. This mechanism introduces optimization instability as network depth increases, thereby limiting their performance. Meanwhile, these methods fail to incorporate proper physical priors to effectively alleviate spectrum bias. To address these issues, inspired by the commonalities between deep periodic networks and generalized Fourier series, we propose a novel Calibrated Harmonic Overlaid Implicit Neural Representation (CHOIR). Specifically, we utilize Coordinated Harmonic Superposition (CHS) to replace the conventional function composition used in most INRs, thereby ensuring optimization stability when scaling network depth. Furthermore, we introduce a Perceptual Spectrum Calibration (PSC) to mitigate spectrum bias. This calibration embeds the ubiquitous power-law spectrum prior of natural images and adjusts the globally fixed spectrum towards a physically plausible log-uniform distribution. Extensive experiments on various multidimensional data recovery problems demonstrate that our method achieves superior performance over state-of-the-art approaches. Code is available at https://github.com/chorl0229/CHOIR.",
+      "authors": [
+        "Honghang Chen",
+        "Xiujun Zhang",
+        "Xiaoli Sun",
+        "Mingqing Xiao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-25T08:48:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.26763v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multidimensional data implicit neural representation for recovery similar to tensor recovery for hyperspectral",
+      "llm_evidence_cn": "多维数据隐式神经表示用于恢复，类似于高光谱张量恢复",
+      "llm_evidence": "多维数据隐式神经表示用于恢复，类似于高光谱张量恢复",
+      "canonical_evidence": "多维数据隐式神经表示用于恢复，类似于高光谱张量恢复",
+      "llm_tldr_en": "Proposes CHOIR, an implicit neural representation using calibrated harmonic superposition for multi-dimensional data like multispectral images, addressing optimization instability and spectrum bias; applicable to tensor data recovery for hyperspectral images.",
+      "llm_tldr_cn": "针对隐式神经表示在多层网络中因函数组合导致的优化不稳定性以及缺乏物理先验引起的频谱偏差问题，本文提出一种新颖的校准谐波叠加隐式神经表示方法（CHOIR）。该方法通过协调谐波叠加与校准机制，有效增强了对多维数据（如多光谱图像）的表示能力。实验结果表明，CHOIR在图像表示和恢复任务中均优于现有方法，显著缓解了频谱偏差。该工作为高维张量数据的恢复与去噪提供了新的技术途径。",
+      "llm_tldr": "针对隐式神经表示在多层网络中因函数组合导致的优化不稳定性以及缺乏物理先验引起的频谱偏差问题，本文提出一种新颖的校准谐波叠加隐式神经表示方法（CHOIR）。该方法通过协调谐波叠加与校准机制，有效增强了对多维数据（如多光谱图像）的表示能力。实验结果表明，CHOIR在图像表示和恢复任务中均优于现有方法，显著缓解了频谱偏差。该工作为高维张量数据的恢复与去噪提供了新的技术途径。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

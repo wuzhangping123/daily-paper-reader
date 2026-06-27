@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-27 <!--dpr-date:20260627-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/27/2606.26763v1-calibrated-harmonic-overlaid-implicit-neural-representations-for-multi-dimensional-data" data-sidebar-item="{&quot;title&quot;: &quot;Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.26763v1-calibrated-harmonic-overlaid-implicit-neural-representations-for-multi-dimensional-data&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;多维数据隐式神经表示用于恢复，类似于高光谱张量恢复&quot;}">Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data</a>
   * 2026-06-26 <!--dpr-date:20260626-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202606/26/2606.26688v1-adaptive-randomized-pivoting-for-tensor-singular-value-decomposition-model" data-sidebar-item="{&quot;title&quot;: &quot;Adaptive Randomized Pivoting for Tensor Singular Value Decomposition Model&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.26688v1-adaptive-randomized-pivoting-for-tensor-singular-value-decomposition-model&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;张量奇异值分解与CUR近似用于数据恢复&quot;}">Adaptive Randomized Pivoting for Tensor Singular Value Decomposition Model</a>
