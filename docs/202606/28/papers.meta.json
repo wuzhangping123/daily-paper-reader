@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-28",
+  "date": "2026-06-28",
+  "generated_at": "2026-06-28T21:18:17",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/28/2606.22346v1-flow-annealing-posterior-sampling-for-function-space-regression-and-inverse-problems",
+      "section": "quick",
+      "title_en": "Flow Annealing Posterior Sampling for Function-Space Regression and Inverse Problems",
+      "authors": "Yaozhong Shi, Zachary E. Ross, Yisong Yue",
+      "date": "2026-06-21",
+      "pdf": "https://arxiv.org/pdf/2606.22346v1",
+      "score": "6.0",
+      "evidence": "用于逆问题（含去噪和恢复）的函数空间后验采样",
+      "tldr": "该论文提出Flow Annealing Posterior Sampling (FAPS)框架，用于函数空间回归和科学逆问题。基于预训练的函数空间流匹配先验，FAPS通过似然引导从稀疏噪声观测中生成后验样本，支持可变查询离散化且无需显式计算先验密度。其Langevin校正采用低秩协方差预条件子，利用主导函数空间相关性。在多个高斯与非高斯随机过程回归基准以及各类PDE逆问题中，FAPS生成一致的后验样本，不确定性量化准确，显著优于现有函数回归基线，在PDE含噪逆问题上性能与扩散后验采样器相当或更优，同时降低了测试时采样成本。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Principled regression for stochastic processes is a long-standing challenge with deep connections to scientific inverse problems. We introduce Flow Annealing Posterior Sampling (FAPS), to our knowledge the first function-space posterior sampling framework that unifies stochastic-process regression and PDE inverse problems. Built on pretrained function-space flow-matching priors, FAPS enables likelihood-guided posterior inference from sparse and noisy observations, supports variable query discretizations, and avoids explicit prior-density evaluation. Its Langevin correction uses a low-rank covariance preconditioner to exploit dominant function-space correlations across discretizations. Across Gaussian and non-Gaussian stochastic-process regression benchmarks and diverse PDE inverse problems, FAPS produces coherent posterior samples with accurate uncertainty quantification, significantly outperforming existing functional regression baselines and achieving competitive or better PDE noisy inverse performance than diffusion-based posterior samplers while reducing test-time sampling cost.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/28/2606.26652v1-scalable-operator-learning-via-nystrm-approximation-with-denoising-applications",
+      "section": "quick",
+      "title_en": "Scalable Operator Learning via Nyström Approximation With Denoising Applications",
+      "authors": "Naveen Gupta, Vaibhav Silmana, S. Sivananthan",
+      "date": "2026-06-25",
+      "pdf": "https://arxiv.org/pdf/2606.26652v1",
+      "score": "6.0",
+      "evidence": "可扩展算子学习及其去噪应用",
+      "tldr": "本文针对向量值回归中标准核方法计算成本高的问题，提出基于Nyström子采样的可扩展算子学习算法，支持函数输出并建立极小化最优收敛率。将该框架应用于函数去噪，实验涵盖信号、音频、图像去噪及逆Radon变换等，性能媲美全核方法但计算成本显著降低。贡献在于提供了高效且理论最优的算子学习方案，拓展了去噪问题的通用框架。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "In this paper, we study Nyström subsampling for vector-valued regression in vector-valued reproducing kernel Hilbert spaces. Standard kernel methods often suffer from prohibitive computational costs due to the construction and inversion of large kernel matrices, which limits their scalability to large datasets. To overcome this bottleneck, we propose an efficient operator learning algorithm based on Nyström subsampling that accommodates functional outputs. Under general source conditions characterized by index functions-extending beyond the classical Hölder-type and operator-monotone frameworks-we establish minimax-optimal convergence rates for the proposed estimator. As an application of the proposed framework, we consider function denoising problems. Unlike classical denoising methods, which are typically tailored to specific signal representations or noise models, our approach formulates denoising within a general operator learning framework. Numerical experiments on signal denoising, real-time audio denoising, image denoising, inverse Radon transform reconstruction, and energy-efficiency prediction confirm that the proposed method achieves performance comparable to full kernel methods while substantially reducing computational cost.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
