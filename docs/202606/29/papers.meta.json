@@ -1,0 +1,54 @@
+{
+  "label": "2026-06-29",
+  "date": "2026-06-29",
+  "generated_at": "2026-06-29T20:31:30",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202606/29/2606.24737v1-vsanet-view-aware-sparse-attention-network-for-light-field-image-denoising",
+      "section": "deep",
+      "title_en": "VSANet: View-aware Sparse Attention Network for Light Field Image Denoising",
+      "authors": "Gargi Panda, Soumitra Kundu, Saumik Bhattacharya, Aurobinda Routray",
+      "date": "2026-06-23",
+      "pdf": "https://arxiv.org/pdf/2606.24737v1",
+      "score": "8.0",
+      "evidence": "利用视角感知稀疏注意力网络进行光场图像去噪",
+      "tldr": "光场图像去噪面临高维数据挑战，噪声独立但场景内容具有强跨视角相关性。本文提出VSANet，采用视图感知稀疏注意力（VSA）块，将4D特征映射为统一空间-角度令牌空间，通过局部敏感哈希稀疏注意力实现线性复杂度的全局特征交互，有效利用跨视角和空间相关性。同时设计特征细化（FR）块增强空间、角度和对极子空间特征。实验表明VSANet在多个数据集上超越现有方法，为光场图像去噪提供了高效且鲁棒的解决方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Light field (LF) image denoising is challenging due to the high-dimensional structure of LF data. While noise is independent across sub-aperture images, scene content exhibits strong cross-view correlations. We introduce VSANet, a view-aware sparse attention network for LF denoising. Specifically, we propose a view-aware sparse attention (VSA) block that represents the 4D LF feature map as a unified spatial-angular token space and performs cross-view aggregation via locality-sensitive hashing-based sparse attention. This enables global feature interactions with linear complexity, effectively exploiting LF correlations across views and spatial locations. In addition, we design a feature refinement (FR) block to emphasize informative features in spatial, angular, and epipolar subspaces. The VSA and FR blocks are integrated within a sequential attention refinement module, forming the core of VSANet. Experiments demonstrate VSANet outperforms stateof-the-art LF denoising methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/29/2606.28112v1-bidemem-bidirectional-degradation-memory-for-explainable-image-restoration",
+      "section": "quick",
+      "title_en": "BiDeMem: Bidirectional Degradation Memory for Explainable Image Restoration",
+      "authors": "Xinrui Wu, Lichen Huang",
+      "date": "2026-06-26",
+      "pdf": "https://arxiv.org/pdf/2606.28112v1",
+      "score": "7.0",
+      "evidence": "具有退化记忆的可解释图像恢复方法",
+      "tldr": "现有图像复原方法常使用降解先验但缺乏可解释性，仅以PSNR为弱语义测试。本文提出BiDeMem双向降解记忆框架，利用复原特征与输入统计构建查询，从存储器检索top-k子集，同时支持复原路径和训练时的前向降解解释路径。实验在NAFNet多降解设置下验证，BiRank相比纯矫正头、密集查询先验、静态全局先验分别提升0.2588、0.2586、0.2839 dB。该机制既作为复原模块又作为可证伪的解释机制。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Degradation-aware prompts, conditions, and latent priors are increasingly used in image restoration, yet they are usually judged by a single endpoint: whether the restored image obtains higher PSNR. This is a weak test of semantics. A condition can help by adding capacity, acting as a global correction bias, or exploiting dataset shortcuts, without becoming an interpretable degradation prior. We propose BiDeMem, a bidirectional degradation memory for explainable image restoration. A query built from restoration features and input statistics retrieves a compact top-k subset of memory slots. The same selected slot identity supports the restoration path at inference time and a training-only forward-degradation explanation path. The study centers on verifiability in a controlled multi-degradation NAFNet setting. New controls separate the gain from a correction head alone, a dense query prior, and a static global prior: these variants are 0.2588, 0.2586, and 0.2839 dB below BiRank, respectively. Strong residual supervision and a wider degradation head also remain below the full bidirectional memory model. Intervention probes show that BiRank preserves restoration quality while increasing wrong-prior and native-prior sensitivity, framing degradation memory as both a restoration module and a falsifiable explanation mechanism.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/29/2606.22696v1-nullflow-one-step-generative-reconstruction",
+      "section": "quick",
+      "title_en": "NullFlow: One-Step Generative Reconstruction",
+      "authors": "Xiao Shi, Edward P. Chandler, Chicago Y. Park, Shirin Shoushtari, Ulugbek S. Kamilov",
+      "date": "2026-06-21",
+      "pdf": "https://arxiv.org/pdf/2606.22696v1",
+      "score": "6.0",
+      "evidence": "一步生成式图像重建用于恢复任务",
+      "tldr": "现有的生成式图像重建方法（如扩散模型）需要多步迭代采样和额外的保真校正，推理速度慢。NullFlow提出将生成流限制在测量一致子空间，通过学习流的平均速度实现单步采样。在图像修复任务上，NullFlow达到与最先进扩散求解器相当的质量，但推理从数百次网络评估减少到一次。该方法无需单独的数据保真校正，为高效生成式重建提供了新框架。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We propose NullFlow, a principled framework for one-step generative image reconstruction. Our key idea is to confine the generative flow to a measurement-consistent subspace. Because the flow never leaves this subspace, NullFlow needs no separate data-fidelity corrections, unlike existing solvers. NullFlow samples in a single network evaluation by learning the flow's average velocity, avoiding the step-by-step integration of traditional flow matching methods. We prove that the average velocity of this constrained flow yields a training objective whose global minimizer is a one-step posterior sampler. We show on image inpainting that NullFlow matches state-of-the-art diffusion solvers while cutting inference from hundreds of network evaluations to one.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

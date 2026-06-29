@@ -6,29 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-28
-- 运行时间：2026-06-28 21:18:08 UTC
+- 最新运行日期：2026-06-29
+- 运行时间：2026-06-29 20:31:24 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：0
+- 本次总论文数：3
+- 精读区：1
 - 速读区：2
 
 ### 今日简报（AI）
-今日精选2篇速读论文，聚焦函数空间回归与大规模算子学习。  
-值得关注：基于流退火后验采样的函数空间逆问题求解，以及利用Nyström近似实现可扩展算子降噪应用。  
-普通读者可优先从这两篇的引言与实验部分入手，理解其方法动机与性能提升点。
-- 详情：[/202606/28/README](/202606/28/README)
+1) 今日精读高分论文《VSANet: View-aware Sparse Attention Network for Light Field Image Denoising》，速读《BiDeMem: Bidirectional Degradation Memory》与《NullFlow: One-Step Generative Reconstruction》。
+2) 最值得关注的是使用视图感知稀疏注意力机制的光场去噪方法（8.0分），以及利用双向退化记忆的可解释图像恢复框架（7.0分）。
+3) 后续可重点学习如何将稀疏注意力与多视图信息结合以提升降噪效果，并关注可解释性在图像修复中的应用价值。
+- 详情：[/202606/29/README](/202606/29/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [VSANet: View-aware Sparse Attention Network for Light Field Image Denoising](/202606/29/2606.24737v1-vsanet-view-aware-sparse-attention-network-for-light-field-image-denoising)  
+   标签：评分：8.0/10、query:hsi-denoise
+   evidence：利用视角感知稀疏注意力网络进行光场图像去噪
 
 ### 速读区论文标签
-1. [Flow Annealing Posterior Sampling for Function-Space Regression and Inverse Problems](/202606/28/2606.22346v1-flow-annealing-posterior-sampling-for-function-space-regression-and-inverse-problems)  
+1. [BiDeMem: Bidirectional Degradation Memory for Explainable Image Restoration](/202606/29/2606.28112v1-bidemem-bidirectional-degradation-memory-for-explainable-image-restoration)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：具有退化记忆的可解释图像恢复方法
+2. [NullFlow: One-Step Generative Reconstruction](/202606/29/2606.22696v1-nullflow-one-step-generative-reconstruction)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：用于逆问题（含去噪和恢复）的函数空间后验采样
-2. [Scalable Operator Learning via Nyström Approximation With Denoising Applications](/202606/28/2606.26652v1-scalable-operator-learning-via-nystrm-approximation-with-denoising-applications)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：可扩展算子学习及其去噪应用
+   evidence：一步生成式图像重建用于恢复任务
 
 
 <div class="dpr-home-promo-card">

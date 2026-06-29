@@ -1,0 +1,131 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-29T20:29:45.042187+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2606.24737v1",
+      "source": "arxiv",
+      "title": "VSANet: View-aware Sparse Attention Network for Light Field Image Denoising",
+      "abstract": "Light field (LF) image denoising is challenging due to the high-dimensional structure of LF data. While noise is independent across sub-aperture images, scene content exhibits strong cross-view correlations. We introduce VSANet, a view-aware sparse attention network for LF denoising. Specifically, we propose a view-aware sparse attention (VSA) block that represents the 4D LF feature map as a unified spatial-angular token space and performs cross-view aggregation via locality-sensitive hashing-based sparse attention. This enables global feature interactions with linear complexity, effectively exploiting LF correlations across views and spatial locations. In addition, we design a feature refinement (FR) block to emphasize informative features in spatial, angular, and epipolar subspaces. The VSA and FR blocks are integrated within a sequential attention refinement module, forming the core of VSANet. Experiments demonstrate VSANet outperforms stateof-the-art LF denoising methods.",
+      "authors": [
+        "Gargi Panda",
+        "Soumitra Kundu",
+        "Saumik Bhattacharya",
+        "Aurobinda Routray"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-23T16:00:44+00:00",
+      "link": "https://arxiv.org/pdf/2606.24737v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "light field image denoising using view-aware sparse attention network",
+      "llm_evidence_cn": "利用视角感知稀疏注意力网络进行光场图像去噪",
+      "llm_evidence": "利用视角感知稀疏注意力网络进行光场图像去噪",
+      "canonical_evidence": "利用视角感知稀疏注意力网络进行光场图像去噪",
+      "llm_tldr_en": "Proposes VSANet with view-aware sparse attention and feature refinement for LF denoising, leveraging cross-view correlations via hashing-based attention.",
+      "llm_tldr_cn": "针对光场图像高维结构去噪难题，提出VSANet，利用视角感知稀疏注意力（VSA）将4D特征映射为统一空间-角度标记空间，通过局部敏感哈希稀疏注意力实现全局交叉视图聚合，并设计特征精炼块增强有用特征。方法与高光谱图像的空间-光谱去噪高度相似，可迁移至高光谱领域。",
+      "llm_tldr": "针对光场图像高维结构去噪难题，提出VSANet，利用视角感知稀疏注意力（VSA）将4D特征映射为统一空间-角度标记空间，通过局部敏感哈希稀疏注意力实现全局交叉视图聚合，并设计特征精炼块增强有用特征。方法与高光谱图像的空间-光谱去噪高度相似，可迁移至高光谱领域。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "spectral-spatial denoising for hyperspectral images",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.28112v1",
+      "source": "arxiv",
+      "title": "BiDeMem: Bidirectional Degradation Memory for Explainable Image Restoration",
+      "abstract": "Degradation-aware prompts, conditions, and latent priors are increasingly used in image restoration, yet they are usually judged by a single endpoint: whether the restored image obtains higher PSNR. This is a weak test of semantics. A condition can help by adding capacity, acting as a global correction bias, or exploiting dataset shortcuts, without becoming an interpretable degradation prior. We propose BiDeMem, a bidirectional degradation memory for explainable image restoration. A query built from restoration features and input statistics retrieves a compact top-k subset of memory slots. The same selected slot identity supports the restoration path at inference time and a training-only forward-degradation explanation path. The study centers on verifiability in a controlled multi-degradation NAFNet setting. New controls separate the gain from a correction head alone, a dense query prior, and a static global prior: these variants are 0.2588, 0.2586, and 0.2839 dB below BiRank, respectively. Strong residual supervision and a wider degradation head also remain below the full bidirectional memory model. Intervention probes show that BiRank preserves restoration quality while increasing wrong-prior and native-prior sensitivity, framing degradation memory as both a restoration module and a falsifiable explanation mechanism.",
+      "authors": [
+        "Xinrui Wu",
+        "Lichen Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-26T14:12:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.28112v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "explainable image restoration with degradation memory",
+      "llm_evidence_cn": "具有退化记忆的可解释图像恢复方法",
+      "llm_evidence": "具有退化记忆的可解释图像恢复方法",
+      "canonical_evidence": "具有退化记忆的可解释图像恢复方法",
+      "llm_tldr_en": "BiDeMem proposes a bidirectional degradation memory that retrieves compact slot identities to support both restoration and explanation, improving interpretability.",
+      "llm_tldr_cn": "针对现有图像恢复方法缺乏可解释退化先验的问题，本文提出双向退化记忆（BiDeMem）。该方法从恢复特征和输入统计量构建查询，检索紧凑的 top-k 记忆槽，同一槽位同时支持恢复路径和解释路径。实验表明，BiDeMem 在恢复质量上不逊于现有方法，同时提供了可解释的退化分析。",
+      "llm_tldr": "针对现有图像恢复方法缺乏可解释退化先验的问题，本文提出双向退化记忆（BiDeMem）。该方法从恢复特征和输入统计量构建查询，检索紧凑的 top-k 记忆槽，同一槽位同时支持恢复路径和解释路径。实验表明，BiDeMem 在恢复质量上不逊于现有方法，同时提供了可解释的退化分析。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.22696v1",
+      "source": "arxiv",
+      "title": "NullFlow: One-Step Generative Reconstruction",
+      "abstract": "We propose NullFlow, a principled framework for one-step generative image reconstruction. Our key idea is to confine the generative flow to a measurement-consistent subspace. Because the flow never leaves this subspace, NullFlow needs no separate data-fidelity corrections, unlike existing solvers. NullFlow samples in a single network evaluation by learning the flow's average velocity, avoiding the step-by-step integration of traditional flow matching methods. We prove that the average velocity of this constrained flow yields a training objective whose global minimizer is a one-step posterior sampler. We show on image inpainting that NullFlow matches state-of-the-art diffusion solvers while cutting inference from hundreds of network evaluations to one.",
+      "authors": [
+        "Xiao Shi",
+        "Edward P. Chandler",
+        "Chicago Y. Park",
+        "Shirin Shoushtari",
+        "Ulugbek S. Kamilov"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-21T22:21:43+00:00",
+      "link": "https://arxiv.org/pdf/2606.22696v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "one-step generative image reconstruction for recovery tasks",
+      "llm_evidence_cn": "一步生成式图像重建用于恢复任务",
+      "llm_evidence": "一步生成式图像重建用于恢复任务",
+      "canonical_evidence": "一步生成式图像重建用于恢复任务",
+      "llm_tldr_en": "Proposes NullFlow for one-step generative reconstruction, achieving state-of-the-art inpainting with a single network evaluation by constraining flow to measurement subspace.",
+      "llm_tldr_cn": "针对扩散模型迭代采样计算成本高的问题，提出NullFlow，将生成流约束在测量一致子空间中，学习平均速度实现一步采样。在图像修复上达到与扩散模型相当的性能，而推理仅需一次网络评估。该方法通用性强，可推广至图像去噪和恢复任务，但未涉及高光谱具体场景。",
+      "llm_tldr": "针对扩散模型迭代采样计算成本高的问题，提出NullFlow，将生成流约束在测量一致子空间中，学习平均速度实现一步采样。在图像修复上达到与扩散模型相当的性能，而推理仅需一次网络评估。该方法通用性强，可推广至图像去噪和恢复任务，但未涉及高光谱具体场景。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
