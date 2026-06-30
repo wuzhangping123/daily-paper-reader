@@ -1,0 +1,137 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-30T21:10:44.742758+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.28677v1",
+      "source": "arxiv",
+      "title": "SATB-VR: Training Few-Step Video Restoration Diffusion Model using SNR-Aware Trajectory Blending",
+      "abstract": "While diffusion models excel in video restoration, their reliance on extensive iterative steps limits efficiency. Conversely, aggressive single-step distillation often compromises fine texture recovery. To achieve an optimal balance, we present SATB-VR, a few-step paradigm that jump-starts the denoising process via an auxiliary predictor, explicitly bypassing early low signal-to-noise ratio (SNR) steps. However, naive joint training of the predictor and the denoiser inherently introduces a severe train-inference discrepancy. To resolve this, we propose the SNR-Aware Trajectory Blending (SATB) strategy. During the forward process, SATB constructs the noisy input by dynamically blending the predictor's output with the ground-truth trajectory based on the SNRs. This forces the denoiser to robustly compensate for initial prediction errors while smoothly converging to the clean data manifold. Furthermore, we introduce a Denoiser-Driven Consistency (DDC) loss, leveraging the concurrently updated denoiser as a dynamic evaluator to explicitly align internal features and boost predictor accuracy. Extensive experiments demonstrate that, under flexible few-step inference regimes (\\eg, $\\le 5$ steps), SATB-VR performs favorably against existing approaches on synthetic, real-world, and AIGC benchmarks.",
+      "authors": [
+        "Haoran Bai",
+        "Xiaoxu Chen",
+        "Xiaoyu Liu",
+        "Zongsheng Yue",
+        "Sibin Deng",
+        "Wangmeng Zuo",
+        "Ying Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-27T01:32:16+00:00",
+      "link": "https://arxiv.org/pdf/2606.28677v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "few-step diffusion model for video restoration denoising",
+      "llm_evidence_cn": "少步扩散模型用于视频恢复去噪",
+      "llm_evidence": "少步扩散模型用于视频恢复去噪",
+      "canonical_evidence": "少步扩散模型用于视频恢复去噪",
+      "llm_tldr_en": "SATB-VR enables few-step video restoration diffusion by blending SNR-aware trajectories, reducing steps while preserving texture; applicable to hyperspectral restoration.",
+      "llm_tldr_cn": "该论文针对扩散模型在视频恢复中迭代步骤多、效率低的问题，提出SATB-VR少步范式，利用SNR感知轨迹混合策略，在保持纹理质量的同时大幅减少推理步骤。该扩散模型加速技术可迁移至高光谱图像恢复，提升去噪效率。",
+      "llm_tldr": "该论文针对扩散模型在视频恢复中迭代步骤多、效率低的问题，提出SATB-VR少步范式，利用SNR感知轨迹混合策略，在保持纹理质量的同时大幅减少推理步骤。该扩散模型加速技术可迁移至高光谱图像恢复，提升去噪效率。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.28785v1",
+      "source": "arxiv",
+      "title": "Stochastic Optimal Control Sampling for Diffusion Inverse Problems",
+      "abstract": "Benefiting from the strong ability to capture data distributions, diffusion models have become powerful tools for solving image inverse problems. The key is to controllably steer the sampling trajectory toward the measurements while respecting the diffusion prior. In this work, we introduce Stochastic Optimal Control Sampling (SOCS), which models the denoising process as a dynamical system and injects control signals via SOC. Previous SOC-based approach addresses inverse problems by optimizing over the entire trajectory, which is computationally expensive. In contrast, we derive a closed-form control update and apply it at each sampling step, pulling the measurement-consistent clean prediction back onto the denoising flow. In SOCS, we can readily modulate the control strength to align with the diffusion model's native capabilities and thereby enhance perceptual quality. Our method is compatible with a variety of linear stochastic differential equation backbones. Extensive experiments across a broad spectrum of image inverse tasks demonstrate that SOCS achieves accurate measurement-aligned reconstructions with improved visual fidelity and stronger quantitative performance.",
+      "authors": [
+        "Jie Zhang",
+        "Youmei Qiu",
+        "Hanling Tian",
+        "Jingyuan Zhang",
+        "Xiang Yin",
+        "Xiaolin Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-27T07:34:52+00:00",
+      "link": "https://arxiv.org/pdf/2606.28785v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "diffusion model sampling method for inverse problems, directly applicable to image denoising",
+      "llm_evidence_cn": "扩散模型逆问题采样方法，可直接用于图像去噪",
+      "llm_evidence": "扩散模型逆问题采样方法，可直接用于图像去噪",
+      "canonical_evidence": "扩散模型逆问题采样方法，可直接用于图像去噪",
+      "llm_tldr_en": "This work introduces Stochastic Optimal Control Sampling (SOCS) for diffusion-based inverse problems, deriving a closed-form control update that enforces measurement consistency. It enables efficient high-quality denoising and restoration without full trajectory optimization.",
+      "llm_tldr_cn": "本文提出随机最优控制采样(SOCS)方法，用于扩散模型求解图像逆问题。通过推导闭式控制更新，将测量一致性约束融入每步去噪流程，避免全局优化。实验表明该方法在图像去噪、超分辨率等任务中取得优异效果，计算效率高。该工作为扩散模型在逆问题中的应用提供了高效且可调的框架，有助于推动其在图像恢复领域的实际部署。",
+      "llm_tldr": "本文提出随机最优控制采样(SOCS)方法，用于扩散模型求解图像逆问题。通过推导闭式控制更新，将测量一致性约束融入每步去噪流程，避免全局优化。实验表明该方法在图像去噪、超分辨率等任务中取得优异效果，计算效率高。该工作为扩散模型在逆问题中的应用提供了高效且可调的框架，有助于推动其在图像恢复领域的实际部署。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.30230v1",
+      "source": "arxiv",
+      "title": "A Distributionally Robust Framework for Learned Reconstructions in Inverse Problems",
+      "abstract": "Learned reconstruction operators for inverse problems are typically trained under a fixed noise model, and generalize poorly when the distribution during testing differs from the one assumed during training. Distributionally robust optimization (DRO) addresses this by optimizing against the worst-case distribution within a prescribed ambiguity set, but standard Wasserstein DRO perturbs the full joint distribution uniformly, which can be overly conservative and ignores the physics of the measurement process. We develop a structured DRO framework in which the ambiguity set is restricted to structured perturbations aligned with the data-acquisition process. This allows us to learn data-driven reconstruction operators that remain robust to distributional shifts. By constraining perturbations to subsets such as $P(Y|X)$, our framework models uncertainty in the forward operator and noise model more faithfully, accommodating any noise model expressible as a stochastic forward operator. We establish strong duality for this general formulation and derive explicit finite-dimensional dual representations for perturbations in the joint, marginal, and conditional distributions. A central result is an explicit worst-case risk bound that induces Tikhonov regularization on the Lipschitz constant of the reconstruction operator, and is less conservative relative to standard DRO for well-posed problems. Numerical experiments on deblurring and sinogram-to-CT reconstruction demonstrate improved robustness, stability, and interpretability over standard DRO and MSE baselines. In the linear setting, the learned operator becomes effectively low-rank, truncating at the intrinsic dimension of the data and recovering a data-driven analogue of truncated-SVD regularization.",
+      "authors": [
+        "Floor van Maarschalkerwaart",
+        "Subhadip Mukherjee",
+        "Christoph Brune",
+        "Marcello Carioni"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.LG"
+      ],
+      "published": "2026-06-29T12:43:21+00:00",
+      "link": "https://arxiv.org/pdf/2606.30230v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "distributionally robust framework for learned reconstruction under noise distribution shift",
+      "llm_evidence_cn": "针对噪声分布偏移的分布鲁棒学习重建框架",
+      "llm_evidence": "针对噪声分布偏移的分布鲁棒学习重建框架",
+      "canonical_evidence": "针对噪声分布偏移的分布鲁棒学习重建框架",
+      "llm_tldr_en": "Proposes structured DRO for inverse problems, robust to noise distribution shift; applicable to hyperspectral denoising.",
+      "llm_tldr_cn": "针对逆问题中学习型重建算子在噪声分布偏移时性能下降的问题，提出结构化分布鲁棒优化框架，限制模糊集与数据获取过程对齐。该方法可应用于高光谱图像去噪，提升对未知噪声类型的泛化能力。实验在图像重建任务上验证了鲁棒性。",
+      "llm_tldr": "针对逆问题中学习型重建算子在噪声分布偏移时性能下降的问题，提出结构化分布鲁棒优化框架，限制模糊集与数据获取过程对齐。该方法可应用于高光谱图像去噪，提升对未知噪声类型的泛化能力。实验在图像重建任务上验证了鲁棒性。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
