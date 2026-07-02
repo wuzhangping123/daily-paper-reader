@@ -1,0 +1,219 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-02T21:30:36.975649+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.28431v1",
+      "source": "arxiv",
+      "title": "A Zero-Shot Deep Image Prior Framework for Denoising and Deconvolution in Fluorescence Microscopy",
+      "abstract": "Fluorescence microscopy images are degraded by noise and diffraction-induced blur, which compromise structural fidelity and limit quantitative analysis. Supervised deep learning methods achieve impressive restoration performance but require large-scale paired datasets that are difficult to obtain in practice. To address this issue, we propose SDIP, a zero-shot deep image prior (DIP) framework that sequentially performs denoising and deconvolution without external training data. An aSeqDIP-based module first suppresses noise while preserving fine structures through sequential autoencoding regularization. In the deconvolution stage, a wavelet-based background correction step is incorporated before the proposed RLG-DIP module performs artifact-reduced deconvolution. RLG-DIP uses the Richardson-Lucy deconvolution result as a physically consistent guidance prior, integrating the imaging model with the implicit prior of DIP to stabilize the ill-posed deconvolution process. Experiments on the BioSR dataset across multiple cellular structures demonstrate that SDIP improves both signal-to-noise ratio and resolution, achieving superior visual quality and improved quantitative performance on most evaluated structures. The proposed framework may also provide useful insights for designing physically guided DIP methods for other inverse problems.",
+      "authors": [
+        "Xiangyu Qian",
+        "Jing Liu",
+        "Yunqing Tang",
+        "Luru Dai",
+        "Qiushi Li"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.CV",
+        "cs.LG",
+        "physics.optics"
+      ],
+      "published": "2026-06-26T01:52:27+00:00",
+      "link": "https://arxiv.org/pdf/2606.28431v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "zero-shot denoising using deep image prior applicable to general image denoising tasks",
+      "llm_evidence_cn": "零样本深度图像先验去噪方法，可迁移至高光谱图像去噪",
+      "llm_evidence": "零样本深度图像先验去噪方法，可迁移至高光谱图像去噪",
+      "canonical_evidence": "零样本深度图像先验去噪方法，可迁移至高光谱图像去噪",
+      "llm_tldr_en": "SDIP proposes a zero-shot deep image prior framework for sequential denoising and deconvolution in fluorescence microscopy, using autoencoding regularization and wavelet-based background correction, achieving competitive performance without paired training data.",
+      "llm_tldr_cn": "SDIP针对荧光显微镜图像提出了一种零样本深度图像先验框架，依次进行去噪和解卷积。它通过序贯自编码正则化抑制噪声同时保留细节，并在解卷积步骤引入小波背景校正。实验证明在不依赖配对训练数据的情况下，恢复效果与监督方法相当，为无数据依赖的图像去噪提供了可行方案。",
+      "llm_tldr": "SDIP针对荧光显微镜图像提出了一种零样本深度图像先验框架，依次进行去噪和解卷积。它通过序贯自编码正则化抑制噪声同时保留细节，并在解卷积步骤引入小波背景校正。实验证明在不依赖配对训练数据的情况下，恢复效果与监督方法相当，为无数据依赖的图像去噪提供了可行方案。",
+      "llm_tags": [
+        "query:hsi-denoise:composite"
+      ],
+      "matched_query_tag": "query:hsi-denoise:composite",
+      "matched_query_text": "Papers central to 高光谱影像噪声去除, especially work that connects or combines: low-rank representation for denoising; stripe noise removal in hyperspectral remote sensing images; high-dimensional tensor data recovery for hyperspectral images; relative radiometric correction for remote sensing images; hyperspectral image denoising methods; spectral-spatial denoising for hyperspectral images; hyperspectral image denoising using deep neural networks; state of the art hyperspectral image restoration and denoising methods; hyperspectral image stripe noise removal using deep learning; tensor based approaches for hyperspectral image anomaly detection and restoration.",
+      "matched_requirement_id": "req-composite-hsi-denoise",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31290v1",
+      "source": "arxiv",
+      "title": "Patch-PODiff-ViT: Structured Latent Diffusion with Patchwise POD for Super-Resolution and Uncertainty Quantification",
+      "abstract": "Diffusion models enable probabilistic super-resolution and conditional generation, but pixel-space methods are computationally expensive and learned latent spaces often lack interpretable uncertainty quantification. We introduce Patch-PODiff-ViT, a structured latent diffusion framework in which the latent space is defined by patchwise Proper Orthogonal Decomposition (POD), a fixed linear orthonormal basis over local patches, rather than learned by a nonlinear autoencoder. This yields low-dimensional, variance-ordered tokens that preserve spatial structure and enable efficient diffusion in a structured low-dimensional latent space with a Vision Transformer. Because the decoder is fixed, linear, and orthonormal, latent coefficient uncertainty can be propagated directly to physical-space predictive variance, enabling analytic propagation of predictive variance through the linear decoder without Monte Carlo estimation in pixel space. Across sea surface temperature, medical imaging, and natural images, the method achieves strong reconstruction with fewer parameters and lower memory, while producing well-calibrated spatial uncertainty that closely matches empirical ensembles.",
+      "authors": [
+        "Onkar Jadhav",
+        "Tim French",
+        "Matthew Rayson",
+        "Nicole L. Jones"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-30T08:05:53+00:00",
+      "link": "https://arxiv.org/pdf/2606.31290v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "structured latent diffusion with POD for image restoration including super-resolution transferable to denoising",
+      "llm_evidence_cn": "基于POD的结构化潜在扩散用于图像复原包括超分辨率可迁移至去噪",
+      "llm_evidence": "基于POD的结构化潜在扩散用于图像复原包括超分辨率可迁移至去噪",
+      "canonical_evidence": "基于POD的结构化潜在扩散用于图像复原包括超分辨率可迁移至去噪",
+      "llm_tldr_en": "Proposes Patch-PODiff-ViT a structured latent diffusion model using patchwise POD to define a low-dimensional latent space enabling efficient super-resolution and uncertainty quantification applicable to general image restoration.",
+      "llm_tldr_cn": "该论文提出Patch-PODiff-ViT，一种结构化潜在扩散框架。利用分块本征正交分解（POD）定义固定线性正交基潜在空间，替代非线性自编码器。该空间低维、方差有序，保留空间结构，配合Vision Transformer在潜在空间扩散。解码器固定且正交，可实现可控超分辨率与不确定性量化。该方法可扩展至高光谱图像去噪与复原。",
+      "llm_tldr": "该论文提出Patch-PODiff-ViT，一种结构化潜在扩散框架。利用分块本征正交分解（POD）定义固定线性正交基潜在空间，替代非线性自编码器。该空间低维、方差有序，保留空间结构，配合Vision Transformer在潜在空间扩散。解码器固定且正交，可实现可控超分辨率与不确定性量化。该方法可扩展至高光谱图像去噪与复原。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.31385v1",
+      "source": "arxiv",
+      "title": "Reconfigurable wavelength-encoded stochastic illumination for active hyperspectral imaging",
+      "abstract": "Traditional hyperspectral imaging (HSI) relies on sequential scanning with complex and bulky hardware, inherently limiting its temporal resolution while increasing system complexity and cost. Computational HSI offers cost-effective alternatives with simplified hardware. However, most existing computational methods rely on fixed spectral encoding units, which lack adaptability for different spectral tasks. Here, we present a reconfigurable optical stochastic encoding (ROSE) framework with programmable illumination, which can be adaptively optimized for different spectral tasks, for high-throughput, compressive HSI. By leveraging an array of monochromatic light-emitting diodes (LEDs), we synthesize stochastic spectral patterns that enable compressive acquisition using a standard monochrome camera. The proposed framework allows dynamic reconfiguration of illumination patterns, making it adaptable to diverse imaging requirements. We experimentally validate the proposed method and achieve HSI with a spatial resolution of 2048 by 1536, reconstructing 60 spectral bands across the spectral range of 400-700 nm. Furthermore, we introduce an automatic optimization strategy to search for optimal illuminations tailored to specific tasks, improving both reconstruction accuracy and task-oriented performance. We demonstrate the effectiveness of our approach in applications including anti-counterfeiting inspection and oral imaging, and further validate its compatibility with standard microscope and endoscope systems. The developed ROSE illumination module could serve as a universal, plug-and-play add-on for conventional cameras and existing optical systems, providing a cost-effective pathway to upgrade them into high-performance, task-adaptive HSI systems.",
+      "authors": [
+        "Yi-Jing Chen",
+        "Bao-Lei Liu",
+        "Ze-Yuan Dong",
+        "Zhi-Hao Zhao",
+        "Yi-Ying Zhang",
+        "Chun-Min Yu",
+        "Zhi-Hua Xu",
+        "Yuan-Jin Yu",
+        "Zhao-Hua Yang"
+      ],
+      "primary_category": "physics.optics",
+      "categories": [
+        "physics.optics",
+        "physics.app-ph"
+      ],
+      "published": "2026-06-30T09:13:38+00:00",
+      "link": "https://arxiv.org/pdf/2606.31385v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "compressive hyperspectral imaging for data recovery",
+      "llm_evidence_cn": "用于数据恢复的压缩高光谱成像",
+      "llm_evidence": "用于数据恢复的压缩高光谱成像",
+      "canonical_evidence": "用于数据恢复的压缩高光谱成像",
+      "llm_tldr_en": "Proposes a reconfigurable optical stochastic encoding framework for compressive HSI, enabling adaptive spectral encoding for improved data recovery.",
+      "llm_tldr_cn": "针对传统高光谱成像硬件复杂、灵活性差的问题，本文提出可重构光学随机编码（ROSE）框架，通过可编程LED阵列合成随机光谱模式，实现自适应压缩高光谱成像。该方法提高了数据采集效率，并为高维张量数据恢复提供了新途径。",
+      "llm_tldr": "针对传统高光谱成像硬件复杂、灵活性差的问题，本文提出可重构光学随机编码（ROSE）框架，通过可编程LED阵列合成随机光谱模式，实现自适应压缩高光谱成像。该方法提高了数据采集效率，并为高维张量数据恢复提供了新途径。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.00138v1",
+      "source": "arxiv",
+      "title": "MG-SpaIR: Multi-grade Sparse-guided Implicit Representation for Training-Data-Free Image Restoration",
+      "abstract": "MG-SpaIR is a training-data-free framework for restoring a clean image from a single observation corrupted by a mixture of blur, downsampling, noise, and missing pixels. Building on implicit neural representations (INRs), we introduce a multi-grade coarse-to-fine residual hierarchy that progressively refines the reconstruction across resolution grades, improving representational fidelity and mitigating spectral limitations. To stabilize reconstruction optimization and suppress INR-induced artifacts, we further propose an explicit sparse proximal regularization (e.g., $\\ell_0$-type) applied directly in the high-resolution image domain, which discourages spurious high-frequency patterns while preserving sharp structures. The resulting optimization is solved efficiently via a multi-grade proximal alternating scheme, and we establish convergence guarantees for the associated updates under standard regularity conditions. Experiments on mixed-degradation benchmarks demonstrate that MG-SpaIR consistently outperforms strong training-data-free baselines such as Deep Image Prior, providing a stable, interpretable, and data-efficient alternative to conventional learning-based restoration methods.",
+      "authors": [
+        "Jianmin Liao",
+        "Lei Huang",
+        "Ronglong Fang",
+        "Ashley Prater-Bennette",
+        "Lixin Shen",
+        "Yuesheng Xu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T20:17:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.00138v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "training-data-free restoration handles noise as part of mixture",
+      "llm_evidence_cn": "无训练数据图像恢复，处理包含噪声的混合退化",
+      "llm_evidence": "无训练数据图像恢复，处理包含噪声的混合退化",
+      "canonical_evidence": "无训练数据图像恢复，处理包含噪声的混合退化",
+      "llm_tldr_en": "MG-SpaIR is a training-data-free framework that restores images from blur, downsampling, noise, and missing pixels using implicit neural representations with multi-grade hierarchy and sparse regularization, achieving high fidelity without external data.",
+      "llm_tldr_cn": "MG-SpaIR是一个无需训练数据的图像恢复框架，能够从包含模糊、下采样、噪声和像素缺失的混合退化中恢复干净图像。它采用隐式神经表示的多级残差分层结构，并结合显式的稀疏正则化来抑制伪影。实验表明该方法在多种退化条件下都能保持高保真度，为无数据依赖的图像恢复提供了新思路。",
+      "llm_tldr": "MG-SpaIR是一个无需训练数据的图像恢复框架，能够从包含模糊、下采样、噪声和像素缺失的混合退化中恢复干净图像。它采用隐式神经表示的多级残差分层结构，并结合显式的稀疏正则化来抑制伪影。实验表明该方法在多种退化条件下都能保持高保真度，为无数据依赖的图像恢复提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise:composite"
+      ],
+      "matched_query_tag": "query:hsi-denoise:composite",
+      "matched_query_text": "Papers central to 高光谱影像噪声去除, especially work that connects or combines: low-rank representation for denoising; stripe noise removal in hyperspectral remote sensing images; high-dimensional tensor data recovery for hyperspectral images; relative radiometric correction for remote sensing images; hyperspectral image denoising methods; spectral-spatial denoising for hyperspectral images; hyperspectral image denoising using deep neural networks; state of the art hyperspectral image restoration and denoising methods; hyperspectral image stripe noise removal using deep learning; tensor based approaches for hyperspectral image anomaly detection and restoration.",
+      "matched_requirement_id": "req-composite-hsi-denoise",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.01100v1",
+      "source": "arxiv",
+      "title": "CPDDNet: Color-Polarization Denoising and Demosaicking Network",
+      "abstract": "Color-polarization imaging using a color-polarization filter array (CPFA) sensor captures both texture (color intensity) and physical (polarization) information of the scene in a single shot, enabling various applications in computer vision. However, the raw mosaic output from a CPFA sensor often suffers from severe noise and resolution loss, especially under low-light conditions. Existing methods generally focus on either denoising or demosaicking tasks, failing to capture the coupling between them and neglecting shared low-level features. In this paper, we propose a color-polarization denoising and demosaicking network (CPDDNet), which is a joint framework that performs noise removal and CPFA interpolation using a feature fusion module that retains the features from the CPFA raw data at both the denoising and the demosaicking stages. Experimental results demonstrate that CPDDNet significantly enhances image quality and polarization parameter accuracy, outperforming existing approaches on a real dataset.",
+      "authors": [
+        "Qihang Zhang",
+        "Yusuke Monno",
+        "Masayuki Tanaka",
+        "Masatoshi Okutomi"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-01T15:52:03+00:00",
+      "link": "https://arxiv.org/pdf/2607.01100v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "color-polarization denoising and demosaicking network using deep learning",
+      "llm_evidence_cn": "彩色偏振去噪与去马赛克深度网络",
+      "llm_evidence": "彩色偏振去噪与去马赛克深度网络",
+      "canonical_evidence": "彩色偏振去噪与去马赛克深度网络",
+      "llm_tldr_en": "Proposes a joint denoising and demosaicking network for color-polarization filter array sensors, using feature fusion to handle noise and interpolation together.",
+      "llm_tldr_cn": "本文针对彩色偏振滤波阵列（CPFA）传感器原始图像噪声严重、分辨率损失的问题，提出一个联合去噪与去马赛克网络（CPDDNet）。该网络通过特征融合模块同时处理噪声去除和CPFA插值，保留了低级特征。实验表明，该方法在低光条件下显著提升了图像质量。虽然该工作面向彩色偏振成像，但其联合去噪框架可启发高光谱图像的去噪与超分辨联合任务。",
+      "llm_tldr": "本文针对彩色偏振滤波阵列（CPFA）传感器原始图像噪声严重、分辨率损失的问题，提出一个联合去噪与去马赛克网络（CPDDNet）。该网络通过特征融合模块同时处理噪声去除和CPFA插值，保留了低级特征。实验表明，该方法在低光条件下显著提升了图像质量。虽然该工作面向彩色偏振成像，但其联合去噪框架可启发高光谱图像的去噪与超分辨联合任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
