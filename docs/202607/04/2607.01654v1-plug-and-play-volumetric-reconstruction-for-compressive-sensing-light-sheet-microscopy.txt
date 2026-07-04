@@ -1,0 +1,1417 @@
+Title: Plug-and-Play Volumetric Reconstruction for Compressive Sensing Light-Sheet Microscopy
+
+URL Source: https://arxiv.org/pdf/2607.01654v1
+
+Published Time: Fri, 03 Jul 2026 00:35:54 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+Plug-and-Play Volumetric Reconstruction for Compressive Sensing Light-Sheet Microscopy ∗
+
+Jianqing Jia † , Yi Gong ‡ , Xinyuan Zhang § , Jichen Chai § , Yichen Ding § , and Yifei Lou ¶
+
+Abstract. We investigate volumetric reconstruction for compressive sensing light-sheet microscopy (CS-LSM), where fast volumetric imaging is achieved by encoding multiple axial planes into each camera ex-posure. To recover the underlying volume from highly multiplexed measurements, we propose a plug-and-play (PnP) framework that flexibly incorporates any user-specified denoiser into the re-construction process. Building on a slice-based formulation, we further introduce an axial-coupled model that exploits correlations between adjacent slices to improve volumetric continuity. For effi-cient computation, we derive a Woodbury-based update for the data-consistency step in both the slice-based and axial-coupled formulations, and employ a Gauss–Seidel sweep for the denoising step in the axial-coupled model. Under a weakly convex regularization assumption, we establish subse-quential convergence of the proposed algorithm. Experiments on synthetic and real zebrafish-heart data demonstrate that the proposed framework successfully recovers cellular structures from com-pressed measurements, and provide practical insights into the comparative performance of commonly used denoisers within the PnP framework under the CS-LSM setup. 
+
+Key words. Compressive Sensing, Light-Sheet Microscopy, Plug-and-Play, Image Reconstruction 
+
+MSC codes. 68U10, 65K10, 65F22, 94A08, 92C55 
+
+1. Introduction. Biological processes such as cardiac contraction and intracardiac flow evolve in three-dimensional (3D) space and over extremely short time scales [1]. Capturing these dynamics in vivo requires volumetric imaging methods that achieve cellular resolution over organ-scale fields of view while maintaining sufficiently high temporal resolution [8]. At the same time, light exposure must be carefully controlled to limit photobleaching and phototoxicity [55], as these measurements are often performed in living specimens. In fluorescence microscopy, volumetric imaging speed, spatial resolution, field of view, and excitation burden are constrained by fundamental trade-offs, thereby hindering their si-multaneous achievement. Existing 3D imaging methods for beating hearts include confocal laser scanning microscopy (CLSM) [25,29,50], two-photon microscopy (TPM) [11,24,27], and light-sheet microscopy (LSM) [18, 23, 28, 35, 38, 56]. CLSM and TPM offer strong optical sec-tioning, but their point- or line-scanning acquisition limits the rate at which full volumes 
+
+> ∗
+
+Submitted to the editors DATE. 
+
+Funding: J.J. was partially supported by AMS-Simons Travel Grant 330934. Y.D. was partially supported by NIH grants R00HL148493 and R01HL162635, NSF grant 2503230, and the Cecil H. and Ida Green Professorship in Systems Biology Science. Y.L. was partially supported by NSF CAREER award DMS-2414705. 
+
+> †
+
+School of Data and Information Sciences, The University of North Carolina at Chapel Hill, Chapel Hill, NC 27599, USA (jqjia@unc.edu). 
+
+> ‡
+
+Department of Mathematics, The University of North Carolina at Chapel Hill, Chapel Hill, NC 27599, USA (yigong@unc.edu). Jia and Gong contributed equally to this work. 
+
+> §
+
+Department of Bioengineering, The University of Texas at Dallas, Richardson, TX 75080, USA (xinyuan.zhang@utdallas.edu, jichen.chai@utdallas.edu, yichen.ding@utdallas.edu). 
+
+> ¶
+
+Department of Mathematics, School of Data and Information Sciences, The University of North Carolina at Chapel Hill, Chapel Hill, NC 27599, USA (yflou@unc.edu). 
+
+1 
+
+> arXiv:2607.01654v1 [cs.CV] 2 Jul 2026 2J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU
+
+can be recorded and may lead to substantial photobleaching, phototoxicity, or thermal load during prolonged high-speed imaging [16, 20]. In contrast, LSM illuminates only the imaging plane and detects fluorescence from an orthogonal direction, positioning it as an attractive approach for fast volumetric imaging with reduced light dose. Despite these advantages, con-ventional LSM struggles to capture dynamics that evolve on millisecond timescales across 3D volumes, and retrospective synchronization or prospective optical gating is often employed to compensate [23, 28, 38, 56]. Approaches such as rapid beam steering [41] or multiplane recording [48] partially mitigate this limitation but typically rely on specialized optical instru-mentation and detection hardware. More fundamentally, detector bandwidth imposes hard limits on volumetric imaging performance, as higher acquisition rates come at the expense of spatial sampling, field of view, or signal quality. This trade-off motivates coded and compressive acquisition strategies, and has recently driven the integration of LSM with compressive sensing (CS) [4,12] for more efficient volumet-ric encoding. While such coded and compressive volumetric imaging approaches show clear promise for improving volumetric imaging speed and reducing the number of required mea-surements, achieving fast in vivo volumetric imaging at cellular resolution remains challenging. For instance, a spatially modulated LSM recover volumes from patterned illumination using CS, but it relies on multiple sequential acquisitions, limiting volumetric speed [3]. Snapshot temporal compressive LSM can recover multiple frames from a single measurement, but it is typically designed for a single light-sheet plane rather than a full 3D volume [42]. In addition, light field microscopy enables single-shot volumetric capture by encoding angular information onto a single sensor; however, the associated trade-off between angular and spatial sampling often reduces effective resolution, introduces on-focal artifacts, or requires customized opti-cal components and extensive training data for neural network-based reconstruction, making cellular-scale in vivo imaging challenging [34, 45–47]. Taken together, these studies indicate that fast acquisition alone is insufficient; when measurements are strongly multiplexed and undersampled, effective reconstruction becomes a central component of the imaging pipeline. Addressing the acquisition side of this pipeline, prior work by our team developed a CS-LSM platform for compressed light-sheet acquisition [57]. This paper focuses on the recon-struction problem; for details on hardware design, calibration, and acquisition protocol, we refer the reader to [58]. In the CS-LSM system, axial scanning is synchronized with spatial light modulation via a digital micromirror device (DMD). Following the incoherent measure-ment framework of CS [4], random binary masks are used to encode fluorescence from multiple depth planes into a single exposure, enabling volumetric imaging at rates of 200 volumes per second while maintaining cellular resolution [57]. It also reduces the number of recorded mea-surements and the associated storage requirements relative to non-compressed acquisition, thereby improving data efficiency in high-speed volumetric imaging [58]. While this hardware platform enables high-speed compressed acquisition, the resulting measurements are highly multiplexed and undersampled, necessitating robust and efficient reconstruction algorithms to recover high-quality volumetric reconstructions. The main ob-jective of this paper is therefore to develop a flexible reconstruction framework tailored to this hardware system. Although motivated by the present CS-LSM platform, the resulting methodology may be applicable to a broader class of coded, multiplexed, and computational volumetric imaging settings. PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 3
+
+To this end, we build on a plug-and-play (PnP) framework [40] and solve the model using the alternating direction method of multipliers (ADMM) [2], which we refer to as PnP-ADMM. We first formulate a slice-based reconstruction model, in which each slice is reconstructed independently. This design exploits the diagonal structure of the DMD masks, enabling effi-cient data-consistency updates via Woodbury-based inversion. To better preserve volumetric continuity, we subsequently introduce an axially coupled reconstruction model that enforces smoothness between adjacent slices along the z direction. This axial coupling is designed to leverage inter-slice correlations within the reconstructed volume, rather than temporal cor-relations across different cardiac phases. In contrast to full 3D regularization or volumetric patch-based reconstruction methods [21, 26, 30], we incorporate axial coupling within the de-noising step using a Gauss–Seidel sweep. This approach is computationally efficient and, importantly, enables us to establish convergence guarantees for the proposed algorithm. The name plug-and-play reflects the fact that one subproblem is formulated as a denoising step, allowing a wide range of denoisers to be incorporated without altering the overall recon-struction framework. This flexibility has also been leveraged in hyperspectral unmixing [61], limited-angle tomography [60], and autonomous driving [51]. Here, we investigate the per-formance of classical denoisers, such as Tikhonov [39], total variation (TV) [5, 6, 15, 32], and block-matching and 3D filtering (BM3D) [10], as well as deep learning (DL)-based denois-ers, including the denoising convolutional neural network (DnCNN) [53], the fast and flexible denoising network (FFDNet) [54], and the deep residual U-Net denoiser (DRUNet) [52]. Ex-periments on both synthetic and real zebrafish-heart data demonstrate the effectiveness of the proposed framework and provide practical insights into the strengths and limitations of these off-the-shelf denoisers. For convex regularizers such as Tikhonov and TV, the convergence of PnP-ADMM follows directly from classical ADMM theories [2, 13]. However, this guarantee does not readily extend to more advanced denoisers, such as BM3D and DL-based methods, for which an explicit underlying prior is typically unavailable, let alone one that can be verified to be convex. To address this gap, Chan et al. [7] established convergence of PnP algorithms under the assumption that the denoiser is nonexpansive, while Ryu et al. [33] relaxed this requirement by imposing nonexpansiveness on the residual operator, at the cost of requiring strong convexity of the data-fidelity term, which is not satisfied in the CS-LSM setting. In this work, we establish subsequential convergence of the PnP-ADMM algorithm for the proposed axial-coupled model for a weakly convex regularization term. The main contributions of this paper are summarized as follows: 
+
+• We introduce an axial-coupled reconstruction model that leverages inter-slice correla-tions along the z direction, leading to improved reconstruction performance compared with slice-based model. 
+
+• We tailor the PnP-ADMM framework to the CS-LSM setup through efficient algorith-mic updates, including a Woodbury-based reformulation of the linear subproblem and a Gauss–Seidel update strategy for the axial-coupled model. 
+
+• We analyze the convergence properties of the proposed algorithm, establishing subse-quential convergence under the assumption that the image prior is weakly convex. 
+
+• Experiments on synthetic and real data provide practical guidance for selecting off-the-shelf denoisers in the CS-LSM reconstruction problem. 4 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+Figure 1: Illustration of the CS-LSM image formation and reconstruction process. Cardiac contraction is observed over M time points during one heartbeat. At one fixed time point, the 3D volume is sampled through N compressed camera shots. In each shot, fluorescence signals from R axial planes are encoded by distinct binary masks and summed into a single DMD-coded measurement. From the resulting N compressed measurements, the CS reconstruction recovers N × R axial slices. The rest of this paper is organized as follows. Section 2 introduces the CS-LSM forward model and the proposed PnP-ADMM reconstruction framework, including both slice-based and axial-coupled models. Section 3 discusses convergence properties of the proposed frame-work. Section 4 presents numerical results on synthetic and real datasets. Finally, Section 5 concludes the paper and outlines future work. 
+
+2. Proposed Approaches. In this section, we first introduce the CS-LSM forward model in Section 2.1. We then present a slice-based reconstruction model in Section 2.2, where a 3D volume is recovered through a collection of 2D subproblems. Next, in Section 2.3, we extend this formulation to an axial-coupled model by enforcing inter-slice smoothness along the z direction. Both models are solved within an ADMM framework. Notably, the regular-ization subproblem is interpreted as a denoising step, reflecting the plug-and-play nature of the framework. 
+
+2.1. Forward model and notation. We adopt the CS-LSM acquisition model from [57] and focus on the reconstruction problem. Specifically, we obtain compressed image data through a set of binary masks, as illustrated in Fig. 1. The top row of Fig. 1 shows a sequence of 3D cardiac volumes acquired at M distinct time points during one heartbeat, indexed by PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 5
+
+t1, t 2, . . . , t M . In this paper, we focus on reconstruction at a fixed time point, recovering one single 3D volume at a time. Extending this across time yields a 4D sequence, while explicit temporal coupling is left for future work. At a time point, the underlying 3D volume is acquired through N compressed camera shots over one scanning period. As shown in Fig. 1, each shot corresponds to one axial block of the volume, and each axial block contains R axial slices along the z direction, where R is the compression ratio, namely, the number of axial slices encoded within a single camera exposure. Consequently, the full reconstructed volume contains S := N R axial slices in total. We denote these unknown slices by {vn}Sn=1 , where each vn ∈ Rp represents one vectorized 2D slice 1 and p denotes the total number of pixels in each 2D slice. In the CS acquisition process, the DMD applies R binary masks sequentially during each camera exposure. Within the jth shot ( j = 1 , · · · , N ), the R axial slices in the corresponding section group are modulated by distinct binary masks through element-wise (Hadamard) products and then summed on the detector, producing a single compressed 2D measurement, which we vectorize as bj ∈ Rp. Let ϕr ∈ Rp×p denote the diagonal masking operator for the 
+
+rth slice ( r = 1 , · · · , R ), so that the Hadamard modulation can be written as a matrix-vector product. Then the jth compressed measurement can be mathematically modeled as (2.1) bj =
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r + ηj , j = 1 , . . . , N, 
+
+where ηj denotes measurement noise. Thus, the reconstruction task is to recover the full stack of S axial slices {vn}Sn=1 from only N compressed measurements stored in {bj }Nj=1 ,which is a highly underdetermined inverse problem. Moreover, since adjacent axial slices in the volume are often strongly correlated, it is beneficial to exploit such inter-slice structure during reconstruction, which motivates the axial-coupled model introduced in Section 2.3. 
+
+2.2. Slice-based reconstruction. We begin with a slice-based model, in which each axial slice is regularized individually. Assuming that the measurement noise can be well approxi-mated as additive Gaussian 2, we employ a least-squares data-fidelity term and consider the following optimization problem, (2.2) min 
+
+> {vn}Sn=1
+
+12
+
+> N
+
+X
+
+> j=1
+
+bj −
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r
+
+> 2
+
++ λ
+
+> S
+
+X
+
+> n=1
+
+ψ(vn),
+
+where ψ(·) denotes a slice-wise regularization term and λ > 0 is a weighting parameter. To solve (2.2), we introduce auxiliary variables {un}Sn=1 and rewrite the model as (2.3) min 
+
+> {vn,un}
+
+12
+
+> N
+
+X
+
+> j=1
+
+bj −
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r
+
+> 2
+
++ λ
+
+> S
+
+X
+
+> n=1
+
+ψ(un)subject to vn = un, n = 1 , . . . , S.  
+
+> 1This vectorization is introduced only for notational convenience; in implementation, each slice is kept in its original 2D form.
+> 2The Gaussian noise model is a common approximation that is well-justified at sufficiently high photon counts, which is consistent with our hardware setting. 6J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU
+
+The corresponding augmented Lagrangian is 
+
+Lρ({un}, {vn}, {dn}) := 12
+
+> N
+
+X
+
+> j=1
+
+bj −
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r
+
+> 2
+
++
+
+> S
+
+X
+
+> n=1
+
+
+
+λψ (un) + ρ
+
+2 ∥vn − un + dn∥2 − ρ
+
+2 ∥dn∥2
+
+,(2.4) where {dn}Sn=1 are scaled dual variables and ρ > 0 is the penalty parameter. The ADMM iterations are given by (2.5) 
+
+
+
+{uk+1  
+
+> n
+
+} = arg min  
+
+> {un}
+
+Lρ({un}, {vkn}, {dkn}),
+
+{vk+1  
+
+> n
+
+} = arg min  
+
+> {vn}
+
+Lρ({uk+1  
+
+> n
+
+}, {vn}, {dkn}),
+
+dk+1  
+
+> n
+
+= dkn + vk+1  
+
+> n
+
+− uk+1  
+
+> n
+
+,
+
+where n = 1 , . . . , S and the superscript k counts the iteration number. The u-subproblem decouples across slices: (2.6) uk+1  
+
+> n
+
+= arg min  
+
+> z
+
+λψ (z) + ρ
+
+2 ∥z − (vkn + dkn)∥2, n = 1 , . . . , S. 
+
+From the PnP perspective, this subproblem is interpreted as a denoising step applied to the input vkn + dkn. Many existing denoising approaches, or denoisers for short, can be formulated as (2.7) Kσ(f ) := arg min  
+
+> z
+
+ψ(z) + 12σ2 ∥z − f ∥2,
+
+where σ > 0 is an input noise-level parameter common to methods such as BM3D, DnCNN, FFDNet, and DRUNet, and typically corresponds to the standard deviation of the noise. Dividing (2.6) by ρ and comparing with the denoising formulation (2.7), we identify the denoiser noise level as σλ = pλ/ρ and adopt the following update: (2.8) uk+1  
+
+> n
+
+= Kσλ (vkn + dkn),
+
+where Kσλ denotes the selected denoiser with its internal noise level σλ controlled by λ. When 
+
+Kσλ is induced by an explicit regularizer, (2.6) reduces to a proximal update. As an example, Tikhonov regularization with ψ(z) = ∥z∥2 yields (2.9) uk+1  
+
+> n
+
+= ρ(vkn + dkn)2λ + ρ .
+
+For the v-subproblem, the variables associated with each compressed shot can be updated shotwise. Fix j ∈ { 1, . . . , N } and define 
+
+c(j),k +1  
+
+> r
+
+:= uk+1 (j−1) R+r − dk
+
+> (j−1) R+r
+
+, r = 1 , . . . , R. PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 7
+
+Let 
+
+v(j) := [ v⊤
+
+> (j−1) R+1
+
+, . . . , v⊤
+
+> jR
+
+]⊤ ∈ RpR , c(j),k +1 := [( c(j),k +1 1 )⊤, . . . , (c(j),k +1  
+
+> R
+
+)⊤]⊤ ∈ RpR ,
+
+and Φ := [ ϕ1, . . . , ϕR] ∈ Rp×pR .
+
+Then the corresponding subproblem becomes (2.10) min 
+
+> v(j)
+
+12 ∥bj − Φv(j)∥2 + ρ
+
+2 ∥v(j) − c(j),k +1 ∥2.
+
+Its closed-form solution is (2.11) v(j),k +1 = (Φ ⊤Φ + ρI pR )−1(Φ ⊤bj + ρc(j),k +1 ).
+
+The matrix inverse in (2.11) can be simplified by the Woodbury matrix identity (2.12) (I + U V )−1 = I − U (I + V U )−1V. 
+
+Applying (2.12) yields the equivalent update (2.13) v(j),k +1 = c(j),k +1 + Φ ⊤(ρI p + ΦΦ ⊤)−1(bj − Φc(j),k +1 ).
+
+Equation (2.13) is computationally attractive because it replaces the inversion of the pR × pR 
+
+matrix in (2.11) by the inversion of the p × p matrix ρI p + ΦΦ ⊤, which has a simple structure. Indeed, since each ϕr is diagonal, then the product ϕrϕ⊤ 
+
+> r
+
+is diagonal and ΦΦ ⊤ = PRr=1 ϕrϕ⊤
+
+> r
+
+is diagonal as well. Therefore, ( ρI p +ΦΦ ⊤)−1 can be computed element-wise. More specifically, if ϕr(i) denotes the ith diagonal entry of ϕr, then (2.14) [ΦΦ ⊤]ii =
+
+> R
+
+X
+
+> r=1
+
+ϕr(i)2.
+
+For binary masks, ϕr(i)2 = ϕr(i), so the quantity in (2.14) is simply the number of masks that are active at pixel i. Therefore, the data-consistency step in (2.13) does not require any matrix inversion and can instead be implemented using inexpensive pointwise operations. Specifically, for a fixed shot j, (2.13) admits a pixel-wise interpretation: for each detector pixel location i, define the R-dimensional vectors 
+
+m(i) := [ ϕ1(i), . . . , ϕ R(i)] ⊤ ∈ RR, bc(j),k +1 (i) := [ c(j),k +1 1 (i), . . . , c (j),k +1  
+
+> R
+
+(i)] ⊤ ∈ RR,
+
+and let 
+
+bv(j),k +1 (i) := [ vk+1 (j−1) R+1 (i), . . . , v k+1  
+
+> jR
+
+(i)] ⊤ ∈ RR,
+
+where bc(j),k +1 (i) and bv(j),k +1 (i) collect the current and updated values of the R slices at pixel location i within the jth shot, respectively. Then (2.13) can be written as (2.15) bv(j),k +1 (i) = bc(j),k +1 (i) + m(i) bj (i) − m(i)⊤ bc(j),k +1 (i)
+
+ρ + ∥m(i)∥22
+
+, i = 1 , · · · , p. 
+
+This expression shows that the data-consistency step decouples across spatial pixels: different detector pixels can be updated independently, while the coupling occurs only among the R
+
+slices sharing the same detector location. In other words, (2.15) is a residual correction along the local mask direction m(i), scaled by the normalization factor ρ + ∥m(i)∥22.8 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+2.3. Axial-coupled reconstruction. While the slice-based model treats each axial slice independently, adjacent slices in a 3D volume are often strongly correlated. Ignoring this inter-slice structure may lead to discontinuities or inconsistent reconstructions along the z
+
+direction. A natural remedy is to apply full 3D regularization directly to the reconstructed volume, such as 3D TV [30], BM4D [26] (a volumetric extension of BM3D), or temporal non-local means [21]. We incorporate a quadratic axial coupling term that penalizes differences between neighboring slices. This pairwise coupling admits an efficient Gauss–Seidel (GS) update strategy for the denoising step, for which we establish subsequential convergence in Section 3. Concretely, the axial-coupled model reads (2.16) min 
+
+> {vn}Sn=1
+
+12
+
+> N
+
+X
+
+> j=1
+
+bj −
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r
+
+> 2
+
++ λ
+
+> S
+
+X
+
+> n=1
+
+ψ(vn) + γ
+
+2
+
+> S
+
+X
+
+> n=1
+
+∥vn − vn−1∥2,
+
+where γ > 0 controls the strength of axial coupling. For notational convenience, we impose periodic boundary conditions, v0 = vS .As in the slice-based case, we introduce auxiliary variables {un}Sn=1 and rewrite (2.16) as (2.17) min 
+
+> {vn,un}
+
+12
+
+> N
+
+X
+
+> j=1
+
+bj −
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r
+
+> 2
+
++ λ
+
+> S
+
+X
+
+> n=1
+
+ψ(un) + γ
+
+2
+
+> S
+
+X
+
+> n=1
+
+∥un − un−1∥2
+
+subject to vn = un, n = 1 , . . . , S. 
+
+The corresponding augmented Lagrangian is 
+
+Lρ({un}, {vn}, {dn}) := 12
+
+> N
+
+X
+
+> j=1
+
+bj −
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r
+
+> 2
+
++
+
+> S
+
+X
+
+> n=1
+
+
+
+λψ (un) + ρ
+
+2 ∥vn − un + dn∥2 − ρ
+
+2 ∥dn∥2
+
++ γ
+
+2
+
+> S
+
+X
+
+> n=1
+
+∥un − un−1∥2,(2.18) where {dn}Sn=1 are scaled dual variables and ρ > 0 is the penalty parameter. Following the ADMM scheme (2.5), we first update the auxiliary variables {un}Sn=1 with 
+
+{vkn} and {dkn} fixed. Due to the axial coupling term, the u-subproblem no longer decouples across slices: (2.19) {uk+1  
+
+> n
+
+}Sn=1 = arg min 
+
+> {zn}Sn=1
+
+λ
+
+> S
+
+X
+
+> n=1
+
+ψ(zn) + ρ
+
+2
+
+> S
+
+X
+
+> n=1
+
+∥zn − (vkn + dkn)∥2 + γ
+
+2
+
+> S
+
+X
+
+> n=1
+
+∥zn − zn−1∥2,
+
+that is, each un depends on its neighboring slices un−1 and un+1 . We adopt a GS strategy, updating one slice at a time in a cyclic sweep with periodic boundary conditions, i.e., u0 = uS
+
+and uS+1 = u1, where each slice is updated with its two neighbors fixed at their most recently computed values. More precisely, for n = 1 , . . . , S , define (2.20) ukn, − := 
+
+(
+
+uk+1 
+
+> n−1
+
+, n = 2 , . . . , S, 
+
+ukS , n = 1 , ukn, + := 
+
+(
+
+ukn+1 , n = 1 , . . . , S − 1,
+
+uk+1 1 , n = S. PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 9
+
+Then each slice is updated by solving (2.21) uk+1  
+
+> n
+
+= arg min  
+
+> z
+
+λψ (z) + ρ
+
+2 ∥z − (vkn + dkn)∥2 + γ
+
+2 ∥z − ukn, −∥2 + γ
+
+2 ∥z − ukn, +∥2.
+
+Completing the square and defining (2.22) gkn = ρ(vkn + dkn) + γ(ukn, − + ukn, +)
+
+ρ + 2 γ ∈ Rp,
+
+the subproblem (2.21) reduces to (2.23) uk+1  
+
+> n
+
+= arg min  
+
+> z
+
+λψ (z) + ρ + 2 γ
+
+2 ∥z − gkn∥2.
+
+From the PnP perspective, (2.23) can be interpreted as a denoising step applied to the axial-coupled quantity gkn. Normalizing (2.23) by ρ + 2 γ and comparing with (2.7) leads to the denoising update: (2.24) uk+1  
+
+> n
+
+= Kσλ (gkn),
+
+with σλ =
+
+q λρ+2 γ . When Kσλ is induced by an explicit regularizer, for example, ψ(z) = ∥z∥2,the Tikhonov update can be written as the closed-form update (2.25) uk+1  
+
+> n
+
+= ρ(vkn + dkn) + γ(ukn, − + ukn, +)2λ + ρ + 2 γ .
+
+With {uk+1  
+
+> n
+
+}Sn=1 fixed, the v- and d-updates are the same as in the slice-based model. We summarize the axial-coupled PnP-ADMM scheme in Algorithm 2.1. When γ = 0, the algorithm reduces to the slice-based model. 
+
+3. Convergence Analysis. In this section, we study convergence properties of the pro-posed Algorithm 2.1. To facilitate the analysis, we recast the summation-based model (2.16) into an equivalent matrix-vector formulation and introduce two auxiliary functions that ex-press the ADMM updates in a form amenable to convergence analysis. For clarity, we summarize the notation used throughout this section. Let S := N R be the total number of axial slices. The indices n = 1 , . . . , S , j = 1 , . . . , N , and r = 1 , . . . , R refer to individual axial slices, compressed shots, and local slices within a shot, respectively, with 
+
+n = ( j − 1) R + r. We stack the slice variables into full vectors 
+
+u := [ u⊤ 
+
+> 1
+
+, . . . , u⊤ 
+
+> S
+
+]⊤ ∈ RpS , v := [ v⊤ 
+
+> 1
+
+, . . . , v⊤ 
+
+> S
+
+]⊤ ∈ RpS , d := [ d⊤ 
+
+> 1
+
+, . . . , d⊤ 
+
+> S
+
+]⊤ ∈ RpS ,
+
+and write uk, vk, and dk for these stacked vectors at the kth outer iteration. The nth slice variables at iteration k are denoted ukn, vkn, and dkn. For each shot j, the corresponding R
+
+slice variables are collected into the shot-wise vector v(j), and we write v(j),k for its value at the kth iteration. In the cyclic GS sweep, each slice variable un is treated as one coordinate block, which we refer to as a slice block; and ukn, − and ukn, + denote the previous and next neighboring slices used when updating un, as defined in (2.20). The notation U k,n denotes 10 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+Algorithm 2.1 Axial-Coupled CS-LSM Reconstruction via PnP-ADMM Input: measurements {bj }Nj=1 , masks {ϕr}Rr=1 , parameters λ, ρ, γ > 0, and denoiser Kσλ
+
+Define S := N R and initialize {u0
+
+> n
+
+, v0
+
+> n
+
+, d0
+
+> n
+
+}Sn=1 
+
+Set k := 0 
+
+while the stopping criterion is not satisfied do for n = 1 , . . . , S do 
+
+Compute gkn by (2.22) Update uk+1  
+
+> n
+
+by (2.24) 
+
+end for for j = 1 , . . . , N do 
+
+Collect the slice indices n = ( j − 1) R + 1 , . . . , jR 
+
+Update {vk+1  
+
+> n
+
+}jR n=( j−1) R+1 pixelwise via (2.15) 
+
+end for for n = 1 , . . . , S do 
+
+Update dk+1  
+
+> n
+
+= dkn + vk+1  
+
+> n
+
+− uk+1 
+
+> n
+
+end for 
+
+Set k := k + 1 
+
+end while return {vkn}Sn=1 
+
+Table 1: Summary of notation used in the convergence analysis. Notation Meaning 
+
+n Global axial-slice index, n = 1 , . . . , S j Compressed-shot index, j = 1 , . . . , N r Local slice index within the jth compressed shot, r = 1 , . . . , R 
+
+ukn, vkn, dkn The nth slice variable at the kth outer iteration 
+
+uk, vk, dk Stacked vectors at the kth outer iteration 
+
+v(j) Shot-wise vector collecting the R slices associated with the jth shot 
+
+v(j),k Value of the shot-wise vector v(j) at the kth iteration 
+
+ukn, −, ukn, + Previous and next neighboring slice used when updating the nth slice 
+
+U k,n Stacked vector after the first n slices have been updated in the kth GS sweep 
+
+u⋆n The nth slice of an accumulation point u⋆
+
+the intermediate stacked vector after the first n slice blocks have been updated in the kth GS sweep. Both v(j) and U k,n are defined explicitly in (3.1) and (3.8), respectively. If u⋆ is an accumulation point, u⋆n denotes its nth slice. All notation is summarized in Table 1. Recall that for each compressed shot j = 1 , . . . , N , we collect the corresponding R slice variables into the shot-wise vector (3.1) v(j) := [ v⊤
+
+> (j−1) R+1
+
+, . . . , v⊤
+
+> jR
+
+]⊤ ∈ RpR ,
+
+and define the shot-wise measurement matrix Φ := [ ϕ1, . . . , ϕR] ∈ Rp×pR . Since the same set PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 11 
+
+of masks is applied in every shot, the global forward operator takes the block-diagonal form 
+
+A := IN ⊗ Φ ∈ RpN ×pS ,
+
+where ⊗ denotes the Kronecker product. Stacking all compressed measurements gives 
+
+b := [ b⊤ 
+
+> 1
+
+, . . . , b⊤ 
+
+> N
+
+]⊤ ∈ RpN .
+
+The summation in the data term of (2.16) can then be equivalently written in matrix-vector form as 12 ∥Av − b∥22 = 12
+
+> N
+
+X
+
+> j=1
+
+bj −
+
+> R
+
+X
+
+> r=1
+
+ϕrv(j−1) R+r
+
+> 22
+
+.
+
+For the axial coupling term, define the periodic first-order difference operator 
+
+D : RpS → RpS , (Du)n := un − un−1, u0 := uS .
+
+Then ∥Du∥22 = PSn=1 ∥un−un−1∥22. We adopt periodic boundary conditions here for analytical convenience; alternative nonperiodic boundary treatments can be handled similarly. The slice-based and axial-coupled models can be written in the following unified formula-tion with γ ≥ 0: (3.2) min  
+
+> v∈RpS
+
+Fγ (v) := 12 ∥Av − b∥22 + λ
+
+> S
+
+X
+
+> n=1
+
+ψ(vn) + γ
+
+2 ∥Dv∥22.
+
+When γ = 0, (3.2) reduces to the slice-based model; when γ > 0, it corresponds to the axial-coupled model. Introduce an auxiliary variable u and impose the constraint v = u. Then (3.2) can be written as (3.3) min  
+
+> v,u
+
+f (v) + g(u) s.t. v − u = 0,
+
+where 
+
+f (v) := 12 ∥Av − b∥22, g(u) := λ
+
+> S
+
+X
+
+> n=1
+
+ψ(un) + γ
+
+2 ∥Du∥22.
+
+Using the scaled dual variable d, the augmented Lagrangian can be written as (3.4) Lρ(u, v, d) = f (v) + g(u) + ρ
+
+2 ∥v − u + d∥22 − ρ
+
+2 ∥d∥22,
+
+or equivalently, (3.5) Lρ(u, v, d) = f (v) + g(u) + ρ⟨v − u, d⟩ + ρ
+
+2 ∥v − u∥22.
+
+Throughout this section, {(uk, vk, dk)}k≥0 denotes the sequence generated by Algorithm 2.1. 12 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+We now proceed with the convergence analysis. We first review relevant concepts from variational analysis [31], then establish a sufficient decrease property for the augmented La-grangian in Theorem 3.1. Building on this and under a standard boundedness assumption, Corollary 3.3 establishes asymptotic regularity of the iterates, and Theorem 3.5 shows that every accumulation point of the generated sequence is a stationary point of (3.2). Recall that an extended real-valued function h : Rm → (−∞ , +∞] is called proper if dom h := {x ∈ Rm : h(x) < +∞} is nonempty and h(x) > −∞ for all x. Additionally, a proper function h is said to be closed if it is lower semi-continuous. For a proper closed convex function h, its subdifferential at x ∈ dom h is defined by ∂h (x) := {s ∈ Rm : h(y) ≥
+
+h(x) + ⟨s, y − x⟩, ∀y ∈ Rm}. When h is differentiable, we write ∇h for its gradient, in which case ∂h (x) = {∇ h(x)}. A function h : Rm → (−∞ , +∞] is called κ-weakly convex if 
+
+h(·) + κ 
+
+> 2
+
+∥ · ∥ 22 is convex for a constant κ ≥ 0, and its subdifferential is defined as ∂h (x) := 
+
+∂  h + κ 
+
+> 2
+
+∥ · ∥ 22
+
+ (x) − κx. 
+
+Assumption 3.1. ψ : Rp → (−∞ , +∞] is proper, closed, and κ-weakly convex. The Lipschitz constant of ∇f is given by Lf := ∥A∥22, which equals the largest eigenvalue of A⊤A. With these ingredients in place, the following theorem establishes a sufficient decrease property for the augmented Lagrangian along the iterates of Algorithm 2.1. 
+
+Theorem 3.1. Suppose Assumption 3.1 holds and the penalty parameter satisfies ρ > 2Lf
+
+and ρ + 2 γ > κλ . Then for all k ≥ 1,
+
+Lρ(uk+1 , vk+1 , dk+1 ) − L ρ(uk, vk, dk)
+
+≤ − ρ + 2 γ − κλ 
+
+2 ∥uk+1 − uk∥22 − ρ
+
+2 ∥vk+1 − vk∥22 −
+
+ 12 − Lf
+
+ρ
+
+
+
+∥A(vk+1 − vk)∥22.(3.6) 
+
+Proof. We estimate the changes of the augmented Lagrangian along the three updates. Fixing vk and dk, we begin with the u-update. For the nth slice update ( n = 1 , · · · , S ), we define the single-slice objective 
+
+Qkn(z) := λψ (z) + ρ
+
+2 ∥z − (vkn + dkn)∥22 + γ
+
+2 ∥z − ukn, −∥22 + γ
+
+2 ∥z − ukn, +∥22,(3.7) where ukn, − and ukn, + are defined in (2.20). To handle the GS sweep compactly, we introduce 
+
+U k,n to denote the intermediate iterate of the stacked vector after the first n slices have been updated in the kth ADMM iteration, that is, (3.8) U k,n := [( uk+1 1 )⊤, . . . , (uk+1  
+
+> n
+
+)⊤, (ukn+1 )⊤, . . . , (ukS )⊤]⊤,
+
+with U k, 0 := uk and U k,S := uk+1 . At the time of the nth slice update, Qkn contains exactly the terms in Lρ(·, vk, dk) that depend on the slice un, with all other slices fixed at their most recently computed values. The remaining terms in Lρ are independent of z and cancel in the difference, which implies 
+
+Lρ(U k,n , vk, dk) − L ρ(U k,n −1, vk, dk) = Qkn(uk+1  
+
+> n
+
+) − Qkn(ukn).
+
+Under Assumption 3.1 and the the condition that ρ + 2 γ > κλ , Qkn is ( ρ + 2 γ − κλ )-strongly convex. Since the nth slice update minimizes Qkn, we have 
+
+Qkn(uk+1  
+
+> n
+
+) − Qkn(ukn) ≤ − ρ + 2 γ − κλ 
+
+2 ∥uk+1  
+
+> n
+
+− ukn∥22.PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 13 
+
+Consequently, 
+
+Lρ(U k,n , vk, dk) − L ρ(U k,n −1, vk, dk) ≤ − ρ + 2 γ − κλ 
+
+2 ∥uk+1  
+
+> n
+
+− ukn∥22.
+
+Summing over n = 1 , . . . , S yields (3.9) Lρ(uk+1 , vk, dk) − L ρ(uk, vk, dk) ≤ − ρ + 2 γ − κλ 
+
+2 ∥uk+1 − uk∥22.
+
+Next, we estimate the decrease from the v-update. Let ∆vk+1 := vk+1 − vk.
+
+For fixed uk+1 and dk, define the v-dependent quadratic function 
+
+qk(v) := 12 ∥Av − b∥22 + ρ⟨v − uk+1 , dk⟩ + ρ
+
+2 ∥v − uk+1 ∥22.
+
+By the expanded form (3.5), the difference, 
+
+Lρ(uk+1 , vk+1 , dk) − L ρ(uk+1 , vk, dk),
+
+is equal to qk(vk+1 ) − qk(vk). Since qk is quadratic with Hessian A⊤A + ρI , we have 
+
+qk(vk+1 ) − qk(vk) = 
+
+D
+
+∇qk(vk+1 ), ∆vk+1 E
+
+− 12 ∥A∆vk+1 ∥22 − ρ
+
+2 ∥∆vk+1 ∥22.(3.10) The optimality condition of the v-update is 
+
+∇qk(vk+1 ) = A⊤(Avk+1 − b) + ρ(vk+1 − uk+1 + dk) = 0.
+
+Therefore, (3.11) Lρ(uk+1 , vk+1 , dk) − L ρ(uk+1 , vk, dk) = − 12 ∥A∆vk+1 ∥22 − ρ
+
+2 ∥∆vk+1 ∥22.
+
+It remains to control the change caused by the dual update. From the v-optimality condition and 
+
+dk+1 = dk + vk+1 − uk+1 ,
+
+we obtain (3.12) A⊤(Avk+1 − b) + ρdk+1 = 0,
+
+or equivalently, (3.13) dk+1 = − 1
+
+ρ A⊤(Avk+1 − b).
+
+Applying this relation at two consecutive iterations gives, for k ≥ 1, (3.14) dk+1 − dk = − 1
+
+ρ A⊤A(vk+1 − vk).14 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+Using the expanded form (3.5), we also have 
+
+Lρ(uk+1 , vk+1 , dk+1 ) − L ρ(uk+1 , vk+1 , dk) = ρ
+
+D
+
+vk+1 − uk+1 , dk+1 − dkE
+
+.
+
+It follows from vk+1 − uk+1 = dk+1 − dk together with (3.14) that 
+
+Lρ(uk+1 , vk+1 , dk+1 ) − L ρ(uk+1 , vk+1 , dk)=ρ∥dk+1 − dk∥22 = 1
+
+ρ ∥A⊤A(vk+1 − vk)∥22 ≤ Lf
+
+ρ ∥A(vk+1 − vk)∥22.(3.15) Combining the estimates for the u-step in (3.9), the v-step in (3.11), and the dual update in (3.15) gives (3.6). 
+
+Assumption 3.2. The function ψ is bounded below. This assumption holds for commonly used nonnegative regularizers, such as Tikhonov and TV regularization. 
+
+Lemma 3.2. Suppose Assumption 3.2 holds and ρ > 2Lf . Then the augmented Lagrangian sequence {L ρ(uk, vk, dk)}k≥1 is bounded below. Proof. Using the relation at the kth iteration, we obtain 
+
+Lρ(uk, vk, dk) = f (vk) + g(uk) + ρ
+
+2 ∥vk − uk + dk∥22 − ρ
+
+2 ∥dk∥22
+
+≥f (vk) + g(uk) − 12ρ ∥A⊤(Avk − b)∥22.(3.16) Since f (v) = 12 ∥Av − b∥22, it is straightforward that 
+
+∥∇ f (v)∥22 = ∥A⊤(Av − b)∥22 ≤ ∥ A∥22∥Av − b∥22 = 2 Lf f (v).
+
+We further plug the expression of g(uk) into (3.16) and obtain 
+
+Lρ(uk, vk, dk) ≥
+
+
+
+1 − Lf
+
+ρ
+
+
+
+f (vk) + g(uk) = 
+
+
+
+1 − Lf
+
+ρ
+
+
+
+f (vk) + λ
+
+> S
+
+X
+
+> n=1
+
+ψ(ukn) + γ
+
+2 ∥Duk∥22.
+
+Since ρ > 2Lf , we have 1 − Lf /ρ > 0. The boundedness of ψ in Assumption 3.2 guarantees that {L ρ(uk, vk, dk)}k≥1 is bounded below. 
+
+Corollary 3.3. Suppose Assumptions 3.1–3.2 hold, ρ > 2Lf , and ρ + 2 γ > κλ . Then P∞ 
+
+> k=1
+
+∥uk+1 − uk∥22 < ∞ and P∞ 
+
+> k=1
+
+∥vk+1 − vk∥22 < ∞. Consequently, 
+
+∥uk+1 − uk∥2 → 0, ∥vk+1 − vk∥2 → 0, ∥dk+1 − dk∥2 → 0,
+
+and the primal residual satisfies ∥vk+1 − uk+1 ∥2 → 0.Proof. Since ρ > 2Lf and ρ + 2 γ > κλ , the coefficients 12 − Lf 
+
+> ρ
+
+and ρ+2 γ−κλ  
+
+> 2
+
+in (3.6) are positive. Summing (3.6) over k and using Lemma 3.2 gives P∞ 
+
+> k=1
+
+∥uk+1 − uk∥22 < ∞ and P∞ 
+
+> k=1
+
+∥vk+1 − vk∥22 < ∞. Therefore, ∥uk+1 − uk∥2 → 0 and ∥vk+1 − vk∥2 → 0. The relation (3.14) implies ∥dk+1 − dk∥2 → 0. Finally, by the dual update, vk+1 − uk+1 = dk+1 − dk, and hence the primal residual also converges to zero. PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 15 
+
+Lemma 3.4. Suppose Assumption 3.1 holds. For every k ≥ 1, there exist vectors ek+1  
+
+> u
+
+,
+
+ek+1  
+
+> v
+
+, and ek+1  
+
+> d
+
+such that 
+
+ek+1  
+
+> u
+
+∈ ∂g (uk+1 ) − ρ(vk+1 − uk+1 + dk+1 ),(3.17) 
+
+ek+1  
+
+> v
+
+= ∇f (vk+1 ) + ρ(vk+1 − uk+1 + dk+1 ),(3.18) 
+
+ek+1  
+
+> d
+
+= ρ(vk+1 − uk+1 ),(3.19) 
+
+and 
+
+(3.20) ∥ek+1  
+
+> u
+
+∥2 + ∥ek+1  
+
+> v
+
+∥2 + ∥ek+1  
+
+> d
+
+∥2 ≤ Crel 
+
+
+
+∥uk+1 − uk∥2 + ∥vk+1 − vk∥2
+
+
+
+,
+
+where Crel > 0 is independent of k. Consequently, under the assumptions of Corollary 3.3, 
+
+∥ek+1  
+
+> u
+
+∥2 + ∥ek+1  
+
+> v
+
+∥2 + ∥ek+1  
+
+> d
+
+∥2 → 0.
+
+Proof. Let ∆ uk+1 := uk+1 −uk, ∆ vk+1 := vk+1 −vk, ∆ dk+1 := dk+1 −dk. The optimality condition of the v-update gives ∇f (vk+1 ) + ρ(vk+1 − uk+1 + dk) = 0. Thus, with ek+1  
+
+> v
+
+defined by (3.18), (3.21) ∥ek+1  
+
+> v
+
+∥2 = ρ∥∆dk+1 ∥2.
+
+Moreover, the dual update gives vk+1 − uk+1 = ∆ dk+1 . Thus, with ek+1  
+
+> d
+
+defined by (3.19), (3.22) ∥ek+1  
+
+> d
+
+∥2 = ρ∥∆dk+1 ∥2.
+
+It remains to estimate the u-component. The optimality condition of (2.21) implies that for every slice n, there exists sk+1  
+
+> n
+
+∈ ∂ψ (uk+1  
+
+> n
+
+) such that (3.23) λsk+1  
+
+> n
+
++ ρ(uk+1  
+
+> n
+
+− vkn − dkn) + γ(uk+1  
+
+> n
+
+− ukn, −) + γ(uk+1  
+
+> n
+
+− ukn, +) = 0.
+
+Define 
+
+qk+1  
+
+> n
+
+:= λsk+1  
+
+> n
+
++ γ(2 uk+1  
+
+> n
+
+− uk+1  
+
+> n−1
+
+− uk+1 
+
+> n+1
+
+), n = 1 , . . . , S, 
+
+where uk+1 0 = uk+1  
+
+> S
+
+and uk+1  
+
+> S+1
+
+= uk+1 1 , and let qk+1 := [( qk+1 1 )⊤, . . . , (qk+1  
+
+> S
+
+)⊤]⊤. By the definition of g, we have qk+1 ∈ ∂g (uk+1 ). Now define (3.24) ek+1  
+
+> u
+
+:= qk+1 − ρ(vk+1 − uk+1 + dk+1 ).
+
+Then (3.17) holds. Moreover, by (3.23), the nth slice of ek+1  
+
+> u
+
+satisfies (3.25) ek+1  
+
+> u,n
+
+= −ρ(vk+1  
+
+> n
+
+− vkn) − ρ(dk+1  
+
+> n
+
+− dkn) + γ(ukn, − − uk+1 
+
+> n−1
+
+) + γ(ukn, + − uk+1 
+
+> n+1
+
+).
+
+The last two terms come from the mixed old and new neighboring slices in one cyclic Gauss– Seidel sweep. By (2.20), 
+
+> S
+
+X
+
+> n=1
+
+(ukn, − − uk+1 
+
+> n−1
+
+) + ( ukn, + − uk+1 
+
+> n+1
+
+) 22
+
+!1/2
+
+≤ 2∥∆uk+1 ∥2.16 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+Therefore, (3.26) ∥ek+1  
+
+> u
+
+∥2 ≤ 2γ∥∆uk+1 ∥2 + ρ∥∆vk+1 ∥2 + ρ∥∆dk+1 ∥2.
+
+Finally, by (3.14), ∆ dk+1 = − 1 
+
+> ρ
+
+A⊤A∆vk+1 , and hence ρ∥∆dk+1 ∥2 ≤ Lf ∥∆vk+1 ∥2. Com-bining this estimate with (3.21), (3.22), and (3.26) gives (3.20) with any Crel ≥ 2γ + ρ + 3 Lf .
+
+The final claim follows from Corollary 3.3. 
+
+Theorem 3.5. Suppose Assumptions 3.1–3.2 hold, ρ > 2Lf , and ρ + 2 γ > κλ . If the sequence {(uk, vk, dk)} generated by Algorithm 2.1 is bounded, then every accumulation point 
+
+(u⋆, v⋆, d⋆) satisfies v⋆ = u⋆ and 
+
+(3.27) 0 ∈ ∇ f (v⋆) + ∂g (v⋆).
+
+Consequently, v⋆ is a stationary point of (3.2) .Proof. Let ( u⋆, v⋆, d⋆) be an accumulation point of {(uk, vk, dk)}, which exists by bound-edness and the Bolzano-Weierstrass theorem. Take a subsequence converging to it; without loss of generality, we index this subsequence by k for simplicity. By Corollary 3.3, the shifted subsequence ( uk+1 , vk+1 , dk+1 ) converges to the same limit. Since vk+1 − uk+1 → 0, we have 
+
+v⋆ = u⋆.The optimality condition of the v-update gives ∇f (vk+1 ) + ρdk+1 = 0. Passing to the limit yields (3.28) ∇f (v⋆) + ρd⋆ = 0.
+
+By Lemma 3.4, there exist vectors ek+1  
+
+> u
+
+, ek+1  
+
+> v
+
+, and ek+1  
+
+> d
+
+satisfying (3.17)–(3.19), such that 
+
+∥ek+1  
+
+> u
+
+∥2 + ∥ek+1  
+
+> v
+
+∥2 + ∥ek+1  
+
+> d
+
+∥2 → 0. From (3.17), there exists qk+1 ∈ ∂g (uk+1 ) such that 
+
+ek+1  
+
+> u
+
+= qk+1 − ρ(vk+1 − uk+1 + dk+1 ). Since ek+1  
+
+> u
+
+→ 0, vk+1 − uk+1 → 0, and dk+1 → d⋆,we have qk+1 → ρd⋆. Under Assumption 3.1, the function g is proper, closed, and weakly convex, so its subdifferential is closed under limits. Since qk+1 ∈ ∂g (uk+1 ), uk+1 → u⋆, and 
+
+qk+1 → ρd⋆, we obtain (3.29) ρd⋆ ∈ ∂g (u⋆).
+
+Since u⋆ = v⋆, combining (3.28) and (3.29) gives 
+
+0 ∈ ∇ f (v⋆) + ∂g (v⋆).
+
+Therefore, v⋆ is a stationary point of (3.2). 
+
+Remark 3.6. The boundedness of the generated sequence {uk, vk, dk} is assumed rather than proved. A sufficient condition that guarantees boundedness is coercivity [43] of ψ, which ensures that the augmented Lagrangian sublevel sets are compact. Both Tikhonov and TV regularizations satisfy this condition. Since coercivity may be difficult to verify for a general function ψ, we state boundedness directly as a hypothesis, which can be monitored empirically during the iteration. PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 17 
+
+Remark 3.7. The weakly convex assumption on ψ provides a natural middle ground be-tween convex and fully nonconvex regularization. Classical convergence guarantees [2, 13] require convexity, which can be restrictive in practice, as some useful regularization models in image reconstruction are nonconvex. Weak convexity retains enough structure to support the convergence analysis above while accommodating a broader class of regularizers. This con-nects to recent efforts to extend PnP convergence theory to nonconvex settings: for example, Hurault et al. [19] propose a proximal denoising step that, in certain cases, coincides with the exact proximal operator of a possibly nonconvex regularizer, and Shoushtari et al. [36] estab-lish nonconvex convergence guarantees for PnP-ADMM under distribution shift, focusing on the case where a learned denoiser is applied outside its training distribution. 
+
+Remark 3.8. The convergence analysis in this section is variational in nature: it assumes that the denoising step is induced by a regularization functional ψ. Another line of PnP research establishes convergence by imposing structural assumptions directly on the denoiser. For example, convergence results for PnP methods with black-box denoisers may require denoiser-based assumptions, such as nonexpansiveness, contractiveness, or averagedness of the denoiser itself or of a related residual operator [7, 33]. Such results often lead to fixed-point convergence guarantees rather than convergence for a variational model. In contrast, our analysis assumes that ψ is weakly convex and proves subsequential convergence for the corresponding variational formulation, and the result applies directly to Tikhonov and TV. For off-the-shelf denoisers such as BM3D, DnCNN, FFDNet, or DRUNet, the iteration is generally no longer equivalent to minimizing a fixed objective. Establishing or verifying such denoiser-based assumptions within the present framework is beyond the scope of this work; for these denoisers, we report empirical behavior only. Developing a rigorous convergence theory for black-box denoisers within the proposed axial-coupled PnP scheme remains an open problem for future work. 
+
+4. Experiments. In this section, we evaluate the proposed reconstruction framework on synthetic and real zebrafish-heart CS-LSM data. The synthetic experiment provides a con-trolled setting with a known reference volume, whereas the real-data experiment evaluates the method under realistic acquisition conditions using a physical imaging system. The ex-periments evaluate the effects of denoiser choice, axial coupling, and the compression ratio. All experiments were implemented in Python and run on an Azure Machine Learning Stan-dard E4ds v4 CPU instance with 4 cores and 32 GB RAM. 
+
+4.1. Experimental setup. 
+
+Datasets. For the synthetic experiment, we use a zebrafish-heart reference volume derived from LSM data acquired by our in-house LSM system [59]. The underlying dataset was obtained using retrospective synchronization, which aligns image sequences from different axial slices and cardiac cycles. The selected reference volume (200 × 200 × 120-voxel) corresponds to a representative time point, containing both the atrium and ventricle with approximately 300 nuclei near the chamber surfaces. Compressed measurements are generated from this reference using the forward model in (2.1) with known random binary masks, consistent with the DMD coding strategy in CS-LSM. The compression ratio is set to R = 5 unless otherwise stated. Results for varying compression ratios are reported in Section 4.4. No additional 18 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+measurement noise is added in the synthetic experiments, so that the comparison isolates the effects of the inverse solver, the denoising prior, and the axial coupling term. For the real-data experiment, we use CS-LSM measurements and the corresponding sens-ing masks acquired by the DMD-based light-sheet platform described in [58]. The real dataset consists of N = 10 compressed camera shots, each of size 404 × 404 pixels, acquired with com-pression ratio R = 15, thus the reconstructed volume contains S = 150 axial slices. These measurements are collected under imaging conditions comparable to those of the synthetic data in zebrafish-heart, but a corresponding volumetric ground truth is not available. To fo-cus on reconstruction performance, we compare different models and denoisers directly on the acquired measurements without additional pre- or post-processing. While addressing effects such as rolling-shutter distortion may further improve image quality, we refer readers to our related work [58] for a detailed discussion of these issues. 
+
+Evaluation metrics. To assess reconstruction performance on synthetic data, we adopt two standard image-quality metrics: Peak Signal-to-Noise Ratio (PSNR) [17] and Structural Similarity Index Measure (SSIM) [44]. PSNR measures pixel-wise reconstruction fidelity, with larger values indicating smaller error. SSIM measures structural similarity between each reconstructed slice and the corresponding reference, following [44], with values closer to 1 indicating greater similarity. Both metrics are computed per slice and averaged over all valid slices. For real data, we report visual comparisons only. 
+
+Parameter tuning. The PnP-ADMM framework has three hyperparameters: the ADMM penalty parameter ρ, the parameter λ controlling the strength of the regularization or denois-ing step, and the axial coupling weight γ, with γ = 0 for the slice-based model. For each denoiser and reconstruction model, we tune these parameters on the synthetic dataset using Bayesian optimization [22, 37], with negative slice-averaged PSNR as the objective. Minimiz-ing this objective is equivalent to maximizing the average reconstruction quality over the axial stack. Each Bayesian-optimization run is limited to 50 objective evaluations over predefined search ranges, and the optimized parameters are then used to rerun the corresponding re-construction. The optimized hyperparameters for all denoiser and model combinations are reported in Table 2. For the real data, no separate parameter search is performed, as an exactly matched volumetric ground truth is unavailable; instead, parameters selected on the synthetic dataset are reused, given similar imaging conditions. 
+
+Remark 4.1. The optimal parameter ρ obtained via Bayesian optimization is notably smaller than the value required by Theorem 3.5. This is not a contradiction, as Theo-rem 3.5 provides a sufficient (not necessary) condition for convergence of the axial-coupled PnP-ADMM scheme, and the true convergence region may be considerably larger. As shown in Table 2, smaller values of ρ work well empirically and tend to yield better reconstruction quality, suggesting that the theoretical bound is conservative. Such a gap between sufficient conditions and practical performance is common in convergence analysis. 
+
+Stopping criteria. For synthetic data, the PnP-ADMM iterations are terminated when the relative change in iterates, i.e., ∥vk − vk−1∥2/∥vk−1∥2, falls below 10 −3, or when the number of iterations reaches 100. For real data, a looser tolerance of 10 −2 is used to account for measurement noise. PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 19 
+
+Table 2: Hyperparameters selected by Bayesian optimization on the synthetic dataset. Denoiser Slice-based Axial-coupled 
+
+ρ λ ρ λ γ
+
+Tikhonov 0.0501 0.0198 0.0412 0.0248 0.0097 TV 0.4999 0.0673 0.0068 0.0018 0.0010 BM3D 0.7828 0.0075 0.0083 0.0001 0.0011 DnCNN 0.0812 0.0008 0.0156 0.0002 0.0031 FFDNet 0.1439 0.0014 0.0403 0.0004 0.0010 DRUNet 0.1921 0.0018 0.0236 0.0002 0.0010 Table 3: Quantitative comparison on the synthetic dataset. Denoiser PSNR (dB) ↑ SSIM ↑ Runtime (s) ↓
+
+Slice Axial Slice Axial Slice Axial Tikhonov 29.7675 33.9182 0.7230 0.9283 0.579 1.267 TV 36.4616 40.1035 0.9551 0.9770 1.861 3.674 BM3D 37.8380 40.2827 0.9617 0.9718 392.380 501.994 DnCNN 42.0069 42.8288 0.9751 0.9735 121.921 142.108 FFDNet 43.1213 43.3507 0.9859 0.9866 61.005 68.156 DRUNet 43.2100 43.7359 0.9866 0.9877 406.829 504.127 
+
+4.2. Synthetic data. 
+
+Quantitative results. Table 3 summarizes the results on synthetic data for the slice-based and axial-coupled models. Compared with slice-based reconstructions, axial coupling improves PSNR across all considered denoisers. SSIM likewise improves in most cases, with the only exception being DnCNN, where the difference is negligible. Notably, the improvement is more pronounced for classical priors such as Tikhonov and TV, where slice-based reconstructions are less accurate, but smaller for deep-learning-based denoisers such as FFDNet and DRUNet, whose slice-based reconstructions are already close to the reference. The gains from axial coupling reflect the multiplexed structure of the CS-LSM inverse problem. Under compressed acquisition, each camera measurement is formed by the masked superposition of R axial slices. Although the data-fidelity term constrains these slices jointly, the slice-based model does not use neighboring slices as an additional prior. As a result, weak cellular or nuclear signals can be less stably localized along the axial direction and may appear fragmented or inconsistent across neighboring slices. The axial term therefore acts as a weak consistency constraint along z, encouraging neighboring slices to share structural information while avoiding strong axial smoothing. Except for Tikhonov, the selected γ values in Table 2 are on the order of 10 −3, suggesting that weak axial coupling is effective for most denoisers. The results reveal a clear dependence on the choice of denoiser. Tikhonov is the fastest method but yields the lowest PSNR and SSIM, while TV provides a stronger classical baseline with only a modest increase in runtime. BM3D improves upon TV in the slice-based setting, 20 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+although its runtime is substantially higher due to the nonlocal patch search. Among the DL-based denoisers, FFDNet and DRUNet achieve the best reconstruction quality. DRUNet attains the highest PSNR/SSIM in both the slice-based and axial-coupled models, whereas FFDNet achieves comparable accuracy with a much lower computational cost, offering a better overall balance between reconstruction quality and efficiency. 
+
+Qualitative results. In all qualitative visualizations, the ventricle and atrium of zebrafish-heart are labeled as V and A respectively for anatomical reference, and all scale bars represent 30 μm . Figure 2 presents visual reconstruction results on the synthetic dataset. For each method, we display slice 15 as a representative axial slice, together with the maximum inten-sity projection (MIP) along the axial direction. MIP is a standard volume-rendering technique that projects the maximum intensity along viewing ray [14], making it well suited for visual-izing bright fluorescent structures in 3D. Here, the slice view assesses local image fidelity at a fixed depth, while the MIP provides a global visual summary of the reconstructed volume, em-phasizing volumetric continuity, background suppression, and the recovery of bright cellular or nuclear signals in 3D. We further highlight two zoomed-in regions (red and green) to illustrate key reconstruction challenges: avoiding the merging or distortion of adjacent bright structures and preserving weak signals in low-intensity regions. These features are critical for downstream tasks, including cell detection, segmentation, and 3D/4D tracking in zebrafish-heart imaging. Undetected weak signals, merged neighboring structures, and spurious background artifacts can bias the quantitative analyses of cardiac morphology and contractile motion [34, 59]. The main visual differences across denoisers lie in fine-structure recovery and background cleanliness. Tikhonov recovers the coarse cardiac shape but leaves a noisy background in the slice-based reconstruction and suppresses many weak cellular or nuclear signals. TV gives a cleaner and sharper baseline, but it still oversmooths weak signals and thin structures. BM3D preserves more local detail than TV, although residual low-intensity artifacts remain visi-ble. The DL-based denoisers recover brighter and better-separated cellular or nuclear signals, with FFDNet and DRUNet appearing closest to the ground truth. This is especially visible in the red zoomed region, where FFDNet and DRUNet better preserve the separation and morphology of neighboring bright cellular or nuclear signals. To further quantify this local comparison, Fig. 3 shows intensity profiles as a function of spatial position along a representa-tive oblique line in the red zoomed region. The profiles are plotted against physical distance in μm and globally normalized using the intensity range across all compared images. FFD-Net and DRUNet more closely match the ground-truth peak locations and valley structure, whereas Tikhonov and TV tend to suppress peak amplitudes and reduce local contrast. The effect of axial coupling is more evident in the MIP views, where slice-to-slice inconsis-tencies accumulate across the axial stack. Compared with the slice-based reconstructions, the axial-coupled results generally show cleaner backgrounds and cardiac boundaries, and more stable recovery of cellular structures across z. The improvement of axial coupling appears in different local regions for different denoisers. For example, BM3D shows improved separation and morphology of adjacent bright signals in the red zoomed region, while FFDNet recovers weak signals in the green zoomed region closer to the ground truth. Comparing Figures 3b and 3c, the axial-coupled profiles are generally closer to the ground truth for the stronger denoisers, especially in preserving the two-peak structure and the intervening valley. Overall, the qualitative results agree with the quantitative comparison in Table 3. FFD-PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 21 
+
+Slice-based slice 15 Axial-coupled slice 15 Slice-based MIP Axial-coupled MIP 
+
+> Ground truth
+> Tikhonov
+> TV
+> BM3D
+> DnCNN
+> FFDNet
+> DRUNet
+
+Figure 2: Qualitative comparison on synthetic data using a representative axial slice and MIP. 22 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU   
+
+> (a) (b) (c)
+
+Figure 3: Intensity line profiles from the red zoomed region in Fig. 2. (a) Profile location. (b) Slice-based reconstructions. (c) Axial-coupled reconstructions. The profiles show peak separation and local contrast relative to the ground truth. Net and DRUNet provide the strongest visual reconstructions, while axial coupling improves the consistency of the reconstructed volume, especially for weak cellular or nuclear signals and for classical priors such as Tikhonov and TV. Together, these results highlight that the choice of denoiser determines the baseline reconstruction quality, while axial coupling provides additional benefit by leveraging inter-slice correlations, particularly when the slice-based prior is relatively weak. 
+
+4.3. Real data. Figure 4 shows real-data reconstruction results using MIPs. Because the real-data evaluation is qualitative, we focus on structural continuity, local contrast, back-ground suppression, and the visibility of cellular or nuclear signals rather than voxel-wise fidelity. The comparison examines practical trade-offs among different denoisers, specifically in terms of weak-signal preservation, background suppression, and the recovery of plausible cardiac morphology. Among the classical priors, Tikhonov and TV retain the main cardiac region and many diffuse low-intensity structures, but at the cost of noticeable background haze and relatively low local contrast. BM3D reduces background variation and yields a cleaner appearance, though some weak structures may also be attenuated in the process. The DL-based denoisers produce sharper bright signals and higher local contrast, but they tend to emphasize the most prominent structures while suppressing some diffuse weak signals. Among them, FFDNet and DRUNet provide the clearest separation between bright nuclear signals and the background. Axial coupling primarily improves the real-data MIPs by reducing background haze and enhancing the visibility of bright structures. This effect is most pronounced for the DL-based denoisers, where the axial-coupled reconstructions exhibit sharper and more distinctly separated cellular or nuclear signals compared with slice-based results. However, without a matched ground truth, sharper punctate signals alone do not establish improved reconstruc-tion fidelity; they may reflect genuine contrast improvement, denoiser-induced enhancement, or both. Their practical relevance therefore depends on the downstream task. The real-data experiment presents additional challenges: the effective sensing operator PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 23 
+
+Tikhonov TV BM3D 
+
+> Slice-based
+> Axial-coupled
+
+DnCNN FFDNet DRUNet 
+
+> Slice-based
+> Axial-coupled
+
+Figure 4: Qualitative real-data comparison using MIPs. 24 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU  
+
+> (a) PSNR (b) SSIM
+
+Figure 5: Effect of compression ratio R on synthetic reconstruction quality for TV and FFD-Net. Each curve reports slice-averaged PSNR or SSIM for the slice-based and axial-coupled models. may deviate from the ideal forward model due to mask misalignment, nonideal modulation, or calibration errors, and the noise statistics may not exactly match the assumed model. Without ground truth, the comparison instead reveals practical visual trade-offs: classical priors tend to retain diffuse low-intensity content but leave stronger background haze, while DL-based denoisers improve local contrast and background suppression at the cost of reduced visibility of weaker diffuse signals. This trade-off highlights a practical advantage of the PnP formulation, namely that the reconstruction prior can be selected according to the needs of the downstream task. 
+
+4.4. Effect of compression ratio. We investigate the dependence of reconstruction qual-ity on the compression ratio R, defined as the number of axial slices multiplexed into one camera exposure. Larger values of R improve acquisition efficiency by reducing the number of measurements per volume, but also increase the degree of ill-posedness of the inverse problem. Figure 5 reports PSNR and SSIM on the synthetic dataset for TV and FFDNet, represent-ing classical and DL-based denoisers, respectively. For both methods, reconstruction quality generally decreases as R increases because each reconstructed volume is supported by fewer measurements. For TV, the axial-coupled model consistently outperforms the slice-based model across the tested compression ratios, especially in SSIM. This indicates that inter-slice correlation provides useful structural support when the slice-wise prior is relatively simple. For FFDNet, the slice-based reconstruction is already strong at low compression ratios, so the additional gain from axial coupling is smaller and not uniformly positive across all R.However, at higher compression ratios like R = 10, the axial-coupled FFDNet reconstruction improves both PSNR and SSIM over slice-based result. Overall, the choice of R should be guided by the downstream task. When the analysis relies on weak cellular or nuclear signals, separation of neighboring cells, or accurate 3D/4D tracking, a smaller R is preferable to preserve fine structural details. When acquisition efficiency is more PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 25 
+
+important and the task can tolerate some loss of fine-scale information, a larger R may be acceptable. The axial-coupled model does not remove this acquisition-reconstruction trade-off, but it can partially offset the loss of measurement information at stronger compression. 
+
+5. Conclusion and future work. We proposed a PnP-ADMM framework for volumetric reconstruction in CS-LSM. The method handles binary-mask encoded axial measurements and flexibly incorporates any off-the-shelf denoiser, encompassing classical and DL-based methods alike. We developed a slice-based approach as a tractable baseline, while the axial-coupled extension exploits inter-slice continuity to improve reconstruction quality across the volume. Furthermore, we established subsequential convergence of the proposed scheme under a weakly convex regularization assumption, with every accumulation point shown to be a stationary point of the corresponding variational formulation. Experiments on zebrafish-heart data show that the proposed framework can recover cellular structures from compressed measurements while accommodating different denoising methods. The axial-coupled model generally im-proves reconstruction quality and volumetric continuity over the slice-based model. Future work will investigate tuning-free approaches based on deep unrolling [9] and reinforcement learning [49], as well as extend the proposed framework to 4D spatiotemporal reconstruction. On the theoretical side, establishing convergence guarantees for the proposed axial-coupled PnP framework, beyond the proximal-based denoiser regime, remains an important open problem. 
+
+REFERENCES 
+
+[1] D. M. Bers , Cardiac excitation-contraction coupling , Nature, 415 (2002), pp. 198–205, https://doi.org/ 10.1038/415198a. [2] S. Boyd, N. Parikh, E. Chu, B. Peleato, and J. Eckstein , Distributed optimization and statisti-cal learning via the alternating direction method of multipliers , Foundations and Trends in Machine Learning, 3 (2011), pp. 1–122, https://doi.org/10.1561/2200000016. [3] G. Calisesi and M. Castriotta , Spatially modulated illumination allows for light-sheet fluorescence microscopy with an incoherent source and compressive sensing , Biomedical Optics Express, 10 (2019), pp. 5776–5787, https://doi.org/10.1364/BOE.10.005776. [4] E. Candes and J. Romberg , Sparsity and incoherence in compressive sampling , Inverse problems, 23 (2007), pp. 969–985. [5] A. Chambolle , An algorithm for total variation minimization and applications , Journal of Mathematical Imaging and Vision, 20 (2004), pp. 89–97, https://doi.org/10.1023/B:JMIV.0000011325.36760.1e. [6] A. Chambolle and P.-L. Lions , Image recovery via total variation minimization and related problems ,Numerische Mathematik, 76 (1997), pp. 167–188, https://doi.org/10.1007/s002110050258. [7] S. H. Chan, X. Wang, and O. A. Elgendy , Plug-and-play ADMM for image restoration: Fixed-point convergence and applications , IEEE Transactions on Computational Imaging, 3 (2017), pp. 84–98, https://doi.org/10.1109/TCI.2016.2629286. [8] J. Chen, Y. Ding, M. Chen, J. Gau, N. Jen, C. Nahal, S. Tu, C. Chen, S. Zhou, C.-C. Chang, J. Lyu, X. Xu, T. K. Hsiai, and R. R. S. Packard , Displacement analysis of myocardial me-chanical deformation (diamond) reveals segmental susceptibility to doxorubicin-induced injury and regeneration , JCI Insight, 4 (2019), p. e125362, https://doi.org/10.1172/jci.insight.125362. [9] Z. Chen, X. Chen, L. Zhang, H. Li, and S. Liang , Deep plug-and-play prior for enhanced electrical impedance tomography , Applied Soft Computing, 195 (2026), p. 114999. [10] K. Dabov, A. Foi, V. Katkovnik, and K. Egiazarian , Image denoising by sparse 3D transform-domain collaborative filtering , IEEE Transactions on Image Processing, 16 (2007), pp. 2080–2095, https://doi.org/10.1109/TIP.2007.901238. 26 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+[11] W. Denk, J. H. Strickler, and W. W. Webb , Two-photon laser scanning fluorescence microscopy ,Science, 248 (1990), pp. 73–76, https://doi.org/10.1126/science.2321027. [12] D. L. Donoho , Compressed sensing , IEEE Transactions on Information Theory, 52 (2006), pp. 1289– 1306. [13] J. Eckstein and W. Yao , Understanding the convergence of the alternating direction method of multi-pliers: Theoretical and computational perspectives , Pac. J. Optim., 11 (2015), pp. 619–644. [14] E. K. Fishman, D. R. Ney, D. G. Heath, F. M. Corl, K. M. Horton, and P. T. Johnson , Volume rendering versus maximum intensity projection in CT angiography: what works best, when, and why ,Radiographics, 26 (2006), pp. 905–922. [15] T. Goldstein and S. Osher , The split Bregman method for L1-regularized problems , SIAM Journal on Imaging Sciences, 2 (2009), pp. 323–343, https://doi.org/10.1137/080725891. [16] F. Helmchen and W. Denk , Deep tissue two-photon microscopy , Nature Methods, 2 (2005), pp. 932– 940, https://doi.org/10.1038/nmeth818. [17] A. Hore and D. Ziou , Image quality metrics: PSNR vs. SSIM , in Proceedings of the International Conference on Pattern Recognition (ICPR), IEEE, 2010, pp. 2366–2369, https://doi.org/10.1109/ ICPR.2010.579. [18] J. Huisken, J. Swoger, F. D. Bene, J. Wittbrodt, and E. H. K. Stelzer , Optical sectioning deep inside live embryos by selective plane illumination microscopy , Science, 305 (2004), pp. 1007–1009, https://doi.org/10.1126/science.1100035. [19] S. Hurault, A. Leclaire, and N. Papadakis , Proximal denoiser for convergent plug-and-play opti-mization with nonconvex regularization , in International Conference on Machine Learning, PMLR, 2022, pp. 9483–9505. [20] J. Icha, M. Weber, J. C. Waters, and C. Norden , Phototoxicity in live fluorescence microscopy, and how to avoid it , BioEssays, 39 (2017), p. 1700003, https://doi.org/10.1002/bies.201700003. [21] X. Jia, Z. Tian, Y. Lou, J.-J. Sonke, and S. B. Jiang , Four-dimensional cone beam CT reconstruction and enhancement using a temporal nonlocal means method , Medical physics, 39 (2012), pp. 5592–5602. [22] D. R. Jones, M. Schonlau, and W. J. Welch , Efficient global optimization of expensive black-box functions , Journal of Global optimization, 13 (1998), pp. 455–492. [23] J. Lee, P. Fei, R. R. S. Packard, H. Kang, H. Xu, K. I. Baek, N. Jen, J. Chen, H. Yen, C.-C. J. Kuo, et al. , 4-dimensional light-sheet microscopy to elucidate shear stress modulation of cardiac trabeculation , The Journal of clinical investigation, 126 (2016), pp. 1679–1690. [24] W. Li, R. G. Nava, A. C. Bribriesco, B. H. Zinselmeyer, J. H. Spahn, A. E. Gelman, A. S. Krupnick, M. J. Miller, and D. Kreisel , Intravital 2-photon imaging of Leukocyte trafficking in beating heart , The Journal of clinical investigation, 122 (2012), pp. 2499–2508. [25] M. Liebling, A. S. Forouhar, M. Gharib, S. E. Fraser, and M. E. Dickinson , Four-dimensional cardiac imaging in living embryos via postacquisition synchronization of nongated slice sequences ,Journal of biomedical optics, 10 (2005), pp. 054001–054001. [26] M. Maggioni, V. Katkovnik, K. Egiazarian, and A. Foi , Nonlocal transform-domain filter for volumetric data denoising and reconstruction , IEEE transactions on image processing, 22 (2012), pp. 119–133. [27] P. Mahou, J. Vermot, E. Beaurepaire, and W. Supatto , Multicolor two-photon light-sheet mi-croscopy , Nature methods, 11 (2014), pp. 600–601. [28] M. Mickoleit, B. Schmid, M. Weber, F. O. Fahrbach, S. Hombach, S. Reischauer, and J. Huisken , High-resolution reconstruction of the beating zebrafish heart , Nature methods, 11 (2014), pp. 919–922. [29] M. Minsky , Memoir on inventing the confocal scanning microscope , Scanning, 10 (1988), pp. 128–138, https://doi.org/10.1002/sca.4950100403. [30] M. Persson, D. Bone, and H. Elmqvist , Total variation norm for three-dimensional iterative recon-struction in limited view angle tomography , Physics in Medicine & Biology, 46 (2001), pp. 853–866. [31] R. T. Rockafellar and R. J. Wets , Variational analysis , Springer, 1998. [32] L. I. Rudin, S. Osher, and E. Fatemi , Nonlinear total variation based noise removal algorithms , Physica D: Nonlinear Phenomena, 60 (1992), pp. 259–268, https://doi.org/10.1016/0167-2789(92)90242-F. [33] E. Ryu, J. Liu, S. Wang, X. Chen, Z. Wang, and W. Yin , Plug-and-play methods provably converge with properly trained denoisers , in International Conference on Machine Learning, PMLR, 2019, PNP VOLUMETRIC RECONSTRUCTION FOR CS-LSM 27 
+
+pp. 5546–5557. [34] A. Saberigarakani, R. P. Patel, M. Almasian, X. Zhang, J. Brewer, S. S. Hassan, J. Chai, J. Lee, B. Fei, J. Yuan, K. Carroll, and Y. Ding , Volumetric imaging and computation to explore contractile function in zebrafish hearts , Cell Reports Methods, 5 (2025), p. 101113, https: //doi.org/10.1016/j.crmeth.2025.101113. [35] P. A. Santi , Light-sheet fluorescence microscopy: A review , Journal of Histochemistry and Cytochem-istry, 59 (2011), pp. 129–138, https://doi.org/10.1369/0022155410394857. [36] S. Shoushtari, J. Liu, E. P. Chandler, M. S. Asif, and U. S. Kamilov , Prior mismatch and adapta-tion in PnP-ADMM with a nonconvex convergence analysis , in Proceedings of the 41st International Conference on Machine Learning (ICML), R. Salakhutdinov, Z. Kolter, K. Heller, A. Weller, N. Oliver, J. Scarlett, and F. Berkenkamp, eds., vol. 235 of Proceedings of Machine Learning Research, PMLR, July 2024, pp. 45154–45182. [37] J. Snoek, H. Larochelle, and R. P. Adams , Practical bayesian optimization of machine learning algo-rithms , in Advances in Neural Information Processing Systems, vol. 25, 2012, pp. 2951–2959, https:// proceedings.neurips.cc/paper files/paper/2012/file/05311655a15b75fab86956663e1819cd-Paper.pdf. [38] J. M. Taylor, C. J. Nelson, F. A. Bruton, A. Kaveh, C. Buckley, C. S. Tucker, A. G. Rossi, J. J. Mullins, and M. A. Denvir , Adaptive prospective optical gating enables day-long 3d time-lapse imaging of the beating embryonic zebrafish heart , Nature communications, 10 (2019), p. 5173. [39] A. N. Tikhonov and V. Y. Arsenin , Solutions of Ill-posed Problems , V. H. Winston and Sons, Wash-ington, D.C., 1977. [40] S. V. Venkatakrishnan, C. A. Bouman, and B. Wohlberg , Plug-and-play priors for model based reconstruction , in Proceedings of the IEEE Global Conference on Signal and Information Processing (GlobalSIP), IEEE, 2013, pp. 945–948, https://doi.org/10.1109/GlobalSIP.2013.6737048. [41] V. Voleti, K. B. Patel, W. Li, C. Perez Campos, S. Bharadwaj, H. Yu, C. Ford, M. J. Casper, R. W. Yan, W. Liang, et al. , Real-time volumetric microscopy of in vivo dynamics and large-scale samples with SCAPE 2.0 , Nature methods, 16 (2019), pp. 1054–1062. [42] M. Wang, L. Zhou, J. Hu, H. Cao, D. Lin, B. Yu, and J. Qu , Snapshot temporal compressive light-sheet fluorescence microscopy via deep denoising and total variation priors , Optics Letters, 48 (2023), pp. 1144–1147, https://doi.org/10.1364/OL.48.001144. [43] Y. Wang, W. Yin, and J. Zeng , Global convergence of ADMM in nonconvex nonsmooth optimization ,Journal of Scientific Computing, 78 (2019), pp. 29–63. [44] Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli , Image quality assessment: From error visibility to structural similarity , IEEE Transactions on Image Processing, 13 (2004), pp. 600–612, https://doi.org/10.1109/TIP.2003.819861. [45] Z. Wang, Y. Ding, S. Satta, M. Roustaei, P. Fei, and T. K. Hsiai , A hybrid of light-field and light-sheet imaging to study myocardial function and intracardiac blood flow during zebrafish development ,PLoS Computational Biology, 17 (2021), p. e1009175, https://doi.org/10.1371/journal.pcbi.1009175. [46] Z. Wang, R. Zhao, D. A. Wagenaar, D. Espino, L. Sheintuch, O. Benshlomo, W. Kang, E. Zhu, C. K. Lee, W. C. Schmidt, et al. , Kilohertz volumetric imaging of in vivo dynamics using squeezed light field microscopy , Nature methods, 22 (2025), pp. 2194–2204. [47] Z. Wang, L. Zhu, H. Zhang, G. Li, C. Yi, Y. Li, Y. Yang, Y. Ding, M. Zhen, S. Gao, T. K. Hsiai, and P. Fei , Real-time volumetric reconstruction of biological dynamics with light-field microscopy and deep learning , Nature Methods, 18 (2021), p. 551–556, https://doi.org/10.1038/s41592-021-01058-x. [48] T. D. Weber, M. V. Moya, K. Kılıc ¸, J. Mertz, and M. N. Economo , High-speed multiplane confocal microscopy for voltage imaging in densely labeled neuronal populations , Nature neuroscience, 26 (2023), pp. 1642–1650. [49] K. Wei, A. Aviles-Rivero, J. Liang, Y. Fu, C.-B. Sch¨ onlieb, and H. Huang , Tuning-free plug-and-play proximal algorithm for inverse imaging problems , in International Conference on Machine Learning, PMLR, 2020, pp. 10158–10169. [50] J. G. White, W. B. Amos, and M. Fordham , An evaluation of confocal versus conventional imaging of biological structures by fluorescence light microscopy , Journal of Cell Biology, 105 (1987), pp. 41–48, https://doi.org/10.1083/jcb.105.1.41. [51] M. Xiong, Z. Wen, Z. Gu, X. Liu, R. Zhang, H. Kang, J. Yang, J. Zhang, W. Li, C. He, et al. ,
+
+Prune2drive: A plug-and-play framework for accelerating vision-language models in autonomous driv-28 J. JIA, Y. GONG, X. ZHANG, J. CHAI, Y. DING, AND Y. LOU 
+
+ing , in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 2026, pp. 25215–25224. [52] K. Zhang, Y. Li, W. Zuo, L. Zhang, L. Van Gool, and R. Timofte , Plug-and-play image restoration with deep denoiser prior , IEEE Transactions on Pattern Analysis and Machine Intelligence, 44 (2021), pp. 6360–6376. [53] K. Zhang, W. Zuo, Y. Chen, D. Meng, and L. Zhang , Beyond a Gaussian denoiser: Residual learning of deep CNN for image denoising , IEEE Transactions on Image Processing, 26 (2017), pp. 3142–3155, https://doi.org/10.1109/TIP.2017.2662206. [54] K. Zhang, W. Zuo, and L. Zhang , Ffdnet: Toward a fast and flexible solution for cnn-based image denoising , IEEE Transactions on Image Processing, 27 (2018), pp. 4608–4622. [55] X. Zhang, R. V. Alexander, J. Yuan, and Y. Ding , Computational analysis of cardiac con-tractile function , Current Cardiology Reports, 24 (2022), pp. 1983–1994, https://doi.org/10.1007/ s11886-022-01814-1. [56] X. Zhang, M. Almasian, S. S. Hassan, R. Jotheesh, V. A. Kadam, A. R. Polk, A. Saberi-garakani, A. Rahat, J. Yuan, J. Lee, et al. , 4d light-sheet imaging and interactive analysis of cardiac contractility in zebrafish larvae , APL bioengineering, 7 (2023). [57] X. Zhang, J. Chai, M. Almasian, A. Saberigarakani, R. Patel, J. Brewer, E. Pollock, Y. Lou, and Y. Ding , Instantaneous volumetric light-sheet imaging of beating heart , in Technical Digest Series, Optica Biophotonics Congress 2025, Optica Publishing Group, 2025, p. NM5C.4, https://doi.org/10. 1364/NTM.2025.NM5C.4. Novel Techniques in Microscopy (NTM). [58] X. Zhang, J. Chai, Y. Gong, M. Almasian, J. A. Brewer, A. Saberigarakani, J. Jia, A. Hines, K. J. Carroll, and Y. Lou , Compressive axial-integrated planar scanning (caps) microscopy for high-speed volumetric imaging of cardiac dynamics , bioRxiv, (2026), pp. 2026–04. [59] X. Zhang, A. Saberigarakani, M. Almasian, S. Hassan, M. Nekkanti, and Y. Ding , 4d light-sheet imaging of zebrafish cardiac contraction , Journal of Visualized Experiments, (2024), p. e66263, https://doi.org/10.3791/66263. [60] C. Zhao, M. Ge, X. Yang, Y. S. Chu, and H. Yan , Limited-angle x-ray nano-tomography with machine-learning enabled iterative reconstruction engine , npj Computational Materials, 11 (2025), p. 240. [61] M. Zhao, X. Wang, J. Chen, and W. Chen , A plug-and-play priors framework for hyperspectral unmixing , IEEE Transactions on Geoscience and Remote Sensing, 60 (2021), pp. 1–13.

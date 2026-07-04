@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-04",
+  "date": "2026-07-04",
+  "generated_at": "2026-07-04T21:05:03",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/04/2606.27635v1-denoising-icf-images-with-multiplicative-uniform-noise-a-self-supervised-study-based-on-the-log-domain-noisier2inverse-framework",
+      "section": "quick",
+      "title_en": "Denoising ICF Images with Multiplicative Uniform Noise: A Self-Supervised Study Based on the Log-Domain Noisier2Inverse Framework",
+      "authors": "Gyeongha Hwang, Bradley Thomas Wolfe, Naima Naheed",
+      "date": "2026-06-26",
+      "pdf": "https://arxiv.org/pdf/2606.27635v1",
+      "score": "6.0",
+      "evidence": "自监督去噪框架，适用于乘法均匀噪声",
+      "tldr": "针对惯性约束聚变（ICF）图像受乘性均匀噪声污染的问题，本文提出基于Log-Domain Noisier2Inverse框架的自监督去噪方法。理论证明最小化对数域自监督损失等价于变换域监督学习。在ICF图像上，最佳变体（每图像加载Uniform噪声）达到PSNR 21.41 dB、SSIM 0.8358，相比噪声输入提升19.46 dB，显著超过BM3D和Noise2Self。该方法无需干净真值即可训练，为乘性噪声去噪提供新途径。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "This paper documents the implementation and evaluation of a self-supervised denoising framework on Inertial Confinement Fusion (ICF) images corrupted by Multiplicative Uniform noise: the \\emph{Log-Domain Noisier2Inverse} framework. This framework is developed and analysed in this work; the key theoretical result -- that minimising the log-domain self-supervised loss is equivalent to supervised learning in the transformed domain -- is presented with full proof. We document significant implementation challenges arising from the unique characteristics of ICF imagery, describe the fixes applied at each stage, and report final quantitative results. The log-domain approach with per-image JSON Uniform noise loading (Variant~B) achieves the best result: a mean PSNR of $21.41\\db$ and SSIM of $0.8358$, a $+19.46\\db$ improvement over the noisy input baseline of $1.95\\db$, substantially outperforming BM3D log-domain ($4.47\\db$, SSIM $0.5181$) and Noise2Self ($4.75\\db$, SSIM $0.0177$). Variant~A, using fixed Gaussian noise loading, achieves $21.39\\db$ PSNR and SSIM $0.8436$. Of the three evaluated methods, Log-Domain Noisier2Inverse and Noise2Self are entirely self-supervised during training, requiring no clean ground truth data; BM3D is a classical filter-based method requiring no training at all. The clean reference images are used solely for quantitative evaluation of all three methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/04/2606.30915v1-spectral-diffuserscope-a-compact-snapshot-hyperspectral-microscope",
+      "section": "quick",
+      "title_en": "Spectral DiffuserScope: a compact snapshot hyperspectral microscope",
+      "authors": "Neerja Aggarwal, Eric Markley, Kyung Chul Lee, Seung Ah Lee, Junghyun Bae, Nakkyu Baek, Wook Park, Min Sung Cho, Youngbin Lim, Polly Fordyce, Stephanie Eberly, Lydia L. Sohn, William D. Houck, Kristina Monakhova, Laura Waller",
+      "date": "2026-06-29",
+      "pdf": "https://arxiv.org/pdf/2606.30915v1",
+      "score": "6.0",
+      "evidence": "高光谱压缩感知方法",
+      "tldr": "传统高光谱荧光显微镜体积庞大或需机械扫描，时间分辨率和通量受限。本文提出一种基于压缩感知的计算快照高光谱显微镜Spectral DiffuserScope，设备紧凑（约15x6x6cm）可直接附加到标准荧光显微镜。通过模拟验证其空间-光谱分辨率优于传统快照系统，实验荧光珠、标记细胞和镧系水凝胶珠成像展示了高速高分辨率性能。该方案为生物和临床提供了一种紧凑、高通量的高光谱显微解决方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral fluorescence microscopy enables important biological and clinical applications, but conventional systems are bulky or require scanning, limiting temporal resolution and throughput. We introduce a computational snapshot hyperspectral microscope that uses compressed sensing to achieve higher spatial-spectral resolution than traditional snapshot systems. Our device is compact (~15 cm x 6 cm x 6 cm) and easily attaches to standard fluorescence microscopes. We benchmark our system against existing snapshot methods through simulations to evaluate its spatial and spectral performance. Experimental imaging of fluorescent beads, labeled cells, and lanthanide hydrogel beads demonstrates a practical, high-throughput solution for hyperspectral microscopy in biological and clinical applications.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/04/2607.00138v1-mg-spair-multi-grade-sparse-guided-implicit-representation-for-training-data-free-image-restoration",
+      "section": "quick",
+      "title_en": "MG-SpaIR: Multi-grade Sparse-guided Implicit Representation for Training-Data-Free Image Restoration",
+      "authors": "Jianmin Liao, Lei Huang, Ronglong Fang, Ashley Prater-Bennette, Lixin Shen, Yuesheng Xu",
+      "date": "2026-06-30",
+      "pdf": "https://arxiv.org/pdf/2607.00138v1",
+      "score": "6.0",
+      "evidence": "无训练数据图像恢复方法，处理噪声",
+      "tldr": "针对混合退化（模糊、下采样、噪声、像素缺失）下的单图像盲复原，提出无需训练数据的MG-SpaIR框架。该方法构建多级粗到细残差层级，结合隐式神经表示逐步提升重建精度；引入高分辨率图像域的显式稀疏近端正则化，有效抑制高频伪影。采用多级近端交替优化求解，并给出收敛性保证。实验表明，该框架在多种退化组合上显著优于Deep Image Prior等无训练数据方法，提供了一种稳定可解释的替代方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "MG-SpaIR is a training-data-free framework for restoring a clean image from a single observation corrupted by a mixture of blur, downsampling, noise, and missing pixels. Building on implicit neural representations (INRs), we introduce a multi-grade coarse-to-fine residual hierarchy that progressively refines the reconstruction across resolution grades, improving representational fidelity and mitigating spectral limitations. To stabilize reconstruction optimization and suppress INR-induced artifacts, we further propose an explicit sparse proximal regularization (e.g., $\\ell_0$-type) applied directly in the high-resolution image domain, which discourages spurious high-frequency patterns while preserving sharp structures. The resulting optimization is solved efficiently via a multi-grade proximal alternating scheme, and we establish convergence guarantees for the associated updates under standard regularity conditions. Experiments on mixed-degradation benchmarks demonstrate that MG-SpaIR consistently outperforms strong training-data-free baselines such as Deep Image Prior, providing a stable, interpretable, and data-efficient alternative to conventional learning-based restoration methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/04/2607.01654v1-plug-and-play-volumetric-reconstruction-for-compressive-sensing-light-sheet-microscopy",
+      "section": "quick",
+      "title_en": "Plug-and-Play Volumetric Reconstruction for Compressive Sensing Light-Sheet Microscopy",
+      "authors": "Jianqing Jia, Yi Gong, Xinyuan Zhang, Jichen Chai, Yichen Ding, Yifei Lou",
+      "date": "2026-07-02",
+      "pdf": "https://arxiv.org/pdf/2607.01654v1",
+      "score": "6.0",
+      "evidence": "即插即用去噪框架可迁移至高光谱图像重建",
+      "tldr": "压缩感知光片显微镜通过将多个轴向平面编码到单次曝光实现快速体积成像，但高度复用的测量需要高效重建。提出即插即用框架，灵活集成任意去噪器，并引入轴向耦合模型利用相邻切片相关性以改善体积连续性。采用Woodbury更新和Gauss-Seidel迭代高效求解，弱凸正则化下保证子序列收敛。在合成和真实斑马鱼心脏数据上成功恢复细胞结构，比较了不同去噪器性能。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We investigate volumetric reconstruction for compressive sensing light-sheet microscopy (CS-LSM), where fast volumetric imaging is achieved by encoding multiple axial planes into each camera exposure. To recover the underlying volume from highly multiplexed measurements, we propose a plug-and-play (PnP) framework that flexibly incorporates any user-specified denoiser into the reconstruction process. Building on a slice-based formulation, we further introduce an axial-coupled model that exploits correlations between adjacent slices to improve volumetric continuity. For efficient computation, we derive a Woodbury-based update for the data-consistency step in both the slice-based and axial-coupled formulations, and employ a Gauss-Seidel sweep for the denoising step in the axial-coupled model. Under a weakly convex regularization assumption, we establish subsequential convergence of the proposed algorithm. Experiments on synthetic and real zebrafish-heart data demonstrate that the proposed framework successfully recovers cellular structures from compressed measurements, and provide practical insights into the comparative performance of commonly used denoisers within the PnP framework under the CS-LSM setup.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
