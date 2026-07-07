@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-07",
+  "date": "2026-07-07",
+  "generated_at": "2026-07-07T21:53:46",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/07/2607.03517v1-mixture-of-gaussians-guided-schedule-design-for-brownian-bridge-diffusion-models",
+      "section": "deep",
+      "title_en": "Mixture-of-Gaussians-Guided Schedule Design for Brownian Bridge Diffusion Models",
+      "authors": "Ron Levi, Michael Elad",
+      "date": "2026-07-03",
+      "pdf": "https://arxiv.org/pdf/2607.03517v1",
+      "score": "8.0",
+      "evidence": "具有原理性调度设计的布朗桥扩散模型用于图像恢复",
+      "tldr": "布朗桥扩散模型（BBDM）通过从干净信号到退化观测的随机桥进行图像恢复，但调度设计常依赖启发式。本文在混合高斯先验下解析了BBDM反向动力学，得到闭式后验和MMSE去噪器，并基于此提出两种互补调度目标：Wasserstein指标优化感知质量，MSE指标优化重建保真度。理论证明存在独立于退化和先验的通用调度，实验在合成数据和FFHQ数据集上验证了方法的有效性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Brownian Bridge Diffusion Models (BBDM) offer an appealing framework for image restoration and inverse problems by constructing a stochastic bridge from the clean signal directly to the degraded observation, rather than to pure noise. Despite their promise, the choice of bridge schedule is typically inherited from heuristics, and a principled analytical framework for schedule design has been lacking. In this work, we develop such a framework by offering a novel analysis of BBDM reverse dynamics under a Mixture-of-Gaussians (MoG) prior. This setting yields a closed-form ideal posterior and a corresponding MMSE denoiser, while the BBDM-induced reconstruction law is captured analytically through a tractable surrogate. Building on these expressions, we formulate two complementary schedule-design objectives: a Wasserstein criterion targeting perceptual quality and an MSE criterion targeting reconstruction fidelity. Our work exposes an inherent tradeoff between the two and proves the existence of universal schedules for both that are independent of the degradation and prior. Extensive experiments on controlled MoG settings confirm full alignment between theory and practice, and experiments on the FFHQ dataset across inpainting, deblurring, and super-resolution tasks validate the practical value of our schedule-design criteria.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/07/2607.02952v1-pooling-based-context-modeling-for-convolution-free-deep-image-prior",
+      "section": "quick",
+      "title_en": "Pooling-Based Context Modeling for Convolution-Free Deep Image Prior",
+      "authors": "Gihyun Kim, Jong-Seok Lee",
+      "date": "2026-07-03",
+      "pdf": "https://arxiv.org/pdf/2607.02952v1",
+      "score": "7.0",
+      "evidence": "深度图像先验去噪方法可应用于高光谱图像",
+      "tldr": "深度图像先验（DIP）利用卷积神经网络的空间上下文实现单图去噪，但过参数化易导致噪声过拟合。本文提出无卷积架构Pool-DIP，通过池化对比建模高效捕获空间上下文，在减少参数和计算量的同时提升去噪性能。光谱分析表明，该方法能稳定高频成分演化并抑制错误高频信号。实验在多个数据集上取得竞争结果，并泛化至超分辨和修复任务。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Convolutional Neural Networks (CNNs) achieve strong denoising performance by exploiting spatial context from neighboring pixels. Deep Image Prior (DIP) leverages this property to restore images from a single noisy input without requiring large datasets. However, the over-parameterized architecture of DIP often leads to noise fitting during optimization. In this paper, we propose Pool-DIP, a convolution-free architecture that incorporates pooling-based contrast modeling to capture spatial context efficiently. Pool-DIP improves denoising performance while significantly reducing the number of parameters and computational complexity compared to convolution-based DIP models. Experimental results show that Pool-DIP achieves competitive performance across multiple datasets, including a real-world benchmark. Spectral analysis further reveals that Pool-DIP stabilizes the evolution of high-frequency components during optimization and suppresses erroneous high-frequency signals. The proposed architecture also generalizes well to other image restoration tasks such as super-resolution and inpainting.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/07/2607.03054v1-directionally-weighted-total-variation-for-inverse-problems",
+      "section": "quick",
+      "title_en": "Directionally Weighted Total Variation for Inverse Problems",
+      "authors": "Ole Løseth Elvetun, Bjørn Fredrik Nielsen",
+      "date": "2026-07-03",
+      "pdf": "https://arxiv.org/pdf/2607.03054v1",
+      "score": "7.0",
+      "evidence": "加权总变分正则化用于反问题，可应用于图像去噪",
+      "tldr": "针对反问题中标准全变分正则化在大零空间正向算子下产生空间偏倚等伪影的问题，本文提出方向性加权全变分方法。通过格林函数对正向算子进行敏感性分析，设计空间变化权重重新平衡惩罚项。模型包括各向同性加权和方向性加权两种形式，并分析了最优性条件和精确恢复。实验表明该方法显著减少伪影，改善定位与尺寸恢复。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We study weighted total variation (TV) regularization for inverse problems in which the forward operator has a large null space, a setting in which standard (unweighted) TV is known to produce systematic reconstruction artifacts such as spatial bias. To address this issue, we consider spatially varying weights derived from a sensitivity analysis of the forward operator expression via an associated Green's function. These weights rebalance the TV penalty and thereby compensate for the inhomogeneous sensitivity of the forward operator.   We introduce and analyze two related models: an isotropic weighted TV functional, where the weight reflects worst-case directional sensitivity, and a directionally weighted refinement in which the weighting depends on the actual jump direction of the solution. In addition to the standard Tikhonov formulation, we also study corresponding basis-pursuit problems. We derive optimality conditions and prove exact recovery results under suitable structural assumptions. Furthermore, we investigate how recoverability depends on the geometry of the solution and its distance to the observation boundary.   Numerical experiments for inverse source problems and related applications demonstrate that the proposed weighted formulations significantly reduce artifacts present in unweighted TV reconstructions, yielding improved localization and size recovery. These results highlight the crucial role of spatial weighting in TV regularization for inverse problems with large null spaces.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/07/2607.03768v1-galosh-blind-training-free-denoising-of-raw-bayer-and-srgb-images-by-parallel-friendly-local-shrinkage",
+      "section": "quick",
+      "title_en": "GALOSH: Blind, Training-Free Denoising of Raw Bayer and sRGB Images by Parallel-Friendly Local Shrinkage",
+      "authors": "Yoshiro Sato",
+      "date": "2026-07-04",
+      "pdf": "https://arxiv.org/pdf/2607.03768v1",
+      "score": "6.0",
+      "evidence": "盲训练免费去噪算法，基于局部收缩，可作为高光谱图像通用去噪方法",
+      "tldr": "传统无训练降噪器依赖内容相关块匹配，并行性差且延迟不固定；学习型方法需训练数据且跨域退化。本文提出GALOSH，完全去除搜索，采用盲噪声拟合、广义Anscombe变换、局部Walsh-Hadamard亮度收缩和色度局部回归，所有阶段数据无关。在四个真实噪声基准上，GALOSH一致超越所有测试的无训练方法，接近原始数据上训练网络的质量，且速度比深度学习基线快7-650倍，可运行在CPU上。该工作实现了无搜索、多域覆盖、高速高质量的无训练降噪，易于硬件部署。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Classical training-free denoisers such as BM3D and non-local means owe much of their strength to search: content-dependent block matching whose memory traffic and data-dependent control flow parallelize poorly and preclude fixed-latency implementations. Learned denoisers reach the highest quality, but they need training data, degrade outside their training domain (which we also observe), and carry per-pixel compute budgets that effectively require a GPU. We present GALOSH (Generalized Anscombe LOcal SHrinkage), a redesign of training-free denoising that removes the search entirely and aims at multi-domain coverage, speed, and quality at once: a blind per-image Poisson-Gaussian noise fit, a generalized Anscombe transform, a two-pass local Walsh-Hadamard shrinkage of luminance, and a luminance-guided local regression of chrominance -- two deliberately different operators for the two perceptually different noise components, each with its own strength control. Every stage is local, data-independent, and regular -- the same computation graph for every pixel of every image. One core serves two domains: raw Bayer mosaics and sRGB/YUV images. On four real-noise benchmarks (SIDD Medium and RawNIND, raw and sRGB) GALOSH is consistently the strongest among the tested blind, training-free methods -- surpassing BM3D- and NLM-family baselines even when those are given an oracle noise level -- and approaches trained networks on raw data while remaining below in-domain trained networks at high ISO in sRGB. Being search-free makes it fast: 7x-650x faster than the DL baselines on the same GPU at full benchmark size, and the only strong method in the comparison that also runs practically on plain CPUs. The fixed, data-independent structure is designed to map naturally onto fixed-point and streaming hardware, supported by an operation-count analysis and a working INT16 fixed-point realization.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

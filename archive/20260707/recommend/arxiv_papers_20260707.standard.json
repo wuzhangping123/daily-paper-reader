@@ -1,0 +1,163 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-07T21:49:09.936360+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.03517v1",
+      "source": "arxiv",
+      "title": "Mixture-of-Gaussians-Guided Schedule Design for Brownian Bridge Diffusion Models",
+      "abstract": "Brownian Bridge Diffusion Models (BBDM) offer an appealing framework for image restoration and inverse problems by constructing a stochastic bridge from the clean signal directly to the degraded observation, rather than to pure noise. Despite their promise, the choice of bridge schedule is typically inherited from heuristics, and a principled analytical framework for schedule design has been lacking. In this work, we develop such a framework by offering a novel analysis of BBDM reverse dynamics under a Mixture-of-Gaussians (MoG) prior. This setting yields a closed-form ideal posterior and a corresponding MMSE denoiser, while the BBDM-induced reconstruction law is captured analytically through a tractable surrogate. Building on these expressions, we formulate two complementary schedule-design objectives: a Wasserstein criterion targeting perceptual quality and an MSE criterion targeting reconstruction fidelity. Our work exposes an inherent tradeoff between the two and proves the existence of universal schedules for both that are independent of the degradation and prior. Extensive experiments on controlled MoG settings confirm full alignment between theory and practice, and experiments on the FFHQ dataset across inpainting, deblurring, and super-resolution tasks validate the practical value of our schedule-design criteria.",
+      "authors": [
+        "Ron Levi",
+        "Michael Elad"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-07-03T17:43:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.03517v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Brownian Bridge diffusion model for image restoration with principled schedule design",
+      "llm_evidence_cn": "具有原理性调度设计的布朗桥扩散模型用于图像恢复",
+      "llm_evidence": "具有原理性调度设计的布朗桥扩散模型用于图像恢复",
+      "canonical_evidence": "具有原理性调度设计的布朗桥扩散模型用于图像恢复",
+      "llm_tldr_en": "Mixture-of-Gaussians-guided schedule design for Brownian Bridge Diffusion Models provides a principled analytical framework for image restoration. The closed-form denoiser and tractable reconstruction law make it a state-of-the-art method directly applicable to hyperspectral denoising.",
+      "llm_tldr_cn": "针对布朗桥扩散模型（BBDM）中调度设计依赖启发式方法的问题，本文提出基于混合高斯先验的原理性分析框架。该框架推导了闭合形式的理想后验和MMSE去噪器，并得到BBDM重建律的解析形式。该方法为图像恢复提供了理论指导，属于最先进的去噪与恢复方法，可应用于高光谱图像。",
+      "llm_tldr": "针对布朗桥扩散模型（BBDM）中调度设计依赖启发式方法的问题，本文提出基于混合高斯先验的原理性分析框架。该框架推导了闭合形式的理想后验和MMSE去噪器，并得到BBDM重建律的解析形式。该方法为图像恢复提供了理论指导，属于最先进的去噪与恢复方法，可应用于高光谱图像。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.02952v1",
+      "source": "arxiv",
+      "title": "Pooling-Based Context Modeling for Convolution-Free Deep Image Prior",
+      "abstract": "Convolutional Neural Networks (CNNs) achieve strong denoising performance by exploiting spatial context from neighboring pixels. Deep Image Prior (DIP) leverages this property to restore images from a single noisy input without requiring large datasets. However, the over-parameterized architecture of DIP often leads to noise fitting during optimization. In this paper, we propose Pool-DIP, a convolution-free architecture that incorporates pooling-based contrast modeling to capture spatial context efficiently. Pool-DIP improves denoising performance while significantly reducing the number of parameters and computational complexity compared to convolution-based DIP models. Experimental results show that Pool-DIP achieves competitive performance across multiple datasets, including a real-world benchmark. Spectral analysis further reveals that Pool-DIP stabilizes the evolution of high-frequency components during optimization and suppresses erroneous high-frequency signals. The proposed architecture also generalizes well to other image restoration tasks such as super-resolution and inpainting.",
+      "authors": [
+        "Gihyun Kim",
+        "Jong-Seok Lee"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-03T04:56:45+00:00",
+      "link": "https://arxiv.org/pdf/2607.02952v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "deep image prior denoising method applicable to hyperspectral images",
+      "llm_evidence_cn": "深度图像先验去噪方法可应用于高光谱图像",
+      "llm_evidence": "深度图像先验去噪方法可应用于高光谱图像",
+      "canonical_evidence": "深度图像先验去噪方法可应用于高光谱图像",
+      "llm_tldr_en": "Proposes Pool-DIP, a convolution-free deep image prior architecture using pooling-based context modeling for image denoising, achieving competitive performance with fewer parameters.",
+      "llm_tldr_cn": "本文提出Pool-DIP，一种基于池化上下文建模的无卷积深度图像先验架构，用于图像去噪。该方法能有效捕获空间上下文，同时减少参数和计算量。实验表明，Pool-DIP在多个去噪任务上取得有竞争力的性能，且无需训练数据。该方法可迁移至高光谱图像去噪任务。",
+      "llm_tldr": "本文提出Pool-DIP，一种基于池化上下文建模的无卷积深度图像先验架构，用于图像去噪。该方法能有效捕获空间上下文，同时减少参数和计算量。实验表明，Pool-DIP在多个去噪任务上取得有竞争力的性能，且无需训练数据。该方法可迁移至高光谱图像去噪任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.03768v1",
+      "source": "arxiv",
+      "title": "GALOSH: Blind, Training-Free Denoising of Raw Bayer and sRGB Images by Parallel-Friendly Local Shrinkage",
+      "abstract": "Classical training-free denoisers such as BM3D and non-local means owe much of their strength to search: content-dependent block matching whose memory traffic and data-dependent control flow parallelize poorly and preclude fixed-latency implementations. Learned denoisers reach the highest quality, but they need training data, degrade outside their training domain (which we also observe), and carry per-pixel compute budgets that effectively require a GPU. We present GALOSH (Generalized Anscombe LOcal SHrinkage), a redesign of training-free denoising that removes the search entirely and aims at multi-domain coverage, speed, and quality at once: a blind per-image Poisson-Gaussian noise fit, a generalized Anscombe transform, a two-pass local Walsh-Hadamard shrinkage of luminance, and a luminance-guided local regression of chrominance -- two deliberately different operators for the two perceptually different noise components, each with its own strength control. Every stage is local, data-independent, and regular -- the same computation graph for every pixel of every image. One core serves two domains: raw Bayer mosaics and sRGB/YUV images. On four real-noise benchmarks (SIDD Medium and RawNIND, raw and sRGB) GALOSH is consistently the strongest among the tested blind, training-free methods -- surpassing BM3D- and NLM-family baselines even when those are given an oracle noise level -- and approaches trained networks on raw data while remaining below in-domain trained networks at high ISO in sRGB. Being search-free makes it fast: 7x-650x faster than the DL baselines on the same GPU at full benchmark size, and the only strong method in the comparison that also runs practically on plain CPUs. The fixed, data-independent structure is designed to map naturally onto fixed-point and streaming hardware, supported by an operation-count analysis and a working INT16 fixed-point realization.",
+      "authors": [
+        "Yoshiro Sato"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.CV"
+      ],
+      "published": "2026-07-04T08:38:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.03768v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "blind training-free denoising algorithm with local shrinkage; applicable as a general denoising method for hyperspectral images",
+      "llm_evidence_cn": "盲训练免费去噪算法，基于局部收缩，可作为高光谱图像通用去噪方法",
+      "llm_evidence": "盲训练免费去噪算法，基于局部收缩，可作为高光谱图像通用去噪方法",
+      "canonical_evidence": "盲训练免费去噪算法，基于局部收缩，可作为高光谱图像通用去噪方法",
+      "llm_tldr_en": "GALOSH presents a training-free, search-free denoising method for raw Bayer and sRGB images using blind noise estimation and local shrinkage, offering a strong baseline for hyperspectral denoising.",
+      "llm_tldr_cn": "该论文提出GALOSH，一种无需训练和搜索的图像去噪方法，通过盲噪声拟合（泊松-高斯）和广义Anscombe变换，再进行局部收缩去噪。该方法在速度和域覆盖上优于BM3D，且无需GPU。其为高光谱图像去噪提供了一个高效且可迁移的训练免费基线。",
+      "llm_tldr": "该论文提出GALOSH，一种无需训练和搜索的图像去噪方法，通过盲噪声拟合（泊松-高斯）和广义Anscombe变换，再进行局部收缩去噪。该方法在速度和域覆盖上优于BM3D，且无需GPU。其为高光谱图像去噪提供了一个高效且可迁移的训练免费基线。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.03054v1",
+      "source": "arxiv",
+      "title": "Directionally Weighted Total Variation for Inverse Problems",
+      "abstract": "We study weighted total variation (TV) regularization for inverse problems in which the forward operator has a large null space, a setting in which standard (unweighted) TV is known to produce systematic reconstruction artifacts such as spatial bias. To address this issue, we consider spatially varying weights derived from a sensitivity analysis of the forward operator expression via an associated Green's function. These weights rebalance the TV penalty and thereby compensate for the inhomogeneous sensitivity of the forward operator.   We introduce and analyze two related models: an isotropic weighted TV functional, where the weight reflects worst-case directional sensitivity, and a directionally weighted refinement in which the weighting depends on the actual jump direction of the solution. In addition to the standard Tikhonov formulation, we also study corresponding basis-pursuit problems. We derive optimality conditions and prove exact recovery results under suitable structural assumptions. Furthermore, we investigate how recoverability depends on the geometry of the solution and its distance to the observation boundary.   Numerical experiments for inverse source problems and related applications demonstrate that the proposed weighted formulations significantly reduce artifacts present in unweighted TV reconstructions, yielding improved localization and size recovery. These results highlight the crucial role of spatial weighting in TV regularization for inverse problems with large null spaces.",
+      "authors": [
+        "Ole Løseth Elvetun",
+        "Bjørn Fredrik Nielsen"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-03T07:43:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.03054v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "weighted TV regularization for inverse problems, applicable to image denoising",
+      "llm_evidence_cn": "加权总变分正则化用于反问题，可应用于图像去噪",
+      "llm_evidence": "加权总变分正则化用于反问题，可应用于图像去噪",
+      "canonical_evidence": "加权总变分正则化用于反问题，可应用于图像去噪",
+      "llm_tldr_en": "Proposes directionally weighted TV regularization for inverse problems, compensating for inhomogeneous sensitivity, reducing artifacts like spatial bias, relevant to denoising methods.",
+      "llm_tldr_cn": "该论文提出方向加权总变分（TV）正则化方法，用于解决逆问题中正向算子零空间大导致的重建伪影（如空间偏差）。通过基于格林函数灵敏度分析推导空间变权重，重新平衡TV惩罚项。方法包括各向同性和方向性加权两种模型，适用于图像去噪等反问题，可迁移至高光谱图像去噪。",
+      "llm_tldr": "该论文提出方向加权总变分（TV）正则化方法，用于解决逆问题中正向算子零空间大导致的重建伪影（如空间偏差）。通过基于格林函数灵敏度分析推导空间变权重，重新平衡TV惩罚项。方法包括各向同性和方向性加权两种模型，适用于图像去噪等反问题，可迁移至高光谱图像去噪。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

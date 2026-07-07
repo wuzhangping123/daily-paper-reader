@@ -1,0 +1,1064 @@
+Title: Directionally Weighted Total Variation for Inverse Problems
+
+URL Source: https://arxiv.org/pdf/2607.03054v1
+
+Published Time: Tue, 07 Jul 2026 00:47:16 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+# Directionally Weighted Total Variation for Inverse Problems 
+
+## Ole Løseth Elvetun ∗and Bjørn Fredrik Nielsen †
+
+## July 7, 2026 
+
+Abstract 
+
+We study weighted total variation (TV) regularization for inverse prob-lems in which the forward operator has a large null space, a setting in which standard (unweighted) TV is known to produce systematic recon-struction artifacts such as spatial bias. To address this issue, we consider spatially varying weights derived from a sensitivity analysis of the forward operator expressed via an associated Green’s function. These weights re-balance the TV penalty and thereby compensate for the inhomogeneous sensitivity of the forward operator. We introduce and analyze two related models: an isotropic weighted TV functional, where the weight reflects worst-case directional sensitivity, and a directionally weighted refinement in which the weighting depends on the actual jump direction of the solution. In addition to the standard Tikhonov formulation, we also study corresponding basis-pursuit prob-lems. We derive optimality conditions and prove exact recovery results under suitable structural assumptions. Furthermore, we investigate how recoverability depends on the geometry of the solution and its distance to the observation boundary. Numerical experiments for inverse source problems and related appli-cations demonstrate that the proposed weighted formulations significantly reduce artifacts present in unweighted TV reconstructions, yielding im-proved localization and size recovery. These results highlight the crucial role of spatial weighting in TV regularization for inverse problems with large null spaces. 
+
+# 1 Introduction 
+
+In this paper we are concerned with inverse problems for which the forward operator K has a significant null space. More precisely, we assume that K :
+
+> ∗
+
+Faculty of Science and Technology, Norwegian University of Life Sciences, P.O. Box 5003, NO-1432 ˚ As, Norway. Email: ole.elvetun@nmbu.no. 
+
+> †
+
+Faculty of Science and Technology, Norwegian University of Life Sciences, P.O. Box 5003, NO-1432 ˚ As, Norway. Email: bjorn.f.nielsen@nmbu.no. 
+
+1
+
+> arXiv:2607.03054v1 [math.NA] 3 Jul 2026
+
+L2(Ω) → L2(∂Ω) is a linear operator and consider the weighted problem min   
+
+> f∈BV (Ω)
+
+
+
+12 ∥Kf − d∥2 
+
+> L2(∂Ω)
+
++ α
+
+Z
+
+> Ω
+
+w(y) |Df |(y)
+
+| {z }  
+
+> =TV w(f)
+
++β
+
+Z
+
+> ∂Ω
+
+w∂ (y)|f (y)| ds (y)
+
+
+
+.
+
+(1) Here, d ∈ L2(∂Ω) is the measured data, Ω ⊂ R2 is a bounded Lipschitz domain, 
+
+α > 0 is a regularization parameter, Df is the vector-valued Radon measure representation of the ”gradient” of f , and w is the weight function 
+
+w(y) = sup  
+
+> d,|d|2=1
+
+∥K(∇G(·; y) · d)∥Lp(∂Ω) , (2) where G is a suitable Green’s function which we define below. The presence of the boundary term, i.e., the term involving the parameter β, is motivated by the following observation: Without this term, it becomes ”cheap” to obtain a good data fit with a source which is (approximately) constant close to ∂Ω since the total variation of a constant function is zero. Hence, a boundary-bias occurs. We will return to this issue below and explain how it is linked to the choice of boundary conditions to use in the definition of the Green’s function G.Operators that map interior distributions to boundary observations, i.e., 
+
+K : L2(Ω) → L2(∂Ω), arise naturally in inverse source problems for elliptic partial differential equations, see [22, 16] and the references therein. Concrete examples include source identification in groundwater modelling, the inverse problem of electrocardiography [24], and certain regimes of electrical impedance tomography [5]. A defining feature of such operators is that the dimension of the null space is typically infinite: many distinct interior sources produce identical boundary data. Stable reconstruction therefore requires regularization, and the regularization functional plays a particularly active role since it must determine the component of the solution that lies in N (K). When K has a substantial null space, the conventional choice w ≡ 1 in (1) is known to introduce systematic artifacts in the reconstructed solution. Since each unit of total variation produces a far larger reduction of the data-fidelity term in regions where K is highly sensitive than in regions where K is nearly blind, an unweighted TV penalty effectively becomes cheaper, relative to the fidelity term, in the sensitive regions. As a consequence, recovered features tend to be displaced toward those regions, and sources of equal magnitude may be reconstructed with different intensities - if at all - depending on their location relative to ∂Ω. These observations motivate spatially varying weights w that rebalance the TV penalty according to the non-uniform sensitivity of K.Spatially weighted TV functionals have been considered by several authors and in several contexts. Anisotropic and direction-aware TV functionals are studied in [20, 4], and structure-guided variants tailored to multi-channel and multi-modal data appear in [14, 15]. Specifically for inverse problems with sig-nificant null spaces, weighted Tikhonov and sparsity formulations have been in-vestigated previously, and the anisotropic (i.e., |Df |1) weighted TV counterpart 2to problem (1) was introduced and analyzed in [7]. The present paper builds on that work in two main respects: (i) it replaces the axis-aligned weights in the anisotropic setting with taking the supremum over all possible directions, and (ii) it introduces and analyzes the directionally weighted refinement TV ew, in which the worst-case supremum over directions is replaced by the actual jump direction of the candidate solution, see (3) and (4) below. The form of the weight (2) can be motivated as follows. Using the repre-sentation of K in terms of G, the action of K on a localized perturbation of 
+
+f near a point y, in direction d, is to leading order given by K(∇G(·; y) · d). The weight w(y) thus measures the maximal sensitivity of the data to a unit perturbation of the gradient of f at y, with the supremum taken over all admis-sible directions. The role of w in (1) is thus to remove spatial bias: where K is weakly sensitive, w(y) is small and the TV penalty becomes inexpensive, so the minimizer is allowed to develop jumps and other structure there. Conversely, in regions of high sensitivity each unit of total variation already produces a large change in Kf , so a larger value of w(y) is needed to prevent the data-fidelity term from biasing reconstructions toward those regions. In this way, the weight rebalances the cost of total variation against the heterogeneous sensitivity of K
+
+across Ω, allowing the reconstruction to follow the data wherever the data are informative and the prior wherever they are not. Our investigation will also suggest the following alternative to (1), involving the polar decomposition Df = νf |Df |, |νf |2 = 1, min   
+
+> f∈BV (Ω)
+
+
+
+12 ∥Kf − d∥2 
+
+> L2(∂)
+
++ α
+
+Z
+
+> Ω
+
+ew(y, f ) |Df |(y)
+
+| {z }   
+
+> =TV ew(f)
+
++β
+
+Z
+
+> ∂Ω
+
+w∂ (y)|f (y)| ds (y)
+
+
+
+,
+
+(3) where the weight function in this case reads 
+
+ew(y, f ) = ∥K(∇G(·; y) · νf (y)) ∥Lp(∂Ω) . (4) Below we will simply write ν, instead of νf , whenever it is clear from the context with which function f , ν is associated. The crucial difference between (2) and (4) is that the supremum over d in (2) is replaced by the actual jump direction ν(y) of the candidate f . While (2) treats every direction equally and thereby penalizes the worst-case sensitivity at y, the formulation in (4) is sensitive to the direction of the level curves: variations of f in different directions are penalized differently, in accordance with how strongly K responds to perturbations in those directions. Setting ϕ(y, ν) := ∥K(∇G(·; y) · ν)∥Lp(∂Ω) ,the map ν 7 → ϕ(y, ν) is the composition of a linear map with the Lp norm and is therefore positively 1-homogeneous and sublinear on R2 for every y.Consequently, TV ew(f ) = 
+
+Z
+
+> Ω
+
+ϕ(y, ν(y)) d|Df |(y)3fits into the framework of anisotropic, position-dependent total variation func-tionals (i.e., Finsler TV [1]) 
+
+f 7 →
+
+Z
+
+> Ω
+
+ϕ(y, dDf (y)) , (5) in which ϕ : Ω × RN → [0 , ∞) is positively 1-homogeneous in its second ar-gument; despite the appearance of ν in the integrand, TV ew(f ) is just the polar-decomposition representation of (5) for our specific choice of ϕ. Func-tionals of this type are convex and lower semicontinuous on BV (Ω) under mild assumptions on ϕ, and have been studied since the 1990s in the context of re-laxation and integral representation [6, 2, 11], as well as in connection with weighted-anisotropic TV regularization for image reconstruction [23]. The class (5) continues to attract attention: the gradient flow associated with general convex linear-growth integrands f (x, Au) and the corresponding BV-relaxation are studied in [25], and a general lower semicontinuity and existence theory for anisotropic TV functionals with position-dependent integrand is developed in [18]. The closely related directional and structure-guided TV functionals appear in [4, 14]. Finally, by construction one has the pointwise inequality TV ew(f ) ≤ TV w(f ), with equality at points where the jump direction ν(y) realizes the supremum in (2). In addition to (1) and (3), we also consider their basis-pursuit counterparts, in which the data fidelity term is replaced by a constraint: min    
+
+> f∈BV (Ω)
+
+TV w(f ) subject to Kf = d, 
+
+and analogously for TV ew.
+
+Contributions and outline. The purpose of this paper is to (i) derive the weights w and ew from a sensitivity argument involving the Green’s function 
+
+G associated with K, (ii) establish some recoverability properties of the basis pursuit counterparts to (1) and (3), and (iii) illustrate, by means of numeri-cal experiments, that the weighted formulations correct several of the artifacts produced by standard isotropic TV when K has a significant null space. The remainder of the paper is organized as follows. Section 2 provides a motivating example where unweighted total variation fails to recover an interior source. Section 3 collects the necessary background on the Green’s function setting, and the detailed motivation and analysis of w and ew. In Section 4 we present the optimality conditions and establish some recoverability criteria for the basis-pursuit counterparts of (1) and (3). Section 5 reports numerical ex-periments illustrating the theoretical results, and Section 6 contains concluding remarks. 42 Motivating example 
+
+Here we present a numerical example showing that standard unweighted isotropic TV fails to yield adequate results for identifying an internal source from bound-ary measurements. Throughout this section we let Ω = (0 , 1) 2 and take K to be the operator that maps a source f ∈ L2(Ω) to the boundary trace u|∂Ω of the solution u ∈ H1(Ω) of the screened-Poisson problem 
+
+−∆u + u = f in Ω , u = 0 on ∂Ω, (6) for which the analysis below applies. Boundary data d = Kf † are generated synthetically from a known/true piecewise constant source f †, and we then solve (3) with ew ≡ 1. The true source is the indicator function of a disk centered at (0 .5, 0.6) with radius 0 .3, see Figure 1(a). The reconstructions obtained with unweighted TV are shown for β = 0 (i.e., without boundary penalty) in Figure 1(b) and for β = α (i.e., with boundary penalty) in Figure 1(c). Two effects are immediately visible. First, the recovered support is pulled toward the boundary ∂Ω: the reconstructed mass is concen-trated where it produces the largest boundary signal per unit total variation, rather than at the true location of the source. This is particularly outspoken when β = 0. Second, the magnitude of the reconstruction is markedly smaller than that of f †. Both effects originate from the spatial inhomogeneity of K: in the unweighted formulation, every unit of |Df | is charged the same price regard-less of where it is placed, even though a unit of |Df | near ∂Ω explains far more of d than a unit of |Df | deep in the interior. The minimizer therefore prefers configurations near the boundary, and accepts a global reduction in amplitude in order to lower the regularization cost.        
+
+> (a) True source (b) Unweighted; β= 0 (c) Unweighted; β=α
+
+Figure 1: Comparison of the true source and unweighted inverse recoveries (i.e., 
+
+ew = 1 in (3)). Panels (b) and (c) show results computed without and with boundary penalty, respectively. This example sets the stage for the rest of the paper. It shows that, when the forward operator has a significant null space, the choice of regularization functional must account for the spatial sensitivity of |Df |, which serves as the main motivation for introducing the weight functions w and ew.53 Preliminaries 
+
+We will now derive how the source f can be represented in terms of the Green’s function of the Laplace operator and the gradient ∇f . These standard results then motivate the definition of our weights and can be used to establish some basic inequalities. One interesting point is that the choice of boundary conditions for the Green’s function influences the weights and the choice could - and perhaps should - be based on whether one wants to penalize jumps at the boundary or not, i.e., whether β = 0 or β > 0 in (1) and (3). We will return to this after introducing the framework. 
+
+Neumann representation 
+
+Let G denote the Green’s function associated with a standard self-adjoint second order elliptic operator subject to homogeneous Neumann boundary conditions: 
+
+− ∆y G(y; x) = δx(y) − 1
+
+|Ω| y ∈ Ω,
+
+∇y G(y; x) · n(y) = 0 y ∈ ∂Ω,
+
+(7) and note that we may express the source f in the form, using integration by parts, 
+
+f (x) = 
+
+Z
+
+> Ω
+
+δx(y)f (y) dy 
+
+=
+
+Z
+
+> Ω
+
+∇G(y; x) · Df (y) + 1
+
+|Ω|
+
+Z
+
+> Ω
+
+f (y) dy 
+
+=
+
+Z
+
+> Ω
+
+∇G(y; x) · ν(y) |Df |(y) + 1
+
+|Ω|
+
+Z
+
+> Ω
+
+f (y) dy 
+
+=
+
+Z
+
+> Ω
+
+∇G(x; y) · ν(y) |Df |(y) + 1
+
+|Ω|
+
+Z
+
+> Ω
+
+f (y) dy, (8) where we have employed the polar decomposition Df = ν|Df |, |ν|2 = 1, and the symmetry of the Green’s function G. We also observe that this representation is independent of the free constant of the solution of (7). Let us, for the sake of simplicity, assume that K1 = 0, i.e., that the null space of K contains the constant functions. If not, we could consider the composite function Q = P ◦ K, where P projects any y ∈ R(K) onto the orthogonal complement of the image under K of the constants and then define the weights in (2) and (4) using Q rather than K. See [7] for details. From (8) we find that, keeping in mind that K is a linear operator, 
+
+Kf = K
+
+Z
+
+> Ω
+
+∇G(·; y) · ν(y) |Df |(y)=
+
+Z
+
+> Ω
+
+K(∇G(·; y) · ν(y)) |Df |(y),
+
+6and we get the following bound for the Lp-norm of the image of f under K:
+
+∥Kf ∥Lp(∂Ω) =
+
+Z 
+
+> ∂Ω
+
+Z
+
+> Ω
+
+K(∇G(·; y) · ν(y)) |Df |(y)
+
+> p
+
+ds (z)
+
+1/p 
+
+≤
+
+Z
+
+> Ω
+
+Z 
+
+> ∂Ω
+
+|K(∇G(·; y) · ν(y)) |p ds (z)
+
+1/p 
+
+|Df |(y)=
+
+Z
+
+> Ω
+
+∥K(∇G(·; y) · ν(y)) ∥Lp(∂Ω) |Df |(y)= TV ew(f ), (9) provided that ew is defined according to (4). It follows from the definitions (2) and (4) that 
+
+ew(y, f ) ≤ w(y) ∀y ∈ Ω, ∀f ∈ BV (Ω) ,
+
+and hence that TV ew(f ) ≤ TV w(f ) ∀f ∈ BV (Ω) .
+
+We can therefore in view of (9) conclude that also 
+
+∥Kf ∥Lp(∂Ω) ≤ TV w(f ) ∀f ∈ BV (Ω) . (10) 
+
+Dirichlet representation 
+
+If we instead consider the Green’s function for the Laplace operator with homo-geneous Dirichlet boundary conditions, we get, in contrast to (8), an alternative representation of the source f , namely 
+
+f (x) = 
+
+Z
+
+> Ω
+
+∇G(x; y) · ν(y)|Df |(y) −
+
+Z
+
+> ∂Ω
+
+∂nG(x; y) f (y) ds (y). (11) Assuming f to have zero trace, we get exactly the same upper bounds as derived in (9) and (10). If not, we get, from an argument analogous to (9), that 
+
+∥Kf ∥Lp(∂Ω) ≤ TV ew(f ) + 
+
+Z
+
+> ∂Ω
+
+w∂ |f | ds ≤ TV w(f ) + 
+
+Z
+
+> ∂Ω
+
+w∂ |f | ds, 
+
+where 
+
+w∂ (y) = 
+
+Z 
+
+> ∂Ω
+
+|K(∂nG(·; y)) |pds (z)
+
+1/p 
+
+.
+
+Remark 3.1. Note that the weight for the boundary term arises naturally when applying Dirichlet boundary conditions to the Green’s function. This is not the case for Neumann conditions. This motivates the use of the former when one wants to apply boundary penalty, i.e., when β > 0.
+
+74 Analysis 
+
+In this section we will first consider some instructive cases where we can guar-antee exact recovery of a given source, before we view the problems through the lens of more classical optimality conditions. 
+
+## 4.1 Exact recovery 
+
+We will now present an exact recovery result for the zero regularization coun-terpart to (3): 
+
+Theorem 4.1. Let p = 1 and β = 0 . Assume that K1 = 0 and let Df ∗ =
+
+ν∗|Df ∗| be the polar decomposition of the BV-derivative of the true source f ∗.If f ∗ satisfies, for every z ∈ ∂Ω,
+
+sgn {(K[∇G(·; y) · ν∗(y)])( z)} ≥ 0 ∀y ∈ Ω (12) 
+
+or 
+
+sgn {(K[∇G(·; y) · ν∗(y)])( z)} ≤ 0 ∀y ∈ Ω, (13) 
+
+then 
+
+f ∗ ∈ arg min   
+
+> g∈BV (Ω)
+
+TV ew(g) subject to Kg = Kf ∗. (14) 
+
+Proof. Assumptions (12) and (13) imply that we can replace, when f = f ∗, the inequality in (9) with equality, i.e., TV ew(f ∗) = ∥Kf ∗∥L1(∂Ω) .
+
+Furthermore, for any g satisfying Kg = Kf ∗ we can invoke (9) with f = g and conclude that TV ew(f ∗) = ∥Kf ∗∥L1(∂Ω) = ∥Kg ∥L1(∂Ω) ≤ TV ew(g).
+
+The following quantity plays an important role in our analysis of (1), 
+
+q(y) ∈ arg max  
+
+> d,∥d∥=1
+
+∥K(∇G(·; y) · d)∥L1(∂Ω) y ∈ Ω. (15) We remark that q(y) is not unique and that Theorem 4.2 below holds for any 
+
+q(y) satisfying (15), provided that also (12)-(16) hold. Roughly speaking, q(y)is a dominant direction of ∇G(·; y) under the image of K. Using this concept, our exact recovery result for the basis pursuit problem associated with (1) reads: 
+
+Theorem 4.2. Let p = 1 and β = 0 . Assume that K1 = 0 and that f ∗, where 
+
+Df ∗ = ν∗|Df ∗|, satisfies (12) -(13) . If 
+
+ν∗(y) = q(y) |Df ∗| − a.e., (16) 
+
+then 
+
+f ∗ ∈ arg min  
+
+> g∈BV (Ω)
+
+TV w(g) subject to Kg = Kf ∗. (17) 8Proof. As in the proof of Theorem 4.1, we find that TV ew(f ∗) = ∥Kf ∗∥L1(∂Ω) .
+
+Assumption (16) implies that 
+
+ew(y, f ∗) = ∥K(∇G(·; y) · ν∗(y)) ∥L1(∂Ω) 
+
+= ∥K(∇G(·; y) · q(y)) ∥L1(∂Ω) 
+
+= w(y).
+
+For any g satisfying Kg = Kf ∗ we thus find that TV w(f ∗) = TV ew(f ∗) = ∥Kf ∗∥L1(∂Ω) = ∥Kg ∥L1(∂Ω) ≤ TV w(g),
+
+where the inequality follows from (10). 
+
+Example 1 
+
+Let us consider a 1D problem with Ω = (0 , 1) , p = 1 , β = 0 and assume that f ∗ is strictly increasing on Ω. Then |Df ∗|(y) = ( Df ∗)( y) for all y ∈ Ω. Consequently, 
+
+ν∗(y) = 1 ∈ arg max  
+
+> d, ∥d∥=1
+
+∥K(G′(·; y) · d)∥L1(∂Ω) y ∈ Ω,
+
+and it follows that (16) holds with q(y) = 1, y ∈ Ω. We conclude that (17) holds for strictly increasing functions provided K and G are such that (12) or (13) is satisfied with ν∗(y) = 1. The same argument can, of course, be made for strictly decreasing functions. 
+
+Example 2 
+
+We consider a true source in 1D with a single jump: 
+
+f ∗(x) = 
+
+ r − 1, x < r, r, x > r, . (18) where r ∈ (0 , 1) is fixed. Also, Ω = (0 , 1) , p = 1 and β = 0. Then, cf. (10), 
+
+∥Kf ∗∥L1(∂Ω) =
+
+Z
+
+> ∂Ω
+
+Z
+
+> Ω
+
+K(∇G(·; y) · ν∗(y)) |Df ∗|(y) dz 
+
+=
+
+Z
+
+> ∂Ω
+
+Z
+
+> Ω
+
+K(G′(·; y) · ν∗(y)) dδ r (y) dz 
+
+=
+
+Z
+
+> ∂Ω
+
+|K(G′(·; r) · 1) | dz 
+
+= w(r).
+
+9Moreover, 
+
+T V w(f ∗) = 
+
+Z
+
+> Ω
+
+w(y) |Df ∗|(y)=
+
+Z
+
+> Ω
+
+w(y) dδ r (y)= w(r).
+
+Consequently, if Kg = Kf ∗, then 
+
+T V w(f ∗) = w(r) = ∥Kf ∗∥L1(∂Ω) = ∥Kg ∥L1(∂Ω) ≤ T V w(g),
+
+where we have used (10), and it follows that f ∗ obeys (17). In this example 
+
+ν∗(y) = 0 for y̸ = r and ν∗(r) = 1 and therefore (12), (13) and (16) all hold. 
+
+## 4.2 Optimality conditions 
+
+The optimality conditions associated with the noise-free limit version of (3) are presented in the proposition below. To this end, we define the polar F ◦ of a convex, lower semi-continuous and 1-homogeneous function F by 
+
+F ◦(y, Ψ( y)) = sup  
+
+> θ̸=0
+
+ θ · Ψ( y)
+
+F (y, θ ) : θ ∈ R2
+
+
+
+Proposition 4.3. The function f ∗ ∈ BV (Ω) is a minimizer of 
+
+min   
+
+> f∈BV (Ω)
+
+Z
+
+> Ω
+
+ew(y, ν(y)) |Df |(y) + β
+
+Z
+
+> ∂Ω
+
+w∂ |f | dσ s.t. Kf = Kf ∗ (19) 
+
+if and only if there exists a Lagrange multiplier λ ∈ Lq (∂Ω) , 1 
+
+> p
+
++ 1 
+
+> q
+
+= 1 and a vector field z ∈ L∞(Ω) with ∇ · z ∈ L2(Ω) such that the following conditions hold: (i) Stationarity condition: 
+
+K∗λ = −∇ · z in Ω ,
+
+(ii) Dual constraints: 
+
+1. Interior: ew◦(y, z(y)) ≤ 1, y ∈ Ω,2. Boundary: |z(y) · n| ≤ βw ∂ (y), y ∈ ∂Ω.
+
+(iii) Exact saturation / Complementary slackness: 
+
+1. Interior alignment: 
+
+z · νf ∗ = ew(y, νf ∗ ), |Df ∗| − a.e. 
+
+2. Boundary alignment: (z · n)f ∗ = −βw ∂ |f ∗| on ∂Ω.
+
+10 Proof. The result is an instance of Fenchel–Rockafellar duality for the weighted total variation functional; the dual vector field z and the saturation conditions follow the predual formulation of TV [9], and condition (i) is the source condition in the sense of [8]. The derivation of the proof is therefore omitted, but we present how these conditions can be used to verify that f ∗ is indeed a minimizer. First, note the general Fenchel inequality 
+
+ψ(y) · ν(y) ≤ F (y, ν(y)) whenever F ◦(y, ψ(y)) ≤ 1.
+
+Now, let g ∈ BV (Ω) be any feasible solution, i.e., Kg = Kf ∗. Using the Fenchel inequality and all of the conditions above, we get 
+
+Z
+
+> Ω
+
+ew(y, νg (y)) |Dg |(y) + β
+
+Z
+
+> ∂Ω
+
+w∂ |g| ds ≥
+
+Z
+
+> Ω
+
+(z · νg ) |Dg |(y) + 
+
+Z
+
+> ∂Ω
+
+|z · n| | g| ds 
+
+≥
+
+Z
+
+> Ω
+
+z · Dg (y) −
+
+Z
+
+> ∂Ω
+
+(z · n)g ds 
+
+= −
+
+Z
+
+> Ω
+
+(∇ · z)g dy +
+
+Z
+
+> ∂Ω
+
+(z · n)g ds −
+
+Z
+
+> ∂Ω
+
+(z · n)g ds 
+
+= ⟨K∗λ, g ⟩ = ⟨λ, Kg ⟩ = ⟨λ, Kf ∗⟩ = ⟨K∗λ, f ∗⟩
+
+= −
+
+Z
+
+> Ω
+
+(∇ · z)f ∗ dy 
+
+=
+
+Z
+
+> Ω
+
+z · Df ∗(y) −
+
+Z
+
+> ∂Ω
+
+(z · n)f ∗ ds 
+
+=
+
+Z
+
+> Ω
+
+(z · νf ∗ ) |Df ∗|(y) −
+
+Z
+
+> ∂Ω
+
+(z · n)f ∗ ds 
+
+=
+
+Z
+
+> Ω
+
+ew(y, νf ∗ ) |Df ∗|(y) + β
+
+Z
+
+> ∂Ω
+
+w∂ |f ∗| ds 
+
+Note that if β = 0 the dual constraint for the boundary implies that z ·n = 0 along ∂Ω. 
+
+Remark 4.4. What might seem to be the most challenging part of the opti-mality conditions to fulfill is the Euler-Lagrange equation. However, for any 
+
+λ ∈ Lq (∂Ω) we have (in a distributional sense via φ ∈ C1 
+
+> c
+
+(Ω) ) the representa-tion 
+
+⟨K∗λ, φ ⟩ = ⟨λ, Kφ ⟩
+
+=
+
+
+
+λ, 
+
+Z
+
+> Ω
+
+K(∇G(·; y)) · Dφ (y)
+
+
+
+=
+
+Z
+
+> Ω
+
+⟨λ, K (∇G(·; y)) ⟩ · Dφ (y)= −
+
+Z
+
+> Ω
+
+∇ · ⟨ λ, K (∇G(·; y)) ⟩ φ(y) dy 
+
+= −
+
+Z
+
+> Ω
+
+(∇ · zλ(y)) φ(y) dy, 
+
+11 where we have defined 
+
+zλ(y) = ⟨λ, K (∇G(·; y)) ⟩. (20) 
+
+Taking the Euclidean inner product of (20) with θ ∈ R2 and applying H¨ older’s inequality give 
+
+zλ(y) · θ = ⟨λ, K (∇G(·; y)) ⟩ · θ
+
+= ⟨λ, K (∇G(·; y) · θ)⟩≤ ∥ λ∥q ∥K(∇G(·, y ) · θ)∥p
+
+= ∥λ∥q ew(y, θ ).
+
+Taking supremum over θ̸ = 0 yields 
+
+ew◦(y, z(y)) ≤ ∥ λ∥q ∀ y ∈ Ω.
+
+In particular, if ∥λ∥q ≤ 1, then the associated field zλ satisfies the interior dual constraint ew◦(y, zλ(y)) ≤ 1 uniformly in y. Thus, for the chosen weight ew,interior dual feasibility reduces to a global norm bound on the Lagrange multiplier rather than a pointwise requirement. 
+
+From these considerations, we get the simplified optimality conditions 
+
+Corollary 4.5. Let ew be defined as in (4) . Then, the function f ∗ ∈ BV (Ω) is a minimizer of (19) if there exists a Lagrange multiplier λ ∈ Lq (∂Ω) such that: (i) Global radial condition: 
+
+∥λ∥q ≤ 1
+
+(ii) Exact saturation / Complementary slackness: 
+
+zλ · νf ∗ = ew(y, νf ∗ ), |Df ∗| − a.e., 
+
+(iii) Boundary trace: |zλ(x) · n| ≤ βw ∂ (x), x ∈ ∂Ω.
+
+(iv) Boundary alignment: (z · n)f ∗ = −βw ∂ |f ∗| on ∂Ω.
+
+Here, zλ is the vector field defined in (20) .
+
+Corollary 4.6. Let ew be defined as in (4) and fix any ”location-direction” pair 
+
+(y0, θ 0). Assume p = q = 2 . Then the dual candidate 
+
+λ(y0,θ 0) := K(∇G(·, y 0) · θ0)
+
+∥K(∇G(·, y 0) · θ0)∥2
+
+,
+
+satisfies the global radial condition (i) of Corollary 4.5. Furthermore, if θ0 =
+
+νf ∗ (y0), it also fulfils exact saturation (ii) at y0.Proof. Clearly, ∥λ(y0,θ 0)∥2 = 1. Setting the given choice of λ into (20), it follows that the complementary slackness condition is satisfied at y0.12 This can be interpreted as follows: The TV atom χR associated with a simple set R (cf. [19, 3]) is generated by a continuum of infinitesimal oriented boundary elements ( y0, θ 0) of its perimeter. Under the weight ew these elements are treated without spatial bias in the sense that every ( y0, θ 0) is equally dual-feasible through its own unit-length canonical certificate/Lagrange multiplier 
+
+λ(y0,θ 0).Admittedly, to certify a full region, i.e., to recover f ∗ = χR, we would need a saturating dual certificate in a |Df ∗|-a.e. sense. The existence of such a certificate is far from trivial and relies on the domain Ω, the shape R and the forward operator K. In the unweighted setting, exact recovery of this type has been established for certain shapes under specific forward operators, both for isotropic TV [10] and in a anisotropic TV setting [21]. Nevertheless, we will attempt to further highlight why the weights are nec-essary to certify extended shapes at different depths throughout the domain Ω. To this end, assume the true source to be the characteristic function χE , where 
+
+E ⊂⊂ Ω has a smooth boundary ∂E .Note that on characteristic functions the weighted total variation reduces to the weighted perimeter, TV ew(χE ) = 
+
+Z
+
+> ∂E
+
+ew(y, nE )ds. 
+
+Consequently, if χE solves (19), it is a stationary point of the Lagrangian 
+
+L(E, λ ) = 
+
+Z
+
+> ∂E
+
+ew(y, nE ) ds + ⟨λ, Kχ E − d⟩,
+
+where λ is an associated Lagrange multiplier. To derive the associated Euler–Lagrange equation, consider a smooth normal deformation 
+
+∂E t = { y + t φ (y) nE (y) : y ∈ ∂E },
+
+with φ an arbitrary smooth scalar velocity. The stationarity condition of the Lagrangian reads 
+
+ddt L(Et, λ )
+
+> t=0
+
+= 0 ∀ φ. 
+
+By the theory of shape derivatives [12], the first variation of the constraint term is ddt ⟨λ, Kχ Et ⟩
+
+> t=0
+
+=
+
+Z
+
+> ∂E
+
+K∗λ φ ds, 
+
+while the first variation of the weighted perimeter (in which the normal nEt
+
+also varies with t) is 
+
+ddt 
+
+Z
+
+> ∂E t
+
+ew(y, nEt ) ds t=0 
+
+=
+
+Z
+
+> ∂E
+
+κ ew φ ds, 
+
+13 where κ ew is the weighted anisotropic curvature [13]. Stationarity for all φ
+
+therefore gives Z
+
+> ∂E
+
+ κ ew + K∗λ φ ds = 0 ∀ φ, 
+
+and hence 
+
+κ ew + K∗λ = 0 on ∂E. (21) We emphasize that (21) is a necessary (stationarity) condition that must hold simultaneously at every point of ∂E ; it does not by itself guarantee that χE is a global minimizer. For simplicity, assume now that ew(y, ν) = w(y), i.e. that the weight is isotropic and that E = Br (x0), i.e., a ball of radius r centered at x0 ∈ Ω. The weighted curvature then simplifies to 
+
+κ ew = wr + ∇w · n,
+
+so that (21) becomes 
+
+K∗λ = − wr − ∇ w · n on ∂B r (x0). (22) Let us now discuss the realism of satisfying (22) for different choices of weight functions w. To this end, let us define ρ(y) := dist( y, ∂ Ω) as the distance from 
+
+y to the boundary, which we refer to as the depth of y. We also assume, which is the case for many inverse problems, that K∗λ decays exponentially into the interior: 
+
+|K∗λ(y)| ≲ C(ρ(y)) e−τ ρ (y),
+
+where C(·) has at most polynomial dependence on ρ.Note that (22) must hold at every point of ∂B r for the same multiplier λ. At a single point, the equation can always be satisfied; the difficulty is simultaneity along the curve ∂B r . With unweighted TV, i.e., w ≡ 1, the right hand side becomes the constant − 1 
+
+> r
+
+, which cannot match the (assumed) exponentially decay of K∗λ for curves spanning over multiple depths. A weight varying only polynomially in ρ also fails for the same reason. Hence, to allow an approximate recovery of interfaces that span a range of depths, it appears that the weight function must have the same exponential dependence on ρ as K∗λ. This is achieved in the present paper by defining w in terms of images under K of the gradient of appropriate Green’s functions. 
+
+# 5 Numerical results 
+
+Discretization 
+
+All experiments are carried out on the unit square Ω = (0 , 1) × (0 , 1), dis-cretized by a uniform grid with spacing h = 1 /128. The forward operator 
+
+K : L2(Ω) → L2(∂Ω) is the map f 7 → u|∂Ω, where u solves the screened Pois-son equation (6). The PDE is discretized with standard piecewise-linear finite 14 elements on the triangulation associated with the grid, and the resulting dis-cretized forward operator is denoted by K = TA −1 ∈ RM ×N , where A and T
+
+are the matrices associated with the screened Poisson equation and the trace operator, respectively. To describe how the weights are generated, let K = USV ⊤ be the (trun-cated) singular value decomposition of the forward matrix, with singular values 
+
+s1, . . . , s r and right singular vectors v1, . . . , vr ∈ RN . Furthermore, we denote by L the discretization of the Laplace operator −∆, used for the representation of the Green’s functions, cf. (11). The directional weight at a point y is the magnitude of the dipole sensitivity, 
+
+sν (y) = K ∇ν G(· ; y) 2, G(· ; y) = L−1δy , (23) i.e., the discrete counterpart of ew(y, ν) = ∥K(∇G(· ; y) · ν)∥L2(∂Ω) .Evaluating (23) directly would require one dipole solve per cell, i.e. N solves. Index the grid cells by e, with ye the corresponding point and δe := δye the discrete source at that cell. The directional derivative ∇ν acts on the source location y, while L−1 acts on the field variable; thus linearity of L−1 gives 
+
+∇ν L−1δe = L−1∇ν δe. Using in addition the symmetry L = L⊤ to write v⊤ 
+
+> k
+
+L−1 =
+
+z⊤ 
+
+> k
+
+with zk = L−1vk gives 
+
+v⊤ 
+
+> k
+
+L−1∇ν δe = ( L−1vk)⊤∇ν δe = z⊤ 
+
+> k
+
+∇ν δe = ( ∇⊤ 
+
+> ν
+
+zk)e = −(∇ν zk)e,
+
+where the last equality follows from integration by parts. Expanding (23) in the singular basis of K and using the expression above yields 
+
+K ∇ν G(· ; ye) 22 =
+
+> r
+
+X
+
+> k=1
+
+s2
+
+> k
+
+ v⊤ 
+
+> k
+
+L−1 ∇ν δe
+
+2 =
+
+> r
+
+X
+
+> k=1
+
+s2
+
+> k
+
+ ∇ν zk
+
+2
+
+> e
+
+. (24) Thus pushing each detectable mode/singular vector once through L−1 and read-ing off its discrete gradient recovers the sensitivity at every cell and in every 
+
+direction simultaneously, replacing N per-cell solves by r mode solves ( r ≪ N ). Stacking the gradients of the smoothed modes column-wise gives 
+
+Wx = Dx [ z1 · · · zr ] Sr , Wy = Dy [ z1 · · · zr ] Sr , Sr = diag( s1, . . . , s r ),
+
+with Dx, Dy the discrete partial-derivative operators. For each evaluation cell 
+
+e (paired with one x- and one y-edge) the corresponding rows form the local weight 
+
+W(e) =
+
+(Wx)e, :
+
+(Wy )e, :
+
+⊤
+
+∈ Rr×2,
+
+whose 2 × 2 Gram matrix is precisely the metric whose quadratic form in ν
+
+equals sν (ye)2 in (23). With ( ∇hf )e =  (Dxf )e, (Dy f )e
+
+⊤, the discrete directionally weighted total variation ( p = 2) is the group ( ℓ2,1) norm of the weighted gradient, TV ew(f ) = 
+
+> Neval
+
+X
+
+> e=1
+
+W(e)(∇hf )e 2.
+
+15 From this, it is also straightforward to compute the discretized isotropic weights corresponding to (2) by setting TV w(f ) = 
+
+> Neval
+
+X
+
+> e=1
+
+∥W(e)∥2 (∇hf )e 2.
+
+Equation (24) shows that each mode’s contribution ( ∇ν zk)2 
+
+> e
+
+involves the factor s2
+
+> k
+
+. In our experiments, removing this factor - i.e. setting sk = 1 for all 
+
+k in (24) - improves recovery in practise, and all numerical results below use this choice. For a more in-depth discussion of employing such a filter for weight generation, see [17]. Note that our analysis is presented in terms of an abstract forward operator K. Hence, such a filter can also be incorporated in the infinite dimensional setting by considering it to be part of the action of K.
+
+Test problems 
+
+We consider two test problems, which differ in the geometry of the unknown. The first is an inverse source problem : the goal is to recover a localized source f †
+
+supported in the interior of Ω from boundary measurements of the corresponding solution u. The ground truth has compact support strictly inside Ω, so feature creation on ∂Ω is undesirable. The second is a gravimetry-inspired problem :the unknown f † models a piecewise constant density and the discontinuity of interest is the interface between two materials of different density, which need not stay away from the boundary. This distinction directly informs the choice of Green’s function and, with it, the form of the regularizer. As discussed in Section 3, the Dirichlet representa-tion (11) naturally produces a boundary term with weight w∂ and is therefore the appropriate setting whenever the regularization should discourage features on ∂Ω, i.e., β > 0. The Neumann representation (8), by contrast, contains no boundary term, and is the appropriate setting when boundary features are admissible, i.e., β = 0. We therefore use the Dirichlet-based weights with β > 0for the inverse source problem and the Neumann-based weights with β = 0 for the gravimetry problem. If not explicitly stated otherwise, we employed p = 2 in the definition of the weight functions w and ew, cf. (2) and (4). 
+
+## Inverse Source Problem 
+
+The first simulations concern the recovery of spherical shapes of different radius. We observe in Figure 2 that a source with small radius is quite well recovered when located close to the boundary, and that relatively larger sources are also recoverable deeper into the domain. Let us mention that when we ran experi-ments with deep sources with small radii, the spatial extent of the reconstructed source was too large and the magnitude too small. These observations can be linked to assumptions (12) and (13). Admit-tedly, it is unrealistic that (12) or (13) is perfectly satisfied in a practical setting 16 involving elliptic PDEs, but they can nevertheless shed some light on recov-erability: Panels (a) and (b) of Figure 3 show ( K[∇G(·; x) · ν∗(x)])( zR) and (K[∇G(·; x) · ν∗(x)])( zL) as functions of the polar angle of x located at a small circle (a) and a large circle (b). Here, zR (red) and zL (blue) are boundary points. In neither of the cases, ( K[∇G(·; x) · ν∗(x)])( zR) ≥ 0 for all x at the circle or ( K[∇G(·; x) · ν∗(x)])( zL) ≥ 0 for all x at the circle, but for the large source this is closer to being satisfied.          
+
+> (a) True source (b) Recovery using TV w(c) Recovery using TV ew
+> (d) True source (e) Recovery using TV w(f) Recovery using TV ew
+> (g) True source (h) Recovery using TV w(i) Recovery using TV ew
+
+Figure 2: Comparison of the true source and inverse recoveries applying the weighted TV (TV w) and directionally weighted TV (TV ew) methods, where the weights are generated with Dirichlet boundary conditions. In all simulations, we set the boundary penalty term β equal to the TV-regularization parameter 
+
+α.17 (a) Small circle (dashed curve) 
+
+> (b) Big circle (dashed curve)
+
+Figure 3: Point evaluations of K[∇G(·; x) · ν∗(x)] at two fixed boundary points 
+
+zR, z L ∈ ∂Ω (in blue and red, respectively), as functions of the polar angle of the source point x on the source circle. In Figure 4, we investigate how well different shapes can be recovered by solving (1) or (3). For the true convex shapes in panels (a) and (d), we observe that the directionally weighted method (seen in panels (c) and (f)) is successful in reconstructing the shape and position, whereas the isotropic functional (seen in panels (b) and (e)) struggles to preserve the sharp boundary. For the non-convex shapes in panels (g) and (j), we observe that both the isotropic and directionally weighted procedures can recover the position and partially the spatial extent of the sources, but they both fail to reconstruct the exact shapes - and the isotropic method still produces smoother reconstructions. We also investigated how choosing of p = 1, instead of p = 2, in the definition 18 (4) of ew affected recovery. In Figure 5 we present the recovery of the same sources as in Figure 4. The position and extension of the sources are still quite well preserved, but we might observe a bit more axis-alignment in the inverse solutions. 
+
+(a) True source (b) Recovery using TV w (c) Recovery using TV ew
+
+(d) True source (e) Recovery using TV w (f) Recovery using TV ew
+
+(g) True source (h) Recovery using TV w (i) Recovery using TV ew
+
+(j) True source (k) Recovery using TV w (l) Recovery using TV ew
+
+Figure 4: Comparison of the true source and inverse recoveries applying the weighted TV (TV w) and directionally weighted TV (TV ew) methods, where the weights are generated with Dirichlet boundary conditions. In all simulations, we set the boundary penalty term β equal to the TV-regularization parameter 
+
+α.19 (a) (b)  
+
+> (c) (d)
+
+Figure 5: Inverse reconstructions using p = 1 in the definition of the weights (4). The corresponding true sources are presented in Figure 4 (and as dashed curves in plots). 
+
+## Gravimetry inspired problem 
+
+The final experiments still concerns the PDE in (6), but we are now searching for a discontinuous source extending throughout the entire domain Ω, placing it into the context of a gravimetry type of problem. In Figure 6, panel (a) shows the true source. When the solution is penal-ized at the boundary, i.e., when β > 0, the reconstruction degrades, as seen in panels (b) and (d): since the true source genuinely reaches the boundary, the boundary penalty suppresses a feature that should be present, and this happens whether or not spatial weighting is used. With β = 0, by contrast, the reconstructions improve, as shown in panels (c), (e), and (f). Although, without spatial weighting (panel (c)), the interface is estimated too close to the boundary. Spatial weighting removes this bias: both the Dirichlet-based weights (panel (e)) and the Neumann-based weights (panel (f)) yield good reconstruc-tions. However, when we restrict the observation domain to the subset Γ = {y ∈
+
+∂Ω : y = 1 } ⊂ ∂Ω, we can observe a significant distinction between the re-constructions depending on whether we use Dirichlet or Neumann conditions for generating the Green’s functions, with the Neumann approach clearly being superior, cf. Figure 7. 20 (a) True interface (b) Standard TV,      
+
+> β > 0
+> (c) Standard TV,
+> β= 0
+> (d) Dirichlet weight,
+> β > 0
+> (e) Dirichlet weight,
+> β= 0
+> (f) Neumann weight,
+> β= 0
+
+Figure 6: Reconstruction of the material interface, comparing standard TV with directionally weighted TV, and the presence ( β > 0) or absence ( β = 0) of the boundary penalty. For the weighted reconstructions, the weight ew is generated from a Green’s function with either Dirichlet or Neumann boundary conditions; the Neumann weight admits no natural boundary term, so its β > 0 case is omitted. 21 (a) True interface (b) Dirichlet weight;      
+
+> β= 0
+> (c) Neumann weight;
+> β= 0
+> (d) True interface (e) Dirichlet weight;
+> β= 0
+> (f) Neumann weight;
+> β= 0
+
+Figure 7: Reconstruction of the material interface, without boundary penalty, i.e., β = 0 in (3), and with weights ew generated by Green’s functions with either Dirichlet or Neumann boundary conditions. Only observations at the top of the domain, i.e., at Γ = {y ∈ ∂Ω : y = 1 }.
+
+# 6 Conclusion 
+
+In this paper we have studied weighted total variation regularization for linear inverse problems whose forward operator K : L2(Ω) → L2(∂Ω) has a signifi-cant null space. We have proposed and analyzed the directionally weighted variant (3)-(4), in which the worst-case supremum over directions defining w,see (1)-(2), is replaced by the actual jump direction of the candidate solution, yielding a sharper but still convex regularizer TV ew.In comparison to standard unweighted TV, we observed large improvements in recoverability for both of the weighted regularization techniques - in partic-ular with respect to the center of mass and spatial extension. However, the directional weighting method did seem to produce better results regarding re-construction of (some of) the shapes, compared with the use of w.Both weights are constructed directly from the operator K together with the Green’s function for the Laplace operator on Ω: depending on whether this Green’s function is taken to satisfy homogeneous Neumann or homoge-neous Dirichlet boundary conditions, the source representation produces either a purely interior term, corresponding to the choice β = 0 in the variational prob-lem, or a representation with an additional boundary term coming equipped with a natural boundary weight w∂ , which corresponds to the choice β > 0. 22 Choosing the Green’s function according to whether one wants to penalize boundary jumps therefore aligns the regularizer with the (expected) geometry of the unknown source. When the support of the true source extends to the boundary, we observed in numerical experiments that using Neumann boundary conditions outperformed the use of Dirichlet boundary conditions. Moreover, for all cases where the true support was strictly interior, we observed that the size and position of all kinds of sources were well recovered, but the new methods admittedly recovered circular/oval shapes much better than more involved shapes. Although it appears that both the total mass and the center of mass of the true sources are well recovered in our numerical simulations, it is currently an open problem whether we can prove that these quantities can be recovered for some typical shapes – or alternatively, that some error estimates can be given. Also, if more prior information concerning the shape(s) of the potential sources is known, it is currently unclear how this can be incorporated into the regularizer – potentially through a more sophisticated choice of a PDE for generating the involved Green’s functions. 
+
+## AI Declaration 
+
+The software used in this project was developed with the aid of AI. 
+
+# References 
+
+[1] M. Amar and G. Bellettini. “A notion of total variation depending on a metric with discontinuous coefficients”. In: Annales de l’Institut Henri Poincar´ e C, Analyse non lin´ eaire 11 (1994), pp. 91–133. doi : 10.1016/ S0294-1449(16)30197-4 .[2] M. Amar and V. De Cicco. “Relaxation in BV for a class of functionals without continuity assumptions”. In: Nonlinear Differential Equations and Applications NoDEA 15 (2008), pp. 25–44. doi : 10.1007/s00030-007-6014-z .[3] L. Ambrosio et al. “Connected components of sets of finite perimeter and applications to image processing”. In: Journal of the European Mathemat-ical Society 3 (2001), pp. 39–92. doi : 10.1007/PL00011302 .[4] I. Bayram and M. E. Kamasak. “A directional total variation”. In: 2012 Proceedings of the 20th European Signal Processing Conference (EUSIPCO) .2012, pp. 265–269. doi : 10.1109/LSP.2012.2220349 .[5] L. Borcea. “Electrical impedance tomography”. In: Inverse Problems 18 (2002), pp. 99–136. doi : 10.1088/0266-5611/18/6/201 .[6] G. Bouchitt´ e, I. Fonseca, and L. Mascarenhas. “A global method for re-laxation”. In: Archive for Rational Mechanics and Analysis 145 (1998), pp. 51–98. doi : 10.1007/s002050050124 .23 [7] M. Burger, O. L. Elvetun, and B. F. Nielsen. “Weighted total variation regularization for inverse problems with significant null spaces”. In: arXiv preprint arXiv:2512.04729 (2025). arXiv: 2512.04729 [math.NA] .[8] M. Burger and S. Osher. “Convergence rates of convex variational regu-larization”. In: Inverse Problems 20 (2004), pp. 1411–1421. doi : 10.1088/ 0266-5611/20/5/005 .[9] A. Chambolle et al. “An introduction to total variation for image analy-sis”. In: Theoretical Foundations and Numerical Methods for Sparse Re-covery . Ed. by M. Fornasier. Vol. 9. Radon Series on Computational and Applied Mathematics. Berlin: De Gruyter, 2010, pp. 263–340. [10] Y. De Castro, V. Duval, and R. Petit. “Exact recovery of the support of piecewise constant images via total variation regularization”. In: Inverse Problems 40 (2024), p. 105012. doi : 10.1088/1361-6420/ad75b1 . arXiv: 
+
+2307.03709 [math.OC] .[11] V. De Cicco, N. Fusco, and A. Verde. “A relaxation result in BV for integral functionals with discontinuous integrands”. In: ESAIM: Control, Optimisation and Calculus of Variations 13 (2007), pp. 396–412. doi :
+
+10.1051/cocv:2007016 .[12] M. C. Delfour and J.-P. Zol´ esio. Shapes and Geometries: Metrics, Analy-sis, Differential Calculus, and Optimization . 2nd ed. Advances in Design and Control. Philadelphia, PA: SIAM, 2011. [13] G. Do˘ gan and R. H. Nochetto. “First variation of the general curvature-dependent surface energy”. In: ESAIM: Mathematical Modelling and Nu-merical Analysis 46 (2012), pp. 59–79. doi : 10.1051/m2an/2011019 .[14] M. J. Ehrhardt and S. R. Arridge. “Vector-valued image processing by parallel level sets”. In: IEEE Transactions on Image Processing 23 (2014), pp. 9–18. doi : 10.1109/TIP.2013.2277775 .[15] M. J. Ehrhardt and M. M. Betcke. “Multicontrast MRI reconstruction with structure-guided total variation”. In: SIAM Journal on Imaging Sci-ences 9 (2016), pp. 1084–1106. doi : 10.1137/15M1047325 .[16] A. El Badia and T. Ha-Duong. “An inverse source problem in potential analysis”. In: Inverse Problems 16 (2000), pp. 651–663. doi : 10.1088/ 0266-5611/16/3/308 .[17] O. L. Elvetun, B. F. Nielsen, and N. Sudheer. “Weighting operators for sparsity regularization”. In: Journal of Inverse and Ill-posed Problems 34 (2026), pp. 121–139. doi : doi:10.1515/jiip-2025-0033 .[18] E. Ficola and T. Schmidt. “Lower semicontinuity and existence results for anisotropic TV functionals with signed measure data”. In: Journal of Functional Analysis 290 (2026), p. 111350. issn : 0022-1236. doi : https: //doi.org/10.1016/j.jfa.2026.111350 .[19] W. H. Fleming. “Functions with generalized gradient and generalized sur-faces”. In: Annali di Matematica Pura ed Applicata 44 (1957), pp. 93–103. 
+
+doi : 10.1007/BF02415193 .24 [20] M. Grasmair and F. Lenzen. “Anisotropic total variation filtering”. In: 
+
+Applied Mathematics and Optimization 62 (2010), pp. 323–339. doi : 10. 1007/s00245-010-9105-x .[21] M. Holler and B. Wirth. “Exact Reconstruction and Reconstruction from Noisy Data with Anisotropic Total Variation”. In: SIAM Journal on Math-ematical Analysis 56 (2024), pp. 2938–2967. doi : 10.1137/22M1508571 .arXiv: 2207.04757 [math.NA] .[22] V. Isakov. Inverse Problems for Partial Differential Equations . 3rd ed. Vol. 127. Applied Mathematical Sciences. New York: Springer, 2017. [23] K. Jalalzai. “Discontinuities of the minimizers of the weighted or anisotropic total variation for image reconstruction”. In: arXiv preprint arXiv:1402.0026 
+
+(2014). arXiv: 1402.0026 [math.AP] .[24] R. S. MacLeod and D. H. Brooks. “Recent progress in inverse problems in electrocardiology”. In: IEEE Engineering in Medicine and Biology Maga-zine 17 (1998), pp. 73–83. doi : 10.1109/51.646224 .[25] D. Meyer. “Total A-variation flows”. In: Annali di Matematica Pura ed Applicata (1923 -) (May 2026). doi : 10.1007/s10231-026-01688-y .25
