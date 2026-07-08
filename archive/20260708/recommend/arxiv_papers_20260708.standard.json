@@ -1,0 +1,136 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-08T20:31:22.933719+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.05636v1",
+      "source": "arxiv",
+      "title": "Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors",
+      "abstract": "Hyperspectral sensing enables material identification; however, state-of-the-art spectrometers are costly and bulky, which limits their use in mobile applications. We address this by proposing sparse spectrum reconstruction from narrowband photocurrents using a pseudoinverse-guided diffusion model (ΠGDM). With ΠGDM we use a denoising diffusion probabilistic model (DDPM) to reconstruct the spectrum, which is trained on a large public spectral dataset to learn realistic spectral priors, eliminating the need for paired sensor measurements. At inference, ΠGDM alternates reverse-diffusion denoising steps with pseudoinverse projection to enforce consistency with measured photocurrents via the calibrated responsivity matrices of sensors. Consequently, our method is sensor-adaptive: when detector arrays change, we simply substitute the responsivity matrix in the pseudoinverse projection without retraining of the diffusion model. The resulting computational spectrometer achieves 1.502% average estimation error, outperforming Tikhonov, Gaussian, compressive-sensing, and multilayer perceptron (MLP) baselines, while providing calibrated uncertainty estimates via Monte Carlo sampling from different random initializations of ΠGDM. Summarizing, our approach offers an accurate, compact alternative for spectral recovery on resource-constrained platforms.",
+      "authors": [
+        "Alireza Siyavashi",
+        "Jon Schlipf",
+        "Sebastian Reiter",
+        "Inga Fischer",
+        "Christian Wenger",
+        "Christian Herglotz"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP"
+      ],
+      "published": "2026-07-06T20:56:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.05636v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "spectral reconstruction for hyperspectral sensing using diffusion priors, directly relevant",
+      "llm_evidence_cn": "利用扩散先验进行高光谱感知光谱重建，直接相关",
+      "llm_evidence": "利用扩散先验进行高光谱感知光谱重建，直接相关",
+      "canonical_evidence": "利用扩散先验进行高光谱感知光谱重建，直接相关",
+      "llm_tldr_en": "Proposes pseudoinverse-guided diffusion model (ΠGDM) for sparse spectrum reconstruction from narrowband photocurrents, using DDPM trained on public spectral dataset, enabling sensor-adaptive hyperspectral reconstruction.",
+      "llm_tldr_cn": "该论文针对高光谱传感中光谱仪昂贵笨重的问题，提出利用伪逆引导扩散模型从窄带光电流稀疏重建光谱。模型使用DDPM学习大规模公共光谱数据集上的真实先验，推理时交替执行逆向扩散去噪和伪逆投影以保证测量一致性。该方法无需配对传感器数据，可实现传感器自适应的光谱重建，直接服务于高光谱去噪与恢复需求。",
+      "llm_tldr": "该论文针对高光谱传感中光谱仪昂贵笨重的问题，提出利用伪逆引导扩散模型从窄带光电流稀疏重建光谱。模型使用DDPM学习大规模公共光谱数据集上的真实先验，推理时交替执行逆向扩散去噪和伪逆投影以保证测量一致性。该方法无需配对传感器数据，可实现传感器自适应的光谱重建，直接服务于高光谱去噪与恢复需求。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.04603v1",
+      "source": "arxiv",
+      "title": "LCPNet: Latent Consistent Proximal Unfolding Network for Infrared Small Target Detection",
+      "abstract": "Infrared small target detection (IRSTD) aims to identify long distance small targets from complex infrared backgrounds, and is a fundamental task in remote sensing. Deep learning methods have improved IRSTD by learning discriminative image-to-mask mappings, but such feed-forward designs often underuse physical decomposition structure between targets and backgrounds. Deep unfolding methods partially address this issue by embedding model-driven iterations into neural networks, yet existing designs still operate mainly in image domain and use updates and memory mechanisms that are not fully coupled with underlying optimization process. To address these limitations, we propose Latent Consistent Proximal unfolding network (LCPNet). First, we verify that low-rank prior remains valid in latent representations and perform unfolding in this space, preserving physical constraint while avoiding repeated compression of intermediate states. Second, we derive a Latent Consistent Proximal (LCP) solver that evolves each latent variable from its previous state rather than reconstructing through an indirect residual, and stabilizes small target updates through task-adaptive normalization and gain control. Third, we introduce Shared Optimization Memory (SOM), a common historical state shared by all decomposition variables to provide coordinated guidance across unfolding stages. Extensive experiments on four public benchmarks demonstrate that LCPNet outperforms state-of-the-art methods while achieving accurate and robust detection with low false alarms and competitive efficiency. Model and code are available at https://github.com/Tianfang-Zhang/LCPNet.",
+      "authors": [
+        "Tianfang Zhang",
+        "Fengyi Wu",
+        "Lei Li",
+        "Chang Liu",
+        "Zhenming Peng",
+        "Huaping Zhang",
+        "Xiangyang Ji"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-06T02:15:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.04603v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deep unfolding network for remote sensing detection, method transferable to HSI restoration and denoising",
+      "llm_evidence_cn": "用于遥感检测的深度展开网络，方法可迁移至高光谱图像恢复与去噪",
+      "llm_evidence": "用于遥感检测的深度展开网络，方法可迁移至高光谱图像恢复与去噪",
+      "canonical_evidence": "用于遥感检测的深度展开网络，方法可迁移至高光谱图像恢复与去噪",
+      "llm_tldr_en": "LCPNet proposes a latent consistent proximal unfolding network for infrared small target detection, integrating model-driven iterations into neural networks. Its hybrid optimization-learning framework is directly transferable to hyperspectral image restoration tasks such as denoising and stripe removal.",
+      "llm_tldr_cn": "LCPNet针对红外小目标检测提出了一种潜在一致近端展开网络，将模型驱动的迭代嵌入神经网络。该方法在遥感图像中融合物理分解结构与深度学习的策略，可自然迁移至高光谱图像恢复问题，如噪声去除和条带修复，为高光谱去噪提供了新的方法论思路。",
+      "llm_tldr": "LCPNet针对红外小目标检测提出了一种潜在一致近端展开网络，将模型驱动的迭代嵌入神经网络。该方法在遥感图像中融合物理分解结构与深度学习的策略，可自然迁移至高光谱图像恢复问题，如噪声去除和条带修复，为高光谱去噪提供了新的方法论思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.05073v1",
+      "source": "arxiv",
+      "title": "An augmented Lagrangian method with exact multipliers for non-separable composite $\\ell_0$-$\\ell_2$ regularization",
+      "abstract": "This paper studies a non-separable composite $\\ell_0$-$\\ell_2$ regularization model that simultaneously enforces sparsity and smoothness for inverse problems. The $\\ell_0$ norm induces inherent nonconvexity and nonsmoothness, while linear transformations further introduce nonseparability, making the problem computationally challenging to solve. The existing inexact augmented Lagrangian method suffers from high computational complexity and unstable convergence. To overcome these difficulties, we develop two novel augmented Lagrangian algorithms with exact multipliers, designed respectively for the full row-rank case and the general matrix case, where all subproblems are globally optimized via closed-form solutions. Furthermore, we prove linear convergence of the proposed method when the transformation matrix is full row rank. In the general setting, all accumulation points of the generated sequence are KKT points for the original problem. Numerical experiments on synthetic data, trend filtering, and image smoothing demonstrate the superior efficiency and accuracy of the proposed methods over the existing method, confirming our theoretical analysis.",
+      "authors": [
+        "Huan Ren",
+        "Guiyun Xiao"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "math.NA"
+      ],
+      "published": "2026-07-06T13:37:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.05073v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "L0-L2 regularization for inverse problems, applicable to denoising",
+      "llm_evidence_cn": "L0-L2正则化用于逆问题，可应用于去噪",
+      "llm_evidence": "L0-L2正则化用于逆问题，可应用于去噪",
+      "canonical_evidence": "L0-L2正则化用于逆问题，可应用于去噪",
+      "llm_tldr_en": "Novel augmented Lagrangian methods with exact multipliers for non-separable L0-L2 regularization, providing closed-form solutions for subproblems, applicable to image denoising and restoration.",
+      "llm_tldr_cn": "针对非可分离组合L0-L2正则化模型，开发了两种精确乘子增广拉格朗日算法，通过闭式解全局优化子问题，克服了传统算法计算复杂和不稳定问题，可有效用于图像去噪、稀疏重建等逆问题，为高光谱图像去噪提供了潜在优化工具。",
+      "llm_tldr": "针对非可分离组合L0-L2正则化模型，开发了两种精确乘子增广拉格朗日算法，通过闭式解全局优化子问题，克服了传统算法计算复杂和不稳定问题，可有效用于图像去噪、稀疏重建等逆问题，为高光谱图像去噪提供了潜在优化工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

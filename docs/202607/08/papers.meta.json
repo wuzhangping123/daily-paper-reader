@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-08",
+  "date": "2026-07-08",
+  "generated_at": "2026-07-08T20:34:06",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/08/2607.05636v1-sensor-adaptive-infrared-spectral-reconstruction-with-plug-and-play-diffusion-priors",
+      "section": "deep",
+      "title_en": "Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors",
+      "authors": "Alireza Siyavashi, Jon Schlipf, Sebastian Reiter, Inga Fischer, Christian Wenger, Christian Herglotz",
+      "date": "2026-07-06",
+      "pdf": "https://arxiv.org/pdf/2607.05636v1",
+      "score": "9.0",
+      "evidence": "利用扩散先验进行高光谱感知光谱重建，直接相关",
+      "tldr": "高光谱传感成本高、体积大，限制了移动应用。本文提出ΠGDM，利用扩散模型学习光谱先验，通过伪逆投影与测量光电流一致，无需配对数据。在公共数据集上训练，平均估计误差1.502%，优于多种基线，并支持传感器自适应更换。该方法为资源受限平台提供了高精度、紧凑的光谱恢复方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral sensing enables material identification; however, state-of-the-art spectrometers are costly and bulky, which limits their use in mobile applications. We address this by proposing sparse spectrum reconstruction from narrowband photocurrents using a pseudoinverse-guided diffusion model (ΠGDM). With ΠGDM we use a denoising diffusion probabilistic model (DDPM) to reconstruct the spectrum, which is trained on a large public spectral dataset to learn realistic spectral priors, eliminating the need for paired sensor measurements. At inference, ΠGDM alternates reverse-diffusion denoising steps with pseudoinverse projection to enforce consistency with measured photocurrents via the calibrated responsivity matrices of sensors. Consequently, our method is sensor-adaptive: when detector arrays change, we simply substitute the responsivity matrix in the pseudoinverse projection without retraining of the diffusion model. The resulting computational spectrometer achieves 1.502% average estimation error, outperforming Tikhonov, Gaussian, compressive-sensing, and multilayer perceptron (MLP) baselines, while providing calibrated uncertainty estimates via Monte Carlo sampling from different random initializations of ΠGDM. Summarizing, our approach offers an accurate, compact alternative for spectral recovery on resource-constrained platforms.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/08/2607.04603v1-lcpnet-latent-consistent-proximal-unfolding-network-for-infrared-small-target-detection",
+      "section": "quick",
+      "title_en": "LCPNet: Latent Consistent Proximal Unfolding Network for Infrared Small Target Detection",
+      "authors": "Tianfang Zhang, Fengyi Wu, Lei Li, Chang Liu, Zhenming Peng, Huaping Zhang, Xiangyang Ji",
+      "date": "2026-07-06",
+      "pdf": "https://arxiv.org/pdf/2607.04603v1",
+      "score": "6.0",
+      "evidence": "用于遥感检测的深度展开网络，方法可迁移至高光谱图像恢复与去噪",
+      "tldr": "红外小目标检测面临复杂背景和弱小目标挑战，现有深度展开网络在图像域操作且更新机制与优化耦合不足。本文提出LCPNet，在潜在空间进行一致近端展开，并引入共享优化记忆协调多变量更新。在四个基准上超越现有方法，实现准确鲁棒的低虚警检测。该方法有效结合物理先验与深度学习，为红外小目标检测提供了新范式。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Infrared small target detection (IRSTD) aims to identify long distance small targets from complex infrared backgrounds, and is a fundamental task in remote sensing. Deep learning methods have improved IRSTD by learning discriminative image-to-mask mappings, but such feed-forward designs often underuse physical decomposition structure between targets and backgrounds. Deep unfolding methods partially address this issue by embedding model-driven iterations into neural networks, yet existing designs still operate mainly in image domain and use updates and memory mechanisms that are not fully coupled with underlying optimization process. To address these limitations, we propose Latent Consistent Proximal unfolding network (LCPNet). First, we verify that low-rank prior remains valid in latent representations and perform unfolding in this space, preserving physical constraint while avoiding repeated compression of intermediate states. Second, we derive a Latent Consistent Proximal (LCP) solver that evolves each latent variable from its previous state rather than reconstructing through an indirect residual, and stabilizes small target updates through task-adaptive normalization and gain control. Third, we introduce Shared Optimization Memory (SOM), a common historical state shared by all decomposition variables to provide coordinated guidance across unfolding stages. Extensive experiments on four public benchmarks demonstrate that LCPNet outperforms state-of-the-art methods while achieving accurate and robust detection with low false alarms and competitive efficiency. Model and code are available at https://github.com/Tianfang-Zhang/LCPNet.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/08/2607.05073v1-an-augmented-lagrangian-method-with-exact-multipliers-for-non-separable-composite-ell0-ell2-regularization",
+      "section": "quick",
+      "title_en": "An augmented Lagrangian method with exact multipliers for non-separable composite $\\ell_0$-$\\ell_2$ regularization",
+      "authors": "Huan Ren, Guiyun Xiao",
+      "date": "2026-07-06",
+      "pdf": "https://arxiv.org/pdf/2607.05073v1",
+      "score": "6.0",
+      "evidence": "L0-L2正则化用于逆问题，可应用于去噪",
+      "tldr": "针对非可分复合ℓ0-ℓ2正则化问题，现有不精确增广拉格朗日方法计算复杂且收敛不稳。本文提出两种精确乘子增广拉格朗日算法，通过闭式解全局优化子问题，分别处理满秩行和一般矩阵情形。理论证明满秩行时线性收敛，一般情形聚点为KKT点。实验表明算法在合成数据、趋势滤波和图像平滑上效率与精度均优于现有方法。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "This paper studies a non-separable composite $\\ell_0$-$\\ell_2$ regularization model that simultaneously enforces sparsity and smoothness for inverse problems. The $\\ell_0$ norm induces inherent nonconvexity and nonsmoothness, while linear transformations further introduce nonseparability, making the problem computationally challenging to solve. The existing inexact augmented Lagrangian method suffers from high computational complexity and unstable convergence. To overcome these difficulties, we develop two novel augmented Lagrangian algorithms with exact multipliers, designed respectively for the full row-rank case and the general matrix case, where all subproblems are globally optimized via closed-form solutions. Furthermore, we prove linear convergence of the proposed method when the transformation matrix is full row rank. In the general setting, all accumulation points of the generated sequence are KKT points for the original problem. Numerical experiments on synthetic data, trend filtering, and image smoothing demonstrate the superior efficiency and accuracy of the proposed methods over the existing method, confirming our theoretical analysis.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,2159 @@
+Title: An augmented Lagrangian method with exact multipliers for non-separable composite ℓ_0-ℓ_2 regularization
+
+URL Source: https://arxiv.org/pdf/2607.05073v1
+
+Published Time: Tue, 07 Jul 2026 03:38:19 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+AN AUGMENTED LAGRANGIAN METHOD WITH EXACT MULTIPLIERS FOR NON-SEPARABLE COMPOSITE ℓ0-ℓ2
+
+REGULARIZATION ∗
+
+HUAN REN † AND GUIYUN XIAO ‡
+
+Abstract. This paper studies a non-separable composite ℓ0-ℓ2 regularization model that simul-taneously enforces sparsity and smoothness for inverse problems. The ℓ0 norm induces inherent non-convexity and nonsmoothness, while linear transformations further introduce nonseparability, mak-ing the problem computationally challenging to solve. The existing inexact augmented Lagrangian method suffers from high computational complexity and unstable convergence. To overcome these difficulties, we develop two novel augmented Lagrangian algorithms with exact multipliers, designed respectively for the full row-rank case and the general matrix case, where all subproblems are glob-ally optimized via closed-form solutions. Furthermore, we prove linear convergence of the proposed method when the transformation matrix is full row rank. In the general setting, all accumulation points of the generated sequence are KKT points for the original problem. Numerical experiments on synthetic data, trend filtering, and image smoothing demonstrate the superior efficiency and accuracy of the proposed methods over the existing method, confirming our theoretical analysis. 
+
+Keywords. Augmented Lagrangian method, exact multipliers, non-separable composite ℓ0-ℓ2 regularization. 
+
+AMS subject classifications. 65F22, 65K05, 90C26. 
+
+1. Introduction. With the growing interest in inverse problem research [7, 24, 36], the importance of regularization techniques has become increasingly prominent. Inverse problems are typically ill-posed, and regularization techniques can alleviate their ill-conditioning while preventing overfitting. This has also greatly advanced the research and development of regularization techniques, including total variation (TV)-based regularization [1], sparsity prior-based regularization[20, 22], Tikhonov regularization [28], and Bayesian prior model-based regularization [30]. Among sparsity-prior regularizers, ℓ0-regularization is the most intuitive and ef-fective across signal estimation [3], feature coding [15], radar space-time adaptive processing [32], image processing [2, 19, 44], and machine learning [16]. Unfortu-nately, the non-convexity of the ℓ0-norm leads to NP-hard computation. Researchers thus widely adopt convex ℓ1-regularization [13, 14, 47], though it attenuates critical features and degrades practical performance [25, 45]. Based on this consideration, in terms of sparsity regularization, we still consider the most direct model, which is the 
+
+ℓ0-regularization model. In the other hand, the discontinuity of the ℓ0-norm may cause the model’s solu-tion to lose smoothness to a certain extent. Similar to sparsity, in numerous specific application scenarios, smoothness is a crucial property that characterizes the natural structure of solutions in the corresponding scene. Based on this, in order to bal-
+
+> ∗
+
+The work is supported by the National Natural Science Foundation of China under grant Nos. 12401496, 12501525, the Fundamental Research Funds for the Central Universities under grant No. D5000240300, the Natural Science Foundation of Jiangxi Province with No. 20244BCE52256, and Jiangxi Science and Technology Normal University Doctoral Research Initiation Fund No. 2023BSQD25. 
+
+> †
+
+School of Mathematical Sciences, Jiangxi Science and Technology Normal University, Nanchang, 330038, People’s Republic of China (jxrh1994@163.com). 
+
+> ‡
+
+Corresponding author. School of Mathematics and Statistics, Northwestern Polytechnical Uni-versity, Xi’an, 710072, People’s Republic of China (xiaogy@nwpu.edu.cn and xiaogy999@163.com). 1
+
+> arXiv:2607.05073v1 [math.OC] 6 Jul 2026
+
+ance sparsity and smoothness, Song et al. proposed non-separable composite ℓ0-ℓ2
+
+regularization model, which takes the following form: (1.1) min  
+
+> u∈Rn
+
+f (u) + λ∥W u∥0 + β
+
+2 ∥W u∥2,
+
+where λ, β > 0, f (u) is a data fidelity term, W : Rn 7 → Rm is a predefined transform. When W = I, (1.1) reduces to the classical ℓ0 and ℓ2 regularization model with abundant existing solvers. Under the restricted isometry property (RIP), typical ℓ0-constrained least-squares solvers fall into greedy and thresholding categories. Greedy algorithms cover matching pursuit [33], orthogonal matching pursuit [18, 41], CoSaMP [37] and subspace pursuit [17]; thresholding methods include hard thresholding [8, 9, 10, 27], soft thresholding [21, 23], and heavy-ball hard thresholding pursuit [40]. Cai et al. [12] proposed a randomized alternating minimization algorithm for solving the sparse phase retrieval problem. When the measurement matrix satisfies the RIP, Zhao [46] introduced the optimal k-thresholding algorithm, which was followed by a series of subsequent improved algorithms, including heavy-ball-type algorithms. In model (1.1), the ℓ0-norm penalty acts on W u rather than u. An invertible square W allows rewriting the model as a standard ℓ0-regularized problem penal-izing y = W u, solvable via existing approaches. However, in practical scenarios, 
+
+W is often non-square and non-invertible, invalidating conventional solvers. This core challenge is that while the ℓ0 proximal operator of u has a closed-form, the counterpart for ∥W u∥0 is nonconvex, nonsmooth and lacks explicit solutions, greatly complicating optimization. To address this issue, Song et al. [39] recently proposed an inexact augmented Lagrangian method for solving model (1.1). For solving the involved subproblem, they adopted an alternating scheme. However, this alternating scheme results in extremely high computational complexity for solving the subprob-lems, thereby severely impairing the efficiency of the entire algorithm. In terms of theoretical analysis, they established the convergence analysis of the algorithm for problems involving non-separable composite ℓ0-ℓ2 regularization terms. Specifically, if the sequence generated by the algorithm is bounded, then there exists an accumu-lation point that is a KKT point of the equivalent problem, i.e., a local minimizer of the original problem. In this paper, we focus on solving the non-separable composite ℓ0-ℓ2 regularization model that arises in various inverse problems. Given the drawbacks of existing inexact augmented Lagrangian methods, together with intrinsic challenges including the non-convexity and non-smoothness of the ℓ0 norm as well as non-separability induced by linear transformation, we develop two novel augmented Lagrangian algorithms with exact multipliers. The first algorithm converges linearly to a KKT point for full row-rank W , while the second guarantees that every accumulation point is a KKT point for arbitrary W . A notable advantage shared by both algorithms is that all subproblems admit closed-form solutions. We further conduct comprehensive numerical experiments on synthetic datasets and practical real-world applications such as trend filtering and image smoothing to validate the performance of our methods. The experimental results demonstrate that our algorithms outperform the existing inexact augmented Lagrangian method in terms of accuracy and efficiency. Throughout this paper, we use the following notation. Let Rm×n denote the set of all m × n real matrices and Rn = Rn×1 the set of n-dimensional real vectors. The space Rn is equipped with the Euclidean inner product ⟨· , ·⟩ and the corresponding induced norm ∥ · ∥ (also denoting the spectral norm of a matrix). The superscript ⊤
+
+> 2
+
+represents the transpose of a vector or matrix. For a matrix B and an index set I, BI
+
+stands for the submatrix consisting of the columns of B indexed by I. The ℓ0-norm 
+
+∥ · ∥ 0 counts the number of nonzero entries in a vector. The symbol ∥ · ∥ ∞ denotes the vector infinity norm. For any c = ( c1, . . . , c n)⊤ ∈ Rn, supp( c) := {j ∈ [n] | cj̸ = 0 },where [ n] := {1, . . . , n }. Given a vector y and an index set J , yJ represents the subvector of y formed by the entries of y indexed by J .The rest of this paper is organized as follows. In Section 2, we propose two augmented Lagrangian methods with exact multipliers to solve problem (1.1), which correspond to two different scenarios: one for the case where W is full row rank and the other for the general case with an arbitrary matrix W . In Section 3, we derive explicit solutions for all subproblems and establish convergence properties of the two proposed algorithms under mild assumptions. In Section 4, we report some numerical tests to indicate the effectiveness of our methods. Finally, some concluding remarks are given in Section 5. 
+
+2. Augmented Lagrangian method with exact multipliers. In this sec-tion, we will propose an augmented Lagrangian method with exact multipliers to solve problem (1.1), considering both the case where W is full row rank and the general case where W is an arbitrary matrix. As is well known, for non-convex and non-smooth problems, there exists a close relationship between optimal points and KKT points. We often aim to find KKT points as a pathway to locating the optimal solution of such problems. First, we reformulate model (1.1) into the following form by introducing an auxiliary variable: (2.1) min  
+
+> u,y
+
+f (u) + λ∥y∥0 + β
+
+2 ∥W u∥2,
+
+s.t. y = W u.
+
+The KKT conditions of the above problem is: a point ( u, y) is called to a KKT point of problem (2.1) if there exists a vector z such that (2.2) 0 = ∇f (u) + βW ⊤W u + W ⊤z,
+
+(2.3) 0 ∈ ∂λ ∥y∥0 − z,
+
+(2.4) W u − y = 0.
+
+In this paper, we aim to find u, y and z that satisfy the above equations. A classical infeasible method for solving such problems is the augmented Lagrangian method. Given a parameter ρ, the augmented Lagrangian function for problem (2.1) is 
+
+L(u, y, z) = f (u) + ⟨W u − y, z⟩ + λ∥y∥0 + β
+
+2 ∥W u∥2 + ρ
+
+2 ∥W u − y∥2.(2.5) Considering that (2.1) is non-convex and non-smooth, the classical augmented Lagrangian method is not applicable. In what follows, we modify and enhance the classical augmented Lagrangian method to adapt it to different scenarios of problem (2.1) corresponding to different W .
+
+> 3
+
+2.1. Augmented Lagrangian method with exact multipliers for full-row-rank W . Based on the equation (2.2) satisfied by the KKT points problem (2.1), we can treat z as a function of the variable u. It can be observed that when W
+
+is of full row rank, z can be uniquely expressed as a function of u, i.e., (2.6) z(u) = ( W ⊤)†(−∇ f (u) − βW ⊤W u).
+
+This implies that when u, z and y satisfy the KKT conditions, z and u must adhere to the functional relationship z = z(u). In other words, once u is determined and satisfies the KKT conditions, z is unique determined accordingly. Based on this idea, when updating the multiplier z, we abandon the classical gradient-based update method for the multiplier z. Instead, we update z using the functional value z(u) corresponding to the updated u. Moreover, since we treat z
+
+as a function of u, when evaluating the quality of iterative values and conducting convergence proofs, we adopt the following correspondingly defined function (2.7) h(u, y) = f (u) + W u − y, z(u) + λ∥y∥0 + β
+
+2 ∥W u∥2 + ρ
+
+2 ∥W u − y∥2
+
+instead of the original augmented Lagrangian function L(u, y, z) for subsequent con-vergence analysis. Building on the above idea, we propose an augmented Lagrangian method with exact multipliers for full-row-rank W to solve model (2.1), detailed in Algorithm 2.1. 
+
+Algorithm 2.1 Augmented Lagrangian method with exact multipliers for full row rank W
+
+Step 0. Input λ and β. Choose u0, y0 = W u0, ρ > 0. Let k := 0. Compute 
+
+z0 = z(u0) = ( W ⊤)†(−∇ f (u0) − βW ⊤W u0).
+
+Step 1. Compute (2.8) 
+
+uk+1 = argmin 
+
+> u∈Rn
+
+n
+
+f (u)+ W u−yk, zk + β
+
+2 ∥W u∥2+ tk
+
+2 ∥u−uk∥2+ ρ
+
+2 ∥W u−yk∥2o
+
+.
+
+Step 2. Take zk+1 = z(uk+1 ) = ( W ⊤)†(−∇ f (uk+1 ) − βW ⊤W uk+1 ) and compute (2.9) 
+
+yk+1 = argmin 
+
+> y∈Rm
+
+n
+
+λ∥y∥0+ W uk+1 −y, zk+1 + tk
+
+2 ∥y−yk∥2+ ρ
+
+2 ∥W uk+1 −y∥2o
+
+.
+
+Step 3. Replace k by k + 1 and go to Step 1. 
+
+2.2. Augmented Lagrangian method with exact multipliers for general case of W . Next, we extend the idea of the augmented Lagrangian method with exact multipliers to the general case of W . However, when W is not full row rank, we find that the solution to the equation (2.2) is not unique. Additionally, z must satisfy (2.3) with 0 = r − z, where r ∈ ∂λ ∥y∥0.According to existing results in literature [39], it is known that 
+
+∂λ ∥y∥0 = ( r1, . . . , r m)⊤ with ri =
+
+ {0}, if yi̸ = 0 ,
+
+R, if yi = 0 .
+
+> 4
+
+Therefore, when yi̸ = 0, zi = 0 and yi = 0, zi ∈ R. Let (2.10)  (z(u, y)) C = (( W ⊤)C )†(−∇ f (u) − βW ⊤W u), C = {i|yi = 0 , i ∈ [m]},
+
+(z(u, y)) I = 0, I = {i|yi̸ = 0 , i ∈ [m]}.
+
+When ( u, y) is a KKT point, it can be confirmed that z = z(u, y) is a solution satisfying equations (2.2) and (2.3). This implies that if ( u, y) is either an optimal solution or a KKT points, then ( u, y, z) satisfies the KKT conditions with z = z(u, y). Based on the definition of z(u, y), it is not only related to u, but also depends on the positions of the non-zero elements of y. Specifically, z(u, y) is a discontinuous, step function with respect to y. Owing to the modified definition of the multiplier function z(u, y), the function characterizing the quality of the sequences generated by the algorithm is adjusted accordingly to: 
+
+h(u, y) = f (u) + ⟨W u − y, z(u, y)⟩ + λ∥y∥0 + β
+
+2 ∥W u∥2 + ρ
+
+2 ∥W u − y∥2,
+
+where z(u, y) follows equation (2.10). However, if we still use z = z(u, y) to up-date the multiplier, we need to propose an algorithm that generates sequences to overcome the issue of jump points, which may cause non-monotonic decrease in the 
+
+h(u, y). We divide the update of the sequence and the corresponding function values into two steps: (1) Compute update the value of u to obtain the corresponding new function value h(uk+1 , yk); (2) Compute update the value of y to obtain the corre-sponding new function value h(uk+1 , yk+1 ). We observe that when y is fixed, z(u, y)is continuous with respect to u, the function h(u, ·) is continuous. Therefore, using a simple proximal point method for u can ensure a monotonic decrease in the updated function value. When u is fixed, the function h(u, y) exhibits jump discontinuities. Consequently, to ensure a monotonic decrease in the function value, it is necessary to minimize h(u, y) with fixed u to update y.
+
+Algorithm 2.2 Augmented Lagrangian method with exact multipliers for general case of W
+
+Step 0. Input λ and β. Choose u0, y0 = W u0, ρ > 0, tk > 0. Let k := 0. Step 1. Take Ck = {i|yki = 0 , i ∈ [n]}, Ik = {i|yki̸ = 0 , i ∈ [n]}, ( z(uk, yk)) Ck =(( W ⊤)Ck )†(−∇ f (uk) − βW ⊤W uk) and ( z(uk, yk)) Ik = 0.
+
+uk+1 = argmin 
+
+> u∈Rm
+
+n
+
+f (u) + W u − yk, z(uk, yk) + β
+
+2 ∥W u∥2 + tk
+
+2 ∥u − uk∥2
+
++ ρ
+
+2 ∥W u − yk∥2o
+
+.(2.11) Step 2. Compute (2.12) yk+1 = argmin 
+
+> y∈Rn
+
+h(uk+1 , y).
+
+Step 3. Replace k by k + 1 and go to Step 1. Based on the above analysis, we propose an augmented Lagrangian method with exact multipliers for general case of W to solve problem (2.1), detailed in Algorithm 2.2. 
+
+> 5
+
+3. Convergence analysis. In this section, we will separately present the con-vergence analysis of the augmented Lagrangian method with exact multipliers for different scenarios of the matrix W .
+
+3.1. Solution of subproblems. Since the specific form of f is crucial to the expression of its solution in the subproblems of Algorithms 2.1–2.2, particularly for the u-subproblem. Therefore, we have investigated different choices of data fidelity terms in various inverse problems, such as f = 12 ∥u − u0∥2 in image smoothing and 
+
+f = 12 ∥Au − u0∥2 in CT image reconstruction. Considering the generality of the problem, we set f = 12 ∥Au − u0∥2 and derive the solution expression form for the subproblem accordingly, along with the subsequent convergence analysis. We summarize the explicit expression of the globally optimal solutions to the subproblems defined in (2.8) and (2.9) of Algorithm 2.1 as Theorem 3.1. 
+
+Theorem 3.1. Let uk, yk be the current iterate generated by Algorithm 2.1, then the global optimal solution uk+1 of subproblem (2.8) and a global optimal solution of subproblem (2.9) are 
+
+(3.1) uk+1 = ( A⊤A + ( β + ρ)W ⊤W + tkI)−1(A⊤u0 − W ⊤zk + ρW ⊤yk + tkuk)
+
+and 
+
+(3.2) yk+1 = H√2λ/ (ρ+tk )( ρρ + tk
+
+W uk+1 + tk
+
+ρ + tk
+
+yk + 1
+
+ρ + tk
+
+zk+1 ),
+
+where H is the hard thresholding operator, i.e., Hλ(s) = s if |s| > λ , Hλ(s) = 0 if 
+
+|s| ≤ λ.Proof . By the optimal condition of (2.8), uk+1 satisfies 
+
+A⊤(Auk+1 − u0) + W ⊤zk + βW ⊤W uk+1 + tk(uk+1 − uk) + ρW ⊤(W uk+1 − yk) = 0,
+
+which implies (3.1). Next, by (2.9), we have argmin 
+
+> y∈Rm
+
+{λ∥y∥0 + ⟨W uk+1 − y, zk+1 ⟩ + tk
+
+2 ∥y − yk∥2 + ρ
+
+2 ∥W uk+1 − y∥2}
+
+= argmin 
+
+> y∈Rm
+
+{λ∥y∥0 + ρ + tk
+
+2 ∥y − ρρ + tk
+
+W uk+1 − tk
+
+ρ + tk
+
+yk − 1
+
+ρ + tk
+
+zk+1 ∥2}
+
+and therefore yk+1 = H√2λ/ (ρ+tk )( ρρ+tk W uk+1 + tk 
+
+> ρ+tk
+
+yk + 1 
+
+> ρ+tk
+
+zk+1 ) is a global optimal solution of subproblem (2.9). For the explicit solutions to subproblems (2.11)–(2.12) in Algorithm 2.2, we have organized them as follows: 
+
+Theorem 3.2. Let {uk, yk} be a bounded sequence generated by Algorithm 2.2. Define 
+
+(3.3) M := sup {∥ (( W ⊤)C )†(−∇ f (uk) − βW ⊤W uk)∥∞, ∀ C ⊂ [m], k = 1 , 2, . . . }.
+
+Suppose ρ > mM 2 
+
+> λ
+
+. For a sufficiently large k, assume that no component of sequence 
+
+{| W uk|} lie within the small interval 
+
+ −M +√M 2+ρλ/m ρ , M +√M 2+2 ρ(m+1) λρ
+
+
+
+. Then, (i) the global optimal solution uk+1 of subproblem (2.11) is 
+
+(3.4) uk+1 = ( tkI +( β +ρ)W ⊤W +A⊤A)−1(A⊤u0 −W ⊤z(uk, yk)+ tkuk +ρW ⊤yk),
+
+> 6
+
+where 
+
+(3.5)  (z(uk, yk)) Ck = (( W ⊤)Ck )†(−∇ f (uk) − βW ⊤W uk), Ck = {i|yki = 0 , i ∈ [m]},
+
+(z(uk, yk)) Ik = 0, Ik = {i|yki̸ = 0 , i ∈ [m]};
+
+(ii) a global optimal solution yk+1 of subproblem (2.12) is 
+
+(3.6) yk+1  
+
+> i
+
+=
+
+
+
+(W uk+1 )i, if |(W uk+1 )i| ≥ M +√M 2+2 ρ(m+1) λρ ,
+
+0, if |(W uk+1 )i| ≤ −M +√M 2+ρλ/m ρ .
+
+Proof . (i) Since subproblem (2.11) is a strongly convex problem, it has exactly one unique optimal solution. From the optimality conditions of (2.11), we have 
+
+A⊤(Auk+1 −u0)+ W ⊤z(uk, yk)+ βW ⊤W uk+1 +tk(uk+1 −uk)+ ρW ⊤(W uk+1 −yk) = 0.
+
+We can readily derive the solution to the above equation that satisfies (3.4), where 
+
+z(uk, yk) defined as in (3.5). (ii) For subproblem (2.12), we have 
+
+yk+1 = argmin 
+
+> y∈Rn
+
+h(uk+1 , y)
+
+⇔ yk+1 = argmin 
+
+> y∈Rn
+
+{λ∥y∥0 + W uk+1 − y, z(uk+1 , y) + ρ
+
+2 ∥W uk+1 − y∥2}.
+
+Let J1 = {j ∈ [m]| | (W uk+1 )j | ≥ M +√M 2+2 ρ(m+1) λρ }, J2 = {j ∈ [m]| | (W uk+1 )j | ≤  
+
+> −M+
+
+√M 2+ρλ/m ρ }, and J1 ∪J 2 = [ m]. Pick an arbitrary y ∈ Rm, define ϕi = λ∥yi∥0 +(W uk+1 − y)i(z(uk+1 , y)) i + ρ 
+
+> 2
+
+(W uk+1 − y)2 
+
+> i
+
+, let T1 = {i ∈ [m]|yi̸ = 0 }, T2 = {i ∈
+
+[m]|yi = 0 }, then T1 ∪ T 2 = [ m] and we have 
+
+λ∥y∥0 + W uk+1 − y, z(uk+1 , y) + ρ
+
+2 ∥W uk+1 − y∥2
+
+= X
+
+> i∈J 1∩T 1
+
+ϕi + X
+
+> i∈J 1∩T 2
+
+ϕi + X
+
+> i∈J 2∩T 1
+
+ϕi + X
+
+> i∈J 2∩T 2
+
+ϕi
+
+= X
+
+> i∈J 1∩T 1
+
+h
+
+λ + ρ
+
+2 (W uk+1 − y)2
+
+> i
+
+i
+
++ X
+
+> i∈J 1∩T 2
+
+h
+
+(W uk+1 )i(z(uk+1 , y)) i + ρ
+
+2 (W uk+1 )2
+
+> i
+
+i
+
++ X
+
+> i∈J 2∩T 1
+
+h
+
+λ + ρ
+
+2 (W uk+1 − y)2
+
+> i
+
+i
+
++ X
+
+> i∈J 2∩T 2
+
+h
+
+(W uk+1 )i(z(uk+1 , y)) i + ρ
+
+2 (W uk+1 )2
+
+> i
+
+i
+
+≥ X
+
+> i∈J 1∩T 1
+
+λ
+
+| {z }
+
+> A1
+
++ X
+
+> i∈J 1∩T 2
+
+h
+
+−| (W uk+1 )i|M + ρ
+
+2 (W uk+1 )2
+
+> i
+
+i| {z }
+
+> A2
+
++ X
+
+> i∈J 2∩T 1
+
+λ
+
+| {z }
+
+> A3
+
++ X
+
+> i∈J 2∩T 2
+
+h
+
+−| (W uk+1 )i|M + ρ
+
+2 (W uk+1 )2
+
+> i
+
+i| {z }
+
+> A4
+
+,
+
+where the inequality follows from equation (3.3). Then, for A4, we have 
+
+A4 = X
+
+> i∈J 2∩T 2
+
+h ρ
+
+2 (W uk+1 )2 
+
+> i
+
+− | (W uk+1 )i|M
+
+i
+
+≥ X
+
+> i∈J 2∩T 2
+
+ ρ
+
+2
+
+M 2
+
+ρ2 − Mρ M
+
+
+
+7= X
+
+> i∈J 2∩T 2
+
+− M 2
+
+2ρ ≥ X
+
+> i∈J 2∩T 2
+
+− λ
+
+2m ,
+
+where the first inequality follows from the fact that the quadratic function ρ 
+
+> 2
+
+x2 −M |x|
+
+attains its minimum at x = Mρ , the last inequality follows from the assumption that 
+
+ρ > mM 2 
+
+> λ
+
+. Let |T 1| = t1, |T 2| = t2, |J 1| = s1, |J 2| = s2, and |J 1 ∩ T 1| = p1. Then 
+
+t1 + t2 = s1 + s2 and 
+
+A1 + A2 + A3 + A4
+
+≥ X
+
+> i∈J 1∩T 1
+
+λ + X
+
+> i∈J 1∩T 2
+
+(−| (W uk+1 )i|M + ρ
+
+2 (W uk+1 )2 
+
+> i
+
+) + X
+
+> i∈J 2∩T 1
+
+λ + X
+
+> i∈J 2∩T 2
+
+− λ
+
+2m
+
+≥ p1λ + ( s1 − p1)( m + 1) λ + ( t1 − p1)λ + ( − λ
+
+2m )( s2 + p1 − t1),
+
+where the last inequality follows from the fact that min { ρ 
+
+> 2
+
+x2 − M |x|} = ( m + 1) λ in 
+
+|x| ≥ M +√M 2+2 ρ(m+1) λρ .Similarly, if we take by ˜ y = yk+1 and its components are shown in (3.6), denote ˜ϕi = λ∥˜yi∥0 + ( W uk+1 − ˜y)i(z(uk+1 , ˜y)) i + ρ 
+
+> 2
+
+(W uk+1 − ˜y)2 
+
+> i
+
+, then we have 
+
+λ∥˜y∥0 + W uk+1 − ˜y, z (uk+1 , ˜y) + ρ
+
+2 ∥W uk+1 − ˜y∥2
+
+= X
+
+> i∈J 1∩T 1
+
+˜ϕi + X
+
+> i∈J 1∩T 2
+
+˜ϕi + X
+
+> i∈J 2∩T 1
+
+˜ϕi + X
+
+> i∈J 2∩T 2
+
+˜ϕi
+
+≤ X
+
+> i∈J 1∩T 1
+
+λ + X
+
+> i∈J 1∩T 2
+
+λ + X
+
+> i∈J 2∩T 1
+
+h
+
+|(W uk+1 )i|M + ρ
+
+2 (W uk+1 )2
+
+> i
+
+i
+
++ X
+
+> i∈J 2∩T 2
+
+h
+
+|(W uk+1 )i|M + ρ
+
+2 (W uk+1 )2
+
+> i
+
+i
+
+≤p1λ + ( s1 − p1)λ + ( t1 − p1) λ
+
+2m + ( s2 + p1 − t1) λ
+
+2m ,
+
+where the last inequality follows from the fact that max { ρ 
+
+> 2
+
+x2 − M |x|} = λ 
+
+> 2m
+
+in |x| ≤  
+
+> −M+
+
+√M 2+ρλ/m ρ .We consider the difference between the function values of (2.12) at any y and ˜ y
+
+given by (3.6), 
+
+h(uk+1 , y) − h(uk+1 , ˜y)=λ∥y∥0 + W uk+1 − y, z(uk+1 , y) + ρ
+
+2 ∥W uk+1 − y∥2
+
+− (λ∥˜y∥0 + W uk+1 − ˜y, z (uk+1 , ˜y) + ρ
+
+2 ∥W uk+1 − ˜y∥2)
+
+≥p1λ + ( s1 − p1)( m + 1) λ + ( t1 − p1)λ + ( − λ
+
+2m )( s2 + p1 − t1)
+
+− (p1λ + ( s1 − p1)λ + ( t1 − p1) λ
+
+2m + ( s2 + p1 − t1) λ
+
+2m )=( s1 − p1)mλ + ( t1 − p1)λ − (2 s2 + p1 − t1) λ
+
+2m .(3.7) 
+
+8Next, we prove that the necessary condition for y to be the minimum point of subproblem (2.12) is J1 = T1 and J2 = T2, i.e. s1 = p1 = t1.First, we divide the relationship between s1 and p1 into two cases: s1 − p1 ≥ 1and s1 = p1. When s1 − p1 ≥ 1, we have 
+
+h(uk+1 , y) − h(uk+1 , ˜y) ≥ mλ + ( t1 − p1)λ(1 + 12m ) − λm s2 ≥ mλ − λm s2 > 0,
+
+where the second inequality follows from t1 − p1 ≥ 0, and the last inequality holds by virtue of s2 < m . From the above equation, it can be observed that when s1 − p1 ≥ 1, 
+
+h(uk+1 , y)−h(uk+1 , ˜y) > 0. This implies that the minimum point cannot be attained in the case of s1 −p1 ≥ 1, so the minimum point must satisfy s1 = p1, i.e., J1 ∩T 2 = ∅.On the basis of s1 = p1, we also divide the relationship between p1 and t1 into two cases: t1 − p1 ≥ 1 and t1 = p1. When t1 − p1 ≥ 1, then |J 2 ∩ T 2| = s2 + p1 − t1 =
+
+s2 + s1 − t1 = m − t1 = t2 = |T 2|, from which we readily derive that 
+
+h(uk+1 , y) − h(uk+1 , ˜y)
+
+≥ p1λ + ( t1 − p1)λ + ( − λ
+
+2m )t2 − (p1λ + ( t1 − p1) λ
+
+2m + t2
+
+λ
+
+2m )= (t1 − p1)λ − t2
+
+λ
+
+2m − (m − p1) λ
+
+2m = ( t1 − p1)λ − (m + t2 − p1) λ
+
+2m > 0,
+
+where the last inequality follows from t1 −p1 ≥ 1 and m+t2 −p1 < 2m. Similarly, this also indicates that the minimum point cannot be attained when t1 − p1 ≥ 1; thus, the minimum point must satisfy t1 = p1, i.e., J2 ∩ T 1 = ∅. Combining the result s1 = p1,we readily obtain s1 = p1 = t1 and s2 = t2; that is to say, J1 = T1 and J2 = T2.To summarize, a necessary condition for y to be a minimum point is 
+
+J1 = T1 and J2 = T2.
+
+In other words, when |(W uk+1 )i| ≥ (M + pM 2 + 2 ρ(m + 1) λ)/ρ , the i-th of the optimal solution of subproblem (2.12) at the ( k + 1)-th step is non-zero, i.e., yk+1 
+
+> i
+
+̸ =0; when |(W uk+1 )i| ≤ (−M + pM 2 + ρλ/m )/ρ , the i-th of the optimal solution subproblem (2.12) at the ( k + 1)-th step is zero, i.e. yk+1  
+
+> i
+
+= 0. The above has determined the positions where the components of the optimal solutions of the subproblems (2.12) are non-zero. Next, we determine the correspond-ing value of the components when the i-th component of the optimal solutions of the subproblems (2.12) are non-zero. By the (2.12), we have (3.8) yk+1 = argmin 
+
+> y∈Rn
+
+{λ∥y∥0 + W uk+1 − y, z(uk+1 , y) + ρ
+
+2 ∥W uk+1 − y∥2}.
+
+If yk+1 
+
+> i
+
+̸ = 0, we have ( z(uk+1 , y)) i = 0. Then 
+
+W uk+1 − yk+1 , z(uk+1 , yk+1 )
+
+= W uk+1 , z(uk+1 , yk+1 ) − yk+1 , z(uk+1 , yk+1 )
+
+= W uk+1 , z(uk+1 , yk+1 ) = (W uk+1 )Ck+1 , (z(uk+1 , yk+1 )) Ck+1 
+
+= (W uk+1 )Ck+1 , (( W ⊤)Ck+1 )†(−∇ f (uk+1 ) − βW ⊤W uk+1 )
+
+Therefore, for any y ∈ Rm,
+
+λ∥y∥0 + W uk+1 − y, z(uk+1 , y) + ρ
+
+2 ∥W uk+1 − y∥2
+
+> 9
+
+= X
+
+> i∈I
+
+ λ + ρ
+
+2 (yi − (W uk+1 )i)2
+
++ X
+
+> i∈C
+
+(W uk+1 )i[(( W ⊤)i)†(−∇ f (uk+1 ) − βW ⊤W uk+1 )] + X
+
+> i∈C
+
+ρ
+
+2 (W uk+1 )2 
+
+> i
+
+,
+
+where C = {i|yi = 0 , i ∈ [m]} and I = {i|yi̸ = 0 , i ∈ [m]}. Obviously, the objective function of (3.8) attains its minimum if and only if yi = ( W uk+1 )i for i ∈ I . Specifi-cally, when |(W uk+1 )i| ≥ (M + pM 2 + 2 ρ(m + 1) λ)/ρ , yi must equal to ( W uk+1 )i.This thus proves that yk+1 is a globally optimal solution to subproblem (2.12) at (k + 1)-th step. 
+
+Remark 3.3. In Theorem 3.2, for all sufficiently large k, we assume that no com-ponent of sequence {| W uk|} lie within the small interval (( −M +pM 2 + ρλ/m )/ρ, (M
+
++pM 2 + 2 ρ(m + 1) λ)/ρ ). This may appear unusual, but in practice, it is not difficult to satisfy because when ρ is sufficiently large, 
+
+M + pM 2 + 2 ρ(m + 1) λρ − −M + pM 2 + ρλ/m ρ
+
+= 2Mρ +
+
+pM 2 + 2 ρ(m + 1) λ − pM 2 + ρλ/m ρ
+
+= 2Mρ + 2( m + 1) λ − λ/m 
+
+pM 2 + 2 ρ(m + 1) λ + pM 2 + ρλ/m ,
+
+the length of above interval tends to zero. This indicates that as the regularization parameter ρ increases, the length of the small interval continuously decreases, making the assumption that |(W uk)i| does not lie within this small interval a mild condition. 
+
+3.2. Convergence analysis of Algorithm 2.1. In this subsection, we demon-strate the linear convergence results of the proposed augmented Lagrangian method with exact multipliers for row-full-rank W under mild conditions. In the following lemma, we show that the constraint violation at the current iterate can be bounded by the norm of difference between the updated value and the current iterate, which facilitates the subsequent proof of monotonic decrease in the function value. 
+
+Lemma 3.4. Let {(uk, yk)} be the sequence generated by Algorithm 2.1, then 
+
+uk+1 − uk ≥ ρ
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥ ∥ W †∥2 W †(W uk − yk) .
+
+Proof . Let W = U ΣmV ⊤ 
+
+> m
+
+be the singular value decomposition of W , where 
+
+U, Σm ∈ Rm×m and Vm ∈ Rn×m. Then 
+
+W †(W uk − yk) = VmΣ−1 
+
+> m
+
+U ⊤(W uk − yk) = Σ−1 
+
+> m
+
+U ⊤(W uk − yk)
+
+≤ Σ−1  
+
+> m2
+
+U ⊤(W uk − yk)
+
+= W † 
+
+> 2
+
+U U ⊤(W uk − yk)
+
+= W † 
+
+> 2
+
+(W ⊤)†W ⊤(W uk − yk) .(3.9) By (3.1) in Theorem 3.1 and zk = ( W ⊤)†(−∇ f (uk)−βW ⊤W uk) = ( W ⊤)†(−A⊤(Auk−
+
+u0) − βW ⊤W uk), we have 
+
+uk+1 − uk
+
+> 10
+
+= (A⊤A + ( β + ρ)W ⊤W + tkI)−1(A⊤u0 − W ⊤zk + ρW ⊤yk + tkuk) − uk
+
+= (A⊤A + ( β + ρ)W ⊤W + tkI)−1(A⊤u0 − W ⊤zk + ρW ⊤yk + tkuk − A⊤Auk
+
+−(β + ρ)W ⊤W uk − tkuk)
+
+= (A⊤A + ( β + ρ)W ⊤W + tkI)−1(A⊤u0 − W ⊤zk + ρW ⊤yk − A⊤Auk
+
+− (β + ρ)W ⊤W uk)
+
+> (∗)
+
+≥ A⊤u0 − W ⊤zk + ρW ⊤yk − A⊤Auk − (β + ρ)W ⊤W uk
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2
+
+= −W ⊤zk + ( −A⊤(Auk − u0) − βW ⊤W uk) − ρW ⊤(W uk − yk)
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2
+
+= ∥(I − W ⊤(W ⊤)†)  − ∇ f (uk) − βW ⊤W uk − ρW ⊤(W uk − yk)∥∥A⊤A + ( β + ρ)W ⊤W + tkI∥2(∗∗ )
+
+≥ (W ⊤)† (I − W ⊤(W ⊤)†)  − ∇ f (uk) − βW ⊤W uk − ρW ⊤(W uk − yk)
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2 ∥(W ⊤)†∥2
+
+= ρ
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2 ∥(W ⊤)†∥2
+
+(W ⊤)†W ⊤(W uk − yk)
+
+≥ ρ
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2 ∥W †∥22
+
+W †(W uk − yk) ,
+
+where the inequality ( ∗) follows by the fact that for any x, y satisfying x = D−1y,we have ∥x∥ ≥ 1 
+
+> ∥D∥2
+
+∥y∥, the inequality ( ∗∗ ) follows by ∥(W ⊤)†x∥ ≤ ∥ (W ⊤)†∥2∥x∥,the last inequality is follows from (3.9) and ∥(W ⊤)†∥2 = ∥W †∥2.The following theorem characterizes the relationship between the norm of the dif-ference between two consecutive iterates and the corresponding difference in function values. 
+
+Lemma 3.5. Let {(uk, yk)} be the sequence generated by Algorithm 2.1. Let 
+
+ρ ≥ max {t, 1} and t = max k{tk},
+
+(3.10) 
+
+tk ≥ max {4( W ⊤(W ⊤)†(A⊤A + βW ⊤W ) + W ⊤W W † 2 A⊤A + βW ⊤W
+
++
+
+
+
+A⊤A + βW ⊤W + 1 
+
+
+
+W † 2 A⊤A + βW ⊤W ), c },
+
+where c > 0, then 
+
+h(uk, yk) − h(uk+1 , yk+1 ) ≥ c
+
+4
+
+
+
+uk+1 − uk 2 + yk+1 − yk 2
+
+.
+
+Proof . By (2.8) and (2.9), we have (3.11) 
+
+f (uk) + β
+
+2 W uk 2 + W uk − yk, zk + ρ
+
+2 W uk − yk 2 ≥ f (uk+1 ) + β
+
+2 W uk+1 2
+
++ W uk+1 − yk, zk + ρ
+
+2 W uk+1 − yk 2 + tk
+
+2 uk+1 − uk 2
+
+and (3.12) 
+
+λ yk 
+
+> 0
+
++ W uk+1 − yk, zk+1 + ρ
+
+2 W uk+1 − yk 2
+
+≥ λ yk+1  
+
+> 0
+
++ W uk+1 − yk+1 , zk+1 + tk
+
+2 yk+1 − yk 2 + ρ
+
+2 W uk+1 − yk+1 2 .
+
+> 11
+
+By leveraging (3.11) and (3.12), we obtain 
+
+h(uk, yk) − h(uk+1 , yk+1 )= h(uk, yk) − h(uk+1 , yk) + h(uk+1 , yk) − h(uk+1 , yk+1 )
+
+≥ tk
+
+2 uk+1 − uk 2 + W uk+1 − yk, zk − W uk+1 − yk, zk+1 + tk
+
+2 yk+1 − yk 2
+
+= tk
+
+2 ( uk+1 − uk 2 + yk+1 − yk 2)+ W uk+1 − yk, (W ⊤)†(−A⊤A − βW ⊤W )( uk − uk+1 )
+
+= tk
+
+2 ( uk+1 − uk 2 + yk+1 − yk 2)
+
+− (W )†(W uk+1 − yk), (A⊤A + βW ⊤W )( uk − uk+1 )
+
+= tk
+
+2 (∥uk+1 − uk∥2 + ∥yk+1 − yk∥2)
+
+− (W )†W (uk+1 − uk), (A⊤A + βW ⊤W )( uk − uk+1 )
+
+− (W )†(W uk − yk), (A⊤A + βW ⊤W )( uk − uk+1 )
+
+≥ tk
+
+2 ( uk+1 − uk 2 + yk+1 − yk 2)
+
+−∥ W ⊤(W ⊤)†(A⊤A + βW ⊤W )∥2∥uk − uk+1 ∥2
+
+−∥ (W )†(W uk − yk)∥∥ A⊤A + βW ⊤W ∥2∥uk − uk+1 ∥
+
+> (∗)
+
+≥ tk
+
+2 ( uk+1 − uk 2 + yk+1 − yk 2)
+
+− W ⊤(W ⊤)†(A⊤A + βW ⊤W ) 2 uk − uk+1 2
+
+− A⊤A + ( β + ρ)W ⊤W + tkI 2 W † 22
+
+ρ A⊤A + βW ⊤W 2 uk − uk+1 2
+
+≥ tk
+
+2 ( uk+1 − uk 2 + yk+1 − yk 2)
+
+− W ⊤(W ⊤)†(A⊤A + βW ⊤W ) 2 uk − uk+1 2
+
+− A⊤A + βW ⊤W + tkI 2 W † 22
+
+ρ A⊤A + βW ⊤W 2 uk − uk+1 2
+
+− W ⊤W 2 W † 22 A⊤A + βW ⊤W 2 uk − uk+1 2(∗∗ )
+
+≥ tk
+
+4 uk+1 − uk 2 + tk
+
+2 yk+1 − yk 2
+
+≥ tk
+
+4 ( uk+1 − uk 2 + yk+1 − yk 2)
+
+≥ c
+
+4 ( uk+1 − uk 2 + yk+1 − yk 2),
+
+where the inequality ( ∗) follows by Lemma 3.4, the inequality ( ∗∗ ) follows from (3.10). Regarding the subdifferential of h(u, y), we readily have the following result. 
+
+Lemma 3.6. Let h be defined in (2.7) . Then for all (u, y) ∈ Rn × Rm we have 
+
+∂h (u, y) = 
+
+
+
+∇uh(u, y), ∇y(⟨W u − y, z(u)⟩ + ρ
+
+2 ∥W u − y∥2) + ∂(λ∥y∥0)
+
+
+
+.
+
+12 Next, we give some preliminary results on subgradients of nonsmooth functions and Kurdyka-Lojasiewicz (KL) property. We first recall some subdifferentials (sub-gradients) for nonsmooth functions in [34, 35, 38]. 
+
+Definition 3.7. Consider a function f : Rp → [−∞ , ∞] and a point x ∈ dom f ,the regular subdifferential of f at x is defined as 
+
+b∂f (x) := 
+
+
+
+v ∈ Rp : lim inf  
+
+> x′→x,x′̸=x
+
+f (x′) − f (x) − ⟨ v, x′ − x⟩∥x′ − x∥ ≥ 0
+
+
+
+;
+
+the subdifferential of the function f at x is defined as 
+
+∂f (x) := 
+
+
+
+v ∈ Rp : ∃xk→ 
+
+> f
+
+x and vk ∈ b∂f  xk with vk → v as k → ∞ 
+
+
+
+;
+
+and the horizon subdifferential of the function f at x is defined as 
+
+∂∞f (x) := 
+
+
+
+v ∈ Rp : ∃xk→ 
+
+> f
+
+x, λ k ↓ 0 and vk ∈ b∂f  xk s.t. λkvk → v as k → ∞ 
+
+
+
+.
+
+We now recall the KL property for a nonsmooth function [4, 11]. 
+
+Definition 3.8. (KL property) Let h : Rn → [−∞ , +∞] be a proper lsc function. Then h is said to have the KL property at ¯a ∈ dom ∂h := {a ∈ Rn | ∂h (a)̸ = ∅} if there exist μ ∈ (0 , +∞], a neighborhood B of ¯a and a function ξ : [0 , μ ) → R+ such that ξ is concave and continuously differentiable on (0 , μ ) and continuous at 0 with 
+
+ξ(0) = 0 and ξ′(x) > 0 for all x ∈ (0 , μ ), and the KL inequality 
+
+ξ′ h(a) − h(¯ a)dist( 0, ∂h (a)) ≥ 1
+
+holds for all a ∈ B ∩ { a ∈ Rn | h(¯ a) < h (a) < h (¯ a) + μ}, where dist( 0, ∂h (¯ a)) := inf {∥ r∥ | r ∈ ∂h (¯ a)}.
+
+If ξ can be chosen as ξ(s) = c√s for some c > 0, then h is said to have the KL property at ¯ a with an exponent of 1 /2. If h has the KL property of exponent 1 /2 at each point of dom ∂h , then h is called a KL function of exponent 1 /2. The following lemma gives a subgradient lower bound for the successive iterate gap. We refer to Definition 3.7 and Lemma 3.6 for the subgradient of h.
+
+Lemma 3.9. Let {(uk, yk)} be the sequence generated by Algorithm 2.1. For any 
+
+k ≥ 0, define 
+
+ak+1 = ∇f (uk+1 ) + W ⊤zk+1 − (A⊤A + βW ⊤W )W †(W uk+1 − yk+1 )+βW ⊤W uk+1 + ρW ⊤(W uk+1 − yk+1 )
+
+and bk+1 = −tk(yk+1 − yk). Then, (ak+1 , bk+1 ) ∈ ∂h (uk+1 , yk+1 ) and 
+
+∥(ak+1 , bk+1 )∥ ≤ √γ∥(uk+1 − uk, yk+1 − yk)∥,
+
+where 
+
+γ = max 2  W ⊤(W ⊤)†(−A⊤A − βW ⊤W ) − (A⊤A + βW ⊤W )W †W − tI 
+
++ A⊤A + βW ⊤W
+
+
+
+A⊤A + ( β + ρ)W ⊤W + tI W † 2
+
+/ρ 
+
+i2
+
+,
+
+2 (A⊤A + βW ⊤W )W † − ρW ⊤ 2 + t2o
+
+> 13
+
+with t = max {tk} for any k.Proof . The function h(u, y) under consideration has the following form: 
+
+h(u, y) = f (u) + W u − y, z(u) + λ∥y∥0 + β
+
+2 ∥W u∥2 + ρ
+
+2 ∥W u − y∥2
+
+with 
+
+z(u) = ( W ⊤)†(−∇ f (u) − βW ⊤W u) and f (u) = 12 ∥Au − u0∥2.
+
+Obviously, it can be easily verified that ak+1 = ∇uh(uk+1 , yk+1 ). By (2.9), there exists an element ηk+1 ∈ λ∥yk+1 ∥0 such that 
+
+ηk+1 − zk+1 + tk(yk+1 − yk) + ρ(yk+1 − W uk+1 ) = 0,
+
+then 
+
+−tk(yk+1 − yk) = ηk+1 − zk+1 + ρ(yk+1 − W uk+1 ),
+
+it is easy to verify that the right-hand side of the above expression is an element of 
+
+∂yh(uk+1 , yk+1 ). Therefore, bk+1 ∈ ∂yh(uk+1 , yk+1 ). By (2.8), we have (3.13) ∇f (uk+1 ) + W ⊤zk + βW ⊤W uk+1 + tk(uk+1 − uk) + ρW ⊤(W uk+1 − yk) = 0.
+
+Substituting (3.13) into the definition of ak+1 yields 
+
+∥ak+1 ∥
+
+= ∇f (uk+1 ) + W ⊤(W ⊤)†(−A⊤(Auk+1 − u0) − βW ⊤W uk+1 )
+
+−(A⊤A + βW ⊤W )W †(W uk+1 − yk+1 ) + βW ⊤W uk+1 + ρW ⊤(W uk+1 − yk+1 )
+
+−∇ f (uk+1 ) − W ⊤(W ⊤)†(−A⊤(Auk − u0) − βW ⊤W uk) − βW ⊤W uk+1 
+
+−tk(uk+1 − uk) − ρW ⊤(W uk+1 − yk)
+
+= W ⊤(W ⊤)†(−A⊤A − βW ⊤W )( uk+1 − uk) + ρW ⊤(yk − yk+1 ) − tk(uk+1 − uk)
+
+−(A⊤A + βW ⊤W )W †(W uk+1 − yk+1 )
+
+= W ⊤(W ⊤)†(−A⊤A − βW ⊤W )( uk+1 − uk) + ρW ⊤(yk − yk+1 ) − tk(uk+1 − uk)
+
+−(A⊤A + βW ⊤W )W †W (uk+1 − uk) − (A⊤A + βW ⊤W )W †(W uk − yk)
+
+−(A⊤A + βW ⊤W )W †(yk − yk+1 )
+
+≤ W ⊤(W ⊤)†(−A⊤A − βW ⊤W ) − (A⊤A + βW ⊤W )W †W − tkI 2 uk+1 − uk
+
++ (A⊤A + βW ⊤W )W † − ρW ⊤ 
+
+> 2
+
+yk − yk+1 
+
++ (A⊤A + βW ⊤W ) 2 W †(W uk − yk)
+
+≤ W ⊤(W ⊤)†(−A⊤A − βW ⊤W ) − (A⊤A + βW ⊤W )W †W − tkI 2 uk+1 − uk
+
++ (A⊤A + βW ⊤W )W † − ρW ⊤ 
+
+> 2
+
+yk − yk+1 
+
++ (A⊤A + βW ⊤W ) 2
+
+A⊤A + ( β + ρ)W ⊤W + tkI 2 W † 22
+
+ρ uk+1 − uk ,
+
+where the last inequality follows from Lemma 3.4. Hence, 
+
+ak+1 2
+
+> 14
+
+≤2 (A⊤A + βW ⊤W )W † − ρW ⊤ 22 yk − yk+1 22
+
++ 2  W ⊤(W ⊤)†(−A⊤A − βW ⊤W )( A⊤A + βW ⊤W )W †W − tkI 2
+
++ (A⊤A + βW ⊤W ) 2
+
+
+
+A⊤A + ( β + ρ)W ⊤W + tkI 2 W † 22
+
+
+
+/ρ 
+
+i2
+
+∥uk+1 − uk∥2
+
+Additionally, by the definition of bk+1 we obtain ∥bk+1 ∥ ≤ tk∥yk+1 − yk∥. Therefore, 
+
+∥(ak+1 , bk+1 )∥ ≤ √γ∥(uk+1 , yk+1 ) − (uk, yk)∥.
+
+Next, by leveraging the results from [31] and [42], we first show that h satisfies the KL property of exponent 1 /2. Subsequently, combining the aforementioned re-sults with this 1 /2-KL property, we establish the linear convergence of the sequence generated by the Algorithm 2.1. Let x = [ u⊤, y⊤]⊤ ∈ Rm+n, then 
+
+h(u, y) = f (u) + W u − y, z(u) + λ∥y∥0 + β
+
+2 ∥W u∥2 + ρ
+
+2 ∥W u − y∥2
+
+can be reformulate as (3.14) h(x) = x⊤M x + b⊤x + ν + λ
+
+> m+n
+
+X
+
+> i=n+1
+
+∥xi∥0,
+
+where M =
+
+M11 M12 
+
+M21 M22 
+
+
+
+, b = [ b⊤ 
+
+> 1
+
+, b⊤ 
+
+> 2
+
+]⊤ with (3.15) 
+
+M11 = 12
+
+ A⊤A + ( ρ − β)W ⊤W − W ⊤(W ⊤)†A⊤A − A⊤AW †W ,W12 = 12 (βW ⊤W + A⊤A)W † − ρW ⊤), M21 = M ⊤
+
+> 12
+
+, M22 = ρ 12 I, 
+
+b1 = −A⊤u0 + W ⊤(W ⊤)†A⊤u0,
+
+b2 = −(W ⊤)†A⊤u0, ν = 12 u⊤ 
+
+> 0
+
+u0.
+
+Theorem 3.10. (Properties of function h) The function h has the KL property of exponent 1/2 at all critical points. Proof . Let g(x) = x⊤M x + b⊤x + ν, where M , b and ν are defined in (3.15). Fix an arbitrary ¯ x ∈ crit h, where crit h denotes the set of critical points of h(u, y). Let 
+
+J = {i|¯xi̸ = 0 , i = n + 1 , . . . , n + m} and I = [ n]. We define gI∪J (z) := g(II∪J z)for z ∈ R|I∪J | , where II∪J ∈ R(n+m)×|I∪J | is formed by extracting columns of the identity matrix using the elements of I ∪J as indices. By [31, Corollary 5.2], we know 
+
+gI∪J is a KL function of exponent 1 /2. Then, there exist δ1 > 0, η 1 > 0 and c1 > 0such that for all z ∈ B (¯ xI∪J , δ 1) ∩ { z|gI∪J (¯ xI∪J ) < g I∪J (z) < g I∪J (¯ xI∪J ) + η1},dist (0 , ∂ gI∪J (z)) ≥ c1
+
+pgI∪J (z) − gI∪J (¯ xI∪J ).(3.16) Take η2 ∈ (0 , λ/ 3]. Since g(x) is continues, there exists δ2 > 0 such that 
+
+|g(x) − g(¯ x)| < η 2 ∀x ∈ B (¯ x, δ 2) ∩ dom ∂g. (3.17) Take δ = min ( δ1, δ 2) and η = min ( η1, η 2). Pick an arbitrary x from the set B(¯ x, δ ) ∩{x|h(¯ x) < h (x) < h (¯ x) + η}. We prove the arguments by two cases. 
+
+> 15
+
+• Case 1: x ∈ dom ∂h . We have 
+
+∂h (x) ⊆ ∇ g(x) + λ
+
+> m+n
+
+X
+
+> i=n+1
+
+∂∥xi∥0.(3.18) Next, we prove g(x) > g (¯ x) by contradiction. Suppose g(x) ≤ g(¯ x). Combining with (3.17), we have g(x) < g (¯ x) + η2. Moreover, since h(¯ x) < h (x) < h (¯ x) + η, that is, (3.19) g(¯ x) + λ
+
+> m+n
+
+X
+
+> i=n+1
+
+∥¯xi∥0 < g (x) + λ
+
+> m+n
+
+X
+
+> i=n+1
+
+∥xi∥0 < g (¯ x) + λ
+
+> m+n
+
+X
+
+> i=n+1
+
+∥¯xi∥0 + η. 
+
+By (3.19), g(x) ≤ g(¯ x) and g(x) < g (¯ x) + η2, we have 
+
+> m+n
+
+X
+
+> i=n+1
+
+∥¯xi∥0 ≤
+
+> m+n
+
+X
+
+> i=n+1
+
+∥xi∥0 − 1 <
+
+> m+n
+
+X
+
+> i=n+1
+
+∥¯xi∥0 + 1
+
+λ (η + η2) − 1 <
+
+> m+n
+
+X
+
+> i=n+1
+
+∥¯xi∥0.
+
+Therefore, g(x) > g (¯ x). By h(x) < h (¯ x) + η, we obtain that Pm+ni=n+1 ∥xi∥0 < Pm+ni=n+1 ∥¯xi∥0 + η/λ , that is, Pm+ni=n+1 ∥xi∥0 ≤ Pm+ni=n+1 ∥¯xi∥0. In addition, according to x ∈ B(¯ x, δ ), when δ
+
+is sufficiently small, we can deduce that Pm+ni=n+1 ∥xi∥0 ≥ Pm+ni=n+1 ∥¯xi∥0 and {i|xi̸ =0, i = n + 1 , . . . , m + n} ⊇ { i|¯xi̸ = 0 , i = n + 1 , . . . , m + n}. Thus, Pm+ni=n+1 ∥xi∥0 =
+
+Pm+ni=n+1 ∥¯xi∥0 and (3.20) {i|xi̸ = 0 , i = n + 1 , . . . , m + n} = {i|¯xi̸ = 0 , i = n + 1 , . . . , m + n} = J .
+
+We denote ζ∗ = ∇g(x). By virtue of (3.18), we obtain dist(0 , ∂h (x)) ≥ dist(0 , ∇g(x) + λ
+
+> m+n
+
+X
+
+> i=n+1
+
+∂∥xi∥0)= min   
+
+> ζ=∇g(x),ξ ∈λPm+ni=n+1 ∂∥xi∥0
+
+∥ζ + ξ∥ = ∥ζ∗I∪J ∥.(3.21) By the definition of gI∪J , we have 
+
+∇gI∪J (xI∪J ) = I⊤I∪J ∇g (II∪J xI∪J ) .(3.22) In addition, using ζ∗ = ∇g(x) and x = II∪J xI∪J , we have 
+
+ζ∗I∪J = I⊤I∪J ∇g(x) = I⊤I∪J ∇g (II∪J xI∪J ) .
+
+From the equation (3.22), it follows that ζ∗I∪J = ∇gI∪J (xI∪J ). Moreover, by (3.21), we obtain dist(0 , ∂h (x)) ≥ ζ∗I∪J = dist (0 , ∇gI∪J (xI∪J )) .(3.23) Recall that x ∈ { v|h(¯ x) < h (v) < h (¯ x) + η}. By invoking (3.20), it follows that 
+
+h(x) = g (II∪J xI∪J ) + λ|J | = gI∪J (xI∪J ) + λ|J | and h(¯ x) = gI∪J (¯ xI∪J ) + λ|J | .
+
+Thus, xI∪J ∈ { z|gI∪J (¯ xI∪J ) < g I∪J (z) < g I∪J (¯ xI∪J ) + η1}. By x ∈ B (¯ x, δ ), 
+
+δ ≤ δ1 and ∥x − ¯x∥ = ∥xI∪J − ¯xI∪J ∥, we have xI∪J ∈ B (¯ xI∪J , δ 1), by (3.23) and (3.16), dist(0 , ∂h (x)) ≥ dist (0 , ∂g I∪J (xI∪J )) 
+
+≥ c1
+
+pgI∪J (xI∪J ) − gI∪J (¯ xI∪J ) = c1
+
+ph(x) − h(¯ x).
+
+> 16
+
+• Case 2: x /∈ dom ∂h .In this case, ∂h (x) = ∅, and dist(0 , ∂h (x)) = ∞. This implies that the final inequality holds automatically. Now, by the arbitrariness of x in B(¯ x, δ ) ∩ { x|h(¯ x) < h (x) < h (¯ x) + η], the final inequality implies that h has the KL property of exponent 1 /2 at ¯ x. Given the arbitrariness of ¯ x ∈ crit h, the desired conclusion follows. In the following, utilizing the properties of h and the above results, we prove that the sequence generated by the Algorithm 2.1 converges linearly. 
+
+Theorem 3.11. Under the same assumptions as in Lemma 3.5, let {(uk, yk)}
+
+be the sequence generated by Algorithm 2.1 which is assumed to be bounded. Then the sequence {(uk, yk)} converges at least linearly to a limiting critical point (u∗, y∗) of 
+
+h, i.e., there exist constants c1 > 0 and τ ∈ [0 , 1) such that 
+
+∥(uk, yk) − (u∗, y∗)∥ ≤ c1τ k for k = 0 , 1, . . . 
+
+Proof . Let ( u∗, y∗) be an accumulation point of the sequence {uk, yk}. Then there exists a subsequence {ukt , ykt } converging to ( u∗, y∗). We note that λ∥y∥0 is lower semicontinuous, thus (3.24) lim inf  
+
+> t→∞
+
+λ∥ykt ∥0 ≥ λ∥y∗∥0.
+
+Using (2.9) we obtain 
+
+λ∥yk+1 ∥0 + W uk+1 − yk+1 , zk+1 ) + tk
+
+2 ∥yk+1 − yk∥2 + ρ
+
+2 ∥W uk+1 − yk+1 ∥2
+
+≤ λ∥y∗∥0 + W uk+1 − y∗, zk+1 ) + tk
+
+2 ∥y∗ − yk∥2 + ρ
+
+2 ∥W uk+1 − y∗∥2.(3.25) By virtue of Lemma 3.5, we have 
+
+h(u0, y0) − h(uk+1 , yk+1 ) =
+
+> k
+
+X
+
+> i=0
+
+(h(ui, yi) − h(ui+1 , yi+1 )) 
+
+≥ c
+
+4
+
+> k
+
+X
+
+> i=0
+
+(∥ui+1 − ui∥2 + ∥yi+1 − yi∥2).
+
+By the boundedness of the sequence {(uk, yk)}, {h(uk, yk)} is bounded below, and we have lim  
+
+> k→∞
+
+∥(uk+1 , yk+1 ) − (uk, yk)∥ = 0 .
+
+Hence, taking k = kt − 1 in (3.25) and let t → ∞ , we obtain lim sup 
+
+> t→∞
+
+λ∥ykt ∥0 ≤ λ∥y∗∥0.
+
+This, together with (3.24), implies that lim  
+
+> t→∞
+
+λ∥ykt ∥0 = λ∥y∗∥0.
+
+Therefore, lim  
+
+> t→∞
+
+h(ukt , ykt ) = lim 
+
+> t→∞
+
+(f (ukt ) + ⟨W ukt − ykt , z(ukt , ykt )⟩ + λ∥ykt ∥0 + β
+
+2 ∥W ukt ∥2
+
+> 17
+
++ ρ
+
+2 ∥W ukt − ykt ∥2)= h(u∗, y∗).(3.26) According to [5, Theorem 2.9], if h satisfies the KL property, and the sequence 
+
+{(uk, yk)} simultaneously satisfies the sufficient decrease condition, the relative error condition, and the continuity condition, then the sequence converges to a critical point of h. Clearly, Theorem 3.10 shows that h satisfies the KL property, while Lemma 3.5, Lemma 3.9 and (3.26) demonstrate that the sequence {uk, yk} satisfies the sufficient decrease condition, the relative error condition, and the continuity condition, respectively. Thus, we can conclude that the sequence {(uk, yk)} converges to a limiting critical point {(u∗, y∗)} of the function h. Moreover, by [4, Theorem 3.4], there exist constants c1 > 0 and τ ∈ [0 , 1) such that 
+
+∥(uk+1 , yk+1 ) − (u∗, y∗)∥F ≤ c1τ k for k = 0 , 1, . . . 
+
+Therefore, the sequence {(uk, yk)} converges at least linearly to the limiting critical point {(uk, yk)} of function h.Next, we demonstrate that the limit point of the sequence generated by the Al-gorithm 2.1 is a KKT point of model (2.1). 
+
+Theorem 3.12. Under the same assumptions as in Lemma 3.5, let {(uk, yk)}
+
+be the bounded sequence generated by Algorithm 2.1. Then, every limit point (u∗, y∗)
+
+of {(uk, yk)} is a KKT point of (2.1) .Proof . We firstly write the KKT point of (2.1). A point ( u, y) is called a KKT point of (2.1) if there exists z such that 
+
+0 = ∇f (u) + W ⊤z + βW ⊤W u, 0 ∈ − z + ∂λ ∥y∥0, W u − y = 0.
+
+By (2.8) we have 
+
+∇f (uk+1 ) + W ⊤zk + βW ⊤W uk+1 + tk(uk+1 − uk) + ρW ⊤(W uk+1 − yk) = 0.
+
+Let k → ∞ , by the continuity of ∇f (u) and z(u) together with Theorem 3.11, we have 
+
+∇f (u∗) + W ⊤z∗ + βW ⊤W u∗ + ρW ⊤(W u∗ − y∗) = 0.(3.27) Then, by ∇f (u∗) + βW ⊤W u∗ = ( I − W ⊤(W ⊤)†)( ∇f (u∗) + βW ⊤W u∗) + W ⊤(W ⊤)†
+
+(∇f (u∗) + βW ⊤W u∗), we have (I − W ⊤(W ⊤)†)( ∇f (u∗) + βW ⊤W u∗) + W ⊤(W ⊤)†(∇f (u∗) + βW ⊤W u∗)+W ⊤z∗ + ρW ⊤(W u∗ − y∗) = 0.
+
+Obviously, ( I − W ⊤(W ⊤)†)( ∇f (u∗) + βW ⊤W u∗) ∈ Range( I − W ⊤(W ⊤)†) and 
+
+W ⊤(W ⊤)†(∇f (u∗) + βW ⊤W u∗) + W ⊤z∗ + ρW ⊤(W u∗ − y∗) ∈ Range( W ⊤). Fur-thermore, since Range( I − W ⊤(W ⊤)†) is the orthogonal complement of Range( W ⊤), it follows that Range( I − W ⊤(W ⊤)†) ∩ Range( W ⊤) = {0}. Thus, we have (I − W ⊤(W ⊤)†)( ∇f (u∗) + βW ⊤W u∗) = 0
+
+and 
+
+W ⊤(W ⊤)†(∇f (u∗) + βW ⊤W u∗) + W ⊤z∗ + ρW ⊤(W u∗ − y∗) = 0.
+
+> 18
+
+By the definition of z∗, we have W ⊤(W ⊤)†(∇f (u∗) + βW ⊤W u∗) + W ⊤z∗ = 0.Then, ρW ⊤(W u∗ − y∗) = 0. Since W ⊤ is of full column rank, then (3.28) W u∗ − y∗ = 0.
+
+Substituting the result into (3.27), we have (3.29) ∇f (u∗) + W ⊤z∗ + βW ⊤W u∗ = 0 .
+
+Next, we prove the second equation of the KKT conditions. Since ( u∗, y∗) is the limit point of sequence of {uk, yk}, let k → ∞ , Combining with (2.9) and ( W u∗ −
+
+y∗) = 0, we have (W ⊤)†(A⊤(Au∗ − u0) − βW ⊤W u∗) + η∗ = 0,
+
+where η∗ ∈ ∂λ ∥y∗∥0. That is, (3.30) −z∗ + η∗ = 0.
+
+Combining equations (3.28)–(3.30), this shows that ( u∗, y∗) is KKT point of (2.1). 
+
+Remark 3.13. From the proof process of Theorem 3.12, it is easy to verify that if (u∗, y∗) is a KKT point of (2.1) , then (u∗, y∗) must be a critical point of h. Con-versely, if (u∗, y∗) is a critical point of h and satisfies W u∗ = y∗, then (u∗, y∗) is also a KKT point of (2.1) .
+
+3.3. Convergence Analysis for Algorithm 2.2. Next, we conduct the con-vergence analysis of Algorithm 2.2. Similar to the preceding subsection, we first demonstrate that the constraint violation at the current iterate can be bounded by the norm of difference between the updated value and the current iterate. 
+
+Lemma 3.14. Let {(uk, yk)} be the sequence generated by Algorithm 2.2, if 
+
+rank(( W ⊤)Ck ) > 0, then 
+
+uk+1 − uk ≥ ρ ((( W ⊤)Ck )†)⊤(W uk − yk)Ck
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥ ∥ (( W ⊤)Ck )†∥2 .
+
+Proof . Let ( W ⊤)Ck = Ur Σr V ⊤ 
+
+> r
+
+with rank(( W ⊤)Ck ) = r > 0. Then 
+
+((( W ⊤)Ck )†)⊤(W uk − yk)Ck = Ur Σ−1 
+
+> r
+
+V ⊤ 
+
+> r
+
+(W uk − yk)Ck
+
+≤ Σ−1  
+
+> r2
+
+V ⊤ 
+
+> r
+
+(W uk − yk)Ck
+
+= (( W ⊤)Ck )† 
+
+> 2
+
+Vr V ⊤ 
+
+> r
+
+(W uk − yk)Ck
+
+= (( W ⊤)Ck )† 
+
+> 2
+
+(( W ⊤)Ck )†(W ⊤)Ck (W uk − yk)Ck
+
+= (( W ⊤)Ck )† 
+
+> 2
+
+(( W ⊤)Ck )†W ⊤(W uk − yk) .(3.31) where the last equality follow from (3.6), i.e., for i ∈ I k, yki = ( W uk)i. By Theorem 3.2, we have 
+
+uk+1 − uk
+
+= (A⊤A + ( β + ρ)W ⊤W + tkI)−1(A⊤u0 − W ⊤zk + ρW ⊤yk + tkuk) − uk
+
+= (A⊤A + ( β + ρ)W ⊤W + tkI)−1  A⊤u0 − W ⊤zk + ρW ⊤yk + tkuk − A⊤Auk
+
+−(β + ρ)W ⊤W uk − tkuk
+
+> 19
+
+= (A⊤A + ( β + ρ)W ⊤W + tkI)−1  A⊤(u0 − Auk) − W ⊤zk + ρW ⊤yk
+
+−(β + ρ)W ⊤W uk
+
+≥ A⊤(u0 − Auk) − W ⊤zk + ρW ⊤yk − (β + ρ)W ⊤W uk
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2
+
+= 1
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2
+
+A⊤(u0 − Auk) − βW ⊤W uk − ρW ⊤(W uk − yk)
+
+−(W ⊤)Ck (( W ⊤)Ck )†(−A⊤(Auk − u0) − βW ⊤W uk)
+
+= 1
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2
+
+−ρW ⊤(W uk − yk)+[ I − (W ⊤)Ck (( W ⊤)Ck )†] − A⊤(Auk − u0) − βW ⊤W uk
+
+≥ 1
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2 ∥(( W ⊤)Ck )†∥2
+
+(( W ⊤)Ck )†[I − (W ⊤)Ck (( W ⊤)Ck )†]
+
+ − A⊤(Auk − u0) − βW ⊤W uk − ρ(( W ⊤)Ck )†W ⊤(W uk − yk)
+
+= ρ
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2 ∥(( W ⊤)Ck )†∥2
+
+(( W ⊤)Ck )†W ⊤(W uk − yk)
+
+≥ ρ
+
+∥A⊤A + ( β + ρ)W ⊤W + tkI∥2 ∥(( W ⊤)Ck )†∥22
+
+((( W ⊤)Ck )†)⊤(W uk − yk)Ck
+
+where the last inequality follows from (3.31). In what follows, we present the result that the sequence of function values corre-sponding to the sequence generated by Algorithm 2.2 is monotonically decreasing. 
+
+Lemma 3.15. Let {(uk, yk)} be the sequence generated by Algorithm 2.2. Let 
+
+ρ ≥ max {t, 1} and t = max k{tk},
+
+(3.32) 
+
+tk ≥ max 
+
+
+
+max 
+
+> k
+
+4  (( W ⊤)Ck )† ∥W ∥ A⊤A + βW ⊤W
+
++ W ⊤W (( W ⊤)Ck )† 2 A⊤A + βW ⊤W
+
++   A⊤A + βW ⊤W + 1  (( W ⊤)Ck )† 2 A⊤A + βW ⊤W
+
+io 
+
+, c 
+
+o
+
+,c > 0, then 
+
+h(uk, yk) − h(uk+1 , yk+1 ) ≥ c
+
+4 uk+1 − uk 2 .
+
+Proof . By (2.11) and (2.12) we have 
+
+f (uk) + β
+
+2 W uk 2 + W uk − yk, zk + ρ
+
+2 W uk − yk 2 ≥ f (uk+1 ) + β
+
+2 W uk+1 2
+
++ W uk+1 − yk, zk + ρ
+
+2 W uk+1 − yk 2 + tk
+
+2 uk+1 − uk 2
+
+(3.33) and 
+
+h(uk+1 , yk) ≥ h(uk+1 , yk+1 ).(3.34) (i) If rank(( W ⊤)Ck ) > 0, using (3.33) and (3.34) we have 
+
+h(uk, yk) − h(uk+1 , yk+1 )
+
+> 20
+
+= h(uk, yk) − h(uk+1 , yk) + h(uk+1 , yk) − h(uk+1 , yk+1 )= f (uk) + λ yk 
+
+> 0
+
++ β
+
+2 W uk 2 + W uk − yk, z(uk, yk) + ρ
+
+2 W uk − yk 2
+
+−f (uk+1 ) − λ yk 
+
+> 0
+
+− β
+
+2 W uk+1 2 − W uk+1 − yk, z(uk+1 , yk)
+
+− ρ
+
+2 W uk+1 − yk 2 + h(uk+1 , yk) − h(uk+1 , yk+1 )
+
+≥ tk
+
+2 uk+1 − uk 2 + W uk+1 − yk, z(uk, yk) − W uk+1 − yk, z(uk+1 , yk)
+
+= tk
+
+2 uk+1 − uk 2 + W uk+1 − yk, z(uk, yk) − z(uk+1 , yk)
+
+= tk
+
+2 uk+1 − uk 2 − (W uk+1 − yk)Ck , (( W ⊤)Ck )†(A⊤A + βW ⊤W )( uk − uk+1 )
+
+= tk
+
+2 uk+1 − uk 2
+
+− ((( W ⊤)Ck )†)⊤(W uk+1 − yk)Ck , (A⊤A + βW ⊤W )( uk − uk+1 )
+
+= tk
+
+2 uk+1 − uk 2
+
+− ((( W ⊤)Ck )†)⊤(W uk+1 − W uk)Ck , (A⊤A + βW ⊤W )( uk − uk+1 )
+
+− ((( W ⊤)Ck )†)⊤(W uk − yk)Ck , (A⊤A + βW ⊤W )( uk − uk+1 )
+
+≥ tk
+
+2 uk+1 − uk 2 − (( W ⊤)Ck )† 
+
+> 2
+
+∥W ∥2 A⊤A + βW ⊤W 2 uk − uk+1 22
+
+− ((( W ⊤)Ck )†)⊤(W uk − yk)Ck 2 A⊤A + βW ⊤W 2 uk − uk+1 
+
+> 2(∗)
+
+≥ tk
+
+2 uk+1 − uk 2 − (( W ⊤)Ck )† 
+
+> 2
+
+∥W ∥2 A⊤A + βW ⊤W 2 uk − uk+1 22
+
+− A⊤A + ( β + ρ)W ⊤W + tkI 2 (( W ⊤)Ck )† 22
+
+ρ A⊤A + βW ⊤W 2 uk − uk+1 2
+
+≥ tk
+
+2 uk+1 − uk 2 − (( W ⊤)Ck )† 
+
+> 2
+
+∥W ∥2 A⊤A + βW ⊤W 2 uk − uk+1 2
+
+− A⊤A + βW ⊤W + tkI 2 (( W ⊤)Ck )† 22
+
+ρ A⊤A + βW ⊤W 2 uk − uk+1 2
+
+− W ⊤W 2 (( W ⊤)Ck )† 22 A⊤A + βW ⊤W 2 uk − uk+1 2
+
+≥ tk
+
+4 uk+1 − uk 2 .
+
+where the inequality ( ∗) follows by Lemma 3.14, and the last inequality follows from (3.32). (ii) If rank(( W ⊤)Ck ) = 0, then z(·, yk) = 0, using (3.33) and (3.34) we have 
+
+h(uk, yk) − h(uk+1 , yk+1 )= h(uk, yk) − h(uk+1 , yk) + h(uk+1 , yk) − h(uk+1 , yk+1 )= f (uk) + λ yk 
+
+> 0
+
++ β
+
+2 W uk 2 + ρ
+
+2 W uk − yk 2 − f (uk+1 ) − λ yk
+
+> 0
+
+− β
+
+2 W uk+1 2 − ρ
+
+2 W uk+1 − yk 2 + h(uk+1 , yk) − h(uk+1 , yk+1 )
+
+≥ tk
+
+2 uk+1 − uk 2 .
+
+21 Next, we give the main result of this subsection. 
+
+Theorem 3.16. Under the same assumptions as in Theorem 3.2 and Lemma 3.15, let {uk, yk} be a bounded sequence generated by Algorithm 2.2. Then, the accu-mulation of {uk, yk} is critical point of h.Proof . Since the sequence {uk, yk} is bounded, let ( u∗, y∗) be an accumulation point thereof. Then there exists a subsequence {ukt , ykt } such that lim t→∞ (ukt , ykt ) = (u∗, y∗). By ykt → y∗, when t is sufficiently large, we have supp( y∗) ⊂ supp( ykt ). We prove the conclusions by two cases. (a) There exists kj , When t ≥ j, supp( ykt ) = supp( y∗). Let supp( y∗) = I∗ and 
+
+C∗ = {i|y∗ 
+
+> i
+
+= 0 }.(i) First, we consider the case Ckt = C∗̸ = ∅ when t ≥ j.By (2.11) and (2.12), taking k = kt and k = kt − 1 respectively, we have 
+
+A⊤(Aukt+1 − u0) + W ⊤z(ukt , ykt ) + βW ⊤W ukt+1 + tk(ukt+1 − ukt )+ρW ⊤(W ukt+1 − ykt ) = 0(3.35) and 
+
+ηkt + ρ(ykt − W ukt ) − z(ukt , ykt ) = 0,(3.36) where ηkt ∈ ∂λ ∥ykt ∥0.When i ∈ I ∗, by supp( ykt ) = supp( y∗) = I∗ and (3.36), we obtain 0 + ρ(ykt −
+
+W ukt )i = 0. Let t → ∞ , we have ρ(y∗ − W u∗)I∗ = 0.Furthermore, when t > j , Ckt = C∗, then lim t→∞ z(ukt , ykt )Ckt = lim t→∞ z(ukt ,
+
+ykt )C∗ = lim t→∞ (( W ⊤)C∗ )†(−A⊤(Aukt −u0)−βW ⊤W ukt ) = z(u∗, y∗)C∗ , z(u∗, y∗)I∗
+
+= 0. By Theorem 3.2, we have if ykt
+
+> i
+
+̸ = 0, ykt 
+
+> i
+
+= ( W ukt )i. Since Lemma 3.15 and 
+
+{(uk, yk)} is bounded, we have lim k→∞ ∥uk+1 − uk∥ = 0. Therefore, let t → ∞ , by (3.35) we have 
+
+A⊤(Au∗ − u0) + ( W ⊤)C∗ (( W ⊤)C∗ )†(−A⊤(Au∗ − u0) − βW ⊤W u∗) + βW ⊤W u∗
+
++ ρ(W ⊤)C∗ (W u∗ − y∗)C∗ = 0(3.37) Splitting both the first and third terms of the above equation into parts, we have (W ⊤)C∗ (( W ⊤)C∗ )† A⊤(Au∗ − u0) + βW ⊤W u∗
+
++ I − (W ⊤)C∗ (( W ⊤)C∗ )†  A⊤(Au∗ − u0) + βW ⊤W u∗
+
++( W ⊤)C∗ (( W ⊤)C∗ )† −A⊤(Au∗ − u0) − βW ⊤W u∗ + ρ(W ⊤)C∗ (W u∗ − y∗)C∗ = 0.
+
+Furthermore, 
+
+I − (W ⊤)C∗ (( W ⊤)C∗ )†  A⊤(Au∗ − u0) + βW ⊤W u∗ + ρ(W ⊤)C∗ (W u∗ − y∗)C∗ = 0.
+
+Since Range( I − (W ⊤)C∗ (( W ⊤)C∗ )†) ∩ Range(( W ⊤)C∗ ) = {0}, we have (I − (W ⊤)C∗ (( W ⊤)C∗ )†)( A⊤(Au∗ − u0) + βW ⊤W u∗) = 0
+
+and (3.38) (W ⊤)C∗ (W u∗ − y∗)C∗ = 0.
+
+> 22
+
+Substituting ( W ⊤)C∗ (W u∗ − y∗)C∗ = 0 into (3.37), we have (3.39) A⊤(Au∗ − u0) + W ⊤z∗ + βW ⊤W u∗ = 0.
+
+Moreover, by (3.38), we have (W ⊤)C∗ (W u∗)C∗ = 0 ⇔ W ⊤IC∗ I⊤C∗ (W u∗) = 0 ⇔ (W ⊤IC∗ )( W ⊤IC∗ )⊤u∗ = 0
+
+⇔ (W ⊤IC∗ )⊤u∗ = 0 ⇔ I⊤C∗ W u∗ = 0 ⇔ I⊤C∗ (W u∗ − y∗) = 0 ⇔ (W u∗ − y∗)C∗ = 0.
+
+Therefore, (3.40) W u∗ − y∗ = 0.
+
+Invoking this result in (3.36) yields: when i ∈ C ∗, there η∗ ∈ λ∥y∗ 
+
+> i
+
+∥0 such that (3.41) η∗ − z∗ = 0.
+
+Combining equations (3.39)–(3.41), it follows that ( u∗, y∗) is a KKT point of (2.1). (ii)when t > j , Ckt = C∗ = ∅, then zkt = 0 for all t > j . By (2.11) and (2.12), taking k = kt and k = kt − 1 respectively, we also have (3.42) A⊤(Aukt+1 −u0)+ βW ⊤W ukt+1 +tk(ukt+1 −ukt )+ ρW ⊤(W ukt+1 −ykt ) = 0
+
+and (3.43) ηkt + ρ(ykt − W ukt ) = 0,
+
+where ηkt ∈ ∂λ ∥ykt ∥0. By Ckt = C∗ = ∅, we obtain ηkt = 0 and ykt − W ukt = 0. Using the boundedness of sequence {(uk, yk)} together with Lemma 3.15, let t → ∞ 
+
+in (3.42) and (3.43), we have 
+
+A⊤(Au∗ − u0) + W ⊤z∗ + βW ⊤W u∗ = 0, W u∗ − y∗ = 0 and η∗ − z∗ = 0.
+
+where η∗ = 0 ∈ ∂λ ∥ykt ∥0. This proves that ( u∗, y∗) is a KKT point of Problem (2.1). (b) supp( y∗) ⊂ supp( ykt ) and supp( y∗)̸ = supp( ykt ) for sufficiently large t.By Theorem 3.2, for all k ≥ 0 and i ∈ [m], we have yk+1  
+
+> i
+
+= ( W uk+1 )i if |(W uk+1 )i|
+
+exceeds a fixed positive constant, and yk+1  
+
+> i
+
+= 0 otherwise. This indicates that the sequence formed by the components of {ykt } can consist of entirely nonzero entries for all sufficiently large t while converging to zero. Equivalently, for y updated via (3.6), the support identity supp( y∗) = supp( ykt ) must hold. Therefore, the second scenario cannot occur. 
+
+4. Numerical experiments. In this section, we report some numerical experi-ments on the performance of ALMEMfrr (Algorithm 2.1) and ALMEMgc (Algorithm 2.2) for solving problem (1.1). To illustrate the effectiveness of our method, we com-pare the proposed algorithm with the inexact augmented Lagrangian method (IALM) in [39]. Our numerical tests were implemented by running MATLAB R2024b on a per-sonal desktop with the processor Intel Core i9-14900K @ 3.2GHz and 192 GB RAM. For comparison purposes, let (kktL (uk, yk)) 2 = ∥A⊤(Auk − u0) + W ⊤zk + βW ⊤W uk + ρW ⊤(W uk − y)∥2
+
++∥(zk + ρ(W uk − yk)) Ik ∥2,
+
+(kkt (uk, yk)) 2 = ∥zk 
+
+> Ik
+
+∥2 + ∥A⊤(Auk − u0) + W ⊤zk + βW ⊤W uk)∥2,
+
+> 23
+
+obj (uk, yk) = f (uk) + λ∥yk∥0 + β
+
+2 ∥W uk∥2.
+
+In our numerical tests, the stopping criterion is set to be kktL (uk, yk) ≤ tol and the largest number of iterations is set to be ITmax , where ‘ tol ’ is a prescribed tolerance. Let ‘ ct. ’ and ‘ rce. ’ denote the total computing time in seconds and the relative constraint error ∥W uk −yk∥/∥W ∥ at the final iterates of the corresponding algorithms, respectively. We choose tk using the Barzilai-Borwein (BB) strategy [6]. 
+
+4.1. Synthetic data. In this subsection, owing to the simplicity and efficiency of the alternating minimization method and the close relation between (4.1) min 
+
+u,y f (u) + λ∥y∥0 + β
+
+2 ∥W u∥2 + ρ
+
+2 ∥W u − y∥2
+
+and problem (1.1), we employ the alternating minimization method to solve (4.1) and use the obtained solution as the initial point. All algorithms are stopped if the running time exceeds 7200 seconds or the number of iterations reaches ITmax .We first examine the performance of the proposed algorithms when W is of full rank. 
+
+Example 4.1. We consider problem (1.1) with m = 800 , n = 1000 . The matrix 
+
+W = [ ˆW , ˜W ] ∈ Rm×n is randomly generated via the randn function, where ˆW ∈
+
+Rm×m and ˜W ∈ Rm×(n−m). We also set matrix A as the identity matrix. The vector y ∈ Rm is sparse random with ∥y∥0 = 80 . To construct the u0 ∈ Rn, we first randomly generate ˜u0 ∈ Rn−m, and set ¯u0 = ˆW †(y − ˜W ˜u0). The vector u0 is then constructed as u0 = [¯ u⊤
+
+0 , ˜u⊤
+
+0 ]⊤ + 0 .001 · randn (n, 1) by adding a small Gaussian perturbation. Finally, we set the hyperparameters as β = λ = 0 .1.0 1000 2000 3000 4000 5000 6000 7000 8000                 
+
+> computing time (in seconds)
+> 10 -10
+> 10 -5
+> 10 0
+> 10 5
+> ALMEMfrr
+> ALMEMgc
+> IALM 01000 2000 3000 4000 5000 6000 7000 8000
+> computing time (in seconds)
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> ALMEMfrr
+> ALMEMgc
+> IALM 01000 2000 3000 4000 5000 6000 7000 8000
+> computing time (in seconds)
+> 10 -15
+> 10 -10
+> 10 -5
+> 10 0
+> ALMEMfrr
+> ALMEMgc
+> IALM
+
+Fig. 4.1: Convergence and computing time curves for Example 4.1. Figure 4.1 and Table 4.1 display the numerical results of all comparative algo-rithms for Example 4.1, where we set ρ = 100 for ALMEMfrr, ρ = 50 for ALMEMgc, 
+
+24 Alg. obj (uk, yk) ct. rce. kktL (uk, yk) kkt (uk, yk)ALMEMfrr 1.9238 × 10 2 1.7837 × 10 3 7.8327 × 10 −14 9.5777 × 10 −8 1.4116 × 10 −8
+
+ALMEMgc 1.9198 × 10 2 7.2000 × 10 3 1.4094 × 10 −12 6.0541 × 10 −7 6.0190 × 10 −7
+
+IALM 7.2419 × 10 4 7.2002 × 10 3 9.3461 × 10 −17 2.4961 × 10 4 1.1581 × 10 4
+
+Table 4.1: Numerical results for Example 4.1. with a stopping tolerance tol = 10 −7 and maximum iteration number ITmax = 10 6.It can be clearly observed from the presented results that both ALMEMfrr and ALMEMgc achieve stable and successful convergece. In particular, ALMEMfrr con-verges accurately under strict tolerance conditions and consumes significantly less computational time than ALMEMgc, demonstrating its higher computational effi-ciency. In contrast, the IALM algorithm exhibits unstable iterative performance. Although the kktL (uk, yk) value decreases rapidly at the initial stage, it increases sharply in subsequent iterations and finally fails to converge to a feasible KKT point of the problem (1.1). Next, we consider the performance of the proposed algorithms on synthetic ex-amples where W is not of full rank. 
+
+Example 4.2. We consider problem (1.1) with m = 800 , n = 1000 , and r = 600 .We first generate ˆW = U ΣV ⊤ ∈ Rm×n using the randn function, and take W =
+
+Ur Σr V ⊤
+
+r . Generate A ∈ Rm×n independently via randn . Let y ∈ Rm be a sparse random vector with ∥y∥0 = 80 . Let u0 = AW †y + ϵθ, where θ = randn (m, 1) and 
+
+ϵ = 0 .001 . The regularization parameters are set to β = λ = 0 .1.0 500 1000 1500 2000 2500 3000             
+
+> computing time (in seconds)
+> 10 -10
+> 10 -5
+> 10 0
+> 10 5
+> ALMEMfrr
+> ALMEMgc
+> IALM 0500 1000 1500 2000 2500 3000
+> computing time (in seconds)
+> 10 3
+> 10 4
+> ALMEMfrr
+> ALMEMgc
+> IALM 0500 1000 1500 2000 2500 3000
+> computing time (in seconds)
+> 10 -15
+> 10 -10
+> 10 -5
+> 10 0
+> ALMEMfrr
+> ALMEMgc
+> IALM
+
+Fig. 4.2: Convergence and computing time curves for Example 4.2. Figure 4.2 and Table 4.2 report the numerical results of Example 4.2. In this numerical test, we set ρ = 100 for both ALMEMfrr and ALMEMgc, and adopt a stopping tolerance tol = 10 −7 together with the maximum iteration number ITmax =
+
+25 Alg. obj (uk, yk) ct. rce. kktL (uk, yk) kkt (uk, yk)ALMEMfrr 1.0239 × 10 3 1.8982 × 10 3 1.7830 × 10 −4 9.9555 × 10 −8 8.9324 × 10 0                              
+
+> ALMEMgc 1.1409 ×10 32.6373 ×10 32.1732 ×10 −13 9.9803 ×10 −89.5782 ×10 −8
+> IALM 9.2293 ×10 37.2018 ×10 36.0459 ×10 −17 2.7842 ×10 41.2604 ×10 4
+
+Table 4.2: Numerical results for Example 4.2. 10 6. As clearly reflected by the experimental data, both ALMEMfrr and ALMEMgc successfully converge to a KKT point of the optimization problem min h(u, y), and ALMEMfrr evidently outperforms its counterpart in computational efficiency with shorter running time. However, there exists a notable difference between the two methods: the limit point yielded by ALMEMfrr does not satisfy the KKT conditions of the original optimization problem, while the limit point from ALMEMgc fully complies with the relevant conditions. This phenomenon is well consistent with the theoretical results derived in our paper. Additionally, the iterative sequence generated by IALM cannot converge to a KKT point of min L(u, y, z) with satisfactory precision throughout the whole iteration process. 
+
+4.2. Real data. We first consider the trend filtering problem, which originates from [29, 43]. 
+
+Example 4.3. Given a time series u0, the objective is to find another time series u
+
+that is closest to u0, while ensuring that u exhibits sparsity after a gradient mapping. We performed trend filtering on the ‘snp500.dat’ dataset, where the experimental data consist of 300 consecutive trading days starting from March 25, 1999. W ∈ R(n−2) ×n
+
+is a 2nd difference matrix. We set β = 1 and λ = 100 .                                                     
+
+> Alg. obj (uk,yk)ct. rce. kktL (uk,yk)kkt (uk,yk)ALMEMfrr 3.0477 ×10 12.2997 ×10 −14.2603 ×10 −13 5.8739 ×10 −81.1470 ×10 −7
+> ALMEMgc 3.0477 ×10 19.8548 ×10 −11.0830 ×10 −12 5.6549 ×10 −81.1308 ×10 −7
+> IALM 3.0477 ×10 17.2012 ×10 31.4989 ×10 −11 4.9983 ×10 −22.2670 ×10 −2
+
+Table 4.3: Numerical results for Example 4.3. Figure 4.3 and Table 4.3 present the numerical results of the real-data experiment in Example 4.3. In this test, we set ρ = 5000 for ALMEMfrr and ρ = 100 for ALMEMgc, with a unified stopping tolerance tol = 10 −7 and a maximum iteration number ITmax = 10 6. The numerical results demonstrate that both ALMEMgc and ALMEMfrr can accurately converge to valid KKT points of the original optimization problem. In contrast, the conventional IALM method only achieves a KKT residual of approximately 10 −2 after a long runtime of 7200 seconds, failing to obtain a high-precision solution. In terms of computational efficiency, ALMEMfrr consumes the shortest running time, followed by ALMEMgc, while the IALM algorithm suffers from significantly higher computational cost. Moreover, the iterative curve in Figure 4.3 verifies that ALMEMfrr exhibits stable linear convergence behavior, which is perfectly consistent with the theoretical convergence results established in this paper. 
+
+Example 4.4 ( Iamge smoothing ). We evaluate the performance of the proposed algorithm on the image smoothing. In this example, the image is sourced from [26], and we employ a difference operator that considers the vertical direction. We set 
+
+β = λ = 2 .5.                                    
+
+> 26 00.5 11.5 2
+> computing time (in seconds)
+> 10 -8
+> 10 -6
+> 10 -4
+> 10 -2
+> 10 0
+> 10 2
+> 10 4
+> ALMEMfrr
+> ALMEMgc
+> IALM 050 100 150 200 250 300
+> k
+> 10 -8
+> 10 -6
+> 10 -4
+> 10 -2
+> 10 0
+> 10 2
+> 10 4
+> ALMEMfrr
+> ALMEMgc
+> IALM 00.5 11.5 2
+> computing time (in seconds)
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> ALMEMfrr
+> ALMEMgc
+> IALM 050 100 150 200 250 300
+> k
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> ALMEMfrr
+> ALMEMgc
+> IALM 00.2 0.4 0.6 0.8 11.2 1.4 1.6 1.8 2
+> computing time (in seconds)
+> 10 -15
+> 10 -10
+> 10 -5
+> 10 0
+> ALMEMfrr
+> ALMEMgc
+> IALM 050 100 150 200 250 300
+> k
+> 10 -15
+> 10 -10
+> 10 -5
+> 10 0
+> ALMEMfrr
+> ALMEMgc
+> IALM
+
+Fig. 4.3: Success rate of recovery for Example 4.3. Image smoothing suppresses undesired textures and noise while preserving promi-nent structural features, serving as a fundamental preprocessing step for salient ob-ject detection, image segmentation, image restoration and other computer vision tasks. In this part, we set W as the gradient operator, i.e., W ∈ R(m−1) ×m with 
+
+Wii = −1, W i,i +1 = 1 and the other entries are zeros. We further test the texture removal task within the framework of image smoothing. Figure 4.4 displays the vi-sual results of the real-image test in Example 4.4 with ρ = 100 for ALMEMfrr and ALMEMgc, tol = 10 −3 and ITmax = 10 6. Additionally, we impose a runtime limit of 3600 seconds, where all algorithms are forcibly terminated once the elapsed time exceeds this threshold. As observed in Figure 4.4, both the proposed ALMEMgc and ALMEMfrr meth-ods achieve favorable image restoration performance compared with the ground-truth image. They effectively eliminate undesired horizontal streaks while preserving the primary structural information of the original image. This satisfactory restoration performance validates the rationality of adopting only the vertical difference opera-tor in our model design. By comparison, the baseline IALM method cannot achieve effective image restoration under the same experimental settings. It fails to remove image artifacts and inevitably results in severe loss of valid image details and original 
+
+27 True image                 
+
+> 50 100 150 200 250
+> 50 100 150 200 250 300 350 400 450 500 IALM
+> 50 100 150 200 250
+> 50 100 150 200 250 300 350 400 450 500 ALMEMfrr
+> 50 100 150 200 250
+> 50 100 150 200 250 300 350 400 450 500 ALMEMgc
+> 50 100 150 200 250
+> 50 100 150 200 250 300 350 400 450 500
+
+Fig. 4.4: Constructed images via ALMEMfrr, ALMEMgc and IALM for Example 4.4. texture content. 
+
+Example 4.5 ( Image smoothing ). We evaluate the performance of the proposed algorithm on the image smoothing. the image is also sourced from [26], and we also employ a difference operator that considers the vertical direction. We set β = λ = 0 .8.
+
+In this example, we consider the case where W is not of full rank. Specifically, 
+
+W is a row circulant matrix of (1 , −1, 0, . . . , 0). Such circulant difference matrices are widely adopted for constructing smoothing priors in image processing tasks. Fig-ure 4.5 reports the corresponding numerical results of Example 4.5 with ρ = 100 for ALMEMfrr and ALMEMgc, tol = 10 −3 and ITmax = 10 6. To avoid excessive com-putation, we additionally set a runtime limit: all algorithms will stop execution once the elapsed time reaches 7200 seconds. As can be clearly seen from Figure 4.5, compared with the original ground-truth image, the proposed ALMEMfrr and ALMEMgc are capable of performing effective image smoothing and successfully eliminating various undesirable artifacts. In sharp contrast, the output generated by the IALM algorithm cannot maintain basic image characteristics, leading to obvious loss of original visual content and detailed infor-mation. 
+
+5. Concluding Remarks. This paper investigates a non-separable composite 
+
+ℓ0-ℓ2 regularization model for inverse problems. We propose two exact augmented La-grangian algorithms, ALMEMfrr and ALMEMgc, for full row-rank and arbitrary-rank transform matrices, respectively. Closed-form solutions are derived for all subprob-lems. Under mild assumptions, we prove that the sequence generated by ALMEMfrr converges linearly to a KKT point, and that any limit point of the sequence generated 
+
+28 True image                         
+
+> 50 100 150 200 250 300 350
+> 50 100 150 200 250 300 350 400 450 500 IALM
+> 50 100 150 200 250 300 350
+> 50 100 150 200 250 300 350 400 450 500 ALMEMfrr
+> 50 100 150 200 250 300 350
+> 50 100 150 200 250 300 350 400 450 500 ALMEMgc
+> 50 100 150 200 250 300 350
+> 50 100 150 200 250 300 350 400 450 500
+
+Fig. 4.5: Constructed images via ALMEMfrr, ALMEMgc and IALM for Example 4.5. by ALMEMgc is a KKT point. 
+
+Conflict of Interest Statement The authors declare that they have no conflict of interest. 
+
+Data Availability Statement All data generated or analysed during this study are included in this manuscript. 
+
+REFERENCES [1] R. Acar and C. R. Vogel, Analysis of bounded variation penalty method for ill-posed problems, Inverse Problems, 10 (1994), 1217. [2] M. V. Afonso and J. M. R. Sanches, Blind inpainting using ℓ0 and Total variation regularization, IEEE Trans. Image Process., 24 (2015), 2239–2253. [3] A. Atamt¨ urk, A. G´ omez, and S. Han, Sparse and smooth signal Estimation: convexification of 
+
+ℓ0-formulations, J. Mach. Learn. Res., 22 (2021), 1–43. [4] H. Attouch, J. Bolte, P. Redont, and A. Soubeyran, Proximal alternating minimization and pro-jection methods for nonconvex problems: an approach based on the Kurdyka-Lojasiewicz inequality, Math. Oper. Res., 35 (2010), 438–457. [5] H. Attouch, J. Bolte, and B. F. Svaiter, Convergence of descent methods for semi-algebraic and tame problems: proximal algorithms, forward-backward splitting, and regularized Gauss-Seidel methods, Math. Program., 137 (2013), 91–129. [6] J. Barzilai and J. M. Borwein, Two-point step size gradient methods, IMA J. Numer. Anal., 8 (1988), pp. 141–148. [7] M. Bertero, P. Boccacci and C. De Mol, Introduction on Inverse Problems in Imaging, 2nd edn., CRC press (2021). [8] T. Blumensath, Accelerated iterative hard thresholding, Signal Process., 92 (2012), 752–756. [9] T. Blumensath and M. E. Davies, Iterative thresholding for sparse approximation, J. Fourier 29 Anal. Appl., 14 (2008), 629–654. [10] T. Blumensath and M. E. Davies, Iterative hard thresholding for compressed sensing, Appl. Comput. Harmon. Anal., 27 (2009), 265–274. [11] J. Bolte, S. Sabach, and M. Teboulle, Proximal alternating linearized minimization for noncon-vex and nonsmooth problems, Math. Program.,146 (2014), 459–494. [12] J.-F. Cai, Y. Jiao, X. Lu, and J. You, Sample-efficient sparse phase retrieval via stochastic alternating minimization, IEEE Trans. Signal Process., 70 (2022), 4951–4966. [13] E. J. Cand` es, M. B. Wakin and S. P. Boyd, Enhancing sparsity by reweighted ℓ1-minimization, J. Fourier Anal. Appl., 14 (2008), 877–905. [14] S. S. Chen, D. L. Donoho and M. A. Saunders, Atomic decomposition by basis pursuit, SIAM J. Sci. Comput., 20 (1998), 33–61. [15] W. Chen, Simultaneously sparse and low-rank matrix reconstruction via nonconvex and non-separable regularization, IEEE Trans. Signal Process., 66 (2018), 5313–5323. [16] Q. Cheng, H. Zhou, and J. Cheng, The fisher-markov selector: fast selecting maximally separa-ble feature subset for multiclass classification with applications to high-dimensional data, IEEE Trans. Pattern anal. Mach. Intell., 33 (2011), 1217–1233. [17] W. Dai and O. Milenkovic, Subspace pursuit for compressive sensing signal reconstruction, IEEE Trans. Inform. Theory, 55 (2009), 2230–2249. [18] G. M. Davis, S. G. Mallat, and Z. Zhang, Adaptive time-frequency decompositions, Optical Engineering, 33 (1994), 2183–2191. [19] B. Dong and Y. Zhang, An efficient algorithm for ℓ0 minimization in wavelet frame based image restoration, J. Sci. Comput., 54 (2013), 350–368. [20] D. L. Donoho, Superresolution via sparsity constraints, SIAM J. Math. Anal., 23 (1992) 1309– 1331. [21] D. L. Donoho, De-noising by soft-thresholdinng, IEEE Trans. Inform. Theory, 41 (1995), 613– 627. [22] D. L. Donoho, Compressed sensing, IEEE Trans. Inform. Theory, 52 (2006), 1289–1306. [23] M. Elad, Why simple shrinkage is still relevant for redundant representations?, IEEE Trans. Inform. Theory, 52 (2006), 5559–5569. [24] H. W. Engl, A. K. Louis and W. Rundell, Inverse Problems in Medical Imaging and Nonde-structive Testing, Springer (1997). [25] J. Fan, R. Li, Variable selection via nonconcave penalized likelihood and its oracle properties, J. Am. Stat. Assoc., 96 (2001), 1348–1360. [26] Q. Fan, J. Yang, D. WIPF, B. Chen and X. Tong, Image smoothing via unsupervised learning, ACM Trans. Graph., 37 (2018), 259. [27] S. Foucart, Hard thresholding pursuit: an algorithm for compressive sensing, SIAM J. Numer. Anal., 49 (2011), 2543–2563. [28] P. C. Hansen, Discrete Inverse Problems: Insight and Algorithms, SIAM (2010). [29] S. J. Kim, K. Koh, S. Boyd and D. Gorinevsky, ℓ1 trend filtering, SIAM Rev., 51 (2009), 339–360. [30] M. Lassas, E. Saksman and S. Siltanen, Discretization-invariant Bayesian inversion and Besov space priors, Inverse Probl. Imaging, 3 (2009), 87–122. [31] G. Li and T. K. Pong, Calculus of the exponent of Kurdyka-Lojasiewicz inequality and its applications to linear convergence of first-order methods, Found. Comput. Math., 18 (2018), 1199–1232. [32] K. Liu and T. Wang, A novel sparse recovery space-time adaptive processing algorithm using the log-sum penalty to approximate the ℓ0-norm penalty, IET Radar Sonar Navig., 18 (2024), 1515–1530. [33] S. G. Mallat and Z. Zhang, Matching pursuits with time-frequency dictionaries, IEEE Trans. Signal Process., 41 (1993), 3397–3415. [34] B. S. Mordukhovich, Variational Analysis and Applications, Springer (2018). [35] B. S. Mordukhovich, Variational Analysis and Generalized Differentiation I–Basic Theory, Springer (2006). [36] F. Natterer and F. W¨ ubbeling, Mathematical Methods in Image Reconstruction, SIAM (2001). [37] D. Needell and J. A. Tropp, CoSaMP: Iterative signal recovery from incomplete and inaccurate samples, Appl. Comput. Harmon. Anal., 26 (2009), 301–321. [38] R. T. Rockafellar and R. J-B, Wets, Variational Analysis, Springer (1998). [39] J. Song, J. Li, Z. Yao, K. Ma, and C. Bao, Zero norm based analysis model for image smoothing and reconstruction, Inverse Problems, 36 (2020), 115009. [40] Z. F. Sun, J. C. Zhou, Y. B. Zhao, and N. Meng, Heavy-ball-based hard thresholding algorithms for sparse signal recovery, J. Comput. Appl. Math., 430 (2023), 115264. [41] J. A. Tropp and A. C. Gilbert, Signal recovery from random measurements via orthogonal 30 matching pursuit, IEEE Trans. Inform. Theory, 53 (2007), 4655–4666. [42] Y. Wu, S. Pan, and S. Bi, Kurdyka-Lojasiewicz property of zero-norm composite functions, J. Optim. Theory Appl., 188 (2021), 94–112. [43] G. Yuan and B. Ghanem, Sparsity constrained minimization via mathematical programming with equilibrium constraints, arXiv: 1608.04430v3. [44] G. Yuan and B. Ghanem, ℓ0TV: a sparse optimization method for impulse noise image restora-tion, IEEE Trans. Pattern Anal. Mach. Intell., 41 (2019), 352–364. [45] C.-H. Zhang, Nearly unbiased variable seletion under minimax concave penalty, Ann. Stat., 38 (2010),894–942. [46] Y. B. Zhao, Optimal k-thresholding algorithms for sparse optimization problems, SIAM J. Optim., 30 (2020), 31–55. [47] Y. B. Zhao and D. Li, Reweighted ℓ1-minimization for sparse solutions to underdetermined linear systems, SIAM J. Optim., 22 (2012), 1065–1088. 31
