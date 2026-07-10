@@ -1,0 +1,59 @@
+{
+  "mode": "skims",
+  "generated_at": "2026-07-10T05:57:57.352074+00:00",
+  "stats": {
+    "mode": "skims",
+    "forced_all_quick": true,
+    "min_score": 8.0,
+    "deep_divecandidates": 1,
+    "deep_cap": null,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": null,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.30958v1",
+      "source": "arxiv",
+      "title": "Exponential-Family Tensor Completion via Nonconvex Dual Total-Variation Regularization",
+      "abstract": "With the emergence of various tensor data, tensor completion from partial measurements has attracted widespread attention in data science and signal processing. Total Variation (TV) has been widely used as an effective regularization technique for tensor completion; however, theoretical studies on TV regularization in this context remain limited. In this work, we present a rigorous theoretical analysis of TV regularization for tensor completion. Specifically, we consider tensor completion under exponential-family noise, which generalizes the standard settings such as Gaussian and Poisson tensor completion. To handle exponential-family tensor completion, we propose a family of dual-TV (DTV) regularizers based on the transformed L1 function, which simultaneously capture sparsity and low-rank structures in the gradient tensor. Moreover, we establish the theoretical upper bounds on the recovery error of the proposed estimator. In certain cases, these upper bounds can attain the convergence order of $\\mathcal{O}\\big( n_3 r_t\\big(\\max_{k} s_k^2\\big) \\log\\big((n_1+n_2)n_3\\big) /n \\big)$, and the minimax lower bound analysis is further presented to show that the upper-bounds can approach the lower bound with the gap of order $\\mathcal{O}(\\max_k s_k^2/max(n_1, n_2))$ up to a logarithmic factor. Finally, multiple groups of experiments on synthetic, image and video tensor data sets are conducted to support our theoretical results and demonstrate the effectiveness of our method.",
+      "authors": [
+        "Wenfei Cao",
+        "Yang Chen",
+        "Qibin Zhao",
+        "Jinglai Li",
+        "Andrzej Cichocki"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "math.OC",
+        "math.ST",
+        "stat.ML"
+      ],
+      "published": "2026-06-29T22:32:19+00:00",
+      "link": "https://arxiv.org/pdf/2606.30958v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "exponential-family tensor completion using TV regularization, applicable to hyperspectral tensor recovery",
+      "llm_evidence_cn": "指数族张量补全方法，采用TV正则化，可应用于高光谱图像张量恢复",
+      "llm_evidence": "指数族张量补全方法，采用TV正则化，可应用于高光谱图像张量恢复",
+      "canonical_evidence": "指数族张量补全方法，采用TV正则化，可应用于高光谱图像张量恢复",
+      "llm_tldr_en": "Proposes dual-TV regularizers for exponential-family tensor completion, with rigorous theoretical analysis. Method handles Gaussian and Poisson noise, directly relevant to high-dimensional tensor data recovery for hyperspectral images.",
+      "llm_tldr_cn": "本文针对指数族噪声下的张量补全问题，提出了一类对偶全变分正则化器，并给出了严格的理论分析。该方法适用于高斯和泊松等常见噪声类型，与高光谱图像张量数据恢复任务高度契合，为高维张量去噪提供了理论支持和新工具。",
+      "llm_tldr": "本文针对指数族噪声下的张量补全问题，提出了一类对偶全变分正则化器，并给出了严格的理论分析。该方法适用于高斯和泊松等常见噪声类型，与高光谱图像张量数据恢复任务高度契合，为高维张量去噪提供了理论支持和新工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-06-11 ~ 2026-07-10 <!--dpr-date:20260611-20260710-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/20260611-20260710/2606.30958v1-exponential-family-tensor-completion-via-nonconvex-dual-total-variation-regularization" data-sidebar-item="{&quot;title&quot;: &quot;Exponential-Family Tensor Completion via Nonconvex Dual Total-Variation Regularization&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2606.30958v1-exponential-family-tensor-completion-via-nonconvex-dual-total-variation-regularization&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;指数族张量补全方法，采用TV正则化，可应用于高光谱图像张量恢复&quot;}">Exponential-Family Tensor Completion via Nonconvex Dual Total-Variation Regularization</a>
   * 2026-07-08 <!--dpr-date:20260708-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/08/2607.05636v1-sensor-adaptive-infrared-spectral-reconstruction-with-plug-and-play-diffusion-priors" data-sidebar-item="{&quot;title&quot;: &quot;Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.05636v1-sensor-adaptive-infrared-spectral-reconstruction-with-plug-and-play-diffusion-priors&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;利用扩散先验进行高光谱感知光谱重建，直接相关&quot;}">Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors</a>
