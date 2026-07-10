@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-10",
+  "date": "2026-07-10",
+  "generated_at": "2026-07-10T21:05:43",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/10/2607.04535v1-manifoldflow-spd-relaxed-stiefel-layers-with-learnable-singular-spectrum",
+      "section": "quick",
+      "title_en": "ManifoldFlow: SPD-Relaxed Stiefel Layers with Learnable Singular Spectrum",
+      "authors": "Haiwen Yi, Xinyuan Song",
+      "date": "2026-07-05",
+      "pdf": "https://arxiv.org/pdf/2607.04535v1",
+      "score": "6.0",
+      "evidence": "可学习奇异值谱用于低秩约束",
+      "tldr": "正交/Stiefel层强制权重奇异值为1，限制了方向依赖性调整。本文提出ManifoldFlow，通过W=Q S^{1/2}参数化，在保持Stiefel流形的同时学习正定谱S，使奇异值可控制。实验表明，在语言模型投影等任务中优于固定谱Stiefel层，但并非通用替代。贡献在于揭示了正交基的谱不必冻结，提供了可学习谱的最小化松弛。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Orthogonal and Stiefel layers give neural weights exact spectral control, but they also impose a strong modeling constraint: all represented singular values are fixed at one. Many settings that benefit from an orthonormal basis still need direction-dependent attenuation or amplification. We introduce ManifoldFlow, a minimal relaxation of a fixed-spectrum Stiefel layer that keeps the basis on the Stiefel manifold while learning a bounded positive spectrum through W = Q S^{1/2}, with Q^T Q = I and S positive definite. Since W^T W = S, the eigenvalues of S are exactly the squared singular values of the realized weight, making eigenvalue clipping a direct singular-value control mechanism. Across paired sequence, tabular, and image experiments, the learnable SPD spectrum improves the fixed-spectrum Stiefel counterpart in the reported settings where the Stiefel prior is useful, with the largest gains in recurrent language-model projections. Boundary cases in convolutional classifier heads clarify the intended scope: ManifoldFlow is not a universal dense-layer replacement, but a spectrum-learnable Stiefel relaxation for settings where an orthonormal basis is a useful prior. When the basis should be orthonormal, its spectrum need not be frozen. Code available at https://github.com/Hik289/manifold_flow",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/10/2607.06330v1-direct-and-efficient-estimation-of-bilinear-forms-in-staggered-tensor-panels",
+      "section": "quick",
+      "title_en": "Direct and efficient estimation of bilinear forms in staggered tensor panels",
+      "authors": "Alberto Bordino, Thomas B. Berrett, Olga Klopp",
+      "date": "2026-07-07",
+      "pdf": "https://arxiv.org/pdf/2607.06330v1",
+      "score": "6.0",
+      "evidence": "从带噪张量数据中直接高效估计，可适用于高维张量恢复",
+      "tldr": "针对交错采用设计中部分观测张量数据的双线性形式估计问题，信号服从Tucker2模型。提出一种跨层池化的谱算法，直接估计双线性形式而非完整张量。理论证明非渐近均方误差界呈现层数相变，并匹配局部极小极大下界。方法扩展至一般交错采用设计，模拟和真实数据验证有效性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We study the estimation of bilinear forms from noisy, partially observed tensor data. The signal follows a Tucker2 model, with shared unit and time factors across tensor layers and slice-specific cores. The missingness pattern is structured and motivated by staggered adoption designs, which are common in causal inference and related applications. We first analyse the four-block missingness pattern, the basic building block for general staggered adoption, and propose a spectral algorithm that pools information across layers and targets the functional directly, rather than completing the entire tensor. We prove a non-asymptotic mean squared error bound that exhibits a phase transition in the number of layers, showing when pooling improves estimation, and match it with a local minimax lower bound up to constants. We then extend the construction to general staggered adoption designs via an anchored four-block reduction, and derive analogous theoretical guarantees. Finally, we validate our theoretical findings through experiments on both simulated and real-world datasets.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/10/2607.08671v1-low-rank-matrix-recovery-via-heavy-tailed-quadratic-sampling",
+      "section": "quick",
+      "title_en": "Low-Rank Matrix Recovery via Heavy-Tailed Quadratic Sampling",
+      "authors": "Gao Huang, Song Li",
+      "date": "2026-07-09",
+      "pdf": "https://arxiv.org/pdf/2607.08671v1",
+      "score": "6.0",
+      "evidence": "低秩矩阵恢复方法可用于去噪",
+      "tldr": "低秩矩阵恢复在重尾二次采样下缺乏理论保证。本文证明核范数最小化和半定约束经验风险最小化方法，在采样向量仅具有有限4+δ矩时，能以最优样本复杂度O(rn)实现稳定鲁棒恢复。通过二次型矩估计和重尾协方差估计达成。结果还改进了复投影4-设计采样的样本复杂度，为实际重尾数据提供了理论支撑。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "The problem of recovering an (approximately) low-rank Hermitian matrix $\\pmb{M}_0 \\in \\mathbb{C}^{n \\times n}$ of rank $r$ from quadratic sampling matrices of the form $\\{\\pmb{a}_k \\pmb{a}_k^*\\}_{k=1}^m$ arises in a variety of applications, including phase retrieval. To obtain rigorous recovery guarantees, the sampling vectors $\\{\\pmb{a}_k\\}_{k=1}^m$ are typically modeled probabilistically. However, most existing theoretical results rely on Gaussian or sub-Gaussian assumptions, which may not accurately capture practical data models. In many applications, sampling vectors exhibit heavier tails, while theoretical understanding in such regimes remains scarce.   In this paper, we bridge this gap. We show that two widely used convex approaches, nuclear norm minimization and semidefinite-constrained empirical risk minimization, achieve uniform, stable, and robust recovery under the mild assumption that the entries of the sampling vectors have only finite $4+δ$ moments, with the optimal sample complexity $m = \\mathcal{O}(rn)$ up to moment-dependent constants. The two main ingredients of our analysis are moment estimates for quadratic forms established via decoupling, together with recent advances in covariance estimation in heavy-tailed settings. As byproducts, we also establish the optimal sample complexity for low-rank matrix recovery under complex projective $4$-design sampling, thereby improving upon previous results, and obtain stability guarantees for phase retrieval under similarly weak moment assumptions.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

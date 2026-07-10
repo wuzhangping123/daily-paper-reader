@@ -6,26 +6,30 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-11 ~ 2026-07-10
-- 运行时间：2026-07-10 05:58:11 UTC
+- 最新运行日期：2026-07-10
+- 运行时间：2026-07-10 21:05:37 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：3
 - 精读区：0
-- 速读区：1
+- 速读区：3
 
 ### 今日简报（AI）
-今日速读一篇高分论文《Exponential-Family Tensor Completion via Nonconvex Dual Total-Variation Regularization》，聚焦非凸对偶全变差正则化方法。  
-核心方向：将张量补全扩展至指数族分布，通过非凸正则项提升对非高斯噪声的鲁棒性。  
-下一步可关注该方法在图像修复、推荐系统等含复杂噪声场景的实际应用效果。
-- 详情：[/20260611-20260710/README](/20260611-20260710/README)
+今日速读3篇论文，聚焦流形学习与矩阵恢复。最值得关注的方向是低秩矩阵恢复与双线性形式估计的交叉应用。建议关注重尾采样下的矩阵恢复方法，可能更贴近真实数据噪声。
+- 详情：[/202607/10/README](/202607/10/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Exponential-Family Tensor Completion via Nonconvex Dual Total-Variation Regularization](/20260611-20260710/2606.30958v1-exponential-family-tensor-completion-via-nonconvex-dual-total-variation-regularization)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：指数族张量补全方法，采用TV正则化，可应用于高光谱图像张量恢复
+1. [ManifoldFlow: SPD-Relaxed Stiefel Layers with Learnable Singular Spectrum](/202607/10/2607.04535v1-manifoldflow-spd-relaxed-stiefel-layers-with-learnable-singular-spectrum)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：可学习奇异值谱用于低秩约束
+2. [Direct and efficient estimation of bilinear forms in staggered tensor panels](/202607/10/2607.06330v1-direct-and-efficient-estimation-of-bilinear-forms-in-staggered-tensor-panels)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：从带噪张量数据中直接高效估计，可适用于高维张量恢复
+3. [Low-Rank Matrix Recovery via Heavy-Tailed Quadratic Sampling](/202607/10/2607.08671v1-low-rank-matrix-recovery-via-heavy-tailed-quadratic-sampling)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：低秩矩阵恢复方法可用于去噪
 
 
 <div class="dpr-home-promo-card">

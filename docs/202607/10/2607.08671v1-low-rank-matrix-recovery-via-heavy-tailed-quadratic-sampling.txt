@@ -1,0 +1,3165 @@
+Title: Low-Rank Matrix Recovery via Heavy-Tailed Quadratic Sampling
+
+URL Source: https://arxiv.org/pdf/2607.08671v1
+
+Published Time: Fri, 10 Jul 2026 01:09:10 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# Low-Rank Matrix Recovery via Heavy-Tailed Quadratic Sampling ∗
+
+## Gao Huang †and Song Li ‡
+
+Abstract 
+
+The problem of recovering an (approximately) low-rank Hermitian matrix 
+
+MMM 0 ∈ Cn×n of rank r from quadratic sampling matrices of the form {aaakaaa∗
+
+> k
+
+}mk=1 
+
+arises in a variety of applications, including phase retrieval. To obtain rigorous recovery guarantees, the sampling vectors {aaak}mk=1 are typically modeled proba-bilistically. However, most existing theoretical results rely on Gaussian or sub-Gaussian assumptions, which may not accurately capture practical data models. In many applications, sampling vectors exhibit heavier tails, while theoretical understanding in such regimes remains scarce. In this paper, we bridge this gap. We show that two widely used convex approaches, nuclear norm minimization and semidefinite-constrained empirical risk minimization, achieve uniform, stable, and robust recovery under the mild assumption that the entries of the sampling vectors have only finite 4 + δ mo-ments, with the optimal sample complexity m = O (rn ) up to moment-dependent constants. The two main ingredients of our analysis are moment estimates for quadratic forms established via decoupling, together with recent advances in co-variance estimation in heavy-tailed settings. As byproducts, we also establish the optimal sample complexity for low-rank matrix recovery under complex pro-jective 4-design sampling, thereby improving upon previous results, and obtain stability guarantees for phase retrieval under similarly weak moment assump-tions. 
+
+Keywords: Low-Rank Matrix; Phase Retrieval; Heavy Tails; Covariance Estimation 
+
+> ∗
+
+This work was supported by NSFC under grant number U21A20426 
+
+> †
+
+School of Mathematical Science, Zhejiang University, Hangzhou 310027, P. R. China, E-mail address: hgmath@zju.edu.cn 
+
+> ‡
+
+School of Mathematical Science, Zhejiang University, Hangzhou 310027, P. R. China, E-mail address: songli@zju.edu.cn 
+
+1arXiv:2607.08671v1 [math.ST] 9 Jul 2026 1 Introduction 
+
+The problem of recovering a low-rank matrix from a small number of linear measure-ments is a central topic in applied mathematics, statistics, electrical engineering, and computer science; see, e.g., [52, 14]. It arises in a variety of areas, including quantum tomography [25, 20, 39], signal processing [4], recommender systems [35], and linear system identification and control [43]. A prominent example is phase retrieval, which arises in a range of signal and imaging applications, including X-ray crystallography, astronomical imaging, and diffraction imaging [47, 55]. In phase retrieval, the apparent obstacle posed by nonlinear magnitude-only measurements can be overcome by lifting the problem to a matrix space, an idea first introduced by Balan et al. [7]. This view-point later inspired the PhaseLift approach of Cand` es et al. [10, 13], which recasts phase retrieval as a low-rank matrix recovery problem. Motivated by these applications and the close connection with phase retrieval, in this paper we study the recovery of an (approximately) low-rank Hermitian matrix 
+
+MMM 0 ∈ H n from the quadratic (i.e., rank-one) sampling model 
+
+yk = ⟨aaakaaa∗
+
+> k
+
+, M MM 0⟩ + ωk, k = 1 , . . . , m. (1) Here, Hn denotes the space of n × n complex Hermitian matrices, {aaak}mk=1 are the sampling vectors, yyy := {yk}mk=1 denotes the measurement vector and ωωω := {ωk}mk=1 
+
+denotes the measurement noise. When MMM 0 = xxx0xxx∗ 
+
+> 0
+
+is rank-one for some xxx0 ∈ Cn, (1) reduces to the intensity-only measurement model arising in phase retrieval [7, 10]. To describe the setup more precisely, let A : Hn → Rm denote the linear map 
+
+A (MMM ) = {⟨ aaakaaa∗
+
+> k
+
+, M MM ⟩} mk=1 . (2) Then (1) can be written compactly as 
+
+yyy = A (MMM 0) + ωωω. (3) A prominent approach for recovering the matrix MMM 0 from (3) is nuclear norm min-imization, formulated as the following convex program [13, 15, 9, 39, 30, 26, 23]: min  
+
+> MMM∈H n
+
+∥MMM ∥∗ subject to ∥A (MMM ) − yyy∥ℓq ≤ η, (4) where ∥MMM ∥∗ denotes the nuclear norm of MMM ∈ Cn×n, and η is a known upper bound on the noise level, namely, ∥ωωω∥ℓq ≤ η. Here, for a vector xxx, ∥xxx∥ℓq denotes the usual ℓq-norm. In some situations, it is known a priori that the target matrix MMM 0 is Hermitian positive semidefinite, i.e., MMM 0 ⪰ 000. In this case, one may replace the nuclear norm minimization program (4) with the semidefinite-constrained empirical risk minimization program [16, 11, 37, 36, 27]: min  
+
+> MMM∈H n
+
+∥A (MMM ) − yyy∥ℓq subject to MMM ⪰ 000, (5) 2which is noise-blind in the sense that it does not require prior knowledge of the noise level. Beyond these convex formulations, related algorithmic developments for the quadratic sampling model (1) include nonconvex matrix factorization methods [42], stochastic gradient-type algorithms [49], hard-thresholding-type methods [21, 18], and recent analyses of the nonconvex landscape of related formulations [45]. From a theoretical perspective, the analysis of the quadratic sampling model (1) has so far relied predominantly on probabilistic assumptions on the sampling vectors. Most existing results are established for Gaussian, or more generally sub-Gaussian, ensembles, both in low-rank matrix recovery and in the rank-one special case of phase retrieval [13, 11, 15, 9, 39, 30, 42, 37, 22, 32, 44, 28, 27, 45], or on structured sam-pling models such as coded diffraction patterns, convolutional ensembles and projec-tive t-design ensembles [12, 50, 39, 41]. However, these idealized probabilistic models cannot fully characterize the sampling patterns arising in practical acquisition sys-tems, and even structured models, though closer to certain acquisition mechanisms, do not encompass all sampling ensembles encountered in practice. For instance, in practical ghost imaging, illumination patterns are often generated by experimentally constrained optical architectures and, in modalities such as X-rays, electrons, and neu-trons, are commonly realized by transversely translating a fixed mask [33, 5], leading to sampling ensembles that may deviate substantially from ideal Gaussian ensembles and may even exhibit heavy-tailed behavior. These considerations motivate the study of recovery guarantees under substantially weaker distributional assumptions on the sampling vectors, which naturally leads to the following question: 
+
+Can one achieve recovery of a low-rank matrix from the quadratic sampling model (1) when the sampling vectors are heavy-tailed and satisfy only weak moment assumptions? 
+
+The main contribution of this paper is to provide an affirmative answer to this question by showing that such recovery guarantees remain valid under remarkably weak assumptions. More precisely, we prove that both nuclear norm minimization (4) and semidefinite-constrained empirical risk minimization (5) achieve uniform, stable, and robust recovery at the optimal sample complexity m = O (rn ) up to moment-dependent constants, provided that the sampling vectors have independent, suitably normalized entries with only finite 4 + δ moments. To the best of our knowledge, this is the first result at this level of generality for the quadratic sampling model (1) in the heavy-tailed regime. Moreover, our analysis yields two further byproducts. First, we establish optimal sample complexity guarantees for low-rank matrix recovery un-der complex projective 4-design sampling, improving earlier results by removing an extra logarithmic factor [39, 30]. Second, our arguments also yield stability guaran-tees for phaseless operators arising in phase retrieval under similarly weak moment assumptions. Finally, numerical experiments corroborate our theoretical findings and demonstrate the effectiveness of these convex recovery procedures in heavy-tailed sam-pling settings. 3Our approach differs in several essential ways from existing analyses. Its main novelty lies in two technical ingredients tailored to the heavy-tailed setting, which allow us to remove the Gaussian or sub-Gaussian assumptions while retaining the rank null space property (rank NSP) framework [30] combined with Mendelson’s small ball method [34, 57]. The first ingredient is a decoupling-based moment estimate for quadratic forms, which replaces the standard arguments commonly used under sub-Gaussian assumptions [15, 37]. The second ingredient draws on recent advances in covariance estimation for heavy-tailed distributions [56, 3, 29], which we adapt to control the empirical process terms arising in the small ball method. Together, these ingredients yield uniform, stable, and robust recovery guarantees under weak moment assumptions in the heavy-tailed setting. We believe that both ingredients may be of independent interest. We introduce some notation that will be used throughout the paper. We denote by 
+
+Sn−1 
+
+> C
+
+and Sn−1 the unit spheres in Cn and Rn, respectively. For a matrix MMM , we write 
+
+∥MMM ∥∗, ∥MMM ∥F , and ∥MMM ∥op for its nuclear norm, Frobenius norm, and operator norm, respectively. For an integer r ≥ 1, MMM r denotes the best rank-r approximation of MMM ,and MMM r,c := MMM −MMM r denotes the residual part. If xxx ∈ Cn, then ℜ (xxx) and ℑ (xxx) denote its real and imaginary parts, respectively. For a random variable X and p ≥ 1, we write 
+
+∥X∥Lp := ( E |X|p)1/p . Finally, for two nonnegative real sequences {at}t and {bt}t, we write bt = O(at) (or bt ≲ at) if there exists a constant C > 0 such that bt ≤ Ca t, and write bt ≳ at if there exists a constant c > 0 such that bt ≥ ca t. Similarly, we write 
+
+a ≲p b if there exists a constant Cp > 0, depending only on p, such that a ≤ Cpb, and write a ≳p b if there exists a constant cp > 0, depending only on p, such that a ≥ cpb.The remainder of the paper is organized as follows. In Section 2, we present the main recovery guarantees for the two convex programs. Section 3.1 reviews prelimi-naries on the rank NSP and Mendelson’s small ball method. In Sections 3.2 and 3.3, we establish moment estimates for quadratic forms and carry out the covariance esti-mation analysis. Sections 3.4 and 3.5 are devoted to the proofs of our main results. In Section 4, we present recovery results for complex projective 4-design sampling. Sec-tion 5 is concerned with stability results for phase retrieval. Finally, Section 6 presents numerical experiments that corroborate our theoretical findings. 
+
+# 2 Main Results 
+
+In this section, we present the main results of the paper. We begin with the nuclear norm minimization program (4) for the quadratic sampling model (3). The following theorem shows that uniform, stable, and robust recovery of low-rank Hermitian matri-ces remains possible in the heavy-tailed setting under merely 4+ δ moment assumptions on the sampling vectors. 
+
+Theorem 1. Let δ > 0 and q ≥ 1. Consider the noisy measurement process in (3) where ∥ωωω∥ℓq ≤ η, with m sampling matrices of the form {aaakaaa∗
+
+> k
+
+}mk=1 . Assume that 4{aaak}mk=1 are independent copies of a random vector aaa ∈ Cn with independent mean-zero, variance-one entries {ai}ni=1 satisfying 
+
+α4+ δ = max  
+
+> i
+
+E
+
+h
+
+|ai|4+ δi
+
+< ∞, β = min  
+
+> i
+
+E |ai|4 > 1, γ = max  
+
+> i
+
+E a2
+
+> i
+
+ < 1. (6) Set ζ = min {β − 1, 1 − γ2} > 0. Fix r ≤ n, and suppose that 
+
+m ≥ C1 (δ) · f · rn. 
+
+Then, with probability at least 1 − e−C2m·g2
+
+it holds that for all MMM 0 ∈ H n, any solution 
+
+MMM ♯ to the program (4) obeys 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≤ C3
+
+√r ∥MMM r,c  
+
+> 0
+
+∥∗ + C4 (δ) ηh · m1/q .
+
+Here, C1 (δ) , C 4 (δ) are positive constants depending only on δ, whereas C2 and C3 are positive universal constants. Moreover, f, g, h are constants given as 
+
+f = α
+
+> 32+12 δ
+> (4+ δ)δ
+> 4+ δ
+
+ζ3+ 8
+
+> δ
+
+, g = ζ4/δ +1 
+
+α4/δ 
+
+> 4+ δ
+
+, and h = g · ζ1/2. (7) We next consider the semidefinite-constrained empirical risk minimization pro-gram (5), which is noise-blind. The following theorem shows that it enjoys a similar recovery guarantee in the heavy-tailed quadratic sampling setting. 
+
+Theorem 2. Let δ > 0 and q ≥ 1. Consider the noisy measurement process in (3) with m sampling matrices of the form {aaakaaa∗
+
+> k
+
+}mk=1 . Here {aaak}mk=1 are independent copies of a random vector aaa ∈ Cn with independent mean-zero, variance-one entries {ai}ni=1 .Assume that {ai}ni=1 satisfy (6), and let ζ be defined as in Theorem 1. Fix r ≤ n, and suppose that 
+
+m ≥ C1 (δ) · f · rn. 
+
+Then, with probability at least 1 − e−C2m·g2
+
+− e−2n − 110 mδ/ 4 − C3(δ) 
+
+> m
+
+it holds that for all 
+
+MMM 0 ⪰ 000, any solution MMM ♯ to the program (5) obeys 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≤ C4
+
+√r ∥MMM r,c  
+
+> 0
+
+∥∗ + C5 (δ) ∥ωωω∥ℓq
+
+h · m1/q .
+
+Here, C1 (δ) , C 3 (δ) , C 5 (δ) are positive constants depending on δ, whereas C2 and C4
+
+are positive universal constants. The constants f, g, h are those defined in (7) and depend only on α4+ δ, ζ, and δ.We make several remarks on the above two theorems. 5Remark 1 (Nearly Minimal Assumptions on α4+ δ). In the above theorems, we do not require the entries of aaa to be i.i.d. Gaussian or sub-Gaussian, as is commonly as-sumed in the literature. Instead, independence and finite (4 + δ)-th moments suffice. This moment condition is nearly minimal within our analytical framework, since the small ball analysis [15, 37, 26] naturally involves fourth moments of the entries through second-moment estimates of aaa∗MMMa aa. The additional δ > 0 provides the extra integra-bility needed for uniform high probability control in the heavy-tailed setting. Thus, under these near-minimal assumptions, our recovery guarantees still achieve the order-optimal sample complexity m = O (rn ), up to constants depending on the moment parameters α4+ δ, ζ and δ. However, we do not know whether the sample complexity and the recovery bounds are optimal with respect to these constants. 
+
+Remark 2 (Necessity of β and γ). The conditions on β and γ are needed to avoid certain ambiguities; see, e.g., [37]. To illustrate this point, suppose in addition that the entries are i.i.d. copies of a random variable a ∈ C. Then conditions (6) on β and 
+
+γ reduce to 
+
+β = E |a|4 > 1, γ = E a2 < 1. (8) If E |a|4 = E |a|2 = 1, which includes the Bernoulli case a ∈ {± 1} with probability 1/2, then |a| = 1 almost surely. Consequently, the rank-one matrices eeejeee∗ 
+
+> j
+> nj=1
+
+are indistinguishable, where {eeej }nj=1 denote the standard basis vectors of Cn. Similarly, if 
+
+|E [a2]| = E |a|2 = 1, for instance when a = λea for some fixed λ ∈ C with |λ| = 1 and some real-valued random variable ea, then the rank-one matrix xxx0xxx∗ 
+
+> 0
+
+cannot be distinguished from xxx0xxx∗
+
+> 0
+
+, although in general xxx0xxx∗
+
+> 0
+
+̸ = xxx0xxx∗
+
+> 0
+
+.
+
+Remark 3 (Uniform, Stable, and Robust Guarantees) . Within the rank-NSP-based framework of [30], our theorems show that uniform (simultaneously for all admissible target matrices), stable (with respect to approximate low-rankness), and robust (with respect to measurement noise) recovery of low-rank Hermitian matrices remains possi-ble in the heavy-tailed setting. Theorems 1 and 2 apply beyond the exactly low-rank setting, with the approximation error measured by ∥MMM r,c  
+
+> 0
+
+∥∗ /√r. When MMM 0 has rank at most r, this term vanishes, and hence any solution MMM ♯ to (4) (or (5)) satisfies 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≲α4+ δ ,ζ,δ 
+
+ηm1/q or ∥ωωω∥ℓq
+
+m1/q 
+
+!
+
+.
+
+Moreover, if MMM 0 has rank at most r and ωωω = 0 00 in the sampling model (3), then exact reconstruction holds. 
+
+Remark 4 (Phase Retrieval via PhaseLift) . If MMM 0 has rank one, say MMM 0 = xxx0xxx∗
+
+> 0
+
+, then the noiseless part of the measurements takes the form 
+
+yk = aaa∗
+
+> k
+
+MMM 0aaak = |⟨ aaak, x xx0⟩| 2 , k = 1 , . . . , m. 
+
+6Thus, the quadratic sampling model reduces to the phase retrieval problem [7]. In this setting, programs (4) and (5) correspond to the well-known PhaseLift method [13, 11]. Consequently, when m = O (n), our results yield uniform and robust recovery guarantees for phase retrieval in the heavy-tailed setting. 
+
+Remark 5 (Probability Bounds) . The recovery guarantee in Theorem 1 holds with an exponentially high probability of the form 1 − e−Ω( m). In contrast, the probability bound in Theorem 2 contains additional error terms, namely the exponential term 
+
+e−2n and two polynomially decaying terms, 1 
+
+> mδ/ 4
+
+and 1 
+
+> m
+
+. This loss is caused by the extra condition required in the proof of Theorem 2, namely that Pmk=1 aaakaaa∗ 
+
+> k
+
+be positive definite; see Section 3.1.1. 
+
+Remark 6 (A Special Case: Eight-Moment Condition) . In the setting of Theorems 1 and 2, suppose in addition that the entries of aaa have finite eighth moments, and set 
+
+α := max 1≤i≤n E |ai|8 < ∞. Then, by taking δ = 4, the conclusions of Theorems 1 and 2 simplify as follows. Assume that m ≳ α5/2 
+
+> ζ5
+
+rn . Then with probability at least 1 − e−Ω(ζ4m/α 2) it holds that for all MMM 0 ∈ H n, any solution MMM ♯ to the program (4) obeys 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≲ ∥MMM r,c  
+
+> 0
+
+∥∗
+
+√r + αη ζ5/2m1/q .
+
+Moreover, with probability at least 1 − e−Ω(ζ4m/α 2) − 2e−n − O (1 /m ) it holds that for all MMM 0 ⪰ 000, any solution MMM ♯ to the program (5) obeys 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≲ ∥MMM r,c  
+
+> 0
+
+∥∗
+
+√r + α ∥ωωω∥ℓq
+
+ζ5/2m1/q .
+
+# 3 Proof of Main Results 
+
+## 3.1 Preliminaries 
+
+3.1.1 Rank Null Space Property 
+
+We first recall some standard results on low-rank matrix recovery from [30], beginning with the Frobenius-robust rank null space property (rank NSP). 
+
+Definition 1. For q ≥ 1, we say an operator A : Hn → Rm satisfies the Frobenius-robust rank NSP with respect to ℓq of order r with constants 0 < ρ < 1 and τ > 0 if for all MMM ∈ H n,
+
+∥MMM r∥F ≤ ρ
+
+√r ∥MMM r,c ∥∗ + τ ∥A (MMM )∥ℓq .
+
+The recovery guarantee for the model (4) follows from the following proposition, provided that the quadratic sampling operator A satisfies the Frobenius-robust rank NSP. 7Proposition 1 ([30, Theorem 3.1]) . Let A : Hn → Rm satisfy the Frobenius-robust rank NSP with respect to ℓq of order r with constants 0 < ρ < 1 and τ > 0. Then for all MMM 0 ∈ H n, any solution MMM ♯ to (4) with yyy = A (MMM 0)+ ωωω and ∥ωωω∥ℓq ≤ η, approximates 
+
+MMM 0 with error 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≤ C1
+
+√r ∥MMM r,c  
+
+> 0
+
+∥∗ + D1τ η, 
+
+where C1 = 2(1+ ρ)2 
+
+> (1 −ρ)
+
+and D1 = 2(3+ ρ)1−ρ .Although the feasible set in the model (5) is the positive semidefinite cone and does not explicitly impose a low-rank constraint, the model can still recover low-rank matrices under suitable structural conditions on the sampling matrices. Specifically, to prove Theorem 2, in addition to requiring that A satisfies the Frobenius-robust rank NSP, we also need the empirical matrix WWW := 1
+
+> m
+
+Pmk=1 aaakaaa∗ 
+
+> k
+
+to be positive definite. 
+
+Proposition 2 ([30, Theorem 8.1]) . Suppose WWW = 1
+
+> m
+
+Pmk=1 aaakaaa∗ 
+
+> k
+
+is positive definite and A : Hn → Rm satisfies the Frobenius-robust rank NSP with respect to ℓq of order 
+
+r with constants 0 < ρ < 1/κ (WWW ) and τ > 0, where κ (WWW ) := ∥WWW ∥op · ∥ WWW −1∥op . Then for all MMM 0 ⪰ 000, any solution MMM ♯ to (5) with yyy = A (MMM 0) + ωωω, approximates MMM 0 with error 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≤ C2κ (WWW )
+
+√r ∥MMM r,c  
+
+> 0
+
+∥∗ +
+
+ C2
+
+m1/q √r + D2 ∥WWW ∥op τ
+
+
+
+WWW −1 
+
+> op
+
+∥ωωω∥ℓq ,
+
+where C2 = 2(1+ ρκ (WWW )) 2  
+
+> 1−ρκ (WWW)
+
+and D2 = 3+ ρκ (WWW )1−ρκ (WWW ) .The Frobenius-robust rank NSP for the quadratic sampling operator A plays a crucial role in proving both Theorem 1 and Theorem 2. To this end, we introduce the set Tρ,r :
+
+Tρ,r =
+
+
+
+MMM ∈ H n : ∥MMM ∥F = 1 , ∥MMM r∥F > ρ
+
+√r ∥MMM r,c ∥∗
+
+
+
+.
+
+The next lemma shows that establishing a uniform lower bound on ∥A (MMM )∥ℓq for all MMM ∈ T ρ,r is sufficient to guarantee that A satisfies the Frobenius-robust rank NSP. 
+
+Lemma 1 ([30, Lemma 3.3]) . If inf 
+
+n
+
+∥A (MMM )∥ℓq : MMM ∈ T ρ,r 
+
+o
+
+> 1
+
+τ , (9) then A satisfies the Frobenius-robust rank NSP with respect to ℓq of order r with constants ρ and τ .The following lemma characterizes the approximate low-rank structure of the set 
+
+Tρ,r . It follows directly from Lemma 3.4 in [30], which embeds Tρ,r into a scaled version of the convex hull of matrices of rank at most r and unit Frobenius norm. 
+
+Lemma 2 ([30, Lemma 3.4]) . For any MMM ∈ T ρ,r , we have 
+
+∥MMM ∥∗ ≤
+
+q
+
+1 + (1 + ρ−1)2√r. (10) 83.1.2 Small Ball Method 
+
+The standard approach to establishing the Frobenius-robust rank NSP for the quadratic sampling operator A through Lemma 1 is Mendelson’s small ball method [46, 34], which has been extensively applied over the past decade to a variety of problems, including sparse recovery, low-rank matrix recovery, phase retrieval, and blind deconvolution [40, 1, 39, 30, 51, 26, 37, 38]. 
+
+Proposition 3 ([34, Theorem 1.5], [57, Proposition 5.1]) . Fix T ⊂ Rn. Let {ϕϕϕk}mk=1 
+
+be independent copies of a random vector ϕϕϕ in Rn, and let {εk}mk=1 be a Rademacher sequence independent of {ϕϕϕk}mk=1 . Define the small ball function and the supremum of the empirical process by 
+
+Qξ (T ; ϕϕϕ) = inf  
+
+> uuu∈T
+
+P (|⟨ ϕϕϕ, u uu⟩| ≥ ξ) and Wm (T ; ϕϕϕ) = E sup 
+
+> uuu∈T
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εk⟨ϕϕϕk, u uu⟩ .
+
+Then for any q ≥ 1, ξ > 0 and t > 0, with probability at least 1 − exp ( −2t2), it holds that inf 
+
+> uuu∈T
+> m
+
+X
+
+> k=1
+
+|⟨ ϕϕϕk, u uu⟩| q
+
+!1/q 
+
+≥ m1
+
+> q
+
+
+
+ξQ2ξ (T ; ϕϕϕ) − 2Wm (T ; ϕϕϕ) − ξt 
+
+√m
+
+
+
+. (11) Hence, to apply the preceding proposition to lower bound ∥A (MMM )∥ℓq in Lemma 1 over the set Tρ,r , it remains to establish a lower bound for 
+
+Q2ξ := inf  
+
+> MMM∈T ρ,r
+
+P (|aaa∗MMMa aa| ≥ 2ξ)and an upper bound for 
+
+Wm := E sup  
+
+> MMM∈T ρ,r
+
+|⟨ HHH, M MM ⟩| ,
+
+where HHH = 1
+
+> m
+
+Pmk=1 εkaaakaaa∗
+
+> k
+
+.To lower bound the small ball function Q2ξ, we employ the celebrated Paley– Zygmund inequality. In order to impose weaker assumptions on the sampling vector 
+
+aaa, we use the following generalized version of the Paley–Zygmund inequality [48]. Its proof is postponed to Appendix A. 
+
+Fact 1. Let Z ≥ 0 be a random variable and let 0 < s < q < ∞ with 0 < ∥Z∥Lq < ∞.Then, for any θ ∈ (0 , 1), 
+
+P  Z ≥ θ ∥Z∥Ls
+
+ ≥ (1 − θs) qq−s
+
+∥Z∥Ls
+
+∥Z∥Lq
+
+! sq q−s
+
+. (12) Applying Fact 1 to Z = |aaa∗MMMa aa|2 with s = 1 and q = p/ 2, where p > 2, yields that for any t ∈ (0 , 1), 
+
+P  |aaa∗MMMa aa|2 ≥ t E |aaa∗MMMa aa|2 ≥ (1 − t) pp−2 · (E |aaa∗MMMa aa|2) pp−2
+
+(E |aaa∗MMMa aa|p) 2
+
+> p−2
+
+. (13) 9The following lemma from [37] is particularly useful. It not only explains the origin of the degeneracy in quadratic sampling, but can also be used to provide a lower bound for E |aaa∗MMMa aa|2.
+
+Lemma 3 ([37, Lemma 9]) . Let aaa ∈ Cn be a random vector with independent mean-zero, variance-one entries {ai}ni=1 . Then for any matrix MMM ∈ H n it holds that 
+
+E |aaa∗MMMa aa|2 = (Tr MMM )2 +
+
+> n
+
+X
+
+> i=1
+
+ E |ai|4 − 1 MMM 2
+
+> ii
+
++ X
+
+> i̸=j
+
+MMM 2 
+
+> ij
+
+E ai2 · E a2
+
+> j
+
+ + X
+
+> i̸=j
+
+|MMM ij |2 .
+
+Hence, in order to lower bound Q2ξ, it remains to obtain an upper bound for 
+
+E |aaa∗MMMa aa|p for some p > 2. A standard tool for this purpose is the Hanson–Wright inequality [54]; see, for instance, [15, 37]. However, this approach relies crucially on the sub-Gaussian assumption on aaa. In Section 3.2, we instead develop an alternative argument based on decoupling, which yields explicit moment bounds for the quadratic form |aaa∗MMMa aa| under suitable finite-moment assumptions. For the supremum term Wm, by H¨ older’s inequality and Lemma 2 in Section 3.1.1, we obtain Wm ≤ E sup  
+
+> MMM∈T ρ,r
+
+∥MMM ∥∗ · ∥ HHH∥op 
+
+≤
+
+q
+
+1 + (1 + ρ−1)2√r · E ∥HHH∥op ,
+
+(14) where HHH = 1
+
+> m
+
+Pmk=1 εkaaakaaa∗
+
+> k
+
+. Therefore, to upper bound Wm, it suffices to control 
+
+E ∥HHH∥op . A standard approach is based on covering number arguments (see, e.g., [57, 37]), which typically relies on sub-Gaussian concentration and therefore breaks down in the heavy-tailed setting. In Section 3.3, we show how to upper bound E ∥HHH∥op using recent results on covariance matrix estimation, which allows us to establish recovery guarantees with optimal sample complexity. 
+
+## 3.2 Quadratic Form 
+
+We derive an upper bound for the moments of the quadratic form |aaa∗MMMa aa|, which will serve as a key technical ingredient in our analysis. The proof is based on a decoupling argument, in the spirit of the proof of the Hanson–Wright inequality [54], but it does not rely on a sub-Gaussian assumption. 
+
+Proposition 4. Let aaa ∈ Cn be a random vector with independent mean-zero, variance-one entries {ai}ni=1 . Fix p ≥ 2, and assume that α2p = max i E |ai|2p < ∞. Then for any MMM ∈ Cn×n,
+
+E |aaa∗MMMa aa|p ≤ Cp (|Tr ( MMM )|p + α2p ∥MMM ∥pF ) , (15) where Cp is a constant depending only on p.10 Proof of Proposition 4. The proof proceeds in five steps. 
+
+Step 1. Expansion. We write 
+
+aaa∗MMMa aa =
+
+> n
+
+X
+
+> i=1
+
+MMM ii |ai|2 + X
+
+> i̸=j
+
+ai MMM ij aj
+
+= Tr ( MMM ) + 
+
+> n
+
+X
+
+> i=1
+
+MMM ii 
+
+ |ai|2 − 1 + X
+
+> i̸=j
+
+ai MMM ij aj
+
+:= Tr ( MMM ) + D + S. 
+
+Therefore, by the elementary inequality |x + y + z|p ≲p |x|p + |y|p + |z|p, it follows that 
+
+E |aaa∗MMMa aa|p ≲p |Tr ( MMM )|p + E |D|p + E |S|p . (16) 
+
+Step 2. Estimate D. We begin with the diagonal part 
+
+D =
+
+> n
+
+X
+
+> i=1
+
+Xi, where Xi = MMM ii 
+
+ |ai|2 − 1 .
+
+Since the random variables {Xi}ni=1 are independent and mean-zero, we appeal to the following form of Rosenthal’s inequality (see [53, Theorem 3]): for any independent mean-zero random variables {Yi}ni=1 and any p ≥ 2, 
+
+E
+
+> n
+
+X
+
+> i=1
+
+Yi
+
+> p
+
+≲p
+
+> n
+
+X
+
+> i=1
+
+E |Yi|2
+
+!p/ 2
+
++
+
+> n
+
+X
+
+> i=1
+
+E |Yi|p . (17) We next estimate the moments of Xi. For each p ≥ 2, we write αp := max i E [|ai|p]. Since E |ai|2 = 1, we have 
+
+E |Xi|2 = |MMM ii |2 E |ai|2 − 1 2 = |MMM ii |2  E |ai|4 − 1 ≤ α4 |MMM ii |2 . (18) Moreover, 
+
+E |Xi|p = |MMM ii |p E |ai|2 − 1 p ≲p α2p |MMM ii |p . (19) Applying (17) to {Xi}ni=1 , we obtain 
+
+E |D|p ≲p
+
+> n
+
+X
+
+> i=1
+
+E |Xi|2
+
+!p/ 2
+
++
+
+> n
+
+X
+
+> i=1
+
+E |Xi|p
+
+≲p αp/ 24
+
+> n
+
+X
+
+> i=1
+
+|MMM ii |2
+
+!p/ 2
+
++ α2pnX
+
+> i=1
+
+|MMM ii |p
+
+≲p α2p ∥MMM ∥pF .
+
+(20) 11 Here, we used that for p ≥ 2, Pni=1 |MMM ii |p ≤  P ni=1 |MMM ii |2p/ 2 ≤ ∥ MMM ∥pF , and that 
+
+α2p ≥ αp/ 24 ≥ 1. 
+
+Step 3. Decoupling. To estimate the off-diagonal part S = P 
+
+> i̸=j
+
+ai MMM ij aj , we first invoke a decoupling argument. Let aaa′ be an independent copy of aaa. Then, by the decoupling inequality for the quadratic form (see [58, Theorem 6.1.1]), we obtain 
+
+E |S|p ≲p E X
+
+> i̸=j
+
+ai MMM ij a′
+
+> j
+> p
+
+.
+
+Set 
+
+eS := X
+
+> i̸=j
+
+ai MMM ij a′ 
+
+> j
+
+=
+
+> n
+
+X
+
+> i=1
+
+ai ci, where ci := X 
+
+> j̸=i
+
+MMM ij a′ 
+
+> j
+
+.
+
+Conditioning on aaa′, and applying Rosenthal’s inequality (17), we obtain 
+
+Eaaa eS p
+
+≲p
+
+> n
+
+X
+
+> i=1
+
+|ci|2
+
+!p/ 2
+
++
+
+> n
+
+X
+
+> i=1
+
+|ci|p E |ai|p
+
+≲p
+
+> n
+
+X
+
+> i=1
+
+|ci|2
+
+!p/ 2
+
++ αp
+
+> n
+
+X
+
+> i=1
+
+|ci|2
+
+!p/ 2
+
+≲p αp
+
+
+
+> n
+
+X
+
+> i=1
+
+X 
+
+> j̸=i
+
+MMM ij a′
+
+> j
+> 2
+
+
+
+> p/ 2
+
+= αp ∥MMM off aaa′∥pℓ2 .
+
+Here, MMM off denotes the off-diagonal part of MMM . Taking expectation with respect to aaa′,we conclude that 
+
+E |S|p ≲p E eS p
+
+≲p αp E ∥MMM off aaa′∥pℓ2 . (21) 
+
+Step 4. Estimate S. To estimate S, we upper bound the term E ∥MMM off aaa′∥pℓ2 .Let MMM off ,j denote the j-th column of MMM off , and let {εj }nj=1 be a Rademacher sequence independent of aaa′. By symmetrization (see Exercise 6.4.5 in [58]) and the Khintchine– Kahane inequality in Cn (see [31]), we have 
+
+E ∥MMM off aaa′∥pℓ2 = Eaaa′
+
+> n
+
+X
+
+> j=1
+
+a′
+
+> j
+
+MMM off ,j 
+
+> pℓ2
+
+≤ 2pEaaa′ Eεεε
+
+> n
+
+X
+
+> j=1
+
+εj a′
+
+> j
+
+MMM off ,j 
+
+> pℓ2
+
+≲p Eaaa′
+
+Eεεε
+
+> n
+
+X
+
+> j=1
+
+εj a′
+
+> j
+
+MMM off ,j 
+
+> 2
+> ℓ2
+
+
+
+> p/ 2
+
+= Eaaa′
+
+> n
+
+X
+
+> j=1
+
+a′ 
+
+> j
+> 2
+
+∥MMM off ,j ∥2
+
+> ℓ2
+
+!p/ 2
+
+.
+
+(22) 12 Since p/ 2 ≥ 1, the triangle inequality yields 
+
+> n
+
+X
+
+> j=1
+
+a′ 
+
+> j
+> 2
+
+∥MMM off ,j ∥2
+
+> ℓ2
+> Lp/ 2
+
+≤
+
+> n
+
+X
+
+> j=1
+
+∥MMM off ,j ∥2 
+
+> ℓ2
+
+a′
+
+> j
+> 2
+> Lp/ 2
+
+≤ α2/p p ∥MMM off ∥2 
+
+> F
+
+. (23) Therefore, combining (22) and (23), we obtain 
+
+E ∥MMM off aaa′∥pℓ2 ≲p αp ∥MMM off ∥pF ≤ αp ∥MMM ∥pF .
+
+Combining this with (21), we conclude that 
+
+E |S|p ≲p α2 
+
+> p
+
+∥MMM ∥pF . (24) 
+
+Step 5. Summary. Combining the estimates (16), (20), and (24), we finally obtain E |aaa∗MMMa aa|p ≲p |Tr ( MMM )|p +  α2p + α2
+
+> p
+
+ ∥MMM ∥pF
+
+≲p |Tr ( MMM )|p + α2p ∥MMM ∥pF .
+
+Here, in the last step we used that α2p ≥ α2
+
+> p
+
+.
+
+## 3.3 Covariance Estimation 
+
+To upper bound E 1
+
+> m
+
+Pmk=1 εkaaakaaa∗  
+
+> kop
+
+in the heavy-tailed setting, we leverage recent advances in covariance matrix estimation for heavy-tailed distributions [56, 3]. The proof of the following theorem is inspired by the strategy developed in [29, Section 3.2], whereas our setting is complex-valued and requires some additional modifications. 
+
+Theorem 3. Let aaa ∈ Cn be a random vector with independent mean-zero, variance-one entries {ai}ni=1 . Assume that αp = max i E [|ai|p] < ∞ for some p > 4. Let {aaak}mk=1 
+
+be independent copies of aaa, and let {εk}mk=1 be a Rademacher sequence independent of 
+
+{aaak}mk=1 . If m ≥ C1n for a sufficiently large constant C1 > 0, then 
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εkaaakaaa∗
+
+> k
+> op
+
+≤ C2 (p)
+
+
+
+α2/p p
+
+r nm + nm
+
+
+
+, (25) where C2 (p) > 0 is a constant depending only on p.The proof of the above theorem relies on the following two lemmas. The first one is a non-asymptotic bound for covariance matrix estimation under heavy-tailed distributions. 
+
+Lemma 4 ([56, 29]) . Let uuu ∈ Rn be an isotropic random vector, and assume that sup xxx∈Sn−1 (E |⟨ uuu, x xx⟩| p)1/p ≤ κp where p > 4. Let {uuuk}mk=1 be independent copies of uuu.13 Assume that m ≥ C3n for a sufficiently large constant C3 > 0. Then, with probability at least 1 − e−n − c(p) 
+
+> m
+
+, it holds that 
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+uuukuuu⊤ 
+
+> k
+
+− IIIn
+
+> op
+
+≤ C4 (p) κ2 
+
+> p
+
+·
+
+r nm + max k ∥uuuk∥2
+
+> ℓ2
+
+m
+
+!
+
+, (26) where c (p) and C4 (p) are constants depending only on p.
+
+Remark 7. The isotropic covariance estimate in Lemma 4 goes back to Tikhomirov [56]. The high-probability formulation stated above follows from equation (36) in [29, The-orem 6], specialized to the isotropic case. More general covariance estimates for heavy-tailed random vectors with nonidentity covariance were developed in [3, 29], where the error bounds are expressed in terms of the effective rank of the covariance matrix ΣΣΣ, defined as r (Σ ΣΣ) = Tr (Σ ΣΣ) / ∥ΣΣΣ∥op . In the present paper, the isotropic version is sufficient for our purposes. To derive the desired expectation bound, we also require a Rosenthal-type inequality for heavy-tailed random matrices. 
+
+Lemma 5 ([29, Theorem 3]) . Let XXX1, . . . , X XXm ∈ Cn×n be a sequence of centered, independent, Hermitian random matrices. Set M = max k ∥XXXk∥op , and σ2 = ∥VVV 2
+
+> m
+
+∥op ,where VVV 2 
+
+> m
+
+⪰ Pmk=1 E XXX2
+
+> k
+
+. Then for all p ≥ 1, we have the following moment inequality: 
+
+E
+
+> m
+
+X
+
+> k=1
+
+XXXk
+
+> pop
+
+
+
+> 1/p
+
+≤ C5
+
+pQσ + Q EM + p
+
+log( ep ) (EM p)1/p 
+
+
+
+,
+
+where C5 > 0 is an absolute constant and Q := max {log ( r (VVV 2
+
+> m
+
+)) , p }.
+
+3.3.1 Proof of Theorem 3 
+
+The proof proceeds in five steps. In Step 1 , we extend Lemma 4 to complex-valued isotropic random vectors and obtain a high probability estimate. In Steps 2–4 , we apply Lemma 5 to convert it into an expectation bound. In Step 5 , we use the assumptions on aaa in Theorem 3 to eliminate the maximum term. 
+
+Step 1: From Rn to Cn. We first use Lemma 4 to prove the following lemma. 
+
+Lemma 6. Let aaa ∈ Cn be an isotropic random vector such that sup xxx∈Sn−1
+
+> C
+
+(E |⟨ aaa, x xx⟩| p)1/p ≤
+
+˜κp where p > 4. Let {aaak}mk=1 be independent copies of aaa. Assume that m ≥ eCn for a sufficiently large constant eC > 0. Then with probability at least 1 − e−2n − ˜c(p) 
+
+> m
+
+, it holds that 
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> op
+
+≤ eC (p) ˜κ2 
+
+> p
+
+·
+
+r nm + max k ∥aaak∥2
+
+> ℓ2
+
+m
+
+!
+
+. (27) Here, ˜ c (p) and eC (p) denote constants depending only on p.14 Proof of Lemma 6. Let θ be uniformly distributed on [0 , 2π) and independent of aaa,and define bbb = eiθaaa. Then bbbb bb∗ = aaaa aa∗ and ∥bbb∥ℓ2 = ∥aaa∥ℓ2 . Thus, it suffices to prove the desired bound with aaa replaced by bbb. Define the realifications of bbb by 
+
+ebbb := 
+
+ℜ (bbb)
+
+ℑ (bbb)
+
+
+
+∈ R2n, bbbb := 
+
+−ℑ (bbb)
+
+ℜ (bbb)
+
+
+
+∈ R2n.
+
+Next, for any MMM = MMM 1 + i MMM 2 ∈ Cn×n, define its realification by 
+
+R (MMM ) = 
+
+MMM 1 −MMM 2
+
+MMM 2 MMM 1
+
+
+
+∈ R2n×2n.
+
+It is well known that the realification preserves the operator norm, namely ∥R (MMM )∥op =
+
+∥MMM ∥op .By the random phase construction, ebbb ∈ R2n satisfies (see Appendix B.1) 
+
+Eebbbebbb⊤
+
+= 12III2n, sup 
+
+> xxx∈S2n−1
+
+
+
+E
+
+Debbb, x xx
+
+E p1/p 
+
+≤ ˜κp. (28) Let {θk}mk=1 be independent copies of θ, independent of {aaak}mk=1 , and set bbbk = eiθkaaak.We apply the covariance estimate in Lemma 4 to the isotropic random vector √2ebbb in dimension 2 n. Therefore, provided m ≥ eCn , it follows that with probability at least 1 − e−2n − c(p) 
+
+> m
+
+, the following inequalities hold simultaneously: 
+
+
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+ebbbkebbb⊤ 
+
+> k
+
+− 12III2n
+
+> op
+
+≲p ˜κ2 
+
+> p
+
+·
+
+r2nm +max k ebbbk
+
+> 2
+> ℓ2
+
+m ,
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+bbbbkbbbb⊤ 
+
+> k
+
+− 12III2n
+
+> op
+
+≲p ˜κ2 
+
+> p
+
+·
+
+r2nm +max k bbbbk
+
+> 2
+> ℓ2
+
+m .
+
+Indeed, the second inequality follows from the first one since bbbbk is obtained from ebbbk by an orthogonal transformation. Moreover, a direct computation shows that (see Appendix B.2) 
+
+R (bbbb bb∗) = ebbbebbb⊤
+
++ bbbbbbbb⊤
+
+. (29) Consequently, 
+
+R 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+bbbkbbb∗ 
+
+> k
+
+− IIIn
+
+!
+
+= 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+ebbbkebbb⊤ 
+
+> k
+
+− 12III2n
+
+!
+
++ 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+bbbbkbbbb⊤ 
+
+> k
+
+− 12III2n
+
+!
+
+.
+
+15 Using the identity ∥R (MMM )∥op = ∥MMM ∥op together with the triangle inequality and the fact that ebbbk ℓ2
+
+= bbbbk ℓ2
+
+= ∥bbbk∥ℓ2 , we obtain 
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+bbbkbbb∗ 
+
+> k
+
+− IIIn
+
+> op
+
+≲p ˜κ2 
+
+> p
+
+·
+
+r nm + max k ∥bbbk∥2
+
+> ℓ2
+
+m .
+
+Finally, since bbbkbbb∗ 
+
+> k
+
+= aaakaaa∗ 
+
+> k
+
+and ∥bbbk∥ℓ2 = ∥aaak∥ℓ2 for all k, the desired estimate follows. 
+
+Step 2: Reduction to Expectation. Under the moment assumptions on the entries of aaa, we have the following estimate (see Appendix B.3): sup 
+
+> xxx∈Sn−1
+> C
+
+E |⟨ aaa, x xx⟩| p ≲p αp. (30) Let E denote the event, with probability at least 1 − e−2n − ˜c(p) 
+
+> m
+
+, on which the inequality in Lemma 6 holds. Therefore, 
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> op
+
+≲p α2/p p
+
+r nm + E max k ∥aaak∥2
+
+> ℓ2
+
+m + E
+
+ 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> op
+
+1Ec
+
+ .
+
+(31) By H¨ older’s inequality, 
+
+E
+
+ 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> op
+
+1Ec
+
+ ≤
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> 2
+> op
+
+
+
+> 1/2
+
+· P (Ec)1/2
+
+≤
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> 2
+> op
+
+
+
+> 1/2
+
+·
+
+
+
+e−2n + ˜c (p)
+
+m
+
+1/2
+
+.
+
+(32) 
+
+Step 3: Rosenthal’s Inequality. We now invoke Lemma 5. We set 
+
+XXXk = 1
+
+m (aaakaaa∗ 
+
+> k
+
+− IIIn) , VVV 2 
+
+> m
+
+=
+
+> m
+
+X
+
+> k=1
+
+E XXX2
+
+> k
+
+.
+
+Then 
+
+M = max k ∥aaakaaa∗ 
+
+> k
+
+− IIIn∥op 
+
+m ≤ max k ∥aaak∥2 
+
+> ℓ2
+
++ 1 
+
+m .
+
+By a direct calculation (see Appendix B.4), 
+
+E ∥aaa∥2 
+
+> ℓ2
+
+aaaa aa∗ = ( n − 1) IIIn + diag  E |a1|4 , . . . , E |an|4 . (33) 16 Consequently, 
+
+σ2 =
+
+> m
+
+X
+
+> k=1
+
+E XXX2
+
+> k
+> op
+
+= 1
+
+m2
+
+
+
+> m
+
+X
+
+> k=1
+
+ E ∥aaak∥2 
+
+> ℓ2
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+
+
+> op
+
+ ≤ α4 + n − 2
+
+m ≤ α4nm .
+
+We apply Lemma 5 with moment parameter 2 and use Q ≲ log ( en ). This yields 
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> 2
+> op
+
+
+
+> 1/2
+
+≲ plog ( en )
+
+rα4nm + log ( en )
+
+m E max  
+
+> k
+
+∥aaak∥2 
+
+> ℓ2
+
++ 1
+
+m
+
+
+
+E max  
+
+> k
+
+∥aaak∥4
+
+> ℓ2
+
+1/2
+
+.
+
+Substituting the above inequality into (32) and using m ≳ log 2 n, we deduce that 
+
+E
+
+ 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> op
+
+1Ec
+
+ ≲p
+
+rα4nm + E max k ∥aaak∥2
+
+> ℓ2
+
+m +
+
+ E max k ∥aaak∥4
+
+> ℓ2
+
+1/2
+
+m min {m1/2, e n} . (34) 
+
+Step 4: Symmetrization Argument. We now apply the symmetrization argu-ment: 
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εkaaakaaa∗
+
+> k
+> op
+
+≤ EaaaEεεε
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εk (aaakaaa∗ 
+
+> k
+
+− IIIn)
+
+> op
+
++ Eεεε
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εkIIIn
+
+> op
+
+≤ 2Eaaa
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+− IIIn
+
+> op
+
++ Eεεε
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εk
+
+≲p
+
+
+
+α2/p p + α1/24
+
+ r nm + E max k ∥aaak∥2
+
+> ℓ2
+
+m +
+
+ E max k ∥aaak∥4
+
+> ℓ2
+
+1/2
+
+m min {m1/2, e n} .
+
+(35) The first line follows from the triangle inequality. The second line follows from the symmetrization inequality; see Lemma 6.4.2 in [58]. The final line follows from (31) and (34), together with the standard estimate E |Pmk=1 εk| ≲ √m.
+
+Step 5: Bounding the Maximum Terms. We now bound the two maximal terms. By a direct calculation, 
+
+E ∥aaa∥2 
+
+> ℓ2
+
+= n, E ∥aaa∥4 
+
+> ℓ2
+
+≤ α4n + n (n − 1) , and Var  ∥aaa∥2
+
+> ℓ2
+
+ ≤ (α4 − 1) n. 
+
+Therefore, 
+
+E max  
+
+> k
+
+∥aaak∥2 
+
+> ℓ2
+
+≤ n + E max  
+
+> k
+
+∥aaak∥2 
+
+> ℓ2
+
+− n ≤ n + E
+
+> m
+
+X
+
+> k=1
+
+∥aaak∥2 
+
+> ℓ2
+
+− n 2
+
+!1/2
+
+≤ n + E
+
+> m
+
+X
+
+> k=1
+
+∥aaak∥2 
+
+> ℓ2
+
+− n 2
+
+!1/2
+
+= n +  m Var  ∥aaa∥2
+
+> ℓ2
+
+ 1/2
+
+≤ n + √α4mn. 
+
+17 Similarly, 
+
+
+
+E max  
+
+> 1≤k≤m
+
+∥aaak∥4
+
+> ℓ2
+
+1/2
+
+=
+
+"
+
+E
+
+
+
+max  
+
+> 1≤k≤m
+
+∥aaak∥2
+
+> ℓ2
+
+2#1/2
+
+≤ n +
+
+
+
+E max  
+
+> 1≤k≤m
+
+∥aaak∥2 
+
+> ℓ2
+
+− n 2
+
+1/2
+
+≤ n + E
+
+> m
+
+X
+
+> k=1
+
+∥aaak∥2 
+
+> ℓ2
+
+− n 2
+
+!1/2
+
+≤ n + √α4mn. 
+
+Combining the above two estimates with (35), and using the fact that α1/44 ≤ α1/p p ,finally we obtain 
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εkaaakaaa∗
+
+> k
+> op
+
+≲p α2/p p
+
+r nm + nm.
+
+## 3.4 Proof of Theorem 1 
+
+Now we are ready to prove Theorem 1. Recall that α4+ δ = max i E
+
+h
+
+|ai|4+ δi
+
+, β =min i E |ai|4 > 1, γ = max i |E [a2 
+
+> i
+
+]| < 1 and define ζ = min {β − 1, 1 − γ2} > 0. By Lemma 3 in Section 3.1.2, we have 
+
+E |aaa∗MMMa aa|2 ≥ (Tr MMM )2 + ( β − 1) 
+
+> n
+
+X
+
+> i=1
+
+MMM 2 
+
+> ii
+
++  1 − γ2 X 
+
+> i̸=j
+
+|MMM ij |2
+
+≥ (Tr MMM )2 + ζ · ∥ MMM ∥2 
+
+> F
+
+.
+
+Combining this estimate with Proposition 4 in Section 3.2 yields that for any nonzero 
+
+MMM ∈ H n
+
+(E |aaa∗MMMa aa|2)4+ δδ
+
+
+
+E |aaa∗MMMa aa|2+ δ
+
+> 2
+
+4
+
+> δ
+
+≳δ
+
+ζ 4+ δδ
+
+α4/δ 
+
+> 4+ δ
+
+. (36) Now by (13) in Section 3.1.2, we obtain 
+
+Q2ξ := inf  
+
+> MMM∈T ρ,r
+
+P (|aaa∗MMMa aa| ≥ 2ξ)
+
+≥ inf   
+
+> ∥MMM∥F=1
+
+P
+
+
+
+|aaa∗MMMa aa|2 ≥ 4ξ2
+
+ζ E |aaa∗MMMa aa|2
+
+
+
+≥
+
+
+
+1 − 4ξ2
+
+ζ
+
+4+ δδ
+
+inf   
+
+> ∥MMM∥F=1
+
+(E |aaa∗MMMa aa|2)4+ δδ
+
+
+
+E |aaa∗MMMa aa|2+ δ
+
+> 2
+
+4
+
+> δ
+
+≳δ
+
+(ζ − 4ξ2)4+ δδ
+
+α4/δ 
+
+> 4+ δ
+
+.
+
+(37) 18 By (14) in Section 3.1.2 and Theorem 3 in Section 3.3, provided that m ≳ n, we obtain 
+
+Wm ≲δ
+
+q
+
+1 + (1 + ρ−1)2√r ·
+
+
+
+α2/(4+ δ)4+ δ
+
+r nm + nm
+
+
+
+. (38) We choose ξ = ζ1/2 
+
+> 2√2
+
+and t = c1
+
+√m · g in Proposition 3 in Section 3.1.2. Provided that 
+
+m ≳δ ρ−2 · f · rn, 
+
+we obtain, with probability at least 1 − e−c2m·g2
+
+inf 
+
+n
+
+∥A (MMM )∥ℓq : MMM ∈ T ρ,r 
+
+o
+
+≳δ h · m1/q ,
+
+where c1, c 2 > 0 are sufficiently small absolute constants and f, g, h are the constants defined in Theorem 1. Thus A satisfies the Frobenius-robust rank NSP in Lemma 1 in Section 3.1.1 with constants ρ and τ ≲δ 1 
+
+> h·m1/q
+
+. Finally, applying Proposition 1 in Section 3.1.1 and choosing ρ = 12 completes the proof. 
+
+## 3.5 Proof of Theorem 2 
+
+In Section 3.4, we established that A satisfies the Frobenius-robust rank NSP. There-fore, by Proposition 2 in Section 3.1.1, in order to prove Theorem 2, it remains to show that WWW is positive definite and that its condition number is bounded. To this end, we first establish the following fact. We postpone the proof to Appendix C. 
+
+Fact 2. Let aaa ∈ Cn be a random vector with independent mean-zero, variance-one entries {ai}ni=1 . Assume that αp = max i E [|ai|p] < ∞ where p ≥ 4. Let {aaak}mk=1 be independent copies of aaa. Then with probability at least 1 − 110 mp/ 4−1 ,max  
+
+> k
+
+∥aaak∥2 
+
+> ℓ2
+
+≤ 2n + C (p) α2/p p
+
+√mn. 
+
+Here, C (p) > 0 is a sufficiently large constant depending only on p.Now, set p = 4 + δ. By Lemma 6, Equation (30) in Section 3.3.1, and Fact 2 above, we have, with probability at least 1 − e−2n − 110 mδ/ 4 − ˜c(δ) 
+
+> m
+
+, that 1−C1 (δ)
+
+
+
+α2/(4+ δ)4+ δ
+
+r nm + nm
+
+
+
+≤ λmin (WWW ) ≤ λmax (WWW ) ≤ 1+ C1 (δ)
+
+
+
+α2/(4+ δ)4+ δ
+
+r nm + nm
+
+
+
+,
+
+(39) provided m ≳ n. Consequently, if m ≳δ α4/(4+ δ)4+ δ n, then max 
+
+n
+
+∥WWW ∥op , WWW −1 
+
+> op
+
+, ∥WWW ∥op · WWW −1
+
+> op
+
+o
+
+≤ C0.
+
+Here, C0 > 0 denotes an absolute constant. Finally, intersecting this event with the rank-NSP event from Section 3.4, applying Proposition 2, and choosing ρ = 12C0 com-pletes the proof. 19 4 Complex Projective t-Design 
+
+In this section, we consider sampling matrices formed by taking outer products of vec-tors drawn independently from a complex projective t-design [24, 39, 30, 23]. Such designs are finite sets of unit vectors in Cn that reproduce the low-order moment structure of Haar-random vectors, and therefore serve as a versatile tool for partially derandomizing recovery results. This is especially important in low-rank matrix re-covery, and in particular in quantum state tomography [25], where t-designs provide structured sampling ensembles that retain the theoretical advantages of fully random measurements while being closely connected to physically realizable implementations, such as random quantum circuits. 
+
+Definition 2. Let {www1, . . . , w wwN } ⊆ Cn be a collection of unit vectors with correspond-ing weights {p1, . . . , p N } ⊆ [0 , 1] satisfying PNi=1 pi = 1. We say that the weighted set 
+
+{pi, w wwi}Ni=1 forms a weighted complex projective t-design if 
+
+> N
+
+X
+
+> i=1
+
+pi (wwwiwww∗ 
+
+> i
+
+)⊗t =
+
+Z
+
+> Sn−1
+> C
+
+(wwww ww∗)⊗t dμ (www). (40) Here, μ denotes the normalized uniform measure on Sn−1 
+
+> C
+
+.We present the following theorem, which states that low-rank matrix recovery from complex projective 4-design sampling can be achieved with the optimal sample com-plexity m = O (rn ). This removes the extra logarithmic factor in the sample complexity bounds of [39, 30], where m = O (rn log n) is required. 
+
+Theorem 4. Let {pi, w wwi}Ni=1 be a weighted complex projective 4-design, and define 
+
+ewwwi = 4
+
+pn(n + 1) wwwi. Consider the noisy measurement process in (3) with m sampling matrices {aaakaaa∗
+
+> k
+
+}mk=1 , where {aaak}mk=1 are independent copies of a random vector aaa ∈ Cn
+
+drawn from {pi, ewwwi}Ni=1 . Fix r ≤ n, and suppose that m ≥ C1rn for a sufficiently large constant C1 > 0. Then the following statements hold. (a) If ∥ωωω∥ℓq ≤ η, then with probability at least 1 − e−C2m, it holds that for all 
+
+MMM 0 ∈ H n, any solution MMM ♯ to the program (4) obeys 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≤ C3
+
+√r ∥MMM r,c  
+
+> 0
+
+∥∗ + C4
+
+ηm1/q .
+
+(b) With probability at least 1 − e−C5m − e−2n − C6 
+
+> m
+
+, it holds that for all MMM 0 ⪰ 000, any solution MMM ♯ to the program (5) obeys 
+
+MMM 0 − MMM ♯ 
+
+> F
+
+≤ C7
+
+√r ∥MMM r,c  
+
+> 0
+
+∥∗ + C8
+
+∥ωωω∥ℓq
+
+m1/q .
+
+Here, C1, . . . , C 8 are positive universal constants. 20 The following lemma is a key ingredient in the proof of the above theorem. 
+
+Lemma 7. Let {pi, w wwi}Ni=1 be a weighted complex projective 3-design, and set ewwwi =
+
+> 4
+
+pn(n + 1) wwwi. Let {aaak}mk=1 be independent copies of a random vector aaa ∈ Cn drawn from {pi, ewwwi}Ni=1 . Let {εk}mk=1 be a Rademacher sequence independent of {aaak}mk=1 . If 
+
+m ≥ C9n for a sufficiently large constant C9 > 0, then 
+
+E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εkaaakaaa∗
+
+> k
+> op
+
+≤ C10 
+
+r nm + nm
+
+
+
+, (41) where C10 is a positive universal constant. 
+
+Proof of Lemma 7. By the definition of a weighted complex projective 3-design, for any xxx ∈ Sn−1 
+
+> C
+
+, we have 
+
+E |⟨ aaa, x xx⟩| 6 = (( n + 1) n)3/2 E |⟨ www, x xx⟩| 6
+
+= (( n + 1) n)3/2
+
+Z
+
+> Sn−1
+> C
+
+|⟨ www, x xx⟩| 6 dμ (www)= 3! (( n + 1) n)3/2
+
+n(n + 1)( n + 2) ≤ 6.
+
+Similarly, for any xxx ∈ Sn−1 
+
+> C
+
+, E |⟨ aaa, x xx⟩| 2 =
+
+qn+1  
+
+> n
+
+≥ 1. Consequently, the complex projective 3-design ensemble satisfies the L6–L2 condition 
+
+ E |⟨ aaa, x xx⟩| 61/6 ≤ 61/6  E |⟨ aaa, x xx⟩| 21/2 , ∀ xxx ∈ Cn.
+
+After normalization, we apply Lemma 6 in Section 3.3.1 with p = 6 (although aaa is not centered, the random phase construction used in Section 3.3.1 allows us to replace it by the centered vector eiθaaa without changing the sampling matrix aaaa aa∗). We obtain that if m ≳ n, then with probability at least 1 − e−2n − c1 
+
+> m
+
+,
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+aaakaaa∗ 
+
+> k
+
+−
+
+rn + 1 
+
+n IIIn
+
+> op
+
+≲
+
+r nm + max k ∥aaak∥2
+
+> ℓ2
+
+m ≲
+
+r nm + nm. (42) Here, we used the identities 
+
+E aaaa aa∗ =
+
+rn + 1 
+
+n IIIn and max  
+
+> k
+
+∥aaak∥2 
+
+> ℓ2
+
+= ∥aaa∥2 
+
+> ℓ2
+
+= p(n + 1) n. 
+
+By the same argument as in the proof of Theorem 3 in Section 3.3, using (42) together with Lemma 5 in Section 3.3, we obtain the desired estimate (41) whenever m ≳ n.We are now ready to prove Theorem 4. 21 Proof of Theorem 4. We first prove part (a) of Theorem 4. As in the proof of Theo-rem 1, it suffices to establish a uniform lower bound on ∥A (MMM )∥ℓq over Tρ,r by using Proposition 3 in Section 3.1.2; Lemma 1 in Section 3.1.1 then yields the Frobenius-robust rank NSP. By [39, Proposition 12], for every ξ ∈ [0 , 1/2], 
+
+Q2ξ := inf  
+
+> MMM∈T ρ,r
+
+P (|⟨ aaaa aa∗, M MM ⟩| ≥ 2ξ) ≥ inf    
+
+> ∥MMM∥F=1
+
+P (|⟨ aaaa aa∗, M MM ⟩| ≥ 2ξ) ≥ (1 − 4ξ2)2
+
+24 . (43) Moreover, by (14) in Section 3.1.2 and Lemma 7, provided that m ≳ n,
+
+Wm := E sup  
+
+> MMM∈T ρ,r
+
+|⟨ HHH, M MM ⟩| ≲
+
+q
+
+1 + (1 + ρ−1)2 ·
+
+rrn m ,
+
+where HHH = 1
+
+> m
+
+Pmk=1 εkaaakaaa∗
+
+> k
+
+. Finally, choosing ξ = 1 /4, t = c2
+
+√m in Proposition 3, we obtain, provided that m ≳ ρ−2rn , that A satisfies the Frobenius-robust rank NSP with constants ρ and τ ≲ m−1/q with probability at least 1 − e−c3m. Taking ρ = 12 and applying Proposition 1 in Section 3.1.1 proves part (a). We next prove part (b). Following the proof of Theorem 2, it remains, by Propo-sition 2 in Section 3.1.1, to show that WWW = 1
+
+> m
+
+Pmk=1 aaakaaa∗ 
+
+> k
+
+is positive definite and has bounded condition number. By (42), provided that m ≳ n, with probability at least 1 − e−2n − c1 
+
+> m
+
+,
+
+rn + 1 
+
+n − C1
+
+r nm ≤ λmin (WWW ) ≤ λmax (WWW ) ≤
+
+rn + 1 
+
+n + C1
+
+r nm.
+
+Hence, if m ≥ eCn for a sufficiently large constant eC > 0, then WWW is positive definite and max 
+
+n
+
+∥WWW ∥op , WWW −1 
+
+> op
+
+, ∥WWW ∥op · WWW −1
+
+> op
+
+o
+
+≤ C0.
+
+Intersecting this event with the rank-NSP event obtained above, choosing ρ = 12C0 , and applying Proposition 2 proves part (b). 
+
+Remark 8. Recovery guarantees for approximate complex projective 4-designs have also been established in [39, 30] under suitable assumptions, with sample complexity 
+
+m = O (rn log n); see [39, Section 3.1] for the definition of approximate complex pro-jective t-designs. We expect that our method can be extended to this setting, yielding analogous guarantees with the optimal sample complexity m = O (rn ). The main obstacle to extending our approach to this setting is that the ingredient in our proof, namely Lemma 6, are used in a form that relies on the exact moment structure of complex projective 4-designs. One possible way to overcome this difficulty is to extend Lemma 6 to complex random vectors with a general covariance matrix. We leave this direction for future work. 
+
+Remark 9. The preceding argument can also be adapted to complex projective 3-design ensembles. Recent work [23] established recovery guarantees in this setting with sample complexity m = O (r3n log n). More precisely, by following the preceding argument with the small ball estimate (43) replaced by [23, Lemma 3.2.1], one can improve the sample complexity to m = O (r3n). We omit the details here. 22 5 Stability of Phase Retrieval 
+
+Phase retrieval refers to the problem of reconstructing an unknown signal xxx0 ∈ Cn
+
+from m phaseless measurements, given in the form of intensities |⟨ aaak, x xx0⟩| 2 mk=1 , where Ω := {aaak}mk=1 ⊆ Cn denotes the known collection of sampling vectors. In practical ap-plications, ensuring robust reconstruction performance is perhaps the most important concern. Theorem 1 and Theorem 2 state that, under rather weak assumptions, phase retrieval can be achieved by robustly recovering the rank-one matrix xxx0xxx∗ 
+
+> 0
+
+via the PhaseLift method [13, 11]; see Remark 4 in Section 2. In this section, we approach the problem from a different perspective and focus on characterizing the stability of the following phaseless operator [19, 8]: 
+
+FΩ : Cn/ ∼→ Rm, FΩ (xxx) =  |⟨ aaa1, x xx⟩| 2 , . . . , |⟨ aaam, x xx⟩| 2⊤ . (44) Here, since reconstruction is inherently possible only up to a global phase, we consider the quotient space Cn/ ∼ as the input domain, where the equivalence relation ∼ is given by xxx ∼ yyy if xxx = eiθyyy for some θ ∈ [0 , 2π). Following [19, 8, 6, 17], we give the definition of stability of the phaseless operator FΩ.
+
+Definition 3. The phaseless operator FΩ : Cn/ ∼→ Rm is said to be C-stable on Cn
+
+with respect to ∥ · ∥ ℓq for some constant C > 0 if, for every xxx, y yy ∈ Cn, one has 
+
+∥F Ω (xxx) − F Ω (yyy)∥ℓq ≥ C · dist 2 (xxx, y yy) . (45) Here, the distance dist (xxx, y yy) is defined as dist (xxx, y yy) := min  
+
+> θ∈[0 ,2π)
+
+eiθxxx − yyy ℓ2 .The main result of this section is as follows. 
+
+Theorem 5. Let δ > 0 and q ≥ 1. Consider the phaseless operator FΩ with m
+
+sampling vectors Ω = {aaak}mk=1 . Here, {aaak}mk=1 are independent copies of a random vector aaa ∈ Cn with independent mean-zero, variance-one entries {ai}ni=1 . Assume that 
+
+{ai}ni=1 satisfy (6), and let ζ be defined as in Theorem 1. Suppose that m ≥ C1 (δ)·f ·n.Then, with probability at least 1 − e−C2m·g2
+
+, it holds that for all xxx, y yy ∈ Cn,
+
+∥F Ω (xxx) − F Ω (yyy)∥ℓq ≥ C3 (δ) · h · m1/q · dist 2 (xxx, y yy) .
+
+Here, C1 (δ) , C 3 (δ) are constants depending on δ and C2 denotes a positive universal constant. The constants f, g, h are those defined in Theorem 1 and depend only on 
+
+α4+ δ, ζ, and δ.
+
+Remark 10. The stability of the phaseless operator FΩ in the real case, measured in the ℓ1-norm, was first studied in [19], where the analysis relies on a sub-Gaussian assumption on the sampling vectors. Later, [17, Proposition 1] extended this result by showing that only a small ball condition is required. However, in the complex setting, 23 their analysis still relies on a sub-Gaussian assumption; see [17, Proposition 2]. In con-trast, our result does not rely on any sub-Gaussian assumption. We also mention that related stability results for the amplitude model {|⟨ aaak, x xx0⟩|} mk=1 have been considered in ongoing work [2], where the assumptions are formulated in terms of a rank-2 small ball condition. This is a different setting from that of the present theorem. 
+
+Remark 11. The stability result in Theorem 5 also applies to the complex projective 
+
+t-design setting discussed in Section 4. Indeed, for phase retrieval, the lifted difference 
+
+xxxx xx∗ − yyyy yy∗ has rank at most 2, so the proof only requires the corresponding small ball and empirical process estimates on rank-2 Hermitian matrices. Consequently, complex projective 4-design measurements yield stability of FΩ with sample complexity 
+
+m = O (n). 
+
+Proof of Theorem 5. By [17, Lemma A.4] or [27, Proposition 1], we have dist 2 (xxx, y yy) ≤
+
+2 ∥xxxx xx∗ − yyyy yy∗∥F , which implies that inf  
+
+> xxx,y yy∈Cn
+> xxxx xx∗̸=yyyy yy∗
+
+∥F Ω (xxx) − F Ω (yyy)∥ℓq
+
+dist 2 (xxx, y yy) ≥ inf  
+
+> xxx,y yy∈Cn
+> xxxx xx∗̸=yyyy yy∗
+
+∥F Ω (xxx) − F Ω (yyy)∥ℓq
+
+2 ∥xxxx xx∗ − yyyy yy∗∥F
+
+= inf  
+
+> xxx,y yy∈Cn
+> xxxx xx∗̸=yyyy yy∗
+
+12
+
+> m
+
+X
+
+> k=1
+
+
+
+aaakaaa∗
+
+> k
+
+, xxxx xx∗ − yyyy yy∗
+
+∥xxxx xx∗ − yyyy yy∗∥F
+
+ q!1/q 
+
+≥ inf     
+
+> MMM∈H n,∥MMM∥F=1 rank( MMM)≤2
+
+12
+
+> m
+
+X
+
+> k=1
+
+|⟨ aaakaaa∗
+
+> k
+
+, M MM ⟩| q
+
+!1/q 
+
+Now set eT := {MMM ∈ H n : ∥MMM ∥F = 1 , rank ( MMM ) ≤ 2}. We apply the small ball method from Proposition 3 in Section 3.1.2. First, by (37) in Section 3.4, we have 
+
+Q2ξ
+
+ eT ; aaaa aa∗
+
+
+
+= inf   
+
+> MMM∈eT
+
+P (|⟨ aaaa aa∗, M MM ⟩| ≥ 2ξ) ≳δ
+
+(ζ − 4ξ2)4+ δδ
+
+α4/δ 
+
+> 4+ δ
+
+.
+
+Moreover, by Theorem 3 in Section 3.3, 
+
+Wm
+
+ eT ; aaaa aa∗
+
+
+
+= E sup   
+
+> MMM∈eT
+
+1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εk ⟨aaakaaa∗
+
+> k
+
+, M MM ⟩
+
+≤ √2 E 1
+
+m
+
+> m
+
+X
+
+> k=1
+
+εkaaakaaa∗
+
+> k
+> op
+
+≲δ
+
+√2
+
+
+
+α2/(4+ δ)4+ δ
+
+r nm + nm
+
+
+
+.
+
+Here we used ∥MMM ∥∗ ≤ prank ( MMM ) · ∥ MMM ∥F ≤ √2. Finally, choosing ξ = ζ1/2 
+
+> 2√2
+
+and 
+
+t = c1
+
+√m · g as in the proof of Theorem 1 in Section 3.4, Proposition 3 implies that, provided m ≥ C1 (δ) f n , with probability at least 1 − e−C2m·g2
+
+,inf  
+
+> xxx,y yy∈Cn
+> xxxx xx∗̸=yyyy yy∗
+
+∥F Ω (xxx) − F Ω (yyy)∥ℓq
+
+dist 2 (xxx, y yy) ≥ inf   
+
+> MMM∈eT
+
+12
+
+> m
+
+X
+
+> k=1
+
+|⟨ aaakaaa∗
+
+> k
+
+, M MM ⟩| q
+
+!1/q 
+
+≳δ h · m1/q .
+
+24 6 Numerical Experiments 
+
+We conduct numerical experiments to validate our theoretical results. We compare a heavy-tailed sampling ensemble with the standard complex Gaussian ensemble. In both cases, the sampling vectors {aaak}mk=1 are independent copies of a random vector 
+
+aaa = ( a1, . . . , a n)⊤ with i.i.d. entries. For the heavy-tailed ensemble, each entry is an independent copy of a =
+
+q 310 (X + i Y ), where X, Y i.i.d.
+
+∼ t5. Since Var ( t5) = 5 /3, this normalization gives E |a|2 = 1, while a has finite absolute moment of order q if and only if q < 5. For the Gaussian ensemble, each entry is an independent copy of 
+
+a ∼ CN (0 , 1). In all trials, the ground-truth matrix MMM 0 ∈ Cn×n is randomly generated in the form MMM 0 = ZZZZ ZZ∗ with ZZZ ∈ Cn×r, and then normalized so that ∥MMM 0∥F = 1. For both recovery models (4) and (5), the data-fidelity term is measured in the ℓ2-norm. 
+
+Phase transition. We first examine the empirical sample complexity in the noise-less setting. We fix n = 50 and r = 3, and vary the number of measurements through the oversampling ratio m/ (rn ) ∈ { 3, 3.5, 4, 4.5, 5, 5.5, 6}. For each value of m/ (rn ), each sampling ensemble, and each recovery model, we run 20 independent trials. In every trial, both the sampling vectors and the ground-truth matrix are generated inde-pendently. A trial is declared successful if the Frobenius reconstruction error satisfies 
+
+MMM ♯ − MMM 0 F < 5 · 10 −3. The empirical success probability is then computed as the fraction of successful trials among the 20 repetitions. Figure 1 reports the resulting phase transition curves. The left panel corresponds to the nuclear norm minimiza-tion model (4) (NNM model), while the right panel corresponds to the semidefinite-constrained empirical risk minimization model (5) (PSD model). This experiment confirms that, for both recovery models, the number of measurements required for successful recovery scales on the order of rn , and that the heavy-tailed Student-t5 en-semble exhibits phase transition behavior essentially similar to that of the Gaussian benchmark. 
+
+Noise robustness. We next investigate the robustness of the two recovery models under additive noise. We take n = 30 and r = 3, and fix the oversampling ratio at 
+
+m/ (rn ) = 4 .5. For each normalized noise level 
+
+ν = ∥ωωω∥ℓ2 /√m ∈ { 10 −4, 3 · 10 −4, 10 −3, 3 · 10 −3, 10 −2, 3 · 10 −2},
+
+and for each sampling ensemble and each recovery model, we run 20 independent trials. In each trial, the noise vector is generated with independent real Gaussian entries and then rescaled so that ∥ωωω∥ℓ2 = ν√m. We report the mean Frobenius reconstruction error MMM ♯ − MMM 0 F over the 20 trials. Since ∥MMM 0∥F = 1, this error is also the relative Frobenius error. Figure 2 shows the mean reconstruction error as a function of the 25 3.0 3.5 4.0 4.5 5.0 5.5 6.0  
+
+> oversampling ratio m/( rn )
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> success probability
+
+NNM model        
+
+> student-t5
+> gaussian
+> 3.0 3.5 4.0 4.5 5.0 5.5 6.0
+> oversampling ratio m/( rn )
+> success probability
+
+PSD model 
+
+> student-t5
+> gaussian
+
+Figure 1: Phase transition for the Student-t5 and Gaussian ensembles. normalized noise level. Both the NNM model (4) and the PSD model (5) are included in the comparison. The dotted reference line has slope one. The curves are approx-imately parallel to this reference line, indicating that the reconstruction error grows nearly linearly with the noise level. Moreover, the Student-t5 ensemble exhibits robust-ness comparable to the Gaussian benchmark, which is consistent with the robustness predicted by our results. 10 −4 10 −3 10 −2  
+
+> noise level ‖ ω‖ℓ2/√ m
+> 10 −3
+> 10 −2
+> 10 −1
+> ‖M♯ − M0‖F
+
+NNM model    
+
+> student-t5
+> gaussian
+> slope 1
+> 10 −4 10 −3 10 −2
+> noise level ‖ ω‖ℓ2/√ m
+> ‖M♯ − M0‖F
+
+PSD model 
+
+> student-t5
+> gaussian
+> slope 1
+
+Figure 2: Noise robustness under the Student-t5 and Gaussian ensembles. 
+
+# A Proof of Fact 1 
+
+For completeness, we include the proof; see also equation (9) in [48]. Let Z, s, q, θ be as in Fact 1, and define E := {Z ≥ θ ∥Z∥Ls }. Since Zs < θ s ∥Z∥sLs on Ec, we have 
+
+∥Z∥sLs = E (Zs1E ) + E (Zs1Ec ) ≤ E (Zs1E ) + θs ∥Z∥sLs . (46) 26 Moreover, H¨ older’s inequality gives 
+
+E (Zs1E ) ≤ (EZq) sq (P (E)) 1− sq = ∥Z∥sLq (P (E)) 1− sq . (47) Combining (46) and (47), we obtain (1 − θs) ∥Z∥sLs ≤ ∥ Z∥sLq (P (E)) 1− sq .
+
+Rearranging yields (12). 
+
+# B Auxiliary Proofs from Section 3.3 
+
+## B.1 Proof of Equation (28) 
+
+Since Eeiθ = 0, we have E bbb = Eeiθ · E aaa = 0 00. Moreover, since aaa is isotropic, and by the independence of θ and aaa, we obtain 
+
+E bbbb bb∗ = E aaaa aa∗ = IIIn, E bbbb bb⊤ = E  e2i θaaaa aa⊤ = Ee2i θ · E aaaa aa⊤ = 0 00.
+
+Comparing the real and imaginary parts in the two identities above, we obtain 
+
+E ℜ (bbb) ℜ (bbb)⊤ = E ℑ (bbb) ℑ (bbb)⊤ = 12IIIn, E ℜ (bbb) ℑ (bbb)⊤ = E ℑ (bbb) ℜ (bbb)⊤ = 0 00.
+
+Therefore, 
+
+Eebbbebbb⊤
+
+=
+
+E ℜ (bbb) ℜ (bbb)⊤ E ℜ (bbb) ℑ (bbb)⊤
+
+E ℑ (bbb) ℜ (bbb)⊤ E ℑ (bbb) ℑ (bbb)⊤
+
+
+
+= 12III2n.
+
+Let xxx = ( xxx1, x xx2) ∈ S2n−1 with xxx1, x xx2 ∈ Rn, and set zzz := xxx1 + i xxx2 ∈ Sn−1 
+
+> C
+
+. Then Debbb, x xx
+
+E
+
+= ℜ (⟨bbb, z zz⟩). Hence, sup 
+
+> xxx∈S2n−1
+
+
+
+E
+
+Debbb, x xx
+
+E p1/p 
+
+≤ sup 
+
+> zzz∈Sn−1
+> C
+
+(E |⟨ bbb, z zz⟩| p)1/p = sup 
+
+> zzz∈Sn−1
+> C
+
+(E |⟨ aaa, z zz⟩| p)1/p ≤ ˜κp.
+
+## B.2 Proof of Equation (29) 
+
+Since 
+
+bbbb bb∗ =
+
+
+
+ℜ (bbb) ℜ (bbb)⊤ + ℑ (bbb) ℑ (bbb)⊤
+
++ i 
+
+
+
+ℑ (bbb) ℜ (bbb)⊤ − ℜ (bbb) ℑ (bbb)⊤
+
+,
+
+the definition of R gives 
+
+R (bbbb bb∗) = 
+
+ℜ (bbb) ℜ (bbb)⊤ + ℑ (bbb) ℑ (bbb)⊤ ℜ (bbb) ℑ (bbb)⊤ − ℑ (bbb) ℜ (bbb)⊤
+
+ℑ (bbb) ℜ (bbb)⊤ − ℜ (bbb) ℑ (bbb)⊤ ℜ (bbb) ℜ (bbb)⊤ + ℑ (bbb) ℑ (bbb)⊤
+
+
+
+.
+
+Then, a direct calculation gives 
+
+ebbbebbb⊤
+
++ bbbbbbbb⊤
+
+=
+
+ℜ (bbb)
+
+ℑ (bbb)
+
+  ℜ (bbb)⊤ ℑ (bbb)⊤ +
+
+−ℑ (bbb)
+
+ℜ (bbb)
+
+  −ℑ (bbb)⊤ ℜ (bbb)⊤ = R (bbbb bb∗) .
+
+27 B.3 Proof of Equation (30) 
+
+Let Xi = aixi. Then E [Xi] = 0 , E |Xi|2 = |xi|2, and E |Xi|p = |xi|p E |ai|p ≤ αp |xi|p.Applying Rosenthal’s inequality in (17) yields, for any xxx ∈ Sn−1 
+
+> C
+
+,
+
+E |⟨ aaa, x xx⟩| p ≲p
+
+> n
+
+X
+
+> i=1
+
+|xi|2
+
+!p/ 2
+
++
+
+> n
+
+X
+
+> i=1
+
+αp |xi|p ≲p 1 + αpnX
+
+> i=1
+
+|xi|p ≲p αp.
+
+Here, we used that for p > 2, Pni=1 |xi|p ≤  P ni=1 |xi|2p/ 2 = 1 and αp ≥ 1. Taking the supremum over xxx ∈ Sn−1 
+
+> C
+
+gives (30). 
+
+## B.4 Proof of Equation (33) 
+
+Note that ∥aaa∥2 
+
+> ℓ2
+
+= Pnk=1 |ak|2. Thus the ( i, j )-th entry of E ∥aaa∥2 
+
+> ℓ2
+
+aaaa aa∗ equals 
+
+E ∥aaa∥2 
+
+> ℓ2
+
+aiaj
+
+ =
+
+> n
+
+X
+
+> k=1
+
+E |ak|2 aiaj
+
+ .
+
+If i̸ = j, by independence and Eai = Eaj = 0, every term in the sum vanishes, hence the off-diagonal entries are zero. If i = j, then 
+
+E ∥aaa∥2 
+
+> ℓ2
+
+|ai|2 = E |ai|4 + X 
+
+> k̸=i
+
+E |ak|2 E |ai|2 = E |ai|4 + ( n − 1) .
+
+Therefore, we obtain (33). 
+
+# C Proof of Fact 2 
+
+We write ∥aaa∥2 
+
+> ℓ2
+
+:= n+Pni=1 Xi, where Xi := |ai|2 −1. As in (18) and (19) in Section 3.2, we have 
+
+E |Xi|2 ≤ α4, and E |Xi|p/ 2 ≲p αp.
+
+Hence, by Rosenthal’s inequality in (17), 
+
+E
+
+> n
+
+X
+
+> i=1
+
+Xi
+
+> p/ 2
+
+≲p (α4n)p/ 4 + αpn ≲p αpnp/ 4.
+
+Now, let u ≥ 2n. Then, by Markov’s inequality, 
+
+P  ∥aaa∥2 
+
+> ℓ2
+
+≥ u = P
+
+> n
+
+X
+
+> i=1
+
+Xi ≥ u − n
+
+!
+
+≤ P
+
+> n
+
+X
+
+> i=1
+
+Xi ≥ u
+
+2
+
+!
+
+≲p
+
+E |Pni=1 Xi|p/ 2
+
+up/ 2 ≲p
+
+αpnp/ 4
+
+up/ 2 .
+
+28 Finally, by the union bound, 
+
+P
+
+
+
+max  
+
+> 1≤k≤m
+
+∥aaak∥2 
+
+> ℓ2
+
+≥ u
+
+
+
+≤
+
+> m
+
+X
+
+> k=1
+
+P  ∥aaak∥2 
+
+> ℓ2
+
+≥ u ≲p
+
+αpmn p/ 4
+
+up/ 2 .
+
+Choosing u = 2 n + C (p) α2/p p
+
+√mn with C (p) sufficiently large completes the proof. 
+
+# References 
+
+[1] Pedro Abdalla and Christian K¨ ummerle. Dictionary-sparse recovery from heavy-tailed measurements. Information and Inference: A Journal of the IMA ,11(4):1501–1526, 2022. [2] Pedro Abdalla, Jo˜ ao P. G. Ramos, and Mitchell A. Taylor. In preparation, 2026. [3] Pedro Abdalla and Nikita Zhivotovskiy. Covariance estimation: Optimal dimension-free guarantees for adversarial corruption and heavy tails. Journal of the European Mathematical Society , 28(4):1809–1847, 2026. [4] Ali Ahmed and Justin Romberg. Compressive multiplexing of correlated signals. 
+
+IEEE Transactions on Information Theory , 61(1):479–498, 2014. [5] Alaleh Aminzadeh, Lindon Roberts, Benjamin Young, Cheng I. Chiang, Imants D. Svalbe, David M. Paganin, and Andrew M. Kingston. Mask design, fabrication, and experimental ghost imaging applications for patterned X-ray illumination. 
+
+Optics Express , 31(15):24328–24346, 2023. [6] Radu Balan. Reconstruction of signals from magnitudes of redundant representa-tions: The complex case. Foundations of Computational Mathematics , 16(3):677– 721, 2016. [7] Radu Balan, Bernhard G Bodmann, Peter G Casazza, and Dan Edidin. Painless reconstruction from magnitudes of frame coefficients. Journal of Fourier Analysis and Applications , 15(4):488–501, 2009. [8] Radu Balan and Yang Wang. Invertibility and robustness of phaseless reconstruc-tion. Applied and Computational Harmonic Analysis , 38(3):469–488, 2015. [9] T. Tony Cai and Anru Zhang. ROP: Matrix recovery via rank-one projections. 
+
+The Annals of Statistics , 43(1):102–138, 2015. [10] Emmanuel J Cand` es, Yonina C Eldar, Thomas Strohmer, and Vladislav Voronin-ski. Phase retrieval via matrix completion. SIAM Review , 57(2):225–251, 2015. 29 [11] Emmanuel J Cand` es and Xiaodong Li. Solving quadratic equations via PhaseLift when there are about as many equations as unknowns. Foundations of Computa-tional Mathematics , 14(5):1017–1026, 2014. [12] Emmanuel J Cand` es, Xiaodong Li, and Mahdi Soltanolkotabi. Phase retrieval via Wirtinger flow: Theory and algorithms. IEEE Transactions on Information Theory , 61(4):1985–2007, 2015. [13] Emmanuel J Cand` es, Thomas Strohmer, and Vladislav Voroninski. PhaseLift: Exact and stable signal recovery from magnitude measurements via convex pro-gramming. Communications on Pure and Applied Mathematics , 66(8):1241–1274, 2013. [14] Venkat Chandrasekaran, Benjamin Recht, Pablo A Parrilo, and Alan S Willsky. The convex geometry of linear inverse problems. Foundations of Computational Mathematics , 12(6):805–849, 2012. [15] Yuxin Chen, Yuejie Chi, and Andrea J Goldsmith. Exact and stable covariance estimation from quadratic sampling via convex programming. IEEE Transactions on Information Theory , 61(7):4034–4059, 2015. [16] Laurent Demanet and Paul Hand. Stable optimizationless recovery from phaseless linear measurements. Journal of Fourier Analysis and Applications , 20(1):199–221, 2014. [17] John C Duchi and Feng Ruan. Solving (most) of a set of quadratic equalities: Composite optimization for robust phase retrieval. Information and Inference: A Journal of the IMA , 8(3):471–529, 2019. [18] Henrik Eisenmann, Felix Krahmer, Max Pfeffer, and Andr´ e Uschmajew. Rieman-nian thresholding methods for row-sparse and low-rank matrix recovery. Numerical Algorithms , 93(2):669–693, 2023. [19] Yonina C Eldar and Shahar Mendelson. Phase retrieval: Stability and recovery guarantees. Applied and Computational Harmonic Analysis , 36(3):473–494, 2014. [20] Steven T Flammia, David Gross, Yi-Kai Liu, and Jens Eisert. Quantum to-mography via compressed sensing: error bounds, sample complexity and efficient estimators. New Journal of Physics , 14(9):095022, 2012. [21] Simon Foucart and Srinivas Subramanian. Iterative hard thresholding for low-rank recovery from rank-one projections. Linear Algebra and its Applications ,572:117–134, 2019. [22] Bing Gao, Haixia Liu, and Yang Wang. Phase retrieval for sub-Gaussian mea-surements. Applied and Computational Harmonic Analysis , 53:95–115, 2021. 30 [23] Timm Gilles. Stable low-rank matrix recovery from 3-designs. Applied and Com-putational Harmonic Analysis , 84:101887, 2026. [24] David Gross, Felix Krahmer, and Richard Kueng. A partial derandomization of PhaseLift using spherical designs. Journal of Fourier Analysis and Applications ,21(2):229–266, 2015. [25] David Gross, Yi-Kai Liu, Steven T Flammia, Stephen Becker, and Jens Eisert. Quantum state tomography via compressed sensing. Physical Review Letters ,105(15):150401, 2010. [26] Gao Huang and Song Li. Low-rank Toeplitz matrix restoration: Descent cone anal-ysis and structured random matrix. IEEE Transactions on Information Theory ,71(5):3950–3956, 2025. [27] Gao Huang, Song Li, and Deanna Needell. Stable phase retrieval: Optimal rates in Poisson and heavy-tailed models. arXiv preprint arXiv:2510.00551 , 2025. [28] Gao Huang, Song Li, and Hang Xu. Robust outlier bound condition to phase retrieval with adversarial sparse outliers. Applied and Computational Harmonic Analysis , 80:101819, 2026. [29] Moritz Jirak, Stanislav Minsker, Yiqiu Shen, and Martin Wahl. Concentration and moment inequalities for sums of independent heavy-tailed random matrices. 
+
+Probability Theory and Related Fields , 194:1917–1944, 2026. [30] Maryia Kabanava, Richard Kueng, Holger Rauhut, and Ulrich Terstiege. Stable low-rank matrix recovery via null space properties. Information and Inference: A Journal of the IMA , 5(4):405–441, 2016. [31] Jean-Pierre Kahane. Some Random Series of Functions , volume 5 of Cambridge Studies in Advanced Mathematics . Cambridge University Press, 2 edition, 1985. [32] Seonho Kim and Kiryung Lee. Robust phase retrieval by alternating minimization. 
+
+IEEE Transactions on Signal Processing , 73:40–54, 2024. [33] Andrew M Kingston, Alaleh Aminzadeh, Lindon Roberts, Daniele Pelliccia, Imants D Svalbe, and David M Paganin. Optimizing nonconfigurable, transversely displaced masks for illumination patterns in classical ghost imaging. Physical Re-view A , 107(2):023524, 2023. [34] Vladimir Koltchinskii and Shahar Mendelson. Bounding the smallest singular value of a random matrix without concentration. International Mathematics Re-search Notices , 2015(23):12991–13008, 2015. [35] Yehuda Koren, Robert Bell, and Chris Volinsky. Matrix factorization techniques for recommender systems. Computer , 42(8):30–37, 2009. 31 [36] Felix Krahmer, Christian K¨ ummerle, and Oleh Melnyk. On the robustness of noise-blind low-rank recovery from rank-one measurements. Linear Algebra and its Applications , 652:37–81, 2022. [37] Felix Krahmer and Dominik St¨ oger. Complex phase retrieval from subgaussian measurements. Journal of Fourier Analysis and Applications , 26(6):89, 2020. [38] Felix Krahmer and Dominik St¨ oger. On the convex geometry of blind deconvolu-tion and matrix completion. Communications on Pure and Applied Mathematics ,74(4):790–832, 2021. [39] Richard Kueng, Holger Rauhut, and Ulrich Terstiege. Low rank matrix recovery from rank one measurements. Applied and Computational Harmonic Analysis ,42(1):88–116, 2017. [40] Guillaume Lecu´ e and Shahar Mendelson. Sparse recovery under weak moment assumptions. Journal of the European Mathematical Society , 19(3):881–904, 2017. [41] Huiping Li and Jiayi Li. Truncated amplitude flow with coded diffraction patterns. 
+
+Inverse Problems , 41(1):015002, 2025. [42] Yuanxin Li, Cong Ma, Yuxin Chen, and Yuejie Chi. Nonconvex matrix factor-ization from rank-one measurements. IEEE Transactions on Information Theory ,67(3):1928–1950, 2021. [43] Zhang Liu and Lieven Vandenberghe. Interior-point method for nuclear norm approximation with application to system identification. SIAM Journal on Matrix Analysis and Applications , 31(3):1235–1256, 2010. [44] Tyler Maunu and Martin Molina-Fructuoso. Acceleration and implicit regulariza-tion in Gaussian phase retrieval. In Proceedings of the 27th International Confer-ence on Artificial Intelligence and Statistics , volume 238 of Proceedings of Machine Learning Research , pages 4060–4068. PMLR, 2024. [45] Andrew D. McRae. Phase retrieval and matrix sensing via benign and over-parametrized nonconvex optimization. IEEE Transactions on Information The-ory , 72(6):4203–4220, 2026. [46] Shahar Mendelson. Learning without concentration. Journal of the ACM (JACM) ,62(3):1–25, 2015. [47] R. P. Millane. Phase retrieval in crystallography and optics. Journal of the Optical Society of America A , 7(3):394–411, 1990. [48] Valentin V Petrov. On lower bounds for tail probabilities. Journal of Statistical Planning and Inference , 137(8):2703–2705, 2007. 32 [49] Lianke Qin, Zhao Song, and Ruizhe Zhang. A general algorithm for solving rank-one matrix sensing. In International Conference on Artificial Intelligence and Statistics , volume 238 of Proceedings of Machine Learning Research , pages 757– 765. PMLR, 2024. [50] Qing Qu, Yuqian Zhang, Yonina C. Eldar, and John Wright. Convolutional phase retrieval via gradient descent. IEEE Transactions on Information Theory ,66(3):1785–1821, 2020. [51] Holger Rauhut and Ulrich Terstiege. Low-rank matrix recovery via rank one tight frame measurements. Journal of Fourier Analysis and Applications , 25(2):588– 593, 2019. [52] Benjamin Recht, Maryam Fazel, and Pablo A Parrilo. Guaranteed minimum-rank solutions of linear matrix equations via nuclear norm minimization. SIAM Review ,52(3):471–501, 2010. [53] Haskell P Rosenthal. On the subspaces of lp (p > 2) spanned by sequences of independent random variables. Israel Journal of Mathematics , 8(3):273–303, 1970. [54] Mark Rudelson and Roman Vershynin. Hanson-Wright inequality and sub-Gaussian concentration. Electronic Communications in Probability , 18:1–9, 2013. [55] Yoav Shechtman, Yonina C Eldar, Oren Cohen, Henry Nicholas Chapman, Jianwei Miao, and Mordechai Segev. Phase retrieval with application to optical imaging: a contemporary overview. IEEE Signal Processing Magazine , 32(3):87–109, 2015. [56] Konstantin Tikhomirov. Sample covariance matrices of heavy-tailed distributions. 
+
+International Mathematics Research Notices , 2018(20):6254–6289, 2018. [57] Joel A. Tropp. Convex recovery of a structured signal from independent random linear measurements. In Sampling Theory, a Renaissance: Compressive Sensing and Other Developments , pages 67–101. Birkh¨ auser, 2015. [58] Roman Vershynin. High-Dimensional Probability: An Introduction with Applica-tions in Data Science , volume 47. Cambridge University Press, 2018. 33

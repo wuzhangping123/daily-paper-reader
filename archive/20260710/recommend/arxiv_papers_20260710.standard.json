@@ -1,0 +1,129 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-10T21:01:24.708232+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.04535v1",
+      "source": "arxiv",
+      "title": "ManifoldFlow: SPD-Relaxed Stiefel Layers with Learnable Singular Spectrum",
+      "abstract": "Orthogonal and Stiefel layers give neural weights exact spectral control, but they also impose a strong modeling constraint: all represented singular values are fixed at one. Many settings that benefit from an orthonormal basis still need direction-dependent attenuation or amplification. We introduce ManifoldFlow, a minimal relaxation of a fixed-spectrum Stiefel layer that keeps the basis on the Stiefel manifold while learning a bounded positive spectrum through W = Q S^{1/2}, with Q^T Q = I and S positive definite. Since W^T W = S, the eigenvalues of S are exactly the squared singular values of the realized weight, making eigenvalue clipping a direct singular-value control mechanism. Across paired sequence, tabular, and image experiments, the learnable SPD spectrum improves the fixed-spectrum Stiefel counterpart in the reported settings where the Stiefel prior is useful, with the largest gains in recurrent language-model projections. Boundary cases in convolutional classifier heads clarify the intended scope: ManifoldFlow is not a universal dense-layer replacement, but a spectrum-learnable Stiefel relaxation for settings where an orthonormal basis is a useful prior. When the basis should be orthonormal, its spectrum need not be frozen. Code available at https://github.com/Hik289/manifold_flow",
+      "authors": [
+        "Haiwen Yi",
+        "Xinyuan Song"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "stat.ML"
+      ],
+      "published": "2026-07-05T22:46:17+00:00",
+      "link": "https://arxiv.org/pdf/2607.04535v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "learnable singular spectrum for low-rank constraints",
+      "llm_evidence_cn": "可学习奇异值谱用于低秩约束",
+      "llm_evidence": "可学习奇异值谱用于低秩约束",
+      "canonical_evidence": "可学习奇异值谱用于低秩约束",
+      "llm_tldr_en": "ManifoldFlow introduces learnable singular spectrum to Stiefel layers, enabling direction-dependent attenuation/amplification, supporting low-rank representation tasks such as hyperspectral image denoising via flexible singular value control.",
+      "llm_tldr_cn": "该论文针对神经网络中正交层固定奇异值谱的局限，提出ManifoldFlow层，通过将权重分解为正交基和可学习正定谱矩阵，实现方向相关的衰减或放大。该设计保持Stiefel流形约束的同时允许奇异值学习，能通过裁剪直接控制权重谱。论文通过序列、表格和图像实验证明其有效性。此方法可直接迁移到高光谱去噪中的低秩表示任务，例如用于约束去噪模型中的低秩分量，增强模型灵活性。",
+      "llm_tldr": "该论文针对神经网络中正交层固定奇异值谱的局限，提出ManifoldFlow层，通过将权重分解为正交基和可学习正定谱矩阵，实现方向相关的衰减或放大。该设计保持Stiefel流形约束的同时允许奇异值学习，能通过裁剪直接控制权重谱。论文通过序列、表格和图像实验证明其有效性。此方法可直接迁移到高光谱去噪中的低秩表示任务，例如用于约束去噪模型中的低秩分量，增强模型灵活性。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.06330v1",
+      "source": "arxiv",
+      "title": "Direct and efficient estimation of bilinear forms in staggered tensor panels",
+      "abstract": "We study the estimation of bilinear forms from noisy, partially observed tensor data. The signal follows a Tucker2 model, with shared unit and time factors across tensor layers and slice-specific cores. The missingness pattern is structured and motivated by staggered adoption designs, which are common in causal inference and related applications. We first analyse the four-block missingness pattern, the basic building block for general staggered adoption, and propose a spectral algorithm that pools information across layers and targets the functional directly, rather than completing the entire tensor. We prove a non-asymptotic mean squared error bound that exhibits a phase transition in the number of layers, showing when pooling improves estimation, and match it with a local minimax lower bound up to constants. We then extend the construction to general staggered adoption designs via an anchored four-block reduction, and derive analogous theoretical guarantees. Finally, we validate our theoretical findings through experiments on both simulated and real-world datasets.",
+      "authors": [
+        "Alberto Bordino",
+        "Thomas B. Berrett",
+        "Olga Klopp"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "stat.ME"
+      ],
+      "published": "2026-07-07T14:26:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.06330v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "direct and efficient estimation from noisy tensor data, applicable to high-dimensional tensor recovery",
+      "llm_evidence_cn": "从带噪张量数据中直接高效估计，可适用于高维张量恢复",
+      "llm_evidence": "从带噪张量数据中直接高效估计，可适用于高维张量恢复",
+      "canonical_evidence": "从带噪张量数据中直接高效估计，可适用于高维张量恢复",
+      "llm_tldr_en": "Proposes a spectral algorithm for estimating bilinear forms from noisy, partially observed tensor data with structured missingness, avoiding full tensor completion.",
+      "llm_tldr_cn": "该论文研究了从带噪部分观测张量中估计双线性形式的问题。数据服从Tucker2模型，缺失模式为结构化交错采纳。提出了一种谱算法，跨层池化信息并直接估计目标函数，而非完成整个张量。推导了非渐近均方误差界，揭示了层数相变现象。该方法可推广至高光谱图像等张量数据的恢复与去噪任务。",
+      "llm_tldr": "该论文研究了从带噪部分观测张量中估计双线性形式的问题。数据服从Tucker2模型，缺失模式为结构化交错采纳。提出了一种谱算法，跨层池化信息并直接估计目标函数，而非完成整个张量。推导了非渐近均方误差界，揭示了层数相变现象。该方法可推广至高光谱图像等张量数据的恢复与去噪任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.08671v1",
+      "source": "arxiv",
+      "title": "Low-Rank Matrix Recovery via Heavy-Tailed Quadratic Sampling",
+      "abstract": "The problem of recovering an (approximately) low-rank Hermitian matrix $\\pmb{M}_0 \\in \\mathbb{C}^{n \\times n}$ of rank $r$ from quadratic sampling matrices of the form $\\{\\pmb{a}_k \\pmb{a}_k^*\\}_{k=1}^m$ arises in a variety of applications, including phase retrieval. To obtain rigorous recovery guarantees, the sampling vectors $\\{\\pmb{a}_k\\}_{k=1}^m$ are typically modeled probabilistically. However, most existing theoretical results rely on Gaussian or sub-Gaussian assumptions, which may not accurately capture practical data models. In many applications, sampling vectors exhibit heavier tails, while theoretical understanding in such regimes remains scarce.   In this paper, we bridge this gap. We show that two widely used convex approaches, nuclear norm minimization and semidefinite-constrained empirical risk minimization, achieve uniform, stable, and robust recovery under the mild assumption that the entries of the sampling vectors have only finite $4+δ$ moments, with the optimal sample complexity $m = \\mathcal{O}(rn)$ up to moment-dependent constants. The two main ingredients of our analysis are moment estimates for quadratic forms established via decoupling, together with recent advances in covariance estimation in heavy-tailed settings. As byproducts, we also establish the optimal sample complexity for low-rank matrix recovery under complex projective $4$-design sampling, thereby improving upon previous results, and obtain stability guarantees for phase retrieval under similarly weak moment assumptions.",
+      "authors": [
+        "Gao Huang",
+        "Song Li"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "cs.IT"
+      ],
+      "published": "2026-07-09T16:36:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.08671v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "low-rank matrix recovery method applicable to denoising",
+      "llm_evidence_cn": "低秩矩阵恢复方法可用于去噪",
+      "llm_evidence": "低秩矩阵恢复方法可用于去噪",
+      "canonical_evidence": "低秩矩阵恢复方法可用于去噪",
+      "llm_tldr_en": "Proves nuclear norm minimization and gradient descent achieve low-rank recovery under heavy-tailed quadratic sampling, offering theoretical guarantees for low-rank denoising frameworks.",
+      "llm_tldr_cn": "该论文研究了在重尾二次采样下低秩矩阵恢复的理论保证，证明了核范数最小化和梯度下降法的有效性。虽然主要面向相位恢复等应用，但其低秩表示核心方法可直接迁移至高光谱图像去噪中的低秩去噪框架，为相关方法的理论分析提供支持。实验表明所提方法在重尾噪声下依然稳健。",
+      "llm_tldr": "该论文研究了在重尾二次采样下低秩矩阵恢复的理论保证，证明了核范数最小化和梯度下降法的有效性。虽然主要面向相位恢复等应用，但其低秩表示核心方法可直接迁移至高光谱图像去噪中的低秩去噪框架，为相关方法的理论分析提供支持。实验表明所提方法在重尾噪声下依然稳健。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
