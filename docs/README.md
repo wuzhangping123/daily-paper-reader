@@ -6,30 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-10
-- 运行时间：2026-07-10 21:05:37 UTC
+- 最新运行日期：2026-07-11
+- 运行时间：2026-07-11 21:13:07 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：0
-- 速读区：3
+- 本次总论文数：1
+- 精读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读3篇论文，聚焦流形学习与矩阵恢复。最值得关注的方向是低秩矩阵恢复与双线性形式估计的交叉应用。建议关注重尾采样下的矩阵恢复方法，可能更贴近真实数据噪声。
-- 详情：[/202607/10/README](/202607/10/README)
+今日精读8分论文，探索自适应无矩阵低秩逼近新方法。  
+核心亮点：无需显式矩阵的低秩近似算法，适合大规模科学计算场景。  
+建议关注自适应策略，可尝试应用于你的高维数据处理任务。
+- 详情：[/202607/11/README](/202607/11/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Adaptive, Matrix-Free Low-Rank Approximation](/202607/11/2607.06758v1-adaptive-matrix-free-low-rank-approximation)  
+   标签：评分：8.0/10、query:hsi-denoise
+   evidence：自适应无矩阵低秩近似可直接用于低秩去噪方法
 
 ### 速读区论文标签
-1. [ManifoldFlow: SPD-Relaxed Stiefel Layers with Learnable Singular Spectrum](/202607/10/2607.04535v1-manifoldflow-spd-relaxed-stiefel-layers-with-learnable-singular-spectrum)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：可学习奇异值谱用于低秩约束
-2. [Direct and efficient estimation of bilinear forms in staggered tensor panels](/202607/10/2607.06330v1-direct-and-efficient-estimation-of-bilinear-forms-in-staggered-tensor-panels)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：从带噪张量数据中直接高效估计，可适用于高维张量恢复
-3. [Low-Rank Matrix Recovery via Heavy-Tailed Quadratic Sampling](/202607/10/2607.08671v1-low-rank-matrix-recovery-via-heavy-tailed-quadratic-sampling)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：低秩矩阵恢复方法可用于去噪
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">

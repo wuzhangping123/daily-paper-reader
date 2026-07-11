@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-11",
+  "date": "2026-07-11",
+  "generated_at": "2026-07-11T21:13:14",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/11/2607.06758v1-adaptive-matrix-free-low-rank-approximation",
+      "section": "deep",
+      "title_en": "Adaptive, Matrix-Free Low-Rank Approximation",
+      "authors": "Arnel I. Smith, Elly Do, Chao Chen",
+      "date": "2026-07-07",
+      "pdf": "https://arxiv.org/pdf/2607.06758v1",
+      "score": "8.0",
+      "evidence": "自适应无矩阵低秩近似可直接用于低秩去噪方法",
+      "tldr": "在无矩阵环境下，矩阵或算子仅能通过矩阵向量乘积访问，且需自适应确定秩以满足误差容限。本文提出一系列自适应无矩阵随机化QB算法，包含随机误差指示器直接从草图中估计残差范数，以及秩剪步骤将计算块大小与最终秩解耦。在奇异值多样衰减的测试中，所得秩接近截断SVD最优，并以高概率满足预设容差。该工作为无矩阵低秩近似提供了高效、自适应的通用框架。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We study fixed-tolerance low-rank approximation in the matrix-free setting, where a matrix or linear operator $\\mathbf{A}$ is accessible only through matrix-vector products and its rank must be determined adaptively to meet a prescribed error tolerance. We introduce a family of adaptive, matrix-free randomized QB algorithms. A randomized error indicator estimates the residual norm -- in either the Frobenius or the spectral norm -- directly from a random sketch, remaining accurate down to machine precision. A matrix-free rank-pruning step decouples the computational block size from the final rank, so that large, BLAS-3-friendly blocks can be used without over-estimating the rank, and an adjoint-free variant returns the orthonormal basis using only the forward operator. Across test matrices with diverse singular-value decays, the proposed methods attain ranks close to the truncated-SVD optimum while meeting the prescribed tolerance with high probability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

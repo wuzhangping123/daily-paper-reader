@@ -1,0 +1,53 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-11T21:11:10.765740+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.06758v1",
+      "source": "arxiv",
+      "title": "Adaptive, Matrix-Free Low-Rank Approximation",
+      "abstract": "We study fixed-tolerance low-rank approximation in the matrix-free setting, where a matrix or linear operator $\\mathbf{A}$ is accessible only through matrix-vector products and its rank must be determined adaptively to meet a prescribed error tolerance. We introduce a family of adaptive, matrix-free randomized QB algorithms. A randomized error indicator estimates the residual norm -- in either the Frobenius or the spectral norm -- directly from a random sketch, remaining accurate down to machine precision. A matrix-free rank-pruning step decouples the computational block size from the final rank, so that large, BLAS-3-friendly blocks can be used without over-estimating the rank, and an adjoint-free variant returns the orthonormal basis using only the forward operator. Across test matrices with diverse singular-value decays, the proposed methods attain ranks close to the truncated-SVD optimum while meeting the prescribed tolerance with high probability.",
+      "authors": [
+        "Arnel I. Smith",
+        "Elly Do",
+        "Chao Chen"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-07T19:41:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.06758v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "adaptive matrix-free low-rank approximation directly applicable to low-rank denoising methods",
+      "llm_evidence_cn": "自适应无矩阵低秩近似可直接用于低秩去噪方法",
+      "llm_evidence": "自适应无矩阵低秩近似可直接用于低秩去噪方法",
+      "canonical_evidence": "自适应无矩阵低秩近似可直接用于低秩去噪方法",
+      "llm_tldr_en": "This paper introduces a family of adaptive matrix-free randomized QB algorithms for fixed-tolerance low-rank approximation, with a randomized error indicator that accurately estimates residual norms, enabling efficient low-rank denoising.",
+      "llm_tldr_cn": "该论文研究固定容差的无矩阵低秩近似问题，即仅通过矩阵-向量乘积访问矩阵并自适应确定秩以满足误差。提出一系列自适应无矩阵随机QB算法，包括一个随机误差指示器可直接估计残差范数（Frobenius或谱范数），且精度可达机器精度。另外设计了无矩阵秩剪枝步骤，解耦计算块大小与最终秩，可用大块而不高估秩。该方法可用于图像去噪中的低秩近似，为高光谱图像去噪中的低秩表示提供高效工具。",
+      "llm_tldr": "该论文研究固定容差的无矩阵低秩近似问题，即仅通过矩阵-向量乘积访问矩阵并自适应确定秩以满足误差。提出一系列自适应无矩阵随机QB算法，包括一个随机误差指示器可直接估计残差范数（Frobenius或谱范数），且精度可达机器精度。另外设计了无矩阵秩剪枝步骤，解耦计算块大小与最终秩，可用大块而不高估秩。该方法可用于图像去噪中的低秩近似，为高光谱图像去噪中的低秩表示提供高效工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}
