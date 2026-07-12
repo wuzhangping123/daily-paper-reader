@@ -6,26 +6,24 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-11
-- 运行时间：2026-07-11 21:13:07 UTC
+- 最新运行日期：2026-07-12
+- 运行时间：2026-07-12 20:01:17 UTC
 - 运行状态：成功
 - 本次总论文数：1
-- 精读区：1
-- 速读区：0
+- 精读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-今日精读8分论文，探索自适应无矩阵低秩逼近新方法。  
-核心亮点：无需显式矩阵的低秩近似算法，适合大规模科学计算场景。  
-建议关注自适应策略，可尝试应用于你的高维数据处理任务。
-- 详情：[/202607/11/README](/202607/11/README)
+今日速读1篇关于张量数据混合空间因子分析模型的论文。该研究提出了一种针对高维结构化数据降维的新方法。对处理复杂张量数据感兴趣者可关注其因子分析框架。
+- 详情：[/202607/12/README](/202607/12/README)
 
 ### 精读区论文标签
-1. [Adaptive, Matrix-Free Low-Rank Approximation](/202607/11/2607.06758v1-adaptive-matrix-free-low-rank-approximation)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：自适应无矩阵低秩近似可直接用于低秩去噪方法
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Mixtures of spatial factor analyzers for tensor-variate data](/202607/12/2607.07887v1-mixtures-of-spatial-factor-analyzers-for-tensor-variate-data)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：张量变量数据的空间因子分析混合模型，应用于高光谱纹理数据
 
 
 <div class="dpr-home-promo-card">

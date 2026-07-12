@@ -1,0 +1,64 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-12T20:00:02.519473+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.07887v1",
+      "source": "arxiv",
+      "title": "Mixtures of spatial factor analyzers for tensor-variate data",
+      "abstract": "A mixture of spatial factor analyzers (MSFA) is introduced to address the challenges of clustering high-dimensional spatial data. By leveraging the underlying coordinate system, the proposed framework incorporates a flexible, spline-based spatial decay covariance structure that prevents parameter inflation as dimensionality increases. To model non-spatial dependence, matrix variate factor analyzers are employed for further dimensionality reduction. Parameter estimation is conducted via a variant of the expectation-maximization algorithm combined with a generalized least squares estimator. The proposed models are explored in the context of tensor-variate data analysis, where simulation studies and applications to Raman spectroscopy and hyperspectral texture databases demonstrate their capacity to accurately infer and differentiate distinct spatial patterns.",
+      "authors": [
+        "Hanzhang Lu",
+        "Keiran Malott",
+        "Kirsty Milligan",
+        "Sanjeena Subedi",
+        "Edana Cassol",
+        "Vinita Chauhan",
+        "Connor McNairn",
+        "Prarthana Pasricha",
+        "Sangeeta Murugkar",
+        "Rowan Thomson",
+        "Andrew Jirasek",
+        "Jeffrey L. Andrews"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-07-08T19:49:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.07887v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "mixture of spatial factor analyzers for tensor-variate data, applied to hyperspectral texture data",
+      "llm_evidence_cn": "张量变量数据的空间因子分析混合模型，应用于高光谱纹理数据",
+      "llm_evidence": "张量变量数据的空间因子分析混合模型，应用于高光谱纹理数据",
+      "canonical_evidence": "张量变量数据的空间因子分析混合模型，应用于高光谱纹理数据",
+      "llm_tldr_en": "Introduces a mixture of spatial factor analyzers (MSFA) for clustering high-dimensional spatial data, using spline-based spatial decay covariance and matrix variate factor analyzers, demonstrated on hyperspectral texture data.",
+      "llm_tldr_cn": "针对高维空间数据聚类问题，提出空间因子分析混合模型（MSFA）。该模型利用基于样条的空间衰减协方差结构避免参数膨胀，并通过矩阵变量因子分析器进一步降维。在拉曼光谱和高光谱纹理数据上的实验表明，MSFA能够有效处理张量变量数据，为高光谱数据分析提供了新工具。",
+      "llm_tldr": "针对高维空间数据聚类问题，提出空间因子分析混合模型（MSFA）。该模型利用基于样条的空间衰减协方差结构避免参数膨胀，并通过矩阵变量因子分析器进一步降维。在拉曼光谱和高光谱纹理数据上的实验表明，MSFA能够有效处理张量变量数据，为高光谱数据分析提供了新工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "tensor based approaches for hyperspectral image anomaly detection and restoration",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

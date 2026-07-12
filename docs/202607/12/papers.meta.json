@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-12",
+  "date": "2026-07-12",
+  "generated_at": "2026-07-12T20:01:23",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/12/2607.07887v1-mixtures-of-spatial-factor-analyzers-for-tensor-variate-data",
+      "section": "quick",
+      "title_en": "Mixtures of spatial factor analyzers for tensor-variate data",
+      "authors": "Hanzhang Lu, Keiran Malott, Kirsty Milligan, Sanjeena Subedi, Edana Cassol, Vinita Chauhan, Connor McNairn, Prarthana Pasricha, Sangeeta Murugkar, Rowan Thomson, Andrew Jirasek, Jeffrey L. Andrews",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07887v1",
+      "score": "6.0",
+      "evidence": "张量变量数据的空间因子分析混合模型，应用于高光谱纹理数据",
+      "tldr": "高维空间数据聚类面临维数灾难和参数膨胀问题。为此，提出混合空间因子分析器（MSFA），利用坐标系统引入样条基空间衰减协方差结构，结合矩阵因子分析器进行降维，避免参数膨胀。通过EM算法和广义最小二乘估计参数。模拟和真实数据（拉曼光谱、高光谱纹理）验证了该方法能准确推断和区分不同空间模式，为张量变体数据空间聚类提供了有效框架。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "A mixture of spatial factor analyzers (MSFA) is introduced to address the challenges of clustering high-dimensional spatial data. By leveraging the underlying coordinate system, the proposed framework incorporates a flexible, spline-based spatial decay covariance structure that prevents parameter inflation as dimensionality increases. To model non-spatial dependence, matrix variate factor analyzers are employed for further dimensionality reduction. Parameter estimation is conducted via a variant of the expectation-maximization algorithm combined with a generalized least squares estimator. The proposed models are explored in the context of tensor-variate data analysis, where simulation studies and applications to Raman spectroscopy and hyperspectral texture databases demonstrate their capacity to accurately infer and differentiate distinct spatial patterns.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

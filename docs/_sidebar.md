@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-12 <!--dpr-date:20260712-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/12/2607.07887v1-mixtures-of-spatial-factor-analyzers-for-tensor-variate-data" data-sidebar-item="{&quot;title&quot;: &quot;Mixtures of spatial factor analyzers for tensor-variate data&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.07887v1-mixtures-of-spatial-factor-analyzers-for-tensor-variate-data&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;张量变量数据的空间因子分析混合模型，应用于高光谱纹理数据&quot;}">Mixtures of spatial factor analyzers for tensor-variate data</a>
   * 2026-07-11 <!--dpr-date:20260711-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/11/2607.06758v1-adaptive-matrix-free-low-rank-approximation" data-sidebar-item="{&quot;title&quot;: &quot;Adaptive, Matrix-Free Low-Rank Approximation&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.06758v1-adaptive-matrix-free-low-rank-approximation&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;自适应无矩阵低秩近似可直接用于低秩去噪方法&quot;}">Adaptive, Matrix-Free Low-Rank Approximation</a>
