@@ -6,24 +6,30 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-12
-- 运行时间：2026-07-12 20:01:17 UTC
+- 最新运行日期：2026-07-13
+- 运行时间：2026-07-13 21:15:59 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：3
 - 精读区：0
-- 速读区：1
+- 速读区：3
 
 ### 今日简报（AI）
-今日速读1篇关于张量数据混合空间因子分析模型的论文。该研究提出了一种针对高维结构化数据降维的新方法。对处理复杂张量数据感兴趣者可关注其因子分析框架。
-- 详情：[/202607/12/README](/202607/12/README)
+今日速读三篇论文，聚焦统计逆学习、sRGB噪声生成与图正则化矩阵补全。最值得关注的方向是仅需两张噪声图像即可实现真实感噪声生成的YeTI方法，以及利用变量投影求解图正则化低秩矩阵补全的高效算法。建议后续可深入探索YeTI的跨场景迁移能力，或尝试将L1正则化与图正则化结合用于图像修复。
+- 详情：[/202607/13/README](/202607/13/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Mixtures of spatial factor analyzers for tensor-variate data](/202607/12/2607.07887v1-mixtures-of-spatial-factor-analyzers-for-tensor-variate-data)  
+1. [Statistical inverse learning and $\ell^1$-regularization](/202607/13/2607.07468v1-statistical-inverse-learning-and-ell1-regularization)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：张量变量数据的空间因子分析混合模型，应用于高光谱纹理数据
+   evidence：从含噪间接观测中通过l1正则化进行恢复；可用于图像去噪与复原
+2. [YeTI: You Only Need Two Noisy Images for Real-World sRGB Noise Generation](/202607/13/2607.09193v1-yeti-you-only-need-two-noisy-images-for-real-world-srgb-noise-generation)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：仅从两张噪声图像生成真实sRGB噪声，可用于训练去噪模型
+3. [Graph-Regularized Low-Rank Matrix Completion by Variable Projection](/202607/13/2607.09546v1-graph-regularized-low-rank-matrix-completion-by-variable-projection)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：低秩矩阵补全结合图正则化，可迁移至高光谱去噪
 
 
 <div class="dpr-home-promo-card">

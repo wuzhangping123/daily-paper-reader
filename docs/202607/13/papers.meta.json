@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-13",
+  "date": "2026-07-13",
+  "generated_at": "2026-07-13T21:16:06",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/13/2607.07468v1-statistical-inverse-learning-and-ell1-regularization",
+      "section": "quick",
+      "title_en": "Statistical inverse learning and $\\ell^1$-regularization",
+      "authors": "Abhishake Rastogi, Tatiana A. Bubba, Tapio Helin, Luca Ratti",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07468v1",
+      "score": "6.0",
+      "evidence": "从含噪间接观测中通过l1正则化进行恢复；可用于图像去噪与复原",
+      "tldr": "统计逆学习中从有限噪声间接观测恢复稀疏函数，提出ℓ1正则化经验风险最小化方法。在变分源条件和协方差算子多项式谱衰减假设下，建立了几乎必然一致性和非渐近高概率收敛速率，并证明匹配极小化最优下界。考虑有限平滑合成算子，验证了椭圆PDE反应系数识别和稀疏CT两个应用，获得具体收敛速率。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We study the recovery of sparse functions from finite, noisy, and indirect observations in the framework of statistical inverse learning. The unknown is modeled as an element of $\\ell^1$, and observations are generated through a possibly nonlinear forward operator $A:\\ell^1\\to H$, where $H$ is a vector-valued reproducing kernel Hilbert space. We propose an $\\ell^1$-regularized empirical risk minimizer and develop a theoretical analysis of its statistical properties.   Under mild assumptions, we establish almost-sure consistency and derive non-asymptotic high-probability convergence rates in both the prediction and $\\ell^1$ reconstruction norms. The rates depend on the source smoothness parameter $r$, characterized by a variational source condition, and the effective dimension exponent $b$, describing the polynomial spectral decay of the covariance operator. We further prove matching minimax lower bounds, showing that the obtained convergence rates are optimal.   To relate the theory to practical sparsity models, we consider finitely smoothing operators of the form $A=G\\circ S$, where $S$ is a synthesis operator, and show that approximation-space assumptions imply the required variational source conditions. In particular, we prove that membership in the approximation space $k_t$ is equivalent to polynomial decay of the best $n$-term approximation error.   Finally, we verify the assumptions for two representative inverse problems: reaction coefficient identification in elliptic PDEs and sparse computed tomography. For filtered Radon transforms, we derive explicit effective-dimension asymptotics, yielding concrete convergence rates for standard image models and sparsifying systems.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/13/2607.09193v1-yeti-you-only-need-two-noisy-images-for-real-world-srgb-noise-generation",
+      "section": "quick",
+      "title_en": "YeTI: You Only Need Two Noisy Images for Real-World sRGB Noise Generation",
+      "authors": "Jaekyun Ko, Byung Wan Lim, Soomin Lee, Dongjin Kim, Tae Hyun Kim",
+      "date": "2026-07-10",
+      "pdf": "https://arxiv.org/pdf/2607.09193v1",
+      "score": "6.0",
+      "evidence": "仅从两张噪声图像生成真实sRGB噪声，可用于训练去噪模型",
+      "tldr": "真实sRGB图像去噪面临传感器噪声非线性和干净-噪声对难以获取的挑战。现有监督方法易过拟合，自监督方法依赖多样噪声观测。本文提出YeTI框架，仅需两张同一场景的噪声图像，利用重建自编码器解耦场景结构与噪声，并用一致性条件扩散Transformer建模噪声分布。在SIDD等基准上生成噪声真实且信号相关，下游去噪任务性能优异，实现了无干净图像和元数据的噪声生成。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Real-world sRGB image denoising remains challenging due to the nonlinear characteristics of sensor noise and the difficulty of acquiring aligned clean-noisy image pairs. Supervised denoisers often overfit to limited paired datasets, while self-supervised methods still depend on sufficiently diverse noisy observations. These limitations motivate scalable noise synthesis methods that can model real-world noise without clean ground truth or camera metadata. We propose YeTI, a real-world sRGB noise generation framework that learns from only two noisy observations of the same scene. YeTI uses a Reconstruction Autoencoder to disentangle scene structure and noise characteristics, and models the latent noise distribution with a one-step Conditional Diffusion Transformer trained using consistency objectives. Given a single noisy input at inference time, YeTI generates realistic, signal-dependent noise while preserving the underlying scene content. Extensive experiments demonstrate the effectiveness of YeTI across real-world benchmarks. We evaluate noise generation on SIDD and further assess generalization on SIDD+, MAI2021, and SID, covering smartphone and diverse consumer-camera sensors. Downstream denoising results on DND further show that denoisers trained with YeTI-synthesized images achieve strong real-world performance, highlighting the practical value of clean-image-free and metadata-free noise generation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/13/2607.09546v1-graph-regularized-low-rank-matrix-completion-by-variable-projection",
+      "section": "quick",
+      "title_en": "Graph-Regularized Low-Rank Matrix Completion by Variable Projection",
+      "authors": "Benoît Loucheur, P. -A. Absil, Michel Journée",
+      "date": "2026-07-10",
+      "pdf": "https://arxiv.org/pdf/2607.09546v1",
+      "score": "6.0",
+      "evidence": "低秩矩阵补全结合图正则化，可迁移至高光谱去噪",
+      "tldr": "针对低秩矩阵补全问题，本文在Riemannian Trust-Region Matrix Completion框架中引入图正则化，提出GR-RTRMC方法。通过挖掘矩阵行和列之间的相关关系，该方法在强关联数据场景下提升了补全精度和鲁棒性。实验表明，图正则化有效改善了矩阵恢复效果。该方法为低秩矩阵补全提供了新的几何优化视角。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We address the low-rank matrix completion problem by incorporating graph regularization into the existing Riemannian Trust-Region Matrix Completion (RTRMC) framework. The latter uses the geometry of the low-rank constraint to remodel the problem as an unconstrained optimization problem on a single Grassmann manifold. Our approach, named Graph-Regularized RTRMC (GR-RTRMC), exploits the inherent relationships between rows and columns of the matrix. By using these relationships, we aim to improve the accuracy and robustness of matrix completion, particularly in scenarios where the underlying data exhibits strong correlations between rows or columns.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
