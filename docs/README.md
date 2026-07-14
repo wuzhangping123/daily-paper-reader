@@ -6,30 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-13
-- 运行时间：2026-07-13 21:15:59 UTC
+- 最新运行日期：2026-07-14
+- 运行时间：2026-07-14 20:01:13 UTC
 - 运行状态：成功
 - 本次总论文数：3
-- 精读区：0
-- 速读区：3
+- 精读区：1
+- 速读区：2
 
 ### 今日简报（AI）
-今日速读三篇论文，聚焦统计逆学习、sRGB噪声生成与图正则化矩阵补全。最值得关注的方向是仅需两张噪声图像即可实现真实感噪声生成的YeTI方法，以及利用变量投影求解图正则化低秩矩阵补全的高效算法。建议后续可深入探索YeTI的跨场景迁移能力，或尝试将L1正则化与图正则化结合用于图像修复。
-- 详情：[/202607/13/README](/202607/13/README)
+今日阅读聚焦非凸成像的收敛算法、低秩正则化及张量矩阵恢复。精读文章《PnP-IPA》提出的可证明收敛即插即用算法最具价值。建议重点关注非凸优化与即插即用框架在图像复原中的应用。
+- 详情：[/202607/14/README](/202607/14/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [PnP-IPA: A Provably Convergent Plug-and-Play Inexact Proximal Algorithm for Nonconvex Imaging Problems](/202607/14/2607.10223v1-pnp-ipa-a-provably-convergent-plug-and-play-inexact-proximal-algorithm-for-nonconvex-imaging-problems)  
+   标签：评分：8.0/10、query:hsi-denoise
+   evidence：即插即用去噪算法用于成像逆问题
 
 ### 速读区论文标签
-1. [Statistical inverse learning and $\ell^1$-regularization](/202607/13/2607.07468v1-statistical-inverse-learning-and-ell1-regularization)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：从含噪间接观测中通过l1正则化进行恢复；可用于图像去噪与复原
-2. [YeTI: You Only Need Two Noisy Images for Real-World sRGB Noise Generation](/202607/13/2607.09193v1-yeti-you-only-need-two-noisy-images-for-real-world-srgb-noise-generation)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：仅从两张噪声图像生成真实sRGB噪声，可用于训练去噪模型
-3. [Graph-Regularized Low-Rank Matrix Completion by Variable Projection](/202607/13/2607.09546v1-graph-regularized-low-rank-matrix-completion-by-variable-projection)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：低秩矩阵补全结合图正则化，可迁移至高光谱去噪
+1. [SLORR: Simple and Efficient In-Training Low-Rank Regularization](/202607/14/2607.08754v1-slorr-simple-and-efficient-in-training-low-rank-regularization)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：低秩正则化用于去噪
+2. [Coupled Tensor-Matrix Recovery via Proximal Alternating Linearized Minimization, with an Application to Workforce Skill and Small-Business Health Estimation](/202607/14/2607.10163v1-coupled-tensor-matrix-recovery-via-proximal-alternating-linearized-minimization-with-an-application-to-workforce-skill-and-small-business-health-estimation)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：耦合低秩张量矩阵恢复方法，直接相关于高光谱图像张量数据恢复
 
 
 <div class="dpr-home-promo-card">
