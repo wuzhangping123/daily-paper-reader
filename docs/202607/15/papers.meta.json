@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-15",
+  "date": "2026-07-15",
+  "generated_at": "2026-07-15T21:30:56",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/15/2607.09319v1-differential-analysis-of-multispectral-images-for-terrain-identification",
+      "section": "quick",
+      "title_en": "Differential Analysis of Multispectral Images for Terrain Identification",
+      "authors": "Omar Kashmar, Hemendra Arya, Fulvio Mastrogiovanni",
+      "date": "2026-07-10",
+      "pdf": "https://arxiv.org/pdf/2607.09319v1",
+      "score": "6.0",
+      "evidence": "多光谱框架使用波段比率实现光照不变的噪声鲁棒性",
+      "tldr": "RGB感知在弱光照、阴影和材料模糊下易失效，影响自主机器人地形理解。本文提出DRIFT，一种轻量多光谱框架，通过双流残差架构融合原始光谱波段与照明鲁棒的波段比表示，并引入差分融合分支增强对噪声测量的鲁棒性。在无人机采集的油污土壤数据集及可控水草数据集上，DRIFT持续超越强基线，且适用于边缘部署。该方法有效提升了多光谱地形识别的准确性与可靠性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Reliable terrain understanding is a prerequisite for autonomous robot navigation. Yet, the widespread RGB-based perception can fail under low illumination, shadows, and material ambiguities. In this work we propose DRIFT, a lightweight multispectral framework that combines raw spectral bands and illumination-tolerant band-ratio representations through a dual-stream residual architecture and a differential fusion branch. Band ratios attenuate multiplicative acquisition effects (illumination/sensor gains), while the differential fusion explicitly highlights discrepancies between absolute-band and ratio-derived cues, which improves the robustness to noisy or partially unreliable spectral measurements. In the paper (i) we evaluate DRIFT on a new oil-on-soil multispectral dataset acquired using a MicaSense RedEdge-P camera mounted on an Unmanned Aerial Vehicle, and (ii) we provide an additional controlled study on water-on-grass under varying illumination and thermal perturbations (hot/cold water) to analyze NIR-sensitive effects. DRIFT consistently improves over strong baselines, while remaining compatible with edge deployment.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

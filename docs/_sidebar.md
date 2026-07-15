@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-15 <!--dpr-date:20260715-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/15/2607.09319v1-differential-analysis-of-multispectral-images-for-terrain-identification" data-sidebar-item="{&quot;title&quot;: &quot;Differential Analysis of Multispectral Images for Terrain Identification&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.09319v1-differential-analysis-of-multispectral-images-for-terrain-identification&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;多光谱框架使用波段比率实现光照不变的噪声鲁棒性&quot;}">Differential Analysis of Multispectral Images for Terrain Identification</a>
   * 2026-07-14 <!--dpr-date:20260714-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/14/2607.10223v1-pnp-ipa-a-provably-convergent-plug-and-play-inexact-proximal-algorithm-for-nonconvex-imaging-problems" data-sidebar-item="{&quot;title&quot;: &quot;PnP-IPA: A Provably Convergent Plug-and-Play Inexact Proximal Algorithm for Nonconvex Imaging Problems&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.10223v1-pnp-ipa-a-provably-convergent-plug-and-play-inexact-proximal-algorithm-for-nonconvex-imaging-problems&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;即插即用去噪算法用于成像逆问题&quot;}">PnP-IPA: A Provably Convergent Plug-and-Play Inexact Proximal Algorithm for Nonconvex Imaging Problems</a>
