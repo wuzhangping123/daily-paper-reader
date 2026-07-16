@@ -6,24 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-15
-- 运行时间：2026-07-15 21:30:50 UTC
+- 最新运行日期：2026-07-16
+- 运行时间：2026-07-16 21:17:47 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：0
+- 本次总论文数：2
+- 精读区：1
 - 速读区：1
 
 ### 今日简报（AI）
-今日速读1篇多光谱图像地形识别论文，总体质量中等。该研究通过差分分析多光谱遥感图像提升地形分类精度，适合对遥感或地理信息感兴趣的读者。建议后续可关注该领域更高分论文或具体应用案例，以深化理解。
-- 详情：[/202607/15/README](/202607/15/README)
+今日精读一篇高分张量系统噪声解法，速读一篇图像去雾不确定性学习。推荐重点关注《A Spectrally Damped Tensor Randomized Kaczmarz Method for Doubly Noisy Tensor Systems》中提出的双噪声张量高效迭代方法。下一步可深入理解该方法的谱阻尼机制，并尝试将其迁移至其他张量补全或去噪任务。
+- 详情：[/202607/16/README](/202607/16/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [A Spectrally Damped Tensor Randomized Kaczmarz Method for Doubly Noisy Tensor Systems](/202607/16/2607.13552v1-a-spectrally-damped-tensor-randomized-kaczmarz-method-for-doubly-noisy-tensor-systems)  
+   标签：评分：8.0/10、query:hsi-denoise
+   evidence：谱阻尼张量随机Kaczmarz方法用于含噪张量系统，与高维张量数据恢复相关
 
 ### 速读区论文标签
-1. [Differential Analysis of Multispectral Images for Terrain Identification](/202607/15/2607.09319v1-differential-analysis-of-multispectral-images-for-terrain-identification)  
+1. [Backbone-Agnostic Perturbation-Induced Uncertainty Learning for End-to-End Real-World Image Dehazing](/202607/16/2607.11623v1-backbone-agnostic-perturbation-induced-uncertainty-learning-for-end-to-end-real-world-image-dehazing)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：多光谱框架使用波段比率实现光照不变的噪声鲁棒性
+   evidence：不确定性学习用于图像复原，可迁移至高光谱去噪
 
 
 <div class="dpr-home-promo-card">

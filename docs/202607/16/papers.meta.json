@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-16",
+  "date": "2026-07-16",
+  "generated_at": "2026-07-16T21:17:52",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/16/2607.13552v1-a-spectrally-damped-tensor-randomized-kaczmarz-method-for-doubly-noisy-tensor-systems",
+      "section": "deep",
+      "title_en": "A Spectrally Damped Tensor Randomized Kaczmarz Method for Doubly Noisy Tensor Systems",
+      "authors": "Nahyun Lee, Jiyoung Choi",
+      "date": "2026-07-15",
+      "pdf": "https://arxiv.org/pdf/2607.13552v1",
+      "score": "8.0",
+      "evidence": "谱阻尼张量随机Kaczmarz方法用于含噪张量系统，与高维张量数据恢复相关",
+      "tldr": "针对张量线性系统在双噪声扰动下求解不稳定的问题，本文提出谱阻尼张量随机Kaczmarz方法。通过傅里叶域频率依赖的阻尼参数抑制噪声放大，理论证明了误差递推分离传播与注入。数值实验表明该方法在噪声和病态条件下比标准TRK更稳定，并用于图像重建展示了实用性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Tensor randomized Kaczmarz (TRK) methods are efficient row-action solvers for tensor linear systems under the t-product framework. We study their behavior under a doubly noisy perturbation model. In this model, both the system tensor and the right-hand side tensor are corrupted. We first analyze standard TRK and derive an expected error recursion with two terms. One term is contractive, and the other is a persistent perturbation term. This explains the noise-limited and semi-convergent behavior that can occur when the observed tensor system is inconsistent. We then introduce a spectrally damped tensor randomized Kaczmarz method (SD-TRK). We prove an expected error recursion for SD-TRK that separates error propagation from noise injection. The bound makes explicit a speed-robustness trade-off. We also give an FFT-based implementation that applies the damped update slice-wise in the Fourier domain. This implementation allows frequency-dependent damping parameters in practice. Numerical experiments on synthetic tensor systems illustrate the stabilization behavior of SD-TRK relative to standard TRK in noisy and ill-conditioned settings. We also include a two-pass image reconstruction comparison under the same noisy reconstruction pipeline.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/16/2607.11623v1-backbone-agnostic-perturbation-induced-uncertainty-learning-for-end-to-end-real-world-image-dehazing",
+      "section": "quick",
+      "title_en": "Backbone-Agnostic Perturbation-Induced Uncertainty Learning for End-to-End Real-World Image Dehazing",
+      "authors": "Bingcai Wei",
+      "date": "2026-07-13",
+      "pdf": "https://arxiv.org/pdf/2607.11623v1",
+      "score": "6.0",
+      "evidence": "不确定性学习用于图像复原，可迁移至高光谱去噪",
+      "tldr": "真实世界图像去雾面临空间非均匀、光照依赖和物理模糊等挑战，现有端到端网络通常将去雾视为确定性映射，忽略了退化特征、雾先验和跨域负样本中的不确定性。提出骨干无关的扰动诱导不确定性学习框架（BPUL），包含可学习扰动不确定性调制器（LPUM）估计通道和空间特征敏感性，以及先验信息不确定性引导重建模块（PURM）利用透射率和大气光先验实现退化一致性约束。同时提出双空间域多样化分布感知对比损失（D^3CL）在干净恢复和雾重建空间进行正则化。在五个真实成对基准上，BPUL显著提升多种骨干网络性能，且推理时仅保留LPUM，几乎不增加额外计算开销。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Real-world paired image dehazing remains challenging because haze degradation is spatially non-uniform, illumination-dependent, and physically ambiguous even when haze-free references are available. Existing end-to-end restoration networks usually formulate dehazing as a deterministic mapping from a hazy observation to a clean target, leaving the uncertainty hidden in degraded features, haze priors, and cross-domain negative samples insufficiently explored. In this paper, we propose Backbone-Agnostic Perturbation-Induced Uncertainty Learning (BPUL), a plug-and-play uncertainty learning framework for end-to-end real-world image dehazing. BPUL first introduces a Learnable Perturbation-induced Uncertainty Modulator (LPUM) that estimates channel-wise and spatial-wise feature sensitivity through reparameterized stochastic perturbations. It then develops a Prior-informed Uncertainty-guided Reconstruction Module (PURM), which exploits transmission and atmospheric-light priors to reconstruct the hazy observation from the restored result and enforce degradation consistency. Furthermore, we propose a Dual-space Domain-diversified Distribution-aware Contrastive Loss ($D^3$CL) to regularize both clean restoration and hazy reconstruction spaces with real-world and synthetic negatives. Experiments on five real-world paired benchmarks show that BPUL consistently improves multiple representative backbones. Since only LPUM is retained during inference while PURM and $D^3$CL are used as training-time constraints, BPUL brings substantial restoration gains with only marginal additional inference overhead.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

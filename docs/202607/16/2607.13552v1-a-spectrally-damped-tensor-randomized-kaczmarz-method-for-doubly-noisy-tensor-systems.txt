@@ -1,0 +1,3989 @@
+Title: A Spectrally Damped Tensor Randomized Kaczmarz Method for Doubly Noisy Tensor Systems
+
+URL Source: https://arxiv.org/pdf/2607.13552v1
+
+Published Time: Thu, 16 Jul 2026 00:42:30 GMT
+
+Number of Pages: 37
+
+Markdown Content:
+A SPECTRALLY DAMPED TENSOR RANDOMIZED KACZMARZ METHOD FOR DOUBLY NOISY TENSOR SYSTEMS 
+
+NAHYUN LEE ∗ AND JIYOUNG CHOI ∗
+
+Abstract. Tensor randomized Kaczmarz (TRK) methods are efficient row-action solvers for tensor linear systems under the t-product framework. We study their behavior under a doubly noisy perturbation model. In this model, both the system tensor and the right-hand side tensor are corrupted. We first analyze standard TRK and derive an expected error recursion with two terms. One term is contractive, and the other is a persistent perturbation term. This explains the noise-limited and semi-convergent behavior that can occur when the observed tensor system is inconsistent. We then introduce a spectrally damped tensor randomized Kaczmarz method (SD-TRK). We prove an ex-pected error recursion for SD-TRK that separates error propagation from noise injection. The bound makes explicit a speed–robustness trade-off. We also give an FFT-based implementation that applies the damped update slice-wise in the Fourier domain. This implementation allows frequency-dependent damping parameters in practice. Numerical experiments on synthetic tensor systems illustrate the stabilization behavior of SD-TRK relative to standard TRK in noisy and ill-conditioned settings. We also include a two-pass image reconstruction comparison under the same noisy reconstruction pipeline. 
+
+1. Introduction 
+
+The Kaczmarz method [10] is a classical row-action method for solving linear systems. Its randomized version has been widely studied as an iterative solver for large-scale overdetermined systems. Each iteration uses only one row of the sys-tem, and the method has an expected linear convergence guarantee in the consis-tent setting [19]. This idea has led to many randomized projection methods for linear systems and least-squares problems, including noisy variants, randomized extended Kaczmarz methods for least-squares problems, and general sketch-and-project frameworks [7, 16, 22]. Noise changes the behavior of randomized Kaczmarz methods. Instead of con-verging exactly to the noiseless solution, the iterates may approach a noise-dependent error neighborhood or exhibit semi-convergence [16]. Doubly noisy matrix systems have also been analyzed recently [1]. In such systems, both the coefficient matrix and the right-hand side are perturbed. This model is relevant when the operator is built from uncertain measurements or approximate physical models. Many modern data sets and inverse problems are tensor-valued rather than matrix-valued. Examples include color images, videos, multi-channel measurements, and other multidimensional arrays [5, 14, 18]. Tensor methods can preserve multi-way structure that may be lost under naive matricization. In this paper, we study 
+
+> *
+
+All authors contributed equally.  
+
+> 1arXiv:2607.13552v1 [math.NA] 15 Jul 2026 2NAHYUN LEE AND JIYOUNG CHOI
+
+third-order tensor linear systems under the tensor t-product framework. The t-product was introduced by Kilmer and Martin [13]. It was further developed in [11, 12]. This framework gives a matrix-mimetic algebra for third-order tensors through block-circulant representations and Fourier-domain slice-wise multiplica-tion. Ma and Molitor used this framework to introduce the tensor randomized Kaczmarz method (TRK) and proved expected linear convergence for consistent tensor linear systems [15]. Recent work has also developed randomized Kaczmarz methods for t-product tensor systems with factorized operators [2]. The existing TRK theory primarily addresses consistent tensor systems. In prac-tical applications, both the system tensor and the observation tensor may be cor-rupted. The observed tensor system is then generally inconsistent and need not have the noiseless target as an exact solution. Consequently, the standard TRK iteration is no longer governed by the purely contractive mechanism that appears in the noiseless theory. In this paper we formalize this doubly noisy model in Sub-section 3.2. We then analyze the resulting error recursion for standard TRK and introduce a damped variant designed to reduce perturbation amplification. Our stabilization strategy combines relaxation with spectral damping. Relax-ation parameters have long been used in Kaczmarz-type methods for inconsis-tent systems [3, 17]. Tikhonov-type regularization and spectral filtering are stan-dard tools for suppressing noise amplification in ill-conditioned inverse problems [4, 8, 9, 20]. Motivated by these ideas, we introduce a spectrally damped tensor randomized Kaczmarz method (SD-TRK). The method replaces the inverse nor-malization term in the TRK update by a regularized inverse and also includes a relaxation parameter. In the Fourier-domain implementation, damping can be cho-sen slice-wise. This allows different frequency components to be stabilized with different strengths according to their local conditioning. The main contributions of this paper are as follows. 
+
+• We analyze standard TRK under a doubly noisy tensor model. In particu-lar, we derive an expected error recursion showing that the standard TRK error consists of a contractive term and a persistent perturbation term. The perturbation term is amplified by a frequency-imbalance constant that reflects how the observed row slices behave across Fourier modes. 
+
+• We introduce the spectrally damped TRK method for doubly noisy tensor systems. The proposed update incorporates both a relaxation parameter ω
+
+and a damping parameter λ, and it reduces to standard TRK when ω = 1 and λ = 0. 
+
+• We prove an expected error recursion for SD-TRK. The resulting bound sep-arates the propagation of the previous error from the perturbation injected by the doubly noisy model, thereby making explicit the speed–robustness trade-off controlled by ω and λ.
+
+• We provide an FFT-based implementation of SD-TRK. The implemen-tation avoids forming the block-circulant matrix explicitly and applies the damped update slice-wise in the Fourier domain, where frequency-dependent damping parameters λ(k) can be used in practice. 
+
+• We also include a noise-scaling comparison with a damped reference horizon and a two-pass image reconstruction comparison between standard TRK and SD-TRK under the same reconstruction procedure. SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 3
+
+The remainder of the paper is organized as follows. Section 2 reviews the ma-trix randomized Kaczmarz method, the tensor t-product, and the standard TRK method. Section 3 analyzes the behavior of standard TRK in noiseless and doubly noisy tensor systems. Section 4 introduces SD-TRK and establishes its expected er-ror recursion. Section 5 presents numerical experiments, including synthetic tensor systems and an image reconstruction comparison. Section 6 concludes the paper. 2. Preliminaries 
+
+Notation. Throughout this paper, scalars and vectors are denoted by lowercase letters (e.g., a), matrices by capital letters (e.g., A), and third-order tensors by calligraphic capital letters (e.g., A). The set of integers {1, 2, . . . , m } is denoted by [m]. For a matrix A, we denote its i-th row by Ai:. For a vector a, the Euclidean norm is denoted by ∥a∥ or ∥a∥2, and the standard inner product is denoted by 
+
+⟨· , ·⟩ . For a matrix A, ∥A∥2 denotes the spectral norm. The conjugate transpose is denoted by the superscript asterisk (e.g., A∗). For a matrix A, σmin (A) denotes its smallest singular value and σmax (A) denotes its largest singular value. For a third-order tensor A, Ai:: denotes the i-th horizontal slice (row slice), and A:: k denotes the k-th frontal slice. The Frobenius norm of a tensor A is denoted by ∥A∥ F and calculated as 
+
+∥A∥ F =
+
+sX
+
+> i,j,k
+
+|A ijk |2.
+
+We write fft( ·, [ ] , 3) for the one-dimensional discrete Fourier transform applied to every tube fiber along the third dimension, with transform length n3; this notation specifies the transform direction and is independent of the implementation language. For a tensor A ∈ Cn1×n2×n3 , we write ˆA := fft( A, [ ] , 3) .
+
+The inverse transform is denoted by ifft( ·, [ ] , 3). The k-th frontal slice of ˆA is denoted by ˆA(k), and the i-th row of this slice by ˆA(k) 
+
+> i:
+
+. Thus, for the observed tensor ˜A,ˆ˜A(k) 
+
+> i:
+
+denotes the i-th row of the k-th frontal slice of ˆ˜A. Fourier-domain quantities are generally complex-valued, even when the original tensors are real-valued. 2.1. Matrix randomized Kaczmarz (MRK). The classical matrix randomized Kaczmarz method (MRK) for solving a linear system Ax = b iteratively projects the current iterate onto the hyperplane defined by a single row of the system. At each iteration t, a row index it is selected with probability proportional to ∥Ait:∥2,and the update is given by [19]: 
+
+xt+1 = xt − A∗
+
+> it:
+
+⟨Ait:, x t⟩ − bit
+
+∥Ait:∥2 ,
+
+where A∗ 
+
+> it:
+
+denotes the conjugate transpose of the selected row. This row-wise struc-ture makes the method well suited for large-scale problems, since each update uses only the selected row and does not require forming dense matrix factorizations. 2.2. Tensor linear algebra. Tensors appear in a wide range of applications, and manipulating them in their native form, rather than simply reshaping them into matrices, can retain important structural information and often yield computational benefits. However, many core notions and results from classical linear algebra do not extend to tensors in a straightforward way. 4 NAHYUN LEE AND JIYOUNG CHOI 
+
+To overcome this difficulty, we focus on tensor linear systems formulated under the tensor t-product. The t-product, introduced by Kilmer and Martin [13], is a bilinear tensor operation that carries many familiar matrix-algebra concepts and properties into the tensor setting. Notably, it provides a natural notion of orthogo-nality for tensors, which plays a central role in the analysis of the tensor randomized Kaczmarz (TRK) method. To define the t-product, we first introduce a preliminary definition. 
+
+Definition 2.1. For A ∈ Cn1×n2×n3 , let bcirc( A) denote the block-circulant matrix 
+
+bcirc( A) = 
+
+
+
+A(1) A(n3) A(n3−1) · · · A(2) 
+
+A(2) A(1) A(n3) · · · A(3) 
+
+... ... ... . . . ...
+
+A(n3) A(n3−1) A(n3−2) · · · A(1) 
+
+ ∈ Cn1n3×n2n3 ,
+
+where A(i) = A:: i for i = 1 , . . . , n 3.
+
+To express the tensor operation induced by bcirc( A) using standard matrix mul-tiplication, we reshape a third-order tensor into a block column matrix by stacking its frontal slices. This is done via the unfold operator, whose inverse is fold: unfold( A) = 
+
+
+
+A::1 
+
+...
+
+A:: n3
+
+ , fold(unfold( A)) = A.
+
+Definition 2.2. For given tensors A ∈ Cn1×n2×n3 and B ∈ Cn2×n4×n3 , the t-product AB is defined as 
+
+AB = fold(bcirc( A) unfold( B)) ∈ Cn1×n4×n3 .
+
+The block-circulant and unfolding representations above are useful for theoretical analysis because they express the t-product using standard matrix multiplication. In implementation, however, we do not explicitly construct these large matrices. Instead, we compute the t-product in the Fourier domain using the Fast Fourier Transform (FFT). This preserves the native tensor structure and reduces the com-putational cost. Further details are given in Appendix A. To introduce TRK in Subsection 2.3, we need a few further definitions in addition to those given above. 
+
+Definition 2.3. The n × n × n3 identity tensor is the tensor whose first frontal slice is the n × n identity matrix and whose remaining entries are all zeros, and we denote it by I.
+
+Definition 2.4. The conjugate transpose of a tensor A ∈ Cn1×n2×n3 is denoted by A∗ and is produced by taking the conjugate transpose of all frontal slices and reversing the order of the frontal slices 2, . . . , n 3.
+
+For computing orthogonal projections and least-squares solutions, the conjugate transpose plays a central role. It is defined so that ( AB )∗ = B∗A∗ holds. With the identity tensor defined, we can now rigorously define invertibility under the 
+
+t-product. 
+
+Definition 2.5. A tensor A is invertible if there exists an inverse tensor A−1 such that 
+
+AA −1 = A−1A = I.SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 5
+
+Orthogonality is crucial for the convergence analysis of Kaczmarz methods, since the algorithm can be viewed as performing successive orthogonal projections onto solution spaces. 
+
+Definition 2.6. A tensor Q ∈ Cn1×n1×n3 is orthogonal if 
+
+QQ ∗ = Q∗Q = I.
+
+2.3. Tensor randomized Kaczmarz (TRK). Ma and Molitor [15] introduced a Kaczmarz-type iterative method for solving t-product tensor linear systems 
+
+AX = B,
+
+where A ∈ Cn1×n2×n3 , X ∈ Cn2×n4×n3 , and B ∈ Cn1×n4×n3 . The TRK update for the tensor linear system is (2.1) X t+1 = X t − A ∗
+
+> it::
+
+(Ait:: A∗
+
+> it::
+
+)−1(Ait:: X t − B it:: ),
+
+where the index it ∈ [n1] is selected according to a probability distribution on the row indices at each iteration t.To ensure that the TRK update and the corresponding tensor projection opera-tors discussed later are rigorously well-defined throughout this paper, we make the following fundamental assumption. 
+
+Assumption 2.7. Whenever a row slice Ri:: is used in a TRK-type update, the associated normalization tensor 
+
+Ri:: R∗
+
+> i::
+
+is assumed to be invertible. 
+
+Here, R denotes the tensor that appears in the update, namely the system tensor in the noiseless setting and the observed tensor in the doubly noisy setting. The TRK update (2.1) can be viewed as a direct algebraic generalization of the classical MRK method. While MRK projects the iterate onto a hyperplane defined by a row vector, TRK projects the iterate onto a tensor subspace defined by a horizontal slice. A key distinction lies in the normalization step. Scalar division in MRK is replaced by the inversion of a tube in TRK. Table 1 summarizes this structural correspondence. 
+
+Table 1. Structural Correspondence between Matrix and Tensor Kaczmarz Component MRK TRK Input Data Row vector Ait: ∈ C1×n2 Row slice Ait:: ∈ C1×n2×n3
+
+Operation Inner product ⟨Ait:, x t⟩ t-product Ait:: X t
+
+Residual ⟨Ait:, x t⟩ − bit Ait:: X t − B it:: 
+
+Normalization Scalar division 1 /∥Ait:∥22 Tube inverse ( Ait:: A∗
+
+> it::
+
+)−1
+
+Update Direction A∗ 
+
+> it:
+
+A∗
+
+> it::
+
+The following section recalls the noiseless convergence guarantee for standard TRK and then analyzes how the error recursion changes under the doubly noisy model formalized in Subsection 3.2. 6 NAHYUN LEE AND JIYOUNG CHOI 
+
+3. Error Analysis of TRK 
+
+In this section, we analyze the error behavior of TRK in the noiseless and doubly noisy settings. 3.1. Standard TRK in the noiseless setting. The TRK method is an effec-tive solver for consistent tensor linear systems. Ma and Molitor [15] showed that the TRK algorithm converges linearly in expectation for a consistent tensor linear system as follows. 
+
+Theorem 3.1 (Convergence of standard TRK [15]) . Consider the consistent tensor linear system AX = B. Let X ⋆ be the exact solution and X t be the t-th iterate of the TRK algorithm. If each row slice index it ∈ [n1] is selected with probability 
+
+pit = ∥A it:: ∥2
+
+> F
+> ∥A∥ 2
+> F
+
+, then the expected error satisfies: 
+
+(3.1) E[∥X t+1 − X ⋆∥2 
+
+> F
+
+] ≤
+
+
+
+1 − σ2min (bcirc( A)) 
+
+n3∥A∥ 2
+
+> F
+
+
+
+E[∥X t − X ⋆∥2 
+
+> F
+
+].
+
+Theorem 3.1 provides the theoretical guarantee for the convergence of standard TRK in the absence of perturbations. Note that 
+
+σ2min (bcirc( A)) ≤ ∥ bcirc( A)∥2 
+
+> F
+
+= n3∥A∥ 2 
+
+> F
+
+,
+
+so the contraction factor in (3.1) is nonnegative. If bcirc( A) has full column rank, then σmin (bcirc( A)) > 0, so the contraction factor is strictly smaller than one. In this case, the expected error converges to zero as t → ∞ in the consistent noiseless setting. This behavior is illustrated in Subsubsection 5.1.1. 3.2. Standard TRK under the doubly noisy model. We now formalize the doubly noisy tensor model described in the Introduction. Let A and B be the noiseless tensors satisfying (3.2) AX ⋆ = B,
+
+so that the underlying tensor linear system is consistent. The observed tensors are (3.3) ˜A = A + EA, ˜B = B + EB ,
+
+where EA and EB denote the perturbation tensors. The corresponding observed system is (3.4) ˜AX = ˜B.
+
+This system is not necessarily consistent and need not have X ⋆ as an exact solution. To analyze standard TRK under (3.3), we study the error tensor 
+
+Et := X t − X ⋆.
+
+This lets us separate projection-induced contraction from noise injection at each iteration. Throughout the analysis below, E[·] denotes expectation with respect to the randomized row selection. Under Assumption 2.7 for the observed tensor ˜A,the projection operator is well-defined. The error update then admits the following orthogonal decomposition. 
+
+Lemma 3.2. Assume that Assumption 2.7 holds for the observed tensor ˜A. Let 
+
+˜Pit = ˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1 ˜Ait:: be the orthogonal projection operator onto the tensor SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 7
+
+subspace associated with the it-th row slice of the observed tensor ˜A. The error update of the TRK algorithm satisfies the following orthogonal decomposition: 
+
+∥E t+1 ∥2 
+
+> F
+
+= ∥(I − ˜Pit )Et∥2
+
+> F
+
++ ˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1 (( EA)it:: X ⋆ − (EB )it:: ) 2
+
+> F
+
+.
+
+Lemma 3.2 is proved in Appendix B. Lemma 3.2 reveals the one-step structure of the error in the doubly noisy setting. The updated error decomposes orthogonally into two components. One is the contracted previous error, and the other is a newly injected noise term. As a result, the squared error is the exact sum of these two contributions. This decomposition identifies the basic mechanism by which persistent perturbations can limit the attainable accuracy of standard TRK. Building upon the orthogonal decomposition established in Lemma 3.2, our next goal is to quantify the expected one-step behavior of the error. By taking the ex-pectation over the randomized row selection, the following theorem provides an upper bound on the expected error at the next iteration. The resulting recursion reflects the competition between the contraction of the previous error and the per-sistent perturbation term, while also accounting for the frequency imbalance of the observed row slices. 
+
+Theorem 3.3. Let ˜Pit = ˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1 ˜Ait:: be the orthogonal projection op-erator onto the tensor subspace associated with the it-th row slice of the observed tensor ˜A. Assume that Assumption 2.7 holds for the observed tensor ˜A, and that the block-circulant matrix bcirc( ˜A) has full column rank. Let 
+
+(3.5) I+ := 
+
+n
+
+i ∈ [n1] : ∥ ˜Ai:: ∥F > 0
+
+o
+
+.
+
+For each i ∈ I +, define 
+
+γi =max 
+
+> 1≤ℓ≤n3
+
+∥ ˆ˜A(ℓ) 
+
+> i:
+
+∥2
+
+> F
+
+min 
+
+> 1≤ℓ≤n3
+
+∥ ˆ˜A(ℓ) 
+
+> i:
+
+∥2
+
+> F
+
+, γ = max 
+
+> i∈I +
+
+γi.
+
+Here, we use the Fourier-domain notation introduced in Section 2. Since Assump-tion 2.7 ensures that every row slice sampled with positive probability has nonzero Fourier row norm in every frequency, γi is well-defined, and γ ≥ 1 measures the maximum frequency imbalance across the Fourier slices of the observed row tensors that can be sampled with positive probability. If it is sampled independently at each iteration t according to the distribution pi = ∥ ˜Ai:: ∥2 
+
+> F
+
+/∥ ˜A∥ 2 
+
+> F
+
+for i ∈ [n1], then the expected error of the TRK algorithm under the doubly noisy model satisfies 
+
+E ∥E t+1 ∥2
+
+> F
+
+ ≤ 1 − σ2min (bcirc( ˜A)) 
+
+n3∥ ˜A∥ 2
+
+> F
+
+!
+
+E ∥E t∥2
+
+> F
+
+ + γ∥E AX ⋆ − E B ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+.
+
+Theorem 3.3 is proved in Appendix C. This result shows that the expected TRK error is no longer governed by a purely contractive recursion under the doubly noisy model. Instead, each iteration combines a contraction term controlled by the tensor scaling n3∥ ˜A∥ 2 
+
+> F
+
+and a persistent additive perturbation term, which is amplified by the frequency imbalance constant γ. In the noiseless limit EA = EB = 0, the recursion reduces exactly to the standard TRK rate in Theorem 3.1. This observation motivates introducing the spectrally damped TRK method. 8 NAHYUN LEE AND JIYOUNG CHOI 
+
+4. Spectrally Damped TRK (SD-TRK) 
+
+In Section 3, we showed that standard TRK (2.1) does not necessarily converge to the exact solution under the doubly noisy model. To address this limitation, we introduce a spectrally damped TRK method for doubly noisy tensor systems. The analysis below is stated for fixed perturbation tensors, while the numerical experiments use Gaussian perturbations. To address the instability inherent in the doubly noisy setting, we incorporate both a relaxation parameter and spectral damping to enhance stability. A relaxation parameter controls the step size of each update. In noisy or inconsistent settings, smaller values are often used to obtain more stable iterations [3, 17]. Furthermore, perturbations in the system tensor ˜A can make the row-slice nor-malization term ˜Ait:: ˜A∗ 
+
+> it::
+
+in the standard TRK update (2.1) poorly scaled. In par-ticular, small row-slice normalization values can lead to large reciprocal factors in its inverse, which may amplify perturbations in the update (2.1). Therefore, we ap-ply a Tikhonov-type regularization to the inverse normalization term [8, 20]. This replaces the inverse normalization factor with (4.1) 
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1
+
+,
+
+where λ ≥ 0 is the damping parameter. This regularized inverse damps the effect of small normalization values rather than inverting them without regularization. In the Fourier domain, this regularization can be interpreted as a form of spectral damping, since it reduces the influence of ill-conditioned frequency components [4, 9]. This viewpoint also motivates the slice-dependent implementation used later: different Fourier slices can have different conditioning, so a single global damping level may not reflect the local scale of every spectral component. By incorporating a relaxation parameter and spectral damping into the standard TRK iteration (2.1), we propose the Spectrally Damped TRK (SD-TRK) update as follows. (4.2) X t+1 = X t − ω ˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1  ˜Ait:: X t − ˜Bit:: 
+
+
+
+,
+
+where ω ∈ (0 , 2) is the relaxation parameter controlling the step size and λ ≥ 0is the damping parameter that regularizes the inverse normalization term. When 
+
+ω = 1 and λ = 0, the update reduces to the standard TRK iteration (2.1). Thus, SD-TRK can be viewed as a generalization of the standard TRK method. The role of the damping parameter λ is more explicit in the implementation. Since the t-product is evaluated by applying the FFT along the third dimension, the SD-TRK update (4.2) is computed slice by slice in the Fourier domain. Recall that ˆ˜A(k) denotes the k-th Fourier frontal slice of ˜A, and ˆ˜A(k) 
+
+> it:
+
+denotes its it-th row. For this row, the inverse factor in the k-th slice is 
+
+ ˆ˜A(k)
+
+> it:
+
+ˆ˜A(k)∗ 
+
+> it:
+
++ λI 
+
+−1
+
+.
+
+The addition of λI prevents small row-slice energies ∥ ˆ˜A(k) 
+
+> it:
+
+∥2 
+
+> F
+
+from producing large reciprocal factors. Thus, the damping step is analogous to Tikhonov-type regular-ization within the t-product framework [13, 20], and it makes the row update less sensitive to weakly scaled Fourier row slices. SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 9
+
+4.1. Error analysis. We now derive the error analysis for SD-TRK under the doubly noisy model (3.4). Recall that the error tensor is defined by 
+
+Et := X t − X ⋆,
+
+where X ⋆ is the exact solution of the noiseless system (3.2). 
+
+Lemma 4.1. If λ = 0 , assume that Assumption 2.7 holds for the observed tensor 
+
+˜A. Let 
+
+(4.3) ˜Qλit := ˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1 ˜Ait:: ,
+
+where it ∈ [n1] is the index of the horizontal slice selected at iteration t, and λ ≥ 0
+
+is the damping parameter. Then the SD-TRK error satisfies 
+
+Et+1 = ( I − ω ˜Qλit )Et − ω ˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1
+
+Nit ,
+
+where 
+
+Nit = ( EA)it:: X ⋆ − (EB )it:: .
+
+Proof. By substituting X t = Et +X ⋆ into the residual and using Ait:: X ⋆ −B it:: = 0, the same computation as in the proof of Lemma 3.2 gives ˜Ait:: X t − ˜Bit:: = ˜Ait:: Et + Nit , Nit = ( EA)it:: X ⋆ − (EB )it:: .
+
+Substituting this into the SD-TRK update rule (4.2) and using X t = Et +X ⋆ again, we obtain 
+
+Et+1 = Et − ω ˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1  ˜Ait:: Et + Nit
+
+
+
+,
+
+which is the claimed identity. □
+
+Lemma 4.1 shows that the SD-TRK error consists of a regularized error reduc-tion term and a noise-dependent perturbation term. When λ > 0, unlike standard TRK (2.1), the operator ˜Qλit is no longer an exact orthogonal projector, since the regularization modifies the projection step. By replacing 
+
+ ˜Ait:: ˜A∗
+
+> it::
+
+−1
+
+with 
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1
+
+,
+
+the update (4.2) becomes less sensitive to weakly scaled row-slice normalization values associated with the selected row slice ˜Ait:: . We next derive an expected re-cursion that captures the trade-off between error reduction and noise perturbation. 
+
+Theorem 4.2. Assume that Assumption 2.7 holds for the observed tensor ˜A, and that the block-circulant matrix bcirc( ˜A) has full column rank. Let ω ∈ (0 , 2) , λ ≥ 0,and suppose that it is sampled independently according to 
+
+(4.4) pi = ∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+, i ∈ [n1].
+
+For any α > 0, the expected SD-TRK error satisfies 
+
+(4.5) E∥E t+1 ∥2
+
+> F
+
+ ≤ ρα(ω, λ ) E∥E t∥2
+
+> F
+
+ + ηα(ω, λ ) ∥E AX ⋆ − E B ∥2 
+
+> F
+
+,
+
+where 
+
+p := min   
+
+> i∈[n1]: pi>0
+
+pi,10 NAHYUN LEE AND JIYOUNG CHOI 
+
+ρα(ω, λ ) := (1 + α) 1 − p (2 ω − ω2)σ2min (bcirc( ˜A)) 
+
+σ2max (bcirc( ˜A)) + λ
+
+!
+
+,
+
+and 
+
+ηα(ω, λ ) := 
+
+
+
+1 + 1
+
+α
+
+
+
+η(ω, λ ),
+
+where 
+
+(4.6) η(ω, λ ) := n3 ω2 max 
+
+> i∈I +
+
+˜A∗
+
+> i::
+
+( ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI)−1 2
+
+> F
+
+for I+ defined as in (3.5) .
+
+Theorem 4.2 is proved in Appendix D. The recursion (4.5) separates the expected error into a contraction-type term and a persistent perturbation term. If ρα(ω, λ ) <
+
+1, it gives contraction up to a noise-dependent error floor. If this condition fails, the bound still describes the effect of damping and relaxation, but it does not by itself imply decay or identify the limiting point of the iterates. The factor ρα(ω, λ ) controls error propagation, whereas ηα(ω, λ ) controls noise injection. Underrelaxation and stronger damping can reduce noise amplification at the cost of a weaker contraction bound. Hence the theorem captures a speed– robustness trade-off. The parameter α comes from Young’s inequality and is not part of the algorithm. The dependence on p is a worst-case feature of the proof. If the row-sampling distribution is highly imbalanced, p may be very small, so the contraction factor can be pessimistic. The theorem should therefore be read as identifying the contraction– perturbation structure and the roles of ω and λ, rather than as a sharp predictor of the empirical convergence rate. Since the observed system (3.4) is generally inconsistent, we next compare the iterates with the least-squares solution of the observed system. We denote by (4.7) X LS := ˜A† ˜B
+
+the least-squares solution associated with the observed system (3.4), where ˜A†
+
+denotes the t-pseudoinverse of ˜A [13]. Equivalently, unfold( X LS ) = bcirc( ˜A)† unfold( ˜B).
+
+As a baseline motivated by the doubly noisy matrix Kaczmarz analysis in [1], we introduce the following matrix-inspired reference scale for interpreting the error relative to the least-squares solution: (4.8) HLS (t) := 
+
+
+
+1 − 1˜R
+
+t
+
+∥X 0 − X LS ∥2 
+
+> F
+
++ ∥E AX LS − E B ∥2
+
+> F
+
+σ2min (bcirc( ˜A)) .
+
+This quantity is used only as a comparison scale and should not be read as a convergence theorem for the slice-dependent Fourier-domain implementation in Al-gorithm 1. Here ˜R := ∥ bcirc( ˜A)†∥22∥ bcirc( ˜A)∥2 
+
+> F
+
+= n3∥ bcirc( ˜A)†∥22∥ ˜A∥ 2 
+
+> F
+
+.
+
+The reference scale (4.8) illustrates how small singular values of bcirc( ˜A) can affect a noisy Kaczmarz-type iteration in two ways. They can enlarge ˜R, thereby slowing the decay of the transient term, and they can also increase the perturbation-dependent error horizon through the factor σ−2min (bcirc( ˜A)). Thus, small singular SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 11 
+
+values can simultaneously slow convergence and amplify the asymptotic effect of noise. The SD-TRK update addresses this mechanism directly at the Fourier-slice level. In the k-th Fourier slice, the normalization factor is replaced by 
+
+ ˆ˜A(k)
+
+> it:
+
+ˆ˜A(k)∗ 
+
+> it:
+
++ λ(k)I
+
+−1
+
+,
+
+so the damping parameter λ(k) reduces the effect of directions associated with small row-slice energies. This spectral damping is not uniformly beneficial: increasing λ(k)
+
+may improve robustness to noisy ill-conditioned slices, but it can also slow the transient error decay. Thus, SD-TRK introduces a trade-off between asymptotic robustness and convergence speed. Theorem 4.2 provides a scalar-parameter error recursion, while the Fourier-slice discussion above gives an implementation-level interpretation of the corresponding damping mechanism. In Section 5, we empirically examine this stabilization behav-ior through multi-trial synthetic experiments, a noise-scaling comparison, and an image reconstruction example. 4.2. Implementation. In this subsection, we present the practical implementa-tion of SD-TRK. As discussed in Appendix A, the t-product is implemented in the Fourier domain by performing matrix multiplication on each frontal slice. Accord-ingly, the SD-TRK iteration is also implemented slice-wise in the Fourier domain. Here we follow the Fourier-domain notation introduced in Section 2 and Algo-rithm 2. Thus, even for real-valued input tensors, the Fourier-domain variables in Algorithm 1 are generally complex-valued, and ∗ denotes the conjugate transpose in the slice-wise updates. For the theoretical analysis in Subsection 4.1, we use a uniform scalar damping parameter λ in order to obtain a tractable global recursion. The practical algorithm applies the same damped update mechanism slice-wise in the Fourier domain and therefore allows a frequency-dependent family of damping parameters {λ(k)}n3
+
+> k=1
+
+.This slice-dependent scheme should be viewed as an implementation-level ex-tension motivated by the scalar-parameter theory. It is not a direct corollary of Theorem 4.2, whose formal recursion is stated for a single scalar damping parame-ter. In practice, allowing λ(k) to vary across slices provides additional flexibility in stabilizing ill-conditioned Fourier components. In the synthetic tensor experiments in Subsubsections 5.1.3–5.1.6, the slice-dependent damping parameters are chosen as (4.9) λ(k) = λfloor + λscale (δ2 
+
+> A
+
++ δ2 
+
+> B
+
+) ∥ ˆ˜A(k)∥2
+
+> F
+
+n1
+
+, k = 1 , . . . , n 3,
+
+where λfloor > 0 prevents degeneracy and λscale > 0 controls the overall damping strength. The scaling in (4.9) is intended to match the damping level to both the noise magnitude and the local Fourier-slice scale. The factor δ2 
+
+> A
+
++δ2 
+
+> B
+
+reflects the combined perturbation level in the operator and right-hand side. The quantity ∥ ˆ˜A(k)∥2 
+
+> F
+
+/n 1 is the average row-slice energy in the k-th Fourier slice, so the damping parameter has the same scale as the slice-wise normalization terms used in the update. The param-eter λscale is therefore a user-chosen global multiplier rather than an automatically 12 NAHYUN LEE AND JIYOUNG CHOI 
+
+selected optimal value. A systematic sensitivity analysis and adaptive selection rule are left for future work. When the perturbation levels δA and δB are not known in advance, they should be replaced by estimated noise scales or absorbed into the global multiplier λscale .Developing reliable data-driven estimators for these quantities is beyond the scope of this paper. In applications, this parameter should therefore be treated as a conservative stabilization knob rather than as an automatically tuned quantity. Larger values increase damping of weak spectral components, while smaller values keep the update closer to standard TRK. 
+
+Algorithm 1 Spectrally Damped Tensor Randomized Kaczmarz (SD-TRK) 
+
+Require: Observed noisy tensors ˜A ∈ Rn1×n2×n3 , ˜B ∈ Rn1×n4×n3 , initial iterate 
+
+X 0 ∈ Rn2×n4×n3 , maximum iteration count T , damping parameters {λ(k)}n3
+
+> k=1
+
+with λ(k) ≥ 0, relaxation parameter ω ∈ (0 , 2) 
+
+Ensure: Approximate solution X T 
+
+> 1:
+
+Compute Fourier transforms: ˆ˜A = fft( ˜A, [ ] , 3) , ˆ˜B = fft( ˜B, [ ] , 3) , ˆX 0 = fft( X 0, [ ] , 3)  
+
+> 2:
+
+for t = 0 , . . . , T − 1 do  
+
+> 3:
+
+Sample it ∈ [n1] with probability 
+
+pit = ∥ ˜Ait:: ∥2
+
+> F
+
+Pn1 
+
+> j=1
+
+∥ ˜Aj:: ∥2 
+
+> F
+> 4:
+
+for k = 1 , . . . , n 3 do  
+
+> 5:
+
+Update the k-th frequency slice: ˆXt+1 ,(k) = ˆXt, (k) − ω ˆ˜A(k)∗
+
+> it:
+
+ ˆ˜A(k)
+
+> it:
+
+ˆ˜A(k)∗ 
+
+> it:
+
++ λ(k)I
+
+−1  ˆ˜A(k) 
+
+> it:
+
+ˆXt, (k) − ˆ˜B(k)
+
+> it:
+
+ 
+
+> 6:
+
+end for  
+
+> 7:
+
+end for  
+
+> 8:
+
+Compute inverse Fourier transform: 
+
+X T = ifft( ˆX T , [ ] , 3)  
+
+> 9:
+
+return X T
+
+This frequency-dependent implementation allows the amount of damping to vary across spectral components according to their local conditioning and noise levels. In the following section, we present numerical experiments illustrating the effectiveness of this damping strategy under doubly noisy perturbations. 5. Numerical Experiments 
+
+This section presents numerical experiments related to the theoretical analysis and SD-TRK method. All numerical experiments were performed on a MacBook Pro equipped with an Apple M3 Pro chip (12-core CPU) and 18 GB of unified memory, operating on macOS. The experiments were implemented in Python 3.13.3 using Jupyter notebooks. The experiments are organized to address the following questions. First, Subsub-sections 5.1.1–5.1.2 illustrate the behavior of standard TRK in noiseless and doubly SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 13 
+
+noisy settings, showing the transition from linear convergence to semi-convergence. Second, Subsubsections 5.1.3–5.1.4 compare standard TRK and SD-TRK under well-conditioned and ill-conditioned noisy tensor systems, illustrating the stabiliz-ing behavior of the spectrally damped update. Third, Subsubsection 5.1.5 uses a controlled known-target setting to separate the effect of the update mechanism from stochastic sampling variability. Fourth, Subsubsection 5.1.6 compares the empirical stabilization behavior of SD-TRK with a damped reference horizon. Finally, Sub-section 5.2 uses a two-pass image reconstruction setting as a comparison between standard TRK and SD-TRK. Throughout the synthetic experiments, we report three related but distinct quan-tities. The true reconstruction error 
+
+∥X t − X ⋆∥F
+
+measures accuracy relative to the noiseless target and is available only in controlled synthetic experiments. The observed residual 
+
+∥ ˜AX t − ˜B∥ F
+
+is the quantity available in practical noisy systems. When a least-squares benchmark is used, we also report 
+
+∥X t − X LS ∥F , unfold( X LS ) = bcirc( ˜A)† unfold( ˜B).
+
+These quantities serve different purposes: the true error evaluates recovery accuracy, the residual evaluates consistency with the observed noisy system, and the least-squares error compares the iterate with the observed-system least-squares solution. Table 2 summarizes the main experimental settings used in the synthetic tensor experiments. All synthetic tensor experiments use dimensions ( n1, n 2, n 3, n 4) = (20 , 10 , 5, 5). The slice-dependent damping parameters in Subsubsections 5.1.3–5.1.6 are computed using (4.9) with λfloor = 10 −6, unless otherwise specified. 5.1. Synthetic tensor experiments. Throughout this subsection, we consider the synthetic tensor linear system (3.2). 5.1.1. Standard TRK in the Noiseless Setting. We begin with a noiseless consistent tensor linear system to illustrate the behavior of standard TRK. The tensors A
+
+and X ⋆ were generated independently from the standard Gaussian distribution, and B = AX ⋆. The initial iterate was set to the zero tensor, X 0 = 0, and the TRK iteration was run for 1000 steps. The error was measured by the Frobenius norm ∥X t − X ⋆∥F . Figure 1(a) shows this error on a semilogarithmic scale. The approximately linear decay confirms the expected linear convergence of standard TRK in the noiseless consistent setting, in agreement with Theorem 3.1. 5.1.2. Standard TRK in the Doubly Noisy Setting. We next consider the doubly noisy setting. The tensors A and B were perturbed according to ˜A = A + δAGA, ˜B = B + δB GB ,
+
+where the entries of GA and GB were sampled independently from the standard Gaussian distribution. Equivalently, in the notation of (3.3), EA = δAGA and EB =
+
+δB GB . We considered isotropic noise levels satisfying 
+
+δA = δB ∈ { 0, 10 −4, 10 −2},14 NAHYUN LEE AND JIYOUNG CHOI 
+
+Table 2. Summary of synthetic tensor experiment settings 
+
+Experiment Purpose Noise setting SD-TRK parameters Iterations, trials 5.1.1 Noiseless convergence of standard TRK none – 1000; 1 trial 5.1.2 Semi-convergence of standard TRK 
+
+δA = δB ∈{0, 10 −4, 10 −2} – 1000; 1 trial per noise level 5.1.3 Well-conditioned comparison 
+
+δA = 10 −3
+
+δB = 0 .5
+
+ω = 0 .9
+
+λscale = 5 .0 2000; 20 trials 5.1.4 Ill-conditioned comparison 
+
+δA = 0 .01 
+
+δB = 0 .5
+
+ω = 0 .7
+
+λscale = 100 .0 2000; 20 trials 5.1.5 Paired known-target comparison 
+
+δA = 0 .01 
+
+δB = 0 .5
+
+ω = 0 .8
+
+λscale = 50 .02000; 10 paired trials 5.1.6 Noise-scaling comparison 
+
+δA = δB = δδ ∈ { 0, 10 −3,
+
+5 · 10 −3, 10 −2,
+
+5 · 10 −2}
+
+ω = 0 .9
+
+λscale = 5 .0 1500; 10 trials 
+
+where δA = δB = 0 corresponds to the noiseless reference setting. The same noiseless tensors A and X ⋆ are used for all noise levels, and one run is performed per noise level. We then applied standard TRK to ˜AX = ˜B, again starting from the zero tensor, and measured the error by ∥X t −X ⋆∥F . Figure 1(b) shows the corresponding error trajectories on a semilogarithmic scale. While the noiseless case continues to decrease steadily, the noisy cases exhibit an initial decay followed by stabilization at nonzero error levels. This semi-convergence behavior indicates that standard TRK is sensitive to doubly noisy perturbations and no longer converges to the exact solution in this setting. The observed instability further motivates the introduction of stabilization mechanisms such as the proposed SD-TRK framework. 
+
+(a) Noiseless setting (b) Doubly noisy setting 
+
+Figure 1. Convergence of standard TRK SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 15 
+
+5.1.3. Well-Conditioned Doubly Noisy Comparison. We now consider a compara-tive experiment under a well-conditioned doubly noisy tensor system. To isolate the influence of data-driven perturbations, we adopt an asymmetric noise configu-ration with δA = 10 −3 and δB = 0 .5. This asymmetric choice is used to emphasize the effect of right-hand-side perturbations while keeping structural distortion of the system tensor relatively mild. In this way, the experiment focuses on the data-noise filtering behavior of the proposed algorithm independently of severe operator perturbations. The noiseless tensors A and X ⋆ are independently generated from the standard Gaussian distribution, and the Gaussian noise tensors GA and GB are generated independently. We then set ˜A = A + δAGA, ˜B = AX ⋆ + δB GB .
+
+Equivalently, in the notation of (3.3), EA = δAGA and EB = δB GB . Both algorithms are initialized from X 0 = 0 and executed for T = 2000 iterations. The SD-TRK method employs ω = 0 .9 and uses (4.9) with λscale = 5 .0 and λfloor = 10 −6. All reported curves are averaged over 20 independent Monte Carlo trials. Figure 2(a) and (b) present the averaged convergence trajectories of the standard TRK and SD-TRK methods, respectively.  
+
+> (a) Well-Conditioned Standard TRK (b) Well-Conditioned SD-TRK
+
+Figure 2. Comparison of standard TRK and SD-TRK under a well-conditioned doubly noisy setting. Under this well-conditioned setting, both methods exhibit stable iterative be-havior. The standard TRK iteration attains a final least-squares error of 0 .8755, a true reconstruction error ∥X t − X ⋆∥F of 1 .4214, and a residual of 11 .7462. In com-parison, SD-TRK yields lower values for all three metrics, with a final least-squares error of 0 .4017, a true reconstruction error of 1 .2020, and a residual of 8 .8521. Al-though the observation noise is substantial, the spectral slices of the system tensor remain reasonably well-conditioned, preventing strong amplification of the noise by ill-conditioned inverse steps. Although the quantitative improvement is relatively modest in this well-conditioned regime, SD-TRK consistently achieves lower reconstruction error and residual val-ues than standard TRK. Since the spectral slices do not exhibit severe ill-conditioning, the standard TRK method does not experience strong noise amplification and is therefore able to approximate the least-squares benchmark with reasonable accu-racy. 16 NAHYUN LEE AND JIYOUNG CHOI 
+
+A more significant distinction emerges in the relationship between the observable residual and the true reconstruction error. In practical applications, the ground-truth tensor X ⋆ is unavailable, and the residual ∥ ˜AX t − ˜B∥ F becomes the primary quantity available for monitoring convergence. For the standard TRK iteration shown in Figure 2(a), the observable residual rapidly decreases and reaches a nearly flat plateau after approximately 150–200 iterations. Since the residual is the only practically observable quantity in real-world applications, such behavior may incorrectly suggest that the reconstruction process has already converged. However, the true reconstruction error continues to decrease after the residual has nearly plateaued and remains noticeably separated from the residual trajectory. As a result, residual-based stopping criteria may be difficult to calibrate reliably in this noisy setting. In contrast, SD-TRK exhibits closer alignment between the residual trajectory and the stabilization of the true reconstruction error in Figure 2(b). Both quantities approach their plateau regions at approximately the same iteration stage. In this experiment, the observable residual is therefore a more informative diagnostic for SD-TRK than for standard TRK. 5.1.4. Ill-Conditioned Doubly Noisy Comparison. We next examine the behavior of SD-TRK under a severely ill-conditioned doubly noisy tensor system. This ex-periment examines the stability of the reconstruction process when the underlying tensor operator contains highly ill-conditioned spectral components, a setting in which inverse instability and noise amplification become particularly pronounced. To construct such a regime, we generate a Gaussian tensor and then multiply its 
+
+j-th lateral slice by a scale factor cj , where the factors c1, . . . , c n2 decay geometri-cally from 1 to 2 ×10 −2. This construction makes the smallest singular values of the Fourier-domain frontal slices ˆ˜A(k) small, thereby increasing the condition number of the tensor system. The ground-truth tensor X ⋆ is initialized as the zero tensor. Its first four first-mode slices are filled with independent standard Gaussian entries scaled by 0 .75, and all remaining first-mode slices are kept equal to zero. To isolate the instability caused by the inversion of near-singular spectral com-ponents, we consider a minor numerical perturbation ( δA = 0 .01) to the operator tensor, while a substantial observation noise ( δB = 0 .5) is injected into the right-hand side tensor. All remaining dimensional settings and iteration counts are kept identical to those used in Subsubsection 5.1.3 in order to preserve consistency across the experiments. For SD-TRK, a stronger damping configuration is adopted with re-laxation parameter ω = 0 .7 together with an increased damping scale λscale = 100 .0. The corresponding slice-dependent damping parameters are computed from (4.9) with λfloor = 10 −6.Figure 3 presents the empirical convergence trajectories of both methods, com-paring the true reconstruction error ∥X t −X ⋆∥F together with the observable resid-ual ∥ ˜AX t − ˜B∥ F .The empirical results reveal severe instability in the standard TRK framework under this ill-conditioned regime. As shown in Figure 3(a), the true reconstruction error of standard TRK initially decreases during the early iterations, but subse-quently reverses direction and eventually increases toward a large asymptotic error level of approximately 12 .1125. This characteristic V-shaped trajectory illustrates the classical phenomenon of semi-convergence. Because the standard TRK iteration does not incorporate any regularization mechanism, it attempts to satisfy the noisy SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 17  
+
+> (a) Standard TRK (b) SD-TRK
+
+Figure 3. Comparison of standard TRK and SD-TRK under an ill-conditioned doubly noisy setting. observation tensor ˜B through repeated inversion of severely ill-conditioned spec-tral components. In the presence of near-zero singular values, this process leads to substantial amplification of observation noise and significantly degrades the recon-struction accuracy. In contrast, SD-TRK is empirically more stable under the same ill-conditioned setting. The frequency-dependent damping parameters {λ(k)}n3 
+
+> k=1
+
+act as a spectral regularization mechanism, damping the amplification associated with near-zero sin-gular values across the Fourier-domain frontal slices. Consequently, as illustrated in Figure 3(b), the true reconstruction error of SD-TRK decreases nearly monotoni-cally and eventually stabilizes near an error floor of approximately 2 .1013. Thus, the final reconstruction error is approximately 5 .76 times smaller than that of standard TRK. The residual behavior also favors SD-TRK in this experiment. Even under se-vere ill-conditioning, the residual trajectory remains more closely aligned with the stabilization phase of the true reconstruction error and gradually approaches a sta-ble plateau after approximately 500 iterations. In this experiment, the observable residual is therefore more informative for SD-TRK than for standard TRK. These results are consistent with the stabilizing effect of SD-TRK in this ill-conditioned doubly noisy setting. 5.1.5. Controlled Known-Target Comparison. A controlled known-target experi-ment is conducted to control for stochastic sampling variability and provide a direct point-to-point comparison between the standard TRK and SD-TRK frameworks. In each Monte Carlo realization, the two methods are run on the same ground-truth tensor X ⋆, the same observed operator ˜A, the same observed right-hand side ˜B, and the same randomized row-selection sequence IT = {i1, i 2, . . . , i T }. Across different realizations, the system and row-selection sequence are regenerated independently. Consequently, the comparison is paired within each realization, so discrepancies between the two trajectories can be attributed to the intrinsic update mechanisms rather than to different sampled systems or row sequences. To construct a challenging recovery scenario, the tensor system is generated by the same lateral-slice scaling construction as in Subsubsection 5.1.4, with scale fac-tors decaying geometrically from 1 to 3 × 10 −2. As in Subsubsection 5.1.4, we use a sparse structural configuration for the ground-truth tensor X ⋆. Specifically, the 18 NAHYUN LEE AND JIYOUNG CHOI 
+
+dominant signal energy is concentrated entirely within the leading 5 active rows, while the remaining rows are set identically to zero. This sparse construction is motivated by practical tensor applications in which only a limited number of domi-nant structural components contain meaningful information, whereas the remaining components primarily consist of weak or noise-dominated directions. The observation tensor is contaminated with substantial perturbation noise ( δB =0.5), while the operator tensor is subjected to a relatively minor perturbation (δA = 0 .01). For the proposed SD-TRK framework, the relaxation parameter is set to ω = 0 .8 together with a damping scale λscale = 50 .0. The corresponding slice-dependent damping parameters are again computed from (4.9) with λfloor = 10 −6.Both algorithms are run for T = 2000 iterations, and all convergence trajectories are reported as averages over 10 paired Monte Carlo realizations. Figure 4 presents the resulting convergence trajectories on a logarithmic scale, directly comparing the true reconstruction errors of standard TRK and SD-TRK together with the observable SD-TRK residual. The standard TRK residual is omit-ted from the figure for readability. 
+
+Figure 4. Controlled known-target comparison between standard TRK and SD-TRK under a sparse ill-conditioned doubly noisy setting. The resulting trajectories show a clear difference between the two methods in a sparse-target, ill-conditioned doubly noisy setting. As shown in Figure 4, the stan-dard TRK error initially decreases during the early iterations. It then increases and exhibits pronounced semi-convergence. Since the target tensor contains large zero-valued regions, the standard TRK iteration attempts to fit noise-contaminated components in directions where no true signal is present. Near-zero singular val-ues further amplify the observational perturbation, causing the true reconstruction error ∥X t − X ⋆∥F to increase toward an asymptotic level of approximately 10 .9761. In contrast, SD-TRK remains stable under the same row-sampling sequence. The frequency-dependent damping mechanism suppresses weak spectral directions and limits the amplification of noise-dominated components. Consequently, the true reconstruction error decreases nearly monotonically and stabilizes near an error SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 19 
+
+floor of approximately 2 .9251. Thus, the final reconstruction error is approximately 3.75 times smaller than that of standard TRK. Moreover, the observable SD-TRK residual ∥ ˜AX t − ˜B∥ F remains closely aligned with the stabilization phase of the true reconstruction error. This comparison is meaningful because the two methods use the same row-sampling sequence within each paired realization. The experiment therefore suggests that the spectral damp-ing mechanism suppresses noise amplification in weak spectral components while preserving the dominant sparse structure of the target tensor. 5.1.6. Reference Horizon vs. Empirical Stabilization. We finally investigate the re-lationship between a damped reference horizon and the empirical stabilization be-havior of SD-TRK under varying noise levels. We adopt the general doubly noisy mathematical framework introduced in Subsubsection 5.1.2, setting symmetric noise scales such that δA = δB = δ, with 
+
+δ ∈ { 0, 10 −3, 5 · 10 −3, 10 −2, 5 · 10 −2}.
+
+For each value of δ, we run 10 independent trials, each with 1500 iterations. The SD-TRK parameters are fixed at ω = 0 .9 and λscale = 5 .0, with λfloor = 10 −6 in (4.9). For each trial, we compute the average of ∥X t − X LS ∥F over the last 100 iterations, and then average these values over the 10 trials. We refer to this quantity as the last-100 least-squares error. For comparison, we also plot the damped reference horizon 
+
+Hdamp := max 
+
+> 1≤k≤n3
+
+∥ ˆE(k) 
+
+> A
+
+ˆXLS, (k) − ˆE(k) 
+
+> B
+
+∥F
+
+q
+
+σ2min ( ˆ˜A(k)) + λ(k)
+
+.
+
+This quantity is not a stopping threshold derived from the theorem. It is a conservative slice-wise proxy for the size of the perturbation term after damped spectral normalization. It can be viewed as a damped and slice-wise analogue of the perturbation term in the reference scale (4.8), stated on the error-norm scale rather than the squared-error scale. We compare it with the last-100 least-squares error because both quantities are measured in the same error-norm scale and both reflect the noise-dependent stabilization level of the observed-system iterates. Figure 5 shows that both the damped reference horizon and the last-100 least-squares error increase as the positive noise level δ increases. For the positive noise levels tested, the damped reference horizon remains above the last-100 least-squares error, which is consistent with its role as a conservative reference horizon. At δ = 0, the reference horizon is zero by construction and serves as the noiseless reference case. This gap is expected because the damped reference horizon is computed us-ing slice-wise spectral information, while the observed last-100 least-squares error reflects the actual behavior of SD-TRK iterates. 5.2. Image Reconstruction Comparison. We next consider a two-pass image reconstruction problem to compare standard TRK and SD-TRK. The goal is not to claim state-of-the-art image restoration performance, but to examine the behavior of the two Kaczmarz updates under the same reconstruction pipeline. Unlike the synthetic experiments in Subsubsections 5.1.3–5.1.6, which use slice-dependent damping parameters λ(k), this image experiment uses a fixed scalar damping parameter λ = 10 −2. It should therefore be interpreted as a comparison of damped and undamped Kaczmarz updates in a two-pass reconstruction setting, not 20 NAHYUN LEE AND JIYOUNG CHOI 
+
+Figure 5. Damped reference horizon and last-100 least-squares error under different noise levels δ.as a direct validation of the slice-dependent damping rule in (4.9). In fact, since the blur operators below have nonzero entries only in the first frontal slice, all Fourier frontal slices of each operator coincide. Slice-dependent damping therefore offers no additional flexibility in this setting, and a scalar damping parameter is the natural choice. We model the degradation using a separable Gaussian blur. Let Ar 
+
+> mat
+
+and Ac
+
+> mat
+
+denote the two-dimensional noise-free blur matrices acting along the row and col-umn directions, respectively. These matrices are embedded into t-product tensors by placing them in the first frontal slice and setting the remaining frontal slices to zero: 
+
+Ar 
+
+> ::1
+
+= Ar
+
+> mat
+
+, Ac 
+
+> ::1
+
+= Ac
+
+> mat
+
+, Ar 
+
+> :: k
+
+= Ac 
+
+> :: k
+
+= 0 for k = 2 , 3.
+
+The observed blur operators are formed by perturbing only these underlying two-dimensional blur matrices before embedding them as tensors. Specifically, ˜Ar 
+
+> ::1
+
+= Ar 
+
+> mat
+
++ δAGr
+
+> mat
+
+, ˜Ac 
+
+> ::1
+
+= Ac 
+
+> mat
+
++ δAGc
+
+> mat
+
+,
+
+and ˜Ar 
+
+> :: k
+
+= ˜Ac 
+
+> :: k
+
+= 0 for k = 2 , 3.
+
+Here, the entries of Gr 
+
+> mat
+
+and Gc 
+
+> mat
+
+are independently sampled from the standard Gaussian distribution, and δA controls the operator perturbation level. For the image experiment only, we use Z⊤12 to denote the tensor obtained by transposing each frontal slice of Z, namely (Z⊤12 )ijk = Zjik .
+
+This operation swaps only the row and column image directions and does not reverse the third dimension. It should not be confused with the t-product conjugate transpose Z∗.Using the perturbed blur operators, the blurred image is generated as 
+
+Bblur =
+
+ ˜Ac( ˜Ar X true )⊤12 
+
+⊤12 
+
+.SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 21 
+
+The observed image is then obtained by adding Gaussian noise to this blurred image: (5.1) ˜B = Bblur + δB GB =
+
+ ˜Ac( ˜Ar X true )⊤12 
+
+⊤12 
+
++ δB GB .
+
+Here, the entries of GB are independently sampled from the standard Gaussian distribution, and δB controls the image noise level. In this image pipeline, the degraded data are generated with the observed perturbed blur operators ˜Ar and ˜Ac.Thus, δA perturbs the blur model used to generate the degraded image itself, rather than creating a mismatch between a separate noise-free data-generating operator and the operator supplied to the algorithms. The model (5.1) gives the blurred and noisy image available to the algorithm. Given ˜Ar , ˜Ac, and ˜B, our goal is to recover an approximation of the clean im-age tensor X true . Since the blur in (5.1) is separable, we apply SD-TRK in two directional passes. First, we apply SD-TRK to the row-direction system (5.2) ˜Ar X = ˜B,
+
+and denote the resulting intermediate reconstruction by X row . Then, after trans-posing X row , we apply SD-TRK to the column-direction system (5.3) ˜AcY = ( X row )⊤12 .
+
+The final reconstruction is defined as 
+
+X rec = Y⊤12 .
+
+5.2.1. Experimental setting. In the experiment, X true is an RGB image of the Geisel Library at UC San Diego, resized and normalized so that all pixel values lie in [0 , 1]. The processed image has size 512 × 339 × 3, where the third dimension corresponds to the RGB color channels. The image degradation follows a standard deblurring framework [9]. The underlying row and column blur matrices Ar 
+
+> mat
+
+and Ac 
+
+> mat
+
+are generated using Gaussian smoothing [6], with standard deviation 8 .0 and truncation radius 12, and are then embedded as t-product operators as described above. The perturbation levels are set to δA = 10 −4 for the blur operators and δB = 10 −2 for the observed image. In the implementation, pixel values are clipped to the range [0 , 1] after adding image noise. We then implement both standard TRK and SD-TRK for the two directional systems (5.2) and (5.3). The two methods use the same two-pass reconstruction procedure, the same sampling rule, and the same number of iterations in each pass. For SD-TRK, both passes use relaxation parameter ω = 0 .30, damping parameter 
+
+λ = 10 −2, and 1200 iterations. The standard TRK baseline is obtained by using the corresponding undamped update, that is, ω = 1 and λ = 0, with the same iteration count. To measure how close an image is to the clean image X true , we use two metrics. For an image tensor Z, the first metric is the relative error (5.4) ∥Z − X true ∥F
+
+∥X true ∥F
+
+.
+
+The second metric is the peak signal-to-noise ratio (PSNR), a standard image qual-ity metric in image processing [6, 21]. 22 NAHYUN LEE AND JIYOUNG CHOI 
+
+5.2.2. Numerical results. We now compare the performance of the standard TRK and the proposed SD-TRK using quantitative reconstruction metrics and residual evolution. For SD-TRK, we use relaxation parameter ω = 0 .30 and a fixed scalar damping parameter λ = 10 −2 throughout the two-pass reconstruction pipeline, where the image is subjected to sequential row-directional and column-directional degradations generated with the perturbed blur operators ( δA = 10 −4) and con-taminated with observation noise ( δB = 10 −2). While standard TRK may be sensitive to noise amplification in noisy and in-consistent settings, SD-TRK incorporates a damped normalization term that reg-ularizes the inverse step and improves stability across the two directional passes. To quantitatively assess the reconstruction quality, we compute two standard im-age fidelity metrics: the relative reconstruction error and the Peak Signal-to-Noise Ratio (PSNR). Table 3 summarizes the final quantitative image results recorded at the end of 1200 iterations per directional pass for the degraded observation and the two reconstructed outputs. 
+
+Table 3. Quantitative image results for the degraded observation and reconstructed outputs Image tensor or method Relative error (5.4) PSNR (dB) Degraded observation ˜B 0.1289 22.5856 Standard TRK reconstruction 0.1246 22.8824 SD-TRK reconstruction X rec 0.1025 24.5723 The quantitative metrics indicate that, under the same two-pass reconstruction procedure, SD-TRK achieves better reconstruction quality than the standard TRK baseline in this experiment. Specifically, SD-TRK achieves a lower relative error of 0.1025 and a higher PSNR of 24 .5723 dB, showing a quantitative improvement over both the standard TRK and the initial degraded observation ˜B.
+
+Figure 6. Image restoration results Figure 6 displays the clean image, the degraded observation, the standard TRK, and the SD-TRK reconstruction. Although the visual differences between the stan-dard and damped updates appear modest due to the well-conditioned nature of the underlying blur operators, the proposed damping mechanism reduces noise propa-gation across successive directional passes. To examine the iterative behavior of the two methods, we track the residual norms for the row-directional and column-directional systems. For visualization, the Frobenius norm of each residual is recorded at regular intervals during the iteration process. SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 23 
+
+Figure 7. Residual decay for the two directional systems Figure 7 shows the residual evolution for the row-directional and column-directional systems under both standard TRK and SD-TRK. The residual trajectories stabilize near nonzero plateaus. In the row pass, both methods decrease during the early it-erations, whereas in the column pass the standard TRK residual initially increases slightly before stabilizing. Since the observed right-hand sides contain image noise and pixel values are clipped after noise is added, driving the residuals to zero is not necessarily aligned with recovering the clean image. In addition, the fixed finite iteration budget and, for SD-TRK, the damped updates lead to nonzero terminal residuals in the reported runs. In this experiment, SD-TRK attains lower final residuals than the standard TRK baseline in both directional passes. This behavior is consistent with the quantita-tive image metrics in Table 3, where SD-TRK also achieves the smallest relative reconstruction error and the largest PSNR. These results indicate that the damped update improves the stability of the two-pass reconstruction process under this noisy image reconstruction setting. 6. Conclusion 
+
+In this paper, we studied tensor randomized Kaczmarz methods for tensor linear systems under a doubly noisy perturbation model. We first analyzed standard TRK when both the system tensor and the right-hand side tensor are perturbed. The resulting recursion contains a contraction term and a persistent perturbation term. This explains why standard TRK may exhibit semi-convergent or noise-limited behavior in doubly noisy tensor systems. We then introduced the spectrally damped tensor randomized Kaczmarz method. The SD-TRK update combines a relaxation parameter ω with a Tikhonov-type damping parameter λ. It reduces to standard TRK when ω = 1 and λ = 0. We derived an expected error recursion for SD-TRK that separates the propagation of the previous error from the perturbation injected by the noisy model. The bound shows a speed–robustness trade-off. Stronger damping and underrelaxation can re-duce noise amplification. They may also weaken the guaranteed contraction. We also presented an FFT-based implementation that applies the damped update slice-wise in the Fourier domain and allows frequency-dependent damping parameters λ(k).The numerical experiments are consistent with this interpretation. In noiseless settings, standard TRK exhibits the expected convergent behavior. In doubly noisy 24 NAHYUN LEE AND JIYOUNG CHOI 
+
+settings, its error trajectories are affected by a persistent noise-dependent com-ponent. In the well-conditioned, ill-conditioned, and controlled known-target com-parisons, SD-TRK is more stable than standard TRK in the tested settings. The noise-scaling experiment shows that, for the positive noise levels tested, the empir-ical last-100 least-squares error increases with the noise level and remains below the damped reference horizon, while the noiseless case serves as a zero-horizon ref-erence case. The image experiment also suggests that SD-TRK is more stable than standard TRK under the same two-pass reconstruction procedure. In the reported setting, SD-TRK improves both the relative error and PSNR compared with the degraded observation and the standard TRK reconstruction. Thus, the image ex-periment should be interpreted as a controlled method comparison rather than as a state-of-the-art image restoration benchmark. Several limitations remain. The main theoretical recursion is derived for a scalar damping parameter λ, while the implementation allows slice-dependent parameters 
+
+λ(k). The experiments with slice-dependent damping should therefore be viewed as empirical validation of the Fourier-domain implementation, not as direct numerical instances of the scalar-parameter theorem. The present work also uses fixed user-chosen relaxation and damping parameters. A systematic ablation of relaxation and damping, together with adaptive parameter selection, remains an important direction for future work. A further direction is to move beyond damped least-squares-type stabilization and develop robust tensor Kaczmarz methods for more structured corruption mod-els. Tensor total least-squares formulations are natural when perturbations in the system tensor and the right-hand side tensor should be treated jointly. Combining spectral damping with robust screening rules may lead to tensor Kaczmarz methods that are stable under dense noise and robust to sparse outliers. Interquartile-range screening of corrupted row slices or frequency components is one possible approach. Such extensions would also clarify the relationship between spectral regularization, semi-convergence, and robust row-action methods for doubly noisy tensor inverse problems. 
+
+References                 
+
+> [1] E. H. Bergou, S. Boucherouite, A. Dutta, X. Li, and A. Ma ,A note on the randomized kaczmarz algorithm for solving doubly noisy linear systems , SIAM Journal on Matrix Analysis and Applications, 45 (2024), pp. 992–1006. [2] A. Castillo, J. Haddock, I. Hartsock, P. Hoyos, L. Kassab, A. Kryshchenko, K. Lar-ripa, D. Needell, S. Suryanarayanan, and K. Yacoubou Djima ,Randomized Kaczmarz methods for t-product tensor linear systems with factorized operators , BIT Numerical Math-ematics, 65 (2025). [3] Y. Censor, P. P. B. Eggermont, and D. Gordon ,Strong underrelaxation in kaczmarz’s method for inconsistent systems , Numerische Mathematik, 41 (1983), pp. 83–92. [4] J. Chung, G. Easley, and D. P. O’Leary ,Windowed spectral regularization of inverse problems , SIAM Journal on Scientific Computing, 33 (2011), pp. 3175–3200. [5] A. Cichocki, D. Mandic, A.-H. Phan, C. Caiafa, G. Zhou, Q. Zhao, and L. De Lath-auwer ,Tensor decompositions for signal processing applications: From two-way to multiway component analysis , IEEE Signal Processing Magazine, 32 (2015), pp. 145–163. [6] R. C. Gonzalez and R. E. Woods ,Digital Image Processing , Pearson Education, New York, 4 ed., 2018. [7] R. M. Gower and P. Richt´ arik ,Randomized iterative methods for linear systems , SIAM Journal on Matrix Analysis and Applications, 36 (2015), pp. 1660–1690. SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 25
+
+[8] P. C. Hansen , Rank-Deficient and Discrete Ill-Posed Problems: Numerical Aspects of Linear Inversion , SIAM, Philadelphia, PA, 1998. [9] P. C. Hansen, J. G. Nagy, and D. P. O’Leary , Deblurring Images: Matrices, Spectra, and Filtering , SIAM, Philadelphia, PA, 2006. [10] S. Kaczmarz , Angen¨ aherte Aufl¨ osung von Systemen linearer Gleichungen , Bulletin Interna-tional de l’Acad´ emie Polonaise des Sciences et des Lettres. Classe des Sciences Math´ ematiques et Naturelles. S´ erie A, (1937), pp. 355–357. [11] E. Kernfeld, M. Kilmer, and S. Aeron , Tensor–tensor products with invertible linear transforms , Linear Algebra and its Applications, 485 (2015), pp. 545–570. [12] M. E. Kilmer, K. Braman, N. Hao, and R. C. Hoover , Third-order tensors as operators on matrices: A theoretical and computational framework with applications in imaging , SIAM Journal on Matrix Analysis and Applications, 34 (2013), pp. 148–172. [13] M. E. Kilmer and C. D. Martin , Factorization strategies for third-order tensors , Linear Algebra and its Applications, 435 (2011), pp. 641–658. [14] T. G. Kolda and B. W. Bader , Tensor decompositions and applications , SIAM Review, 51 (2009), pp. 455–500. [15] A. Ma and D. Molitor , Randomized kaczmarz for tensor linear systems , BIT Numerical Mathematics, 62 (2022), pp. 171–194. [16] D. Needell , Randomized kaczmarz solver for noisy linear systems , BIT Numerical Mathe-matics, 50 (2010), pp. 395–403. [17] T. Nikazad and M. Khakzad , Choosing relaxation parameter in randomized kaczmarz method , Journal of Computational and Applied Mathematics, 444 (2024), p. 115790. [18] N. D. Sidiropoulos, L. De Lathauwer, X. Fu, K. Huang, E. E. Papalexakis, and C. Faloutsos , Tensor decomposition for signal processing and machine learning , IEEE Transactions on Signal Processing, 65 (2017), pp. 3551–3582. [19] T. Strohmer and R. Vershynin , A randomized kaczmarz algorithm with exponential con-vergence , Journal of Fourier Analysis and Applications, 15 (2009), pp. 262–278. [20] A. N. Tikhonov , Solution of incorrectly formulated problems and the regularization method ,Soviet Mathematics Doklady, 4 (1963), pp. 1035–1038. [21] Z. Wang, A. Bovik, H. Sheikh, and E. Simoncelli , Image quality assessment: from error visibility to structural similarity , IEEE Transactions on Image Processing, 13 (2004), pp. 600– 612. [22] A. Zouzias and N. M. Freris , Randomized extended Kaczmarz for solving least squares ,SIAM Journal on Matrix Analysis and Applications, 34 (2013), pp. 773–793. 
+
+Appendix A. Efficient t-product Computation via FFT 
+
+In this appendix, we provide the mathematical background and algorithmic de-tails for the efficient computation of the t-product. The t-product operation is fundamentally based on the convolution theorem, which allows us to transform computationally expensive convolution operations in the spatial domain into effi-cient element-wise multiplications in the frequency domain. A.1. Mathematical Foundations. Let A ∈ Cn1×n2×n3 and B ∈ Cn2×n4×n3 be two tensors. The t-product C = AB can be interpreted as a circular convolution along the third dimension (tube fibers). Let aij = Aij : and bjl = Bjl : denote the tube fibers of size n3. The ( i, l )-th tube of the resulting tensor C is given by: 
+
+cil =
+
+> n2
+
+X
+
+> j=1
+
+aij ⊛ bjl ,
+
+where ⊛ denotes the circular convolution. According to the convolution theorem, this corresponds to point-wise multiplication in the Fourier domain: (A.1) F(a ⊛ b) = F(a) ⊙ F (b),
+
+where F denotes the Discrete Fourier Transform (DFT). 26 NAHYUN LEE AND JIYOUNG CHOI 
+
+The computational efficiency arises from the property that the DFT matrix diagonalizes any circulant matrix. Let C = circ( v) ∈ Cq×q be the circulant matrix whose first column is a vector v of length q. Let Fq denote the unnormalized DFT matrix under the FFT convention used here. Then 
+
+C = F −1 
+
+> q
+
+diag(fft( v)) Fq .
+
+Extending this property to the block-circulant matrix used in the t-product, we have (Fn3 ⊗ In1 ) bcirc( A)( F −1 
+
+> n3
+
+⊗ In2 ) = blkdiag( ˆA::1 , . . . , ˆA:: n3 ).
+
+A.2. Complexity Analysis: Derivation of Fast Fourier Transform. To jus-tify the efficiency improvement, we recall the Cooley–Tukey recursion. The standard DFT of a vector x of length q is defined as ˆ xk = Pq−1 
+
+> j=0
+
+xj e−2πi jk q . Assuming q is a power of 2, we can split the summation into even and odd indices: ˆxk =
+
+> q/ 2−1
+
+X
+
+> r=0
+
+x2r e−2πi rk q/ 2 + e−2πi kq
+
+> q/ 2−1
+
+X
+
+> r=0
+
+x2r+1 e−2πi rk q/ 2
+
+= Ek + W kq Ok,
+
+where Ek and Ok are the DFTs of the even and odd indexed parts, and W kq is the twiddle factor. This recursive structure reduces the complexity to T (q) = 2 T (q/ 2)+ 
+
+O(q), implying T (q) = O(q log q). A.3. Implementation Algorithm. Based on the derivation above, the t-product is implemented as in Algorithm 2. This reduces the complexity from 
+
+O(n1n2n4n23) to O n1n2n4n3 + ( n1n2 + n2n4 + n1n4) n3 log n3
+
+,
+
+where the first term accounts for the slice-wise matrix products and the second term for the FFTs and the inverse FFT (IFFT). We denote by ˆA = fft( A, [ ] , 3) and ˆB = fft( B, [ ] , 3) the Fourier transforms of A
+
+and B along the third dimension. In this algorithmic description, we use the tensor-index notation ˆA:: k for the k-th frontal slice; equivalently, ˆA:: k = ˆA(k), ˆB:: k = ˆB(k),and ˆC:: k = ˆC(k).
+
+Algorithm 2 Fast t-product via FFT 
+
+Require: Tensors A ∈ Cn1×n2×n3 , B ∈ Cn2×n4×n3
+
+Ensure: Tensor C = AB ∈ Cn1×n4×n3 
+
+> 1:
+
+Compute the Fourier transforms ˆA = fft( A, [ ] , 3) , ˆB = fft( B, [ ] , 3)  
+
+> 2:
+
+for k = 1 to n3 do  
+
+> 3:
+
+Compute ˆC:: k = ˆA:: k ˆB:: k 
+
+> 4:
+
+end for  
+
+> 5:
+
+Compute the inverse Fourier transform 
+
+C = ifft( ˆC, [ ] , 3)  
+
+> 6:
+
+return CSD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 27 
+
+Appendix B. Proof of Lemma 3.2 
+
+Using the TRK update rule (2.1) for the observed system (3.4), we first de-compose the residual at iteration t. By substituting X t = Et + X ⋆, we have the following. ˜Ait:: X t − ˜Bit:: = ˜Ait:: (Et + X ⋆) − ˜Bit:: 
+
+= ˜Ait:: Et + ( Ait:: + ( EA)it:: )X ⋆ − (Bit:: + ( EB )it:: )= ˜Ait:: Et + ( Ait:: X ⋆ − B it:: ) + (( EA)it:: X ⋆ − (EB )it:: ).
+
+Since X ⋆ is the exact solution to the noiseless system, Ait:: X ⋆ − B it:: = 0. Let 
+
+Nit = ( EA)it:: X ⋆ − (EB )it:: denote the local noise component tensor. Substituting this back into the error update yields: (B.1) Et+1 = Et − ˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1( ˜Ait:: Et + Nit ).
+
+To evaluate the squared Frobenius norm ∥E t+1 ∥2 
+
+> F
+
+, we transform the system into the Fourier domain using the notation introduced above. Let ˆEt, (k) and ˆN (k) 
+
+> it
+
+denote the k-th frontal slices of ˆEt and ˆNit , respectively. By the properties of the t-product in the Fourier domain (see Fact 1 in [15]), the tensor operations map to slice-wise matrix operations for each frequency k ∈ [n3]. Thus, equation (B.1) decouples into n3 independent matrix equations as follows. ˆEt+1 ,(k) = ˆEt, (k) − ( ˆ˜A(k) 
+
+> it:
+
+)∗  ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗−1  ˆ˜A(k) 
+
+> it:
+
+ˆEt, (k) + ˆN (k)
+
+> it
+
+
+
+.
+
+Let 
+
+P (k) 
+
+> it
+
+= ( ˆ˜A(k) 
+
+> it:
+
+)∗  ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗−1 ˆ˜A(k) 
+
+> it:
+
+.
+
+In the standard matrix domain, P (k) 
+
+> it
+
+is an orthogonal projection matrix onto the row space of ˆ˜A(k) 
+
+> it:
+
+. As an orthogonal projector, it satisfies idempotency (( P (k) 
+
+> it
+
+)2 = P (k) 
+
+> it
+
+)and self-adjointness (( P (k) 
+
+> it
+
+)∗ = P (k) 
+
+> it
+
+). We rewrite the error update for the k-th frontal slice as follows. ˆEt+1 ,(k) = ( I − P (k) 
+
+> it
+
+) ˆEt, (k) − ( ˆ˜A(k) 
+
+> it:
+
+)∗  ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗−1 ˆN (k) 
+
+> it
+
+.
+
+To compute the squared Frobenius norm of ˆEt+1 ,(k), we expand the norm of the right-hand side. The cross-term is (B.2) ⟨(I − P (k) 
+
+> it
+
+) ˆEt, (k), ( ˆ˜A(k) 
+
+> it:
+
+)∗  ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗−1 ˆN (k) 
+
+> it
+
+⟩.
+
+Since P (k) 
+
+> it
+
+is self-adjoint, we have ( I −P (k) 
+
+> it
+
+)∗ = I −P (k) 
+
+> it
+
+. To compute the cross-term (B.2), we use the adjoint identity for the inner product. Then (B.2) becomes 
+
+⟨ ˆEt, (k), (I − P (k) 
+
+> it
+
+)∗( ˆ˜A(k) 
+
+> it:
+
+)∗  ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗−1 ˆN (k) 
+
+> it
+
+⟩.28 NAHYUN LEE AND JIYOUNG CHOI 
+
+Since (I − P (k) 
+
+> it
+
+)∗( ˆ˜A(k) 
+
+> it:
+
+)∗ = ( I − P (k) 
+
+> it
+
+)( ˆ˜A(k) 
+
+> it:
+
+)∗
+
+= ( ˆ˜A(k) 
+
+> it:
+
+)∗ − P (k) 
+
+> it
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗
+
+= ( ˆ˜A(k) 
+
+> it:
+
+)∗ − ( ˆ˜A(k) 
+
+> it:
+
+)∗  ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗−1 h ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗i
+
+= ( ˆ˜A(k) 
+
+> it:
+
+)∗ − ( ˆ˜A(k) 
+
+> it:
+
+)∗I
+
+= 0 ,
+
+the projected error ( I −P (k) 
+
+> it
+
+) ˆEt, (k) and the noise term ( ˆ˜A(k) 
+
+> it:
+
+)∗
+
+ ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗
+
+−1 ˆN (k)
+
+> it
+
+are orthogonal. Consequently, the Pythagorean theorem holds in the Fourier domain as follows. (B.3) ∥ ˆEt+1 ,(k)∥2 
+
+> F
+
+= ∥(I − P (k) 
+
+> it
+
+) ˆEt, (k)∥2 
+
+> F
+
++ ( ˆ˜A(k) 
+
+> it:
+
+)∗  ˆ˜A(k) 
+
+> it:
+
+( ˆ˜A(k) 
+
+> it:
+
+)∗−1 ˆN (k)
+
+> it
+> 2
+> F
+
+.
+
+Finally, we sum equation (B.3) over all frequencies k ∈ [n3] and divide by n3. By Parseval’s theorem, the scaled sum of the squared Frobenius norms of the Fourier slices is equal to the squared Frobenius norm of the original spatial tensor, i.e., 
+
+∥Y∥ 2 
+
+> F
+
+= 1
+
+> n3
+
+Pn3 
+
+> k=1
+
+∥ ˆY (k)∥2 
+
+> F
+
+[15]. Note that the set of slice-wise projection matrices 
+
+{P (k) 
+
+> it
+
+}n3 
+
+> k=1
+
+precisely corresponds to the tensor-domain projection operator ˜Pit =˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1 ˜Ait:: . Applying this relation to each term maps the decomposed Fourier equations back to the spatial tensor domain, yielding the desired orthogonal decomposition: 
+
+∥E t+1 ∥2 
+
+> F
+
+= ∥(I − ˜Pit )Et∥2 
+
+> F
+
++ ˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1Nit
+
+> 2
+> F
+
+.
+
+Appendix C. Proof of Theorem 3.3 
+
+Taking the total expectation of the orthogonal decomposition established in Lemma 3.2 with respect to the random variable it ∈ [n1], which is sampled in-dependently at each iteration according to the probability pi = ∥ ˜Ai:: ∥2 
+
+> F
+
+/∥ ˜A∥ 2 
+
+> F
+
+for 
+
+i ∈ [n1], we have the following. (C.1) E ∥E t+1 ∥2
+
+> F
+
+ = E
+
+h
+
+∥(I − ˜Pit )Et∥2
+
+> F
+
+i
+
++ E
+
+
+
+˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1Nit
+
+> 2
+> F
+
+
+
+,
+
+where Nit = ( EA)it:: X ⋆ − (EB )it:: .For the first term, we apply the Pythagorean identity 
+
+∥(I − ˜Pit )Et∥2 
+
+> F
+
+= ∥E t∥2 
+
+> F
+
+− ∥ ˜Pit Et∥2 
+
+> F
+
+.
+
+To calculate the expected reduction E[∥ ˜Pit Et∥2 
+
+> F
+
+], we utilize the selection probability 
+
+pi = ∥ ˜Ai:: ∥2 
+
+> F
+
+/∥ ˜A∥ 2 
+
+> F
+
+. Specifically, since terms with pi = 0 do not contribute to the expectation, it is enough to consider i ∈ I +. For each such i, its squared Frobenius SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 29 
+
+norm is evaluated via Parseval’s theorem as follows. 
+
+∥ ˜PiEt∥2 
+
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆ˜A(k)∗
+
+> i:
+
+ ˆ˜A(k)
+
+> i:
+
+ˆ˜A(k)∗
+
+> i:
+
+−1 ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k)
+
+> 2
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆ˜A(k)∗
+
+> i:
+
+ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k)
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+> 2
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆ˜A(k)∗ 
+
+> i:
+
+∥2 
+
+> F
+
+∥ ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k)∥2
+
+> F
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥4
+
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k)∥2
+
+> F
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+
+.
+
+For the contraction term, we use the following consequence of Parseval’s theorem: for every k ∈ [n3], 
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2 
+
+> F
+
+≤
+
+> n3
+
+X
+
+> ℓ=1
+
+∥ ˆ˜A(ℓ) 
+
+> i:
+
+∥2 
+
+> F
+
+= n3∥ ˜Ai:: ∥2 
+
+> F
+
+.
+
+Therefore, (C.2) 1
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+
+≥ 1
+
+n3∥ ˜Ai:: ∥2
+
+> F
+
+for all k ∈ [n3].
+
+Substituting (C.2) into the previous expression yields 
+
+∥ ˜PiEt∥2 
+
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k)∥2
+
+> F
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+
+≥ 1
+
+n3∥ ˜Ai:: ∥2
+
+> F
+
+1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k)∥2
+
+> F
+
+!
+
+.
+
+By Parseval’s theorem, 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k)∥2 
+
+> F
+
+= ∥ ˜Ai:: Et∥2 
+
+> F
+
+.
+
+Therefore, 
+
+∥ ˜PiEt∥2 
+
+> F
+
+≥ ∥ ˜Ai:: Et∥2
+
+> F
+
+n3∥ ˜Ai:: ∥2
+
+> F
+
+.
+
+Taking total expectation and using the sampling probabilities, we obtain 
+
+E
+
+h
+
+∥ ˜Pit Et∥2
+
+> F
+
+i
+
+= E
+
+ X
+
+> i∈I +
+
+pi∥ ˜PiEt∥2
+
+> F
+
+
+
+≥ E
+
+ X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+∥ ˜Ai:: Et∥2
+
+> F
+
+n3∥ ˜Ai:: ∥2
+
+> F
+
+!
+
+= E
+
+"
+
+1
+
+n3∥ ˜A∥ 2
+
+> Fn1
+
+X
+
+> i=1
+
+∥ ˜Ai:: Et∥2
+
+> F
+
+#
+
+.30 NAHYUN LEE AND JIYOUNG CHOI 
+
+Next, the row-slice norms add up to the norm of the full product: 
+
+> n1
+
+X
+
+> i=1
+
+∥ ˜Ai:: Et∥2 
+
+> F
+
+= ∥ ˜AE t∥2 
+
+> F
+
+.
+
+Moreover, by the definition of the t-product, unfold( ˜AE t) = bcirc( ˜A) unfold( Et).
+
+Since the unfold operator only rearranges the entries, it preserves the Frobenius norm. Hence, 
+
+∥ ˜AE t∥2 
+
+> F
+
+= ∥ unfold( ˜AE t)∥2 
+
+> F
+
+= ∥ bcirc( ˜A) unfold( Et)∥2 
+
+> F
+
+.
+
+Furthermore, 
+
+∥ bcirc( ˜A) unfold( Et)∥2 
+
+> F
+
+≥ σ2min (bcirc( ˜A)) ∥ unfold( Et)∥2 
+
+> F
+
+= σ2min (bcirc( ˜A)) ∥E t∥2 
+
+> F
+
+.
+
+Therefore, 
+
+E
+
+h
+
+∥ ˜Pit Et∥2
+
+> F
+
+i
+
+≥ σ2min (bcirc( ˜A)) 
+
+n3∥ ˜A∥ 2
+
+> F
+
+E ∥E t∥2
+
+> F
+
+ .
+
+This yields the expected contraction bound as follows. 
+
+E
+
+h
+
+∥(I − ˜Pit )Et∥2
+
+> F
+
+i
+
+≤ 1 − σ2min (bcirc( ˜A)) 
+
+n3∥ ˜A∥ 2
+
+> F
+
+!
+
+E ∥E t∥2
+
+> F
+
+ .
+
+For the second term in (C.1), we first apply Parseval’s theorem to evaluate the squared Frobenius norm of the projected noise in the Fourier domain as follows. 
+
+˜A∗
+
+> i::
+
+( ˜Ai:: ˜A∗
+
+> i::
+
+)−1Ni
+
+> 2
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆ˜A(k)∗
+
+> i:
+
+ ˆ˜A(k)
+
+> i:
+
+ˆ˜A(k)∗
+
+> i:
+
+−1 ˆN (k)
+
+> i
+> 2
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆ˜A(k)∗
+
+> i:
+
+ˆN (k)
+
+> i
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+> 2
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆN (k) 
+
+> i
+
+∥2
+
+> F
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+
+,
+
+where the last equality follows from the outer-product identity 
+
+∥ ˆ˜A(k)∗ 
+
+> i:
+
+ˆN (k) 
+
+> i
+
+∥2 
+
+> F
+
+= ∥ ˆ˜A(k) 
+
+> i:
+
+∥2 
+
+> F
+
+∥ ˆN (k) 
+
+> i
+
+∥2 
+
+> F
+
+.
+
+For the perturbation term, we need an upper bound on the reciprocal Fourier-slice row norms. By the definition of γi and Parseval’s theorem, we obtain 1
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+
+≤ 1min 
+
+> 1≤ℓ≤n3
+
+∥ ˆ˜A(ℓ) 
+
+> i:
+
+∥2
+
+> F
+
+≤ γi
+
+∥ ˜Ai:: ∥2
+
+> F
+
+for all k ∈ [n3].
+
+Substituting this into the summation gives 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆN (k) 
+
+> i
+
+∥2
+
+> F
+
+∥ ˆ˜A(k) 
+
+> i:
+
+∥2
+
+> F
+
+≤ 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+γi
+
+∥ ˜Ai:: ∥2
+
+> F
+
+!
+
+∥ ˆN (k) 
+
+> i
+
+∥2
+
+> F
+
+= γi
+
+∥ ˜Ai:: ∥2
+
+> F
+
+1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆN (k) 
+
+> i
+
+∥2
+
+> F
+
+!
+
+= γi
+
+∥N i∥2
+
+> F
+
+∥ ˜Ai:: ∥2
+
+> F
+
+,SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 31 
+
+where we used Parseval’s theorem, 
+
+∥N i∥2 
+
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆN (k) 
+
+> i
+
+∥2 
+
+> F
+
+.
+
+By the law of total expectation, we obtain the following. The summand below does not depend on Et, so the outer expectation can be dropped after the first equality. 
+
+E
+
+
+
+˜A∗
+
+> it::
+
+( ˜Ait:: ˜A∗
+
+> it::
+
+)−1Nit
+
+> 2
+> F
+
+
+
+= X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜A∗
+
+> i::
+
+( ˜Ai:: ˜A∗
+
+> i::
+
+)−1Ni
+
+> 2
+> F
+
+≤ X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+γi
+
+∥N i∥2
+
+> F
+
+∥ ˜Ai:: ∥2
+
+> F
+
+≤ γ
+
+∥ ˜A∥ 2
+
+> F
+
+X
+
+> i∈I +
+
+∥N i∥2
+
+> F
+
+≤ γ
+
+∥ ˜A∥ 2
+
+> Fn1
+
+X
+
+> i=1
+
+∥N i∥2
+
+> F
+
+= γ∥E AX ⋆ − E B ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+.
+
+Substituting the bounds for both terms back into (C.1) completes the proof. 
+
+Appendix D. Proof of Theorem 4.2 
+
+We first decompose the SD-TRK error update into a damped error-propagation term and a noise-injection term. We then expand the squared Frobenius norm in the Fourier domain, bound the cross term using Young’s inequality, and finally average over the randomized row selection. By Lemma 4.1, the error tensor satisfies 
+
+Et+1 =
+
+
+
+I − ω ˜Qλit
+
+
+
+Et − ω ˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1
+
+Nit .
+
+To estimate ∥E t+1 ∥2 
+
+> F
+
+, we pass to the Fourier domain, as in the proof of Lemma 3.2. For any tensor Y, let ˆY denote its discrete Fourier transform along the third mode, and let ˆY (k) be its k-th frontal slice. By the properties of the t-product in the Fourier domain (see Fact 1 in [15]), for each k ∈ [n3], ˆEt+1 ,(k) =
+
+
+
+I − ω ˆQλ, (k)
+
+> it
+
+ ˆEt, (k) − ω  ˆ˜A(k)
+
+> it:
+
+∗  ˆ˜A(k)
+
+> it:
+
+  ˆ˜A(k)
+
+> it:
+
+∗ + λI 
+
+−1 ˆN (k) 
+
+> it
+
+,
+
+where ˆQλ, (k) 
+
+> it
+
+:=   ˆ˜A(k)
+
+> it:
+
+∗  ˆ˜A(k)
+
+> it:
+
+  ˆ˜A(k)
+
+> it:
+
+∗ + λI 
+
+−1 ˆ˜A(k) 
+
+> it:
+
+.
+
+Here, ˆ˜A(k) 
+
+> it:
+
+denotes the it-th row of the matrix ˆ˜A(k).Now define 
+
+U (k) := 
+
+
+
+I − ω ˆQλ, (k)
+
+> it
+
+ ˆEt, (k), V (k) := −ω  ˆ˜A(k)
+
+> it:
+
+∗  ˆ˜A(k)
+
+> it:
+
+  ˆ˜A(k)
+
+> it:
+
+∗ + λI 
+
+−1 ˆN (k) 
+
+> it
+
+.
+
+Then ˆEt+1 ,(k) = U (k) + V (k).32 NAHYUN LEE AND JIYOUNG CHOI 
+
+We next expand the squared Frobenius norm of ˆEt+1 ,(k) using the standard matrix Frobenius inner product 
+
+⟨X, Y ⟩F := trace( Y ∗X).
+
+Since ∥X∥2 
+
+> F
+
+= ⟨X, X ⟩F , we obtain 
+
+ˆEt+1 ,(k) 2 
+
+> F
+
+= ∥U (k) + V (k)∥2
+
+> F
+
+= ⟨U (k) + V (k), U (k) + V (k)⟩F
+
+= ⟨U (k), U (k)⟩F + ⟨U (k), V (k)⟩F + ⟨V (k), U (k)⟩F + ⟨V (k), V (k)⟩F
+
+= ∥U (k)∥2 
+
+> F
+
++ ⟨U (k), V (k)⟩F + ⟨U (k), V (k)⟩F + ∥V (k)∥2
+
+> F
+
+= ∥U (k)∥2 
+
+> F
+
++ 2 Re ⟨U (k), V (k)⟩F + ∥V (k)∥2 
+
+> F
+
+.
+
+Unlike the proof of Lemma 3.2, the cross term does not vanish here, because ˆQλ, (k) 
+
+> it
+
+is not an orthogonal projection matrix in general when λ > 0. Therefore, we estimate the cross term by Young’s inequality. For any α > 0, 2 Re ⟨U (k), V (k)⟩F ≤ 2 ⟨U (k), V (k)⟩F ≤ 2∥U (k)∥F ∥V (k)∥F ≤ α∥U (k)∥2 
+
+> F
+
++ 1
+
+α ∥V (k)∥2 
+
+> F
+
+,
+
+where we used the Cauchy–Schwarz inequality in the second step and Young’s inequality in the third step. Substituting this estimate into the previous identity yields 
+
+ˆEt+1 ,(k) 2 
+
+> F
+
+≤ ∥ U (k)∥2 
+
+> F
+
++ α∥U (k)∥2 
+
+> F
+
++ ∥V (k)∥2 
+
+> F
+
++ 1
+
+α ∥V (k)∥2
+
+> F
+
+= (1 + α)∥U (k)∥2 
+
+> F
+
++
+
+
+
+1 + 1
+
+α
+
+
+
+∥V (k)∥2 
+
+> F
+
+.
+
+That is, 
+
+ˆEt+1 ,(k) 2 
+
+> F
+
+≤ (1 + α)
+
+
+
+I − ω ˆQλ, (k)
+
+> it
+
+ ˆEt, (k) 2
+
+> F
+
++ ω2
+
+
+
+1 + 1
+
+α
+
+   ˆ˜A(k)
+
+> it:
+
+∗  ˆ˜A(k)
+
+> it:
+
+  ˆ˜A(k)
+
+> it:
+
+∗ + λI 
+
+−1 ˆN (k)
+
+> it
+> 2
+> F
+
+.
+
+We now sum this inequality over all k ∈ [n3] and divide by n3. By Parseval’s identity, 
+
+∥Y∥ 2 
+
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+∥ ˆY (k)∥2 
+
+> FSD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 33
+
+for every tensor Y. Applying this identity to each term above gives 
+
+∥E t+1 ∥2 
+
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆEt+1 ,(k) 2
+
+> F
+
+≤ (1 + α) 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+
+
+I − ω ˆQλ, (k)
+
+> it
+
+ ˆEt, (k) 2
+
+> F
+
++ ω2
+
+
+
+1 + 1
+
+α
+
+ 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+  ˆ˜A(k)
+
+> it:
+
+∗  ˆ˜A(k)
+
+> it:
+
+  ˆ˜A(k)
+
+> it:
+
+∗ + λI 
+
+−1 ˆN (k)
+
+> it
+> 2
+> F
+
+= (1 + α)
+
+
+
+I − ω ˜Qλit
+
+
+
+Et 2
+
+> F
+
++ ω2
+
+
+
+1 + 1
+
+α
+
+
+
+˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1
+
+Nit
+
+> 2
+> F
+
+.
+
+Hence, 
+
+∥E t+1 ∥2 
+
+> F
+
+≤ (1+ α)
+
+
+
+I − ω ˜Qλit
+
+
+
+Et 2
+
+> F
+
++ω2
+
+
+
+1 + 1
+
+α
+
+
+
+˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1
+
+Nit
+
+> 2
+> F
+
+.
+
+Taking the conditional expectation with respect to the sampled index it, condi-tioned on Et, we obtain 
+
+E∥E t+1 ∥2 
+
+> F
+
+| E t ≤ (1 + α)E
+
+ 
+
+I − ω ˜Qλit
+
+
+
+Et 2
+
+> F
+
+| E t
+
+
+
++ ω2
+
+
+
+1 + 1
+
+α
+
+
+
+E
+
+"
+
+˜A∗
+
+> it::
+
+ ˜Ait:: ˜A∗ 
+
+> it::
+
++ λI
+
+−1
+
+Nit
+
+> 2
+> F
+
+| E t
+
+#
+
+.
+
+It remains to estimate the two conditional expectation terms on the right-hand side separately. By the sampling rule 
+
+pi = ∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+, i ∈ [n1],
+
+the conditional expectation with respect to the sampled index it, conditioned on 
+
+Et, can be written explicitly as follows. Terms with pi = 0 do not contribute to the expectation, so it is enough to sum over i ∈ I +, where I+ is defined in Theorem 3.3. For i ∈ I +, the operator ˜Qλi is well-defined under Assumption 2.7; for λ > 0, the regularization term also prevents singular normalization factors. We obtain 
+
+E∥E t+1 ∥2 
+
+> F
+
+| E t ≤ (1 + α) X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+
+
+I − ω ˜Qλi
+
+
+
+Et 2
+
+> F
+
++ ω2
+
+
+
+1 + 1
+
+α
+
+ X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1
+
+Ni
+
+> 2
+> F
+
+.
+
+We first estimate the contraction term 
+
+X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+
+
+I − ω ˜Qλi
+
+
+
+Et 2
+
+> F
+
+.34 NAHYUN LEE AND JIYOUNG CHOI 
+
+As in the proof of Lemma 3.2, we pass to the Fourier domain. For each k ∈ [n3], the tensor operator ˜Qλi corresponds to the matrix ˆQλ, (k) 
+
+> i
+
+=   ˆ˜A(k)
+
+> i:
+
+∗  ˆ˜A(k)
+
+> i:
+
+  ˆ˜A(k)
+
+> i:
+
+∗ + λI 
+
+−1 ˆ˜A(k) 
+
+> i:
+
+.
+
+Here, ˆ˜A(k) 
+
+> i:
+
+is the i-th row of the matrix ˆ˜A(k). For notational simplicity, fix i and k,and write 
+
+a := ˆ˜A(k) 
+
+> i:
+
+∈ C1×n2 , x := ˆEt, (k) ∈ Cn2×n4 , Q := a∗a
+
+∥a∥22 + λ .
+
+Then 
+
+∥(I − ωQ ) x∥2 
+
+> F
+
+= trace  x∗(I − ωQ )∗(I − ωQ )x.
+
+Since Q∗ = Q, we obtain 
+
+∥(I − ωQ ) x∥2 
+
+> F
+
+= trace  x∗(I − ωQ ∗ − ωQ + ω2Q∗Q)x
+
+= ∥x∥2 
+
+> F
+
+− 2ω trace( x∗Qx ) + ω2 trace( x∗Q2x).
+
+Moreover, trace( x∗Qx ) = ∥ax ∥2
+
+> F
+
+∥a∥22 + λ ,
+
+and, since 
+
+Q2 = ∥a∥22
+
+∥a∥22 + λ Q, 
+
+we also have trace( x∗Q2x) = ∥a∥22
+
+(∥a∥22 + λ)2 ∥ax ∥2 
+
+> F
+
+.
+
+Substituting these identities gives 
+
+∥(I − ωQ ) x∥2 
+
+> F
+
+= ∥x∥2 
+
+> F
+
+− 2ω
+
+∥a∥22 + λ ∥ax ∥2 
+
+> F
+
++ ω2∥a∥22
+
+(∥a∥22 + λ)2 ∥ax ∥2
+
+> F
+
+= ∥x∥2 
+
+> F
+
+− (2 ω − ω2)∥a∥22 + 2 ωλ 
+
+(∥a∥22 + λ)2 ∥ax ∥2 
+
+> F
+
+.
+
+Let 
+
+S := σ2max (bcirc( ˜A)) , s := ∥a∥22.
+
+Then 0 ≤ s ≤ S, since 
+
+∥a∥2 ≤ σmax 
+
+  ˆ˜A(k) ≤ σmax (bcirc( ˜A)) ,
+
+where the second inequality follows from the block-diagonalization of bcirc( ˜A) in Appendix A. Define 
+
+c(s) := (2 ω − ω2)s + 2 ωλ 
+
+(s + λ)2 .
+
+Since 
+
+c′(s) = − (2 ω − ω2)s + (2 ω + ω2)λ
+
+(s + λ)3 ≤ 0,
+
+the function c(s) is nonincreasing on its domain s + λ > 0; in particular, for the admissible Fourier row norms considered here, c(s) ≥ c(S). Hence 
+
+c(s) ≥ c(S) = (2 ω − ω2)S + 2 ωλ 
+
+(S + λ)2 ≥ 2ω − ω2
+
+S + λ .SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 35 
+
+Therefore, 
+
+∥(I − ωQ ) x∥2 
+
+> F
+
+≤ ∥ x∥2 
+
+> F
+
+− 2ω − ω2
+
+σ2max (bcirc( ˜A)) + λ ∥ax ∥2 
+
+> F
+
+.
+
+Therefore, for each frequency slice k,
+
+
+
+I − ω ˆQλ, (k)
+
+> i
+
+ ˆEt, (k) 2
+
+> F
+
+≤ ˆEt, (k) 2
+
+> F
+
+− 2ω − ω2
+
+σ2max (bcirc( ˜A)) + λ
+
+ˆ˜A(k) 
+
+> i:
+
+ˆEt, (k) 2
+
+> F
+
+.
+
+Applying Parseval’s identity to the slice-wise estimate obtained above, we obtain, for each i ∈ I +,
+
+
+
+I − ω ˜Qλi
+
+
+
+Et 2
+
+> F
+
+≤ ∥E t∥2 
+
+> F
+
+− 2ω − ω2
+
+σ2max (bcirc( ˜A)) + λ
+
+˜Ai:: Et 2
+
+> F
+
+.
+
+Multiplying by pi = ∥ ˜Ai:: ∥2 
+
+> F
+
+/∥ ˜A∥ 2 
+
+> F
+
+and summing over i ∈ I +, we get the bound below. Note that rows with pi = 0 satisfy ˜Ai:: Et = 0, so extending the sum on the right-hand side to all i ∈ [n1] does not change its value. 
+
+X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+
+
+I − ω ˜Qλi
+
+
+
+Et 2
+
+> F
+
+≤ ∥E t∥2 
+
+> F
+
+− 2ω − ω2
+
+σ2max (bcirc( ˜A)) + λ
+
+> n1
+
+X
+
+> i=1
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜Ai:: Et 2
+
+> F
+
+.
+
+Therefore, 
+
+E
+
+ 
+
+I − ω ˜Qλit
+
+
+
+Et 2
+
+> F
+
+Et
+
+
+
+≤ ∥E t∥2 
+
+> F
+
+− 2ω − ω2
+
+σ2max (bcirc( ˜A)) + λ
+
+> n1
+
+X
+
+> i=1
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜Ai:: Et 2
+
+> F
+
+.
+
+To close this estimate, it remains to bound the weighted term on the right-hand side from below. We next estimate the perturbation term 
+
+X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1
+
+Ni
+
+> 2
+> F
+
+.
+
+For each i ∈ I +, define 
+
+Mλi := ˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1
+
+.
+
+In the Fourier domain, the k-th frontal slice corresponding to Mλi is denoted by ˆM λ, (k) 
+
+> i
+
+:= ˆ˜A(k)∗
+
+> i:
+
+ ˆ˜A(k)
+
+> i:
+
+ˆ˜A(k)∗ 
+
+> i:
+
++ λI 
+
+−1
+
+.
+
+Then, by Parseval’s identity and the matrix Frobenius submultiplicative property in each Fourier slice, 
+
+Mλi Ni 
+
+> 2
+> F
+
+= 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆM λ, (k) 
+
+> i
+
+ˆN (k)
+
+> i
+> 2
+> F
+
+≤ 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆM λ, (k)
+
+> i
+> 2
+> F
+
+ˆN (k)
+
+> i
+> 2
+> F
+
+≤ 1
+
+n3
+
+> n3
+
+X
+
+> k=1
+
+ˆM λ, (k)
+
+> i
+> 2
+> F
+
+! n3X
+
+> k=1
+
+ˆN (k)
+
+> i
+> 2
+> F
+
+!
+
+= n3 Mλi 
+
+> 2
+> F
+
+∥N i∥2 
+
+> F
+
+.36 NAHYUN LEE AND JIYOUNG CHOI 
+
+Therefore, 
+
+X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1
+
+Ni
+
+> 2
+> F
+
+≤ n3
+
+X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1 2
+
+> F
+
+∥N i∥2
+
+> F
+
+≤ n3 max 
+
+> i∈I +
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1 2
+
+> F
+
+! n1X
+
+> i=1
+
+∥N i∥2 
+
+> F
+
+.
+
+Recalling the definition 
+
+η(ω, λ ) := n3 ω2 max 
+
+> i∈I +
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1 2
+
+> F
+
+,
+
+we obtain 
+
+ω2
+
+
+
+1 + 1
+
+α
+
+ X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1
+
+Ni
+
+> 2
+> F
+
+≤
+
+
+
+1 + 1
+
+α
+
+
+
+η(ω, λ )
+
+> n1
+
+X
+
+> i=1
+
+∥N i∥2 
+
+> F
+
+.
+
+Finally, if we define the tensor 
+
+N := EAX ⋆ − E B ,
+
+then its i-th horizontal slice is Ni, and hence 
+
+> n1
+
+X
+
+> i=1
+
+∥N i∥2 
+
+> F
+
+= ∥N ∥ 2 
+
+> F
+
+= ∥E AX ⋆ − E B ∥2 
+
+> F
+
+.
+
+Therefore, 
+
+ω2
+
+
+
+1 + 1
+
+α
+
+ X
+
+> i∈I +
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜A∗
+
+> i::
+
+ ˜Ai:: ˜A∗ 
+
+> i::
+
++ λI
+
+−1
+
+Ni
+
+> 2
+> F
+
+≤
+
+
+
+1 + 1
+
+α
+
+
+
+η(ω, λ )∥E AX ⋆−E B ∥2 
+
+> F
+
+.
+
+Thus, combining the above estimates and applying the tower property of condi-tional expectation, we obtain 
+
+E∥E t+1 ∥2
+
+> F
+
+ ≤ (1 + α)E∥E t∥2
+
+> F
+
+
+
+− (1 + α) 2ω − ω2
+
+σ2max (bcirc( ˜A)) + λ E
+
+" n1X
+
+> i=1
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜Ai:: Et 2
+
+> F
+
+#
+
++
+
+
+
+1 + 1
+
+α
+
+
+
+η(ω, λ )∥E AX ⋆ − E B ∥2 
+
+> F
+
+.
+
+To complete the proof, it remains to bound the weighted expectation term in the second line from below. To bound the weighted term from below, define 
+
+p := min  
+
+> i∈[n1]: pi>0
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+.SD-TRK FOR DOUBLY NOISY TENSOR SYSTEMS 37 
+
+Then n1X
+
+> i=1
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜Ai:: Et 2
+
+> F
+
+≥ p
+
+> n1
+
+X
+
+> i=1
+
+˜Ai:: Et 2
+
+> F
+
+.
+
+Moreover, n1X
+
+> i=1
+
+˜Ai:: Et 2
+
+> F
+
+= ∥ ˜AE t∥2 
+
+> F
+
+≥ σ2min (bcirc( ˜A)) ∥E t∥2 
+
+> F
+
+.
+
+Hence n1X
+
+> i=1
+
+∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+˜Ai:: Et 2
+
+> F
+
+≥ p σ 2min (bcirc( ˜A)) ∥E t∥2 
+
+> F
+
+.
+
+Substituting this into the previous estimate yields 
+
+E∥E t+1 ∥2
+
+> F
+
+ ≤ ρα(ω, λ ) E∥E t∥2
+
+> F
+
+ + ηα(ω, λ )∥E AX ⋆ − E B ∥2 
+
+> F
+
+,
+
+where 
+
+ρα(ω, λ ) := (1 + α) 1 − p (2 ω − ω2)σ2min (bcirc( ˜A)) 
+
+σ2max (bcirc( ˜A)) + λ
+
+!
+
+,
+
+and 
+
+ηα(ω, λ ) := 
+
+
+
+1 + 1
+
+α
+
+
+
+η(ω, λ ).
+
+This completes the proof. D.1. Remark. Two points clarify the proof strategy above. First, unlike the stan-dard TRK case in Lemma 3.2, the regularized tensor operator ˜Qλi , equivalently its Fourier-slice matrix representation ˆQλ, (k) 
+
+> i
+
+, is not an orthogonal projection when 
+
+λ > 0. Consequently, the cross term in the expansion of ∥E t+1 ∥2 
+
+> F
+
+cannot be elimi-nated by an orthogonality argument and is instead controlled by Young’s inequality. Second, although one might try to remove the cross term by taking expectation and using the noise structure, this is not immediate under the sampling rule 
+
+pi = ∥ ˜Ai:: ∥2
+
+> F
+
+∥ ˜A∥ 2
+
+> F
+
+,
+
+since the sampling probabilities themselves depend on the observed noisy tensor ˜A. In addition, the bound involving σ2max (bcirc( ˜A)) follows from the fact that each Fourier-slice row norm is bounded by the corresponding global spectral quantity of bcirc( ˜A).
