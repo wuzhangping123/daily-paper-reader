@@ -6,26 +6,24 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-16
-- 运行时间：2026-07-16 21:17:47 UTC
+- 最新运行日期：2026-07-17
+- 运行时间：2026-07-17 20:07:24 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：1
+- 本次总论文数：1
+- 精读区：0
 - 速读区：1
 
 ### 今日简报（AI）
-今日精读一篇高分张量系统噪声解法，速读一篇图像去雾不确定性学习。推荐重点关注《A Spectrally Damped Tensor Randomized Kaczmarz Method for Doubly Noisy Tensor Systems》中提出的双噪声张量高效迭代方法。下一步可深入理解该方法的谱阻尼机制，并尝试将其迁移至其他张量补全或去噪任务。
-- 详情：[/202607/16/README](/202607/16/README)
+今天关注了域自适应在即插即用图像重建中的应用。重点关注失配近端降噪器的域自适应方法，可有效提升图像重建质量。建议了解域自适应技术如何解决实际图像重建中的模型失配问题。
+- 详情：[/202607/17/README](/202607/17/README)
 
 ### 精读区论文标签
-1. [A Spectrally Damped Tensor Randomized Kaczmarz Method for Doubly Noisy Tensor Systems](/202607/16/2607.13552v1-a-spectrally-damped-tensor-randomized-kaczmarz-method-for-doubly-noisy-tensor-systems)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：谱阻尼张量随机Kaczmarz方法用于含噪张量系统，与高维张量数据恢复相关
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Backbone-Agnostic Perturbation-Induced Uncertainty Learning for End-to-End Real-World Image Dehazing](/202607/16/2607.11623v1-backbone-agnostic-perturbation-induced-uncertainty-learning-for-end-to-end-real-world-image-dehazing)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：不确定性学习用于图像复原，可迁移至高光谱去噪
+1. [Domain Adaptation of Mismatched Proximal Denoiser for Plug-and-Play Image Reconstruction](/202607/17/2607.14894v1-domain-adaptation-of-mismatched-proximal-denoiser-for-plug-and-play-image-reconstruction)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：去噪器的域自适应用于即插即用图像重建，与高光谱图像去噪相关
 
 
 <div class="dpr-home-promo-card">

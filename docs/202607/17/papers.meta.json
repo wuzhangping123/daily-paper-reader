@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-17",
+  "date": "2026-07-17",
+  "generated_at": "2026-07-17T20:07:30",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/17/2607.14894v1-domain-adaptation-of-mismatched-proximal-denoiser-for-plug-and-play-image-reconstruction",
+      "section": "quick",
+      "title_en": "Domain Adaptation of Mismatched Proximal Denoiser for Plug-and-Play Image Reconstruction",
+      "authors": "Guixian Xu, Jinglai Li, Junqi Tang",
+      "date": "2026-07-16",
+      "pdf": "https://arxiv.org/pdf/2607.14894v1",
+      "score": "7.0",
+      "evidence": "去噪器的域自适应用于即插即用图像重建，与高光谱图像去噪相关",
+      "tldr": "即插即用图像重建中，去噪器常面临域不匹配问题，导致收敛性能下降。本文定义了“近端失配”度量，并推导出PnP-PGD算法的平稳性边界随迭代次数的倒数衰减，且含平均近端失配惩罚项。为此提出基于近端匹配的域自适应方法，实验表明在显著域偏移下，该方法比基于MSE的自适应显著提升重建质量，尤其在少样本场景中效果突出。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Plug-and-play proximal gradient descent (PnP-PGD) enables flexible image reconstruction by using denoisers as implicit priors. In practice, these denoisers are often deployed outside their training domains. Existing analyses establish convergence under structural assumptions on the deployed denoiser, such as requiring it to be a proximal map or a contraction. However, they do not measure how domain mismatch affects convergence of PnP-PGD. We define this effect as \\emph{proximal mismatch}: the discrepancy between a deployed denoiser $\\widehat{\\mathsf D}$ and a target-domain reference map $\\mathsf D_\\star=\\operatorname{prox}_{R_\\star}$ associated with the underlying regularizer $R_\\star$. Under this mismatch, each denoising update becomes an inexact proximal step for the target objective. We further derive a stationarity bound that decays at a rate of $\\mathcal{O}(1/K)$, with an additive term proportional to the average squared proximal mismatch. This result motivates adaptation via proximal matching rather than MSE-based adaptation alone. We study this approach with two established denoiser families: learned proximal networks and gradient-step denoisers. Experiments on Gaussian deblurring and super-resolution under substantial domain shift show that proximal matching adaptation improves reconstruction quality significantly over MSE-based adaptation, yielding the largest numerical gains in the few-shot regime.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

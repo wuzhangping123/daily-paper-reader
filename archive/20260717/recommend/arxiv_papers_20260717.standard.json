@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-17T20:05:45.833458+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.14894v1",
+      "source": "arxiv",
+      "title": "Domain Adaptation of Mismatched Proximal Denoiser for Plug-and-Play Image Reconstruction",
+      "abstract": "Plug-and-play proximal gradient descent (PnP-PGD) enables flexible image reconstruction by using denoisers as implicit priors. In practice, these denoisers are often deployed outside their training domains. Existing analyses establish convergence under structural assumptions on the deployed denoiser, such as requiring it to be a proximal map or a contraction. However, they do not measure how domain mismatch affects convergence of PnP-PGD. We define this effect as \\emph{proximal mismatch}: the discrepancy between a deployed denoiser $\\widehat{\\mathsf D}$ and a target-domain reference map $\\mathsf D_\\star=\\operatorname{prox}_{R_\\star}$ associated with the underlying regularizer $R_\\star$. Under this mismatch, each denoising update becomes an inexact proximal step for the target objective. We further derive a stationarity bound that decays at a rate of $\\mathcal{O}(1/K)$, with an additive term proportional to the average squared proximal mismatch. This result motivates adaptation via proximal matching rather than MSE-based adaptation alone. We study this approach with two established denoiser families: learned proximal networks and gradient-step denoisers. Experiments on Gaussian deblurring and super-resolution under substantial domain shift show that proximal matching adaptation improves reconstruction quality significantly over MSE-based adaptation, yielding the largest numerical gains in the few-shot regime.",
+      "authors": [
+        "Guixian Xu",
+        "Jinglai Li",
+        "Junqi Tang"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.LG",
+        "math.OC"
+      ],
+      "published": "2026-07-16T12:11:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.14894v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "domain adaptation of denoisers for plug-and-play image reconstruction relevant to HSI denoising",
+      "llm_evidence_cn": "去噪器的域自适应用于即插即用图像重建，与高光谱图像去噪相关",
+      "llm_evidence": "去噪器的域自适应用于即插即用图像重建，与高光谱图像去噪相关",
+      "canonical_evidence": "去噪器的域自适应用于即插即用图像重建，与高光谱图像去噪相关",
+      "llm_tldr_en": "Defines proximal mismatch and analyzes convergence of PnP-PGD under domain shift, offering a framework applicable to adapting deep denoisers for HSI restoration.",
+      "llm_tldr_cn": "该论文定义了即插即用梯度下降(PnP-PGD)中的近端失配(proximal mismatch)概念，即部署的去噪器与目标域参考近端映射之间的差异。通过分析域偏移下PnP-PGD的收敛性，提出了一种无需重新训练即可自适应去噪器的框架。该工作为高光谱图像去噪中深度网络的实际部署提供了理论指导，支持将通用去噪器迁移至高光谱数据。",
+      "llm_tldr": "该论文定义了即插即用梯度下降(PnP-PGD)中的近端失配(proximal mismatch)概念，即部署的去噪器与目标域参考近端映射之间的差异。通过分析域偏移下PnP-PGD的收敛性，提出了一种无需重新训练即可自适应去噪器的框架。该工作为高光谱图像去噪中深度网络的实际部署提供了理论指导，支持将通用去噪器迁移至高光谱数据。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
