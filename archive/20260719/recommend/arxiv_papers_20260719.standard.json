@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-19T20:52:07.502753+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.13919v1",
+      "source": "arxiv",
+      "title": "An Efficient Newton Algorithm for Nonnegative Matrix Factorization with the Kullback-Leibler Divergence",
+      "abstract": "Nonnegative Matrix Factorization (NMF) is a fundamental tool in unsupervised learning, which approximates a nonnegative matrix by the product of two low-rank nonnegative factors. The Kullback-Leibler (KL) divergence is best suited to measure the data to model discrepancy when the decomposed data sample follows a Poisson distribution, which is the case for count datasets such as term-document matrices or images. Most KL-NMF algorithms in the literature minimize a separable majorant of the loss to find their next iterate. We argue that this method has reached its limits and propose to use instead the second-order Taylor expansion of the loss, leading to a Newton-type method. We minimize this non-separable surrogate by proposing a generalization of the well-known HALS algorithm. This yields an efficient KL-NMF algorithm which provably converges and which competes favorably with state-of-the-art algorithms on a large variety of datasets.",
+      "authors": [
+        "Damien Lesens",
+        "Jérémy E. Cohen",
+        "Bora Uçar"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-15T14:59:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.13919v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Efficient Newton algorithm for KL-NMF providing low-rank representation, directly applicable to HSI denoising",
+      "llm_evidence_cn": "高效牛顿算法用于KL散度NMF，提供低秩表示，可直接用于高光谱去噪",
+      "llm_evidence": "高效牛顿算法用于KL散度NMF，提供低秩表示，可直接用于高光谱去噪",
+      "canonical_evidence": "高效牛顿算法用于KL散度NMF，提供低秩表示，可直接用于高光谱去噪",
+      "llm_tldr_en": "Proposes a Newton-type algorithm for nonnegative matrix factorization with Kullback-Leibler divergence, offering faster convergence for low-rank approximation, which can be used as a denoising prior for hyperspectral images.",
+      "llm_tldr_cn": "针对KL散度非负矩阵分解，提出二阶牛顿型算法，替代传统可分离上界最小化方法。该方法利用泰勒展开构造非可分离代理，在合成和真实数据集上加速收敛并提高分解精度。低秩NMF是高光谱图像去噪的重要工具，本文算法可提升其效率。",
+      "llm_tldr": "针对KL散度非负矩阵分解，提出二阶牛顿型算法，替代传统可分离上界最小化方法。该方法利用泰勒展开构造非可分离代理，在合成和真实数据集上加速收敛并提高分解精度。低秩NMF是高光谱图像去噪的重要工具，本文算法可提升其效率。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
