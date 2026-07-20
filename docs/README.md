@@ -6,26 +6,24 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-19
-- 运行时间：2026-07-19 20:53:36 UTC
+- 最新运行日期：2026-07-20
+- 运行时间：2026-07-20 21:35:14 UTC
 - 运行状态：成功
 - 本次总论文数：1
 - 精读区：0
 - 速读区：1
 
 ### 今日简报（AI）
-今日速读一篇非负矩阵分解的牛顿算法论文，聚焦KL散度下的高效优化。
-值得关注：该算法在NMF的KL散度问题上收敛速度优于传统乘法更新，适合大规模数据处理。
-下一步可尝试将该牛顿法与现有NMF工具包结合，实测其对图像或文本数据的加速效果。
-- 详情：[/202607/19/README](/202607/19/README)
+今日速读1篇关于统一图像恢复的论文《QuReC》，其通过查询特定引导和局部-全局校准实现多任务处理。核心方向是构建兼顾去噪、去模糊等任务的单一模型，效果均衡。建议普通读者重点关注其统一框架设计，适合希望用一套方案解决多种图像退化问题的场景。
+- 详情：[/202607/20/README](/202607/20/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [An Efficient Newton Algorithm for Nonnegative Matrix Factorization with the Kullback-Leibler Divergence](/202607/19/2607.13919v1-an-efficient-newton-algorithm-for-nonnegative-matrix-factorization-with-the-kullback-leibler-divergence)  
+1. [QuReC: All-in-One Image Restoration with Query-Specific Guidance and Local-Global Response Calibration](/202607/20/2607.15097v1-qurec-all-in-one-image-restoration-with-query-specific-guidance-and-local-global-response-calibration)  
    标签：评分：7.0/10、query:hsi-denoise
-   evidence：高效牛顿算法用于KL散度NMF，提供低秩表示，可直接用于高光谱去噪
+   evidence：统一图像恢复框架，可处理多种退化，适用于高光谱去噪
 
 
 <div class="dpr-home-promo-card">

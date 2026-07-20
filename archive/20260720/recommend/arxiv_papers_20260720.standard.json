@@ -1,0 +1,61 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-20T21:33:45.495578+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.15097v1",
+      "source": "arxiv",
+      "title": "QuReC: All-in-One Image Restoration with Query-Specific Guidance and Local-Global Response Calibration",
+      "abstract": "All-in-one image restoration aims to recover clean images degraded by multiple corruption types using a single unified model. Existing methods typically rely on image-level prompts or shared guidance to handle diverse degradations. However, such a paradigm becomes inadequate when degradations are spatially heterogeneous or even coexist in mixed forms within a single image. Yet spatially adaptive guidance alone is not sufficient, since accurate restoration also requires each spatial query to reliably aggregate complementary information from local neighborhoods and global contexts. To this end, we propose QuReC, a unified framework for all-in-one image restoration. QuReC consists of a Degradation-Guided Query Reconstruction Module (DQRM) and a Local-Global Response Calibration Module (LGRCM). Specifically, DQRM matches each spatial query against a degradation prototype space to reconstruct a query-specific degradation-aware representation, thereby providing fine-grained spatially adaptive restoration guidance. To further stabilize this query-wise matching process, we introduce a weakly supervised prototype matching learning strategy to improve optimization stability and degradation semantic consistency. Meanwhile, LGRCM performs local-global dual-branch aggregation and calibrates the aggregated responses with learnable priors, improving the reliability of feature aggregation and the coordination between local detail modeling and global context modeling. Extensive experiments demonstrate that QuReC achieves superior performance on multiple all-in-one image restoration benchmarks. The code is released at https://github.com/zhoushen1/QuReC.",
+      "authors": [
+        "Shen Zhou",
+        "Jinghui Zhang",
+        "Wenbo Huang",
+        "Xuwei Qian",
+        "Zhen Wu",
+        "Guangwen Peng",
+        "Zhiyuan Li",
+        "Ding Ding",
+        "Dian Shen",
+        "Fang Dong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-16T15:10:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.15097v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "unified image restoration framework handling multiple degradations adaptable to HSI denoising",
+      "llm_evidence_cn": "统一图像恢复框架，可处理多种退化，适用于高光谱去噪",
+      "llm_evidence": "统一图像恢复框架，可处理多种退化，适用于高光谱去噪",
+      "canonical_evidence": "统一图像恢复框架，可处理多种退化，适用于高光谱去噪",
+      "llm_tldr_en": "Proposes QuReC, a unified all-in-one image restoration framework with query-specific degradation guidance and local-global response calibration, achieving superior performance on multiple degradation types including noise.",
+      "llm_tldr_cn": "针对多种退化共存的图像恢复问题，现有方法依赖全局提示不够灵活。本文提出QuReC框架，通过退化引导的查询重建模块和局部全局响应校准机制，实现对不同退化类型的自适应恢复。在多个基准数据集上，包括去噪任务，QuReC均取得领先性能。该方法可扩展至高光谱图像去噪，具有较强迁移潜力。",
+      "llm_tldr": "针对多种退化共存的图像恢复问题，现有方法依赖全局提示不够灵活。本文提出QuReC框架，通过退化引导的查询重建模块和局部全局响应校准机制，实现对不同退化类型的自适应恢复。在多个基准数据集上，包括去噪任务，QuReC均取得领先性能。该方法可扩展至高光谱图像去噪，具有较强迁移潜力。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
