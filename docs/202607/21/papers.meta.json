@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-21",
+  "date": "2026-07-21",
+  "generated_at": "2026-07-21T20:50:24",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/21/2607.16320v1-the-devil-is-in-the-dark-pixels-toward-brightness-bias-robust-denoising",
+      "section": "deep",
+      "title_en": "The Devil is in the Dark Pixels: Toward Brightness Bias-Robust Denoising",
+      "authors": "Sungjun Cho, Zhuangzhuang Chen, Xiaomeng Li",
+      "date": "2026-07-15",
+      "pdf": "https://arxiv.org/pdf/2607.16320v1",
+      "score": "8.0",
+      "evidence": "针对信号依赖噪声中亮度偏差的去噪方法",
+      "tldr": "图像去噪中暗区域信噪比低，MSE损失导致模型偏亮暗，暗像素重建比噪声底噪差6倍。本文提出BBRD，将像素按亮度分带，用每组噪声方差归一化误差，再通过Group-DRO动态加权最差带，无额外参数。在SIDD等数据集8种架构上，BBRD同时提升所有亮度带PSNR，暗带+0.45dB，亮带+0.32dB，总PSNR+0.65dB。贡献在于揭示并解决了亮度偏差问题，为去噪提供鲁棒方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "In this paper, we reveal an important yet overlooked problem in image denoising: under signal-dependent camera noise models, dark regions suffer from inherently low Signal-to-Noise Ratio (SNR), as signal intensity decays far faster than noise variance diminishes, making detail recovery in dark areas fundamentally challenging. Yet rather than compensating for this difficulty, MSE-trained denoisers exacerbate it -- reconstructing dark pixels up to 6x worse relative to their per-band noise floor. This bias stems from two compounding factors: signal-dependent noise inflates bright-pixel residuals, and the network's Jacobian norm increases monotonically with brightness. Together, these cause bright regions to chronically dominate gradient updates at the expense of dark ones. To this end, we propose Brightness Bias-Robust Denoising (BBRD), a drop-in replacement for MSE loss that partitions pixels into brightness bands, normalizes per-band error by empirical noise variance, and applies Group Distributionally Robust Optimization (Group-DRO) to dynamically upweight whichever band is currently worst, with zero additional parameters or inference cost. Across 8 architectures and 2 datasets in our experiments, BBRD is the only method among 13 tested alternatives that improves each brightness band simultaneously, achieving up to +0.45 dB on dark bands, +0.32 dB on bright bands, and +0.65 dB aggregate Peak Signal-to-Noise Ratio (PSNR) on SIDD, with the largest per-band gains in the darkest regions where detail recovery matters most. Code is available at https://github.com/xmed-lab/BBRD",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/21/2607.17390v1-kernel-regression-with-tensor-trains-and-hadamard-overparameterization",
+      "section": "quick",
+      "title_en": "Kernel Regression with Tensor Trains and Hadamard Overparameterization",
+      "authors": "Duc Thien Nguyen, Konstantinos Slavakis, Eleftherios Kofidis, Dimitris Pados",
+      "date": "2026-07-19",
+      "pdf": "https://arxiv.org/pdf/2607.17390v1",
+      "score": "7.0",
+      "evidence": "张量链回归用于多路数据插补",
+      "tldr": "针对多维数据插补问题，提出KReTTaH框架。它将插补转化为核回归，系数张量约束在固定秩张量列流形上，并利用Hadamard过参数化提升稀疏性与表示效率。通过黎曼乘积流形联合优化系数与核协方差，实现自动化超参数选择。实验在fMRI和动态图数据上取得优越性能。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Kernel regression with tensor trains and Hadamard overparameterization (KReTTaH) is introduced as a training-data-free, interpretable, and nonparametric framework for multi-way data imputation. The imputation problem is reformulated as regression in reproducing kernel Hilbert spaces (RKHS), where the tensor regression coefficients are explicitly constrained to lie on fixed-rank tensor-train (TT) manifolds and structured via Hadamard overparameterization to promote sparsity and high representational efficiency. Rather than relying on costly cross-validation, KReTTaH jointly optimizes the TT coefficient tensors and the kernel covariance matrices within a Riemannian product-manifold framework -- the former on fixed-rank TT manifolds, the latter on the manifold of positive-definite matrices -- thereby enabling automated kernel-hyperparameter selection. Numerical tests on two challenging applications -- imputation of high-dimensional functional magnetic resonance imaging (fMRI) data and recovery of missing edge flows in dynamic graphs -- demonstrate that KReTTaH consistently outperforms state-of-the-art tensor-, Bayesian-, and neural-network-based baselines in terms of modeling accuracy.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/21/2607.16644v1-dara-degradation-aware-low-rank-residual-adaptation-with-original-to-corrupted-distillation-for-corruption-robust-animal-re-identification",
+      "section": "quick",
+      "title_en": "DARA: Degradation-Aware Low-Rank Residual Adaptation with Original-to-Corrupted Distillation for Corruption-Robust Animal Re-Identification",
+      "authors": "Cynthia Xie, Talia Xu",
+      "date": "2026-07-18",
+      "pdf": "https://arxiv.org/pdf/2607.16644v1",
+      "score": "6.0",
+      "evidence": "低秩残差适应用于退化鲁棒性",
+      "tldr": "动物重识别依赖细粒度身份线索，但图像退化（模糊、噪声、压缩）会破坏特征判别性。DARA提出退化感知低秩残差适配方法，冻结主干网络并学习路由低秩残差专家来显式修复退化嵌入空间，同时用原图教师进行蒸馏以保持个体嵌入和检索关系。在ATRW、FriesianCattle2017等数据集上，DARA恢复77.0%的退化查询mAP差距，仅增加0.49%参数和0.05%FLOPs，且泛化到未知退化和跨域场景。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Animal re-identification (Re-ID) relies on fine-grained identity cues that can be disrupted by blur, noise, compression, and other visual degradations. Existing robustness strategies based on degradation-augmented training or pixel-level restoration improve robustness indirectly, but do not explicitly repair shifts in the identity retrieval space. We study corruption-robust animal Re-ID as input-conditioned feature-space repair and introduce DARA, a lightweight retrofit for compact Re-ID models. DARA freezes the fine-tuned backbone and learns routed low-rank residual experts to adapt degraded-input embeddings without corruption-type annotations. To stabilize this adaptive repair, original-to-corrupted distillation uses an original-image teacher to preserve individual embeddings and retrieval relations. Experiments on ATRW, FriesianCattle2017, MPDD, and SeaStarReID2023 show that DARA improves corrupted-query retrieval over standard and augmentation-based fine-tuning, generalizes to unseen corruptions and cross-domain evaluation, and recovers 77.0% of the corrupted-query mAP gap to full corrupted fine-tuning while adding only 0.49% parameters and 0.05% FLOPs.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/21/2607.17313v1-iterated-graph-laplacian-for-image-restoration-problems",
+      "section": "quick",
+      "title_en": "Iterated graph Laplacian for image restoration problems",
+      "authors": "Stefano Aleotti, Davide Bianchi, Florian Bossmann, Marco Donatelli, Pietro Maurino",
+      "date": "2026-07-19",
+      "pdf": "https://arxiv.org/pdf/2607.17313v1",
+      "score": "6.0",
+      "evidence": "迭代图拉普拉斯正则化用于图像恢复，可应用于高光谱图像去噪",
+      "tldr": "图像恢复是典型的不适定线性逆问题，需正则化先验。本文提出迭代图拉普拉斯正则化方法，在广义Tikhonov框架下动态更新图拉普拉斯以逐步融入锐利结构信息。设计了三种更新方案：基于当前重建的标准方案、基于误差估计的误差方程方案及二者混合方案。理论证明了噪声水平趋于零时各方案的收敛性。在CT重建和图像去模糊实验中，该方法相比固定拉普拉斯显著提升了重建质量，尤其是精细细节的恢复。贡献在于提供了一种自适应边缘保持的正则化策略及收敛保证。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We study the graph Laplacian operator as a regularizer in a generalized Tikhonov framework for linear ill-posed problems. The Laplacian is updated iteratively from the current reconstruction, so that progressively sharper structural information about the solution is fed into the regularization term. We introduce three schemes: a standard one that rebuilds the Laplacian from each new iterate; an error-equation scheme that, following the error-based formulation of iterated Tikhonov regularization, builds the Laplacian from an estimate of the reconstruction error rather than of the image itself; and a mixed scheme combining the two. We establish convergence of all three schemes for noisy data under a priori parameter and stopping rules as the noise level tends to zero. Numerical experiments in two-dimensional computed tomography and image deblurring show consistent gains in reconstruction quality and sharper recovery of fine details.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

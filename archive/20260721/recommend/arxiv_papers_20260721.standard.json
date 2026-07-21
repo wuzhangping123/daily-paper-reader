@@ -1,0 +1,169 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-21T20:46:39.133035+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.16320v1",
+      "source": "arxiv",
+      "title": "The Devil is in the Dark Pixels: Toward Brightness Bias-Robust Denoising",
+      "abstract": "In this paper, we reveal an important yet overlooked problem in image denoising: under signal-dependent camera noise models, dark regions suffer from inherently low Signal-to-Noise Ratio (SNR), as signal intensity decays far faster than noise variance diminishes, making detail recovery in dark areas fundamentally challenging. Yet rather than compensating for this difficulty, MSE-trained denoisers exacerbate it -- reconstructing dark pixels up to 6x worse relative to their per-band noise floor. This bias stems from two compounding factors: signal-dependent noise inflates bright-pixel residuals, and the network's Jacobian norm increases monotonically with brightness. Together, these cause bright regions to chronically dominate gradient updates at the expense of dark ones. To this end, we propose Brightness Bias-Robust Denoising (BBRD), a drop-in replacement for MSE loss that partitions pixels into brightness bands, normalizes per-band error by empirical noise variance, and applies Group Distributionally Robust Optimization (Group-DRO) to dynamically upweight whichever band is currently worst, with zero additional parameters or inference cost. Across 8 architectures and 2 datasets in our experiments, BBRD is the only method among 13 tested alternatives that improves each brightness band simultaneously, achieving up to +0.45 dB on dark bands, +0.32 dB on bright bands, and +0.65 dB aggregate Peak Signal-to-Noise Ratio (PSNR) on SIDD, with the largest per-band gains in the darkest regions where detail recovery matters most. Code is available at https://github.com/xmed-lab/BBRD",
+      "authors": [
+        "Sungjun Cho",
+        "Zhuangzhuang Chen",
+        "Xiaomeng Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-15T08:57:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.16320v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "denoising method addressing brightness bias in signal-dependent noise",
+      "llm_evidence_cn": "针对信号依赖噪声中亮度偏差的去噪方法",
+      "llm_evidence": "针对信号依赖噪声中亮度偏差的去噪方法",
+      "canonical_evidence": "针对信号依赖噪声中亮度偏差的去噪方法",
+      "llm_tldr_en": "This paper reveals that MSE-trained denoisers perform poorly on dark pixels due to brightness bias, and proposes a brightness bias-robust denoising approach that improves dark pixel reconstruction.",
+      "llm_tldr_cn": "该论文揭示了在信号依赖噪声模型中，MSE训练的去噪网络对暗像素重建效果极差的问题，原因是亮度偏差导致暗区域梯度更新不足。为此提出一种对亮度偏差鲁棒的去噪方法，通过调整损失函数或网络结构来平衡明暗区域的重建质量。实验表明，该方法在暗像素重建上提升显著，为实际图像传感器去噪提供了新思路。",
+      "llm_tldr": "该论文揭示了在信号依赖噪声模型中，MSE训练的去噪网络对暗像素重建效果极差的问题，原因是亮度偏差导致暗区域梯度更新不足。为此提出一种对亮度偏差鲁棒的去噪方法，通过调整损失函数或网络结构来平衡明暗区域的重建质量。实验表明，该方法在暗像素重建上提升显著，为实际图像传感器去噪提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.17390v1",
+      "source": "arxiv",
+      "title": "Kernel Regression with Tensor Trains and Hadamard Overparameterization",
+      "abstract": "Kernel regression with tensor trains and Hadamard overparameterization (KReTTaH) is introduced as a training-data-free, interpretable, and nonparametric framework for multi-way data imputation. The imputation problem is reformulated as regression in reproducing kernel Hilbert spaces (RKHS), where the tensor regression coefficients are explicitly constrained to lie on fixed-rank tensor-train (TT) manifolds and structured via Hadamard overparameterization to promote sparsity and high representational efficiency. Rather than relying on costly cross-validation, KReTTaH jointly optimizes the TT coefficient tensors and the kernel covariance matrices within a Riemannian product-manifold framework -- the former on fixed-rank TT manifolds, the latter on the manifold of positive-definite matrices -- thereby enabling automated kernel-hyperparameter selection. Numerical tests on two challenging applications -- imputation of high-dimensional functional magnetic resonance imaging (fMRI) data and recovery of missing edge flows in dynamic graphs -- demonstrate that KReTTaH consistently outperforms state-of-the-art tensor-, Bayesian-, and neural-network-based baselines in terms of modeling accuracy.",
+      "authors": [
+        "Duc Thien Nguyen",
+        "Konstantinos Slavakis",
+        "Eleftherios Kofidis",
+        "Dimitris Pados"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG",
+        "eess.SP"
+      ],
+      "published": "2026-07-19T19:43:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.17390v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "tensor-train regression for multi-way data imputation",
+      "llm_evidence_cn": "张量链回归用于多路数据插补",
+      "llm_evidence": "张量链回归用于多路数据插补",
+      "canonical_evidence": "张量链回归用于多路数据插补",
+      "llm_tldr_en": "Proposes KReTTaH, a training-data-free framework that combines tensor-train manifolds and Hadamard overparameterization for multi-way data imputation, achieving interpretable imputation without cross-validation.",
+      "llm_tldr_cn": "针对多路数据缺失插补问题，提出KReTTaH无训练数据框架，将回归系数约束在低秩张量链流形上，并通过Hadamard过参数化促进稀疏性。在黎曼乘积流形上联合优化张量系数和核协方差矩阵，避免了交叉验证。实验表明在多种插补任务上效果优异，为高维张量数据恢复提供了可解释的非参数方法。",
+      "llm_tldr": "针对多路数据缺失插补问题，提出KReTTaH无训练数据框架，将回归系数约束在低秩张量链流形上，并通过Hadamard过参数化促进稀疏性。在黎曼乘积流形上联合优化张量系数和核协方差矩阵，避免了交叉验证。实验表明在多种插补任务上效果优异，为高维张量数据恢复提供了可解释的非参数方法。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.16644v1",
+      "source": "arxiv",
+      "title": "DARA: Degradation-Aware Low-Rank Residual Adaptation with Original-to-Corrupted Distillation for Corruption-Robust Animal Re-Identification",
+      "abstract": "Animal re-identification (Re-ID) relies on fine-grained identity cues that can be disrupted by blur, noise, compression, and other visual degradations. Existing robustness strategies based on degradation-augmented training or pixel-level restoration improve robustness indirectly, but do not explicitly repair shifts in the identity retrieval space. We study corruption-robust animal Re-ID as input-conditioned feature-space repair and introduce DARA, a lightweight retrofit for compact Re-ID models. DARA freezes the fine-tuned backbone and learns routed low-rank residual experts to adapt degraded-input embeddings without corruption-type annotations. To stabilize this adaptive repair, original-to-corrupted distillation uses an original-image teacher to preserve individual embeddings and retrieval relations. Experiments on ATRW, FriesianCattle2017, MPDD, and SeaStarReID2023 show that DARA improves corrupted-query retrieval over standard and augmentation-based fine-tuning, generalizes to unseen corruptions and cross-domain evaluation, and recovers 77.0% of the corrupted-query mAP gap to full corrupted fine-tuning while adding only 0.49% parameters and 0.05% FLOPs.",
+      "authors": [
+        "Cynthia Xie",
+        "Talia Xu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-18T05:25:49+00:00",
+      "link": "https://arxiv.org/pdf/2607.16644v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "low-rank residual adaptation for corruption robustness",
+      "llm_evidence_cn": "低秩残差适应用于退化鲁棒性",
+      "llm_evidence": "低秩残差适应用于退化鲁棒性",
+      "canonical_evidence": "低秩残差适应用于退化鲁棒性",
+      "llm_tldr_en": "Proposes DARA with low-rank residual experts to adapt degraded embeddings for robust animal re-identification, addressing noise and blur.",
+      "llm_tldr_cn": "针对动物重识别中噪声、模糊等退化导致识别精度下降的问题，提出DARA方法，冻结骨干网络并学习低秩残差专家来适应退化嵌入，无需退化类型标注。实验表明该方法有效提升鲁棒性，为低秩表示在图像去噪中的应用提供了新思路。",
+      "llm_tldr": "针对动物重识别中噪声、模糊等退化导致识别精度下降的问题，提出DARA方法，冻结骨干网络并学习低秩残差专家来适应退化嵌入，无需退化类型标注。实验表明该方法有效提升鲁棒性，为低秩表示在图像去噪中的应用提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.17313v1",
+      "source": "arxiv",
+      "title": "Iterated graph Laplacian for image restoration problems",
+      "abstract": "We study the graph Laplacian operator as a regularizer in a generalized Tikhonov framework for linear ill-posed problems. The Laplacian is updated iteratively from the current reconstruction, so that progressively sharper structural information about the solution is fed into the regularization term. We introduce three schemes: a standard one that rebuilds the Laplacian from each new iterate; an error-equation scheme that, following the error-based formulation of iterated Tikhonov regularization, builds the Laplacian from an estimate of the reconstruction error rather than of the image itself; and a mixed scheme combining the two. We establish convergence of all three schemes for noisy data under a priori parameter and stopping rules as the noise level tends to zero. Numerical experiments in two-dimensional computed tomography and image deblurring show consistent gains in reconstruction quality and sharper recovery of fine details.",
+      "authors": [
+        "Stefano Aleotti",
+        "Davide Bianchi",
+        "Florian Bossmann",
+        "Marco Donatelli",
+        "Pietro Maurino"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-19T15:59:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.17313v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "iterated graph Laplacian regularization for image restoration",
+      "llm_evidence_cn": "迭代图拉普拉斯正则化用于图像恢复，可应用于高光谱图像去噪",
+      "llm_evidence": "迭代图拉普拉斯正则化用于图像恢复，可应用于高光谱图像去噪",
+      "canonical_evidence": "迭代图拉普拉斯正则化用于图像恢复，可应用于高光谱图像去噪",
+      "llm_tldr_en": "This paper studies iterated graph Laplacian regularization in a Tikhonov framework for image restoration, providing convergence guarantees for noisy data, which is a transferable method for hyperspectral denoising.",
+      "llm_tldr_cn": "该论文将图拉普拉斯算子作为正则项引入广义Tikhonov框架用于图像恢复，并提出了三种迭代更新方案：标准方案、误差方程方案和混合方案。理论证明了在噪声数据下各方案的收敛性。该方法能充分利用图像结构信息，可转移至高光谱图像去噪任务中。",
+      "llm_tldr": "该论文将图拉普拉斯算子作为正则项引入广义Tikhonov框架用于图像恢复，并提出了三种迭代更新方案：标准方案、误差方程方案和混合方案。理论证明了在噪声数据下各方案的收敛性。该方法能充分利用图像结构信息，可转移至高光谱图像去噪任务中。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
