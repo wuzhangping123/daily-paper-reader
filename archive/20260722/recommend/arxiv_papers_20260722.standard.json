@@ -1,0 +1,142 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-22T21:32:27.883879+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.17390v2",
+      "source": "arxiv",
+      "title": "Kernel Regression with Tensor Trains and Hadamard Overparameterization",
+      "abstract": "Kernel regression with tensor trains and Hadamard overparameterization (KReTTaH) is introduced as a training-data-free, interpretable, and nonparametric framework for multi-way data imputation. The imputation problem is reformulated as regression in reproducing kernel Hilbert spaces (RKHS), where the tensor regression coefficients are explicitly constrained to lie on fixed-rank tensor-train (TT) manifolds and structured via Hadamard overparameterization to promote sparsity and high representational efficiency. Rather than relying on costly cross-validation, KReTTaH jointly optimizes the TT coefficient tensors and the kernel covariance matrices within a Riemannian product-manifold framework -- the former on fixed-rank TT manifolds, the latter on the manifold of positive-definite matrices -- thereby enabling automated kernel-hyperparameter selection. Numerical tests on two challenging applications -- imputation of high-dimensional functional magnetic resonance imaging (fMRI) data and recovery of missing edge flows in dynamic graphs -- demonstrate that KReTTaH consistently outperforms state-of-the-art tensor-, Bayesian-, and neural-network-based baselines in terms of modeling accuracy.",
+      "authors": [
+        "Duc Thien Nguyen",
+        "Konstantinos Slavakis",
+        "Eleftherios Kofidis",
+        "Dimitris Pados"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG",
+        "eess.SP"
+      ],
+      "published": "2026-07-19T19:43:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.17390v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "tensor train kernel regression for multi-way data imputation, relevant to high-dimensional tensor data recovery",
+      "llm_evidence_cn": "张量列车核回归多路数据插补，与高维张量数据恢复相关",
+      "llm_evidence": "张量列车核回归多路数据插补，与高维张量数据恢复相关",
+      "canonical_evidence": "张量列车核回归多路数据插补，与高维张量数据恢复相关",
+      "llm_tldr_en": "KReTTaH uses tensor trains and Hadamard overparameterization for nonparametric multi-way data imputation, optimizing coefficients on fixed-rank TT manifolds.",
+      "llm_tldr_cn": "针对多路数据插补问题，提出KReTTaH框架，利用张量列车（TT）与哈达玛过参数化实现无训练数据的非参数回归。该方法将回归系数约束在固定秩TT流形上，并在黎曼积流形中联合优化系数和核协方差矩阵，避免了交叉验证。实验表明其在高维张量恢复中有效，为高光谱图像张量数据恢复提供了可迁移的方法。",
+      "llm_tldr": "针对多路数据插补问题，提出KReTTaH框架，利用张量列车（TT）与哈达玛过参数化实现无训练数据的非参数回归。该方法将回归系数约束在固定秩TT流形上，并在黎曼积流形中联合优化系数和核协方差矩阵，避免了交叉验证。实验表明其在高维张量恢复中有效，为高光谱图像张量数据恢复提供了可迁移的方法。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.15097v2",
+      "source": "arxiv",
+      "title": "QuReC: All-in-One Image Restoration with Query-Specific Guidance and Local-Global Response Calibration",
+      "abstract": "All-in-one image restoration aims to recover clean images degraded by multiple corruption types using a single unified model. Existing methods typically rely on image-level prompts or shared guidance to handle diverse degradations. However, such a paradigm becomes inadequate when degradations are spatially heterogeneous or even coexist in mixed forms within a single image. Yet spatially adaptive guidance alone is not sufficient, since accurate restoration also requires each spatial query to reliably aggregate complementary information from local neighborhoods and global contexts. To this end, we propose QuReC, a unified framework for all-in-one image restoration. QuReC consists of a Degradation-Guided Query Reconstruction Module (DQRM) and a Local-Global Response Calibration Module (LGRCM). Specifically, DQRM matches each spatial query against a degradation prototype space to reconstruct a query-specific degradation-aware representation, thereby providing fine-grained spatially adaptive restoration guidance. To further stabilize this query-wise matching process, we introduce a weakly supervised prototype matching learning strategy to improve optimization stability and degradation semantic consistency. Meanwhile, LGRCM performs local-global dual-branch aggregation and calibrates the aggregated responses with learnable priors, improving the reliability of feature aggregation and the coordination between local detail modeling and global context modeling. Extensive experiments demonstrate that QuReC achieves superior performance on multiple all-in-one image restoration benchmarks. The code is released at https://github.com/zhoushen1/QuReC.",
+      "authors": [
+        "Shen Zhou",
+        "Jinghui Zhang",
+        "Wenbo Huang",
+        "Xuwei Qian",
+        "Zhen Wu",
+        "Guangwen Peng",
+        "Zhiyuan Li",
+        "Ding Ding",
+        "Dian Shen",
+        "Fang Dong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-16T15:10:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.15097v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "all-in-one image restoration including denoising, with query-specific guidance",
+      "llm_evidence_cn": "全合一图像修复包括去噪，具有查询特定引导",
+      "llm_evidence": "全合一图像修复包括去噪，具有查询特定引导",
+      "canonical_evidence": "全合一图像修复包括去噪，具有查询特定引导",
+      "llm_tldr_en": "QuReC is a unified framework for all-in-one image restoration with degradation-guided query reconstruction and local-global response calibration, handling mixed degradations.",
+      "llm_tldr_cn": "针对单一模型处理多种图像退化（包括去噪）时空间异构和混合退化的问题，提出QuReC框架。它通过退化引导的查询重构和局部-全局响应校准，为每个空间位置自适应恢复信息。实验在多种退化类型（包括噪声）上展现了统一模型的优势，虽未针对高光谱，但方法可直接迁移至高光谱图像去噪任务。",
+      "llm_tldr": "针对单一模型处理多种图像退化（包括去噪）时空间异构和混合退化的问题，提出QuReC框架。它通过退化引导的查询重构和局部-全局响应校准，为每个空间位置自适应恢复信息。实验在多种退化类型（包括噪声）上展现了统一模型的优势，虽未针对高光谱，但方法可直接迁移至高光谱图像去噪任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.19333v1",
+      "source": "arxiv",
+      "title": "Provable diffusion-based posterior sampling for linear inverse problems via DDIM",
+      "abstract": "Diffusion-based methods have achieved remarkable empirical success in solving inverse problems. However, many existing posterior samplers either lack rigorous theoretical guarantees or incur substantial computational overhead. We propose a simple and efficient algorithm, called \\pddim, for solving linear inverse problems with diffusion priors via a DDIM-type sampler. Our method requires only lightweight, coordinate-wise modifications to the standard DDIM update, while explicitly incorporating the measurement model. The key idea is to perform posterior sampling separately along each singular direction of the measurement operator: for each direction, the sampler follows the learned diffusion prior when the observation signal-to-noise ratio (SNR) is below the corresponding diffusion SNR, and switches to a calibrated measurement-based predictor otherwise. We prove that the proposed sampler converges to the Bayesian posterior conditioned on the measurements. Empirical results show that the proposed sampler performs favorably against existing diffusion-based posterior samplers across a range of image restoration tasks, achieving the best performance on the majority of evaluation metrics considered. Overall, our results convert posterior sampling for noisy linear inverse problems to simple coordinate-wise DDIM updates, yielding an efficient, easy-to-implement algorithm with provable posterior consistency.",
+      "authors": [
+        "Yuchen Jiao",
+        "Na Li",
+        "Changxiao Cai",
+        "Yuxin Chen",
+        "Gen Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "stat.ML"
+      ],
+      "published": "2026-07-21T17:53:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.19333v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "diffusion-based posterior sampling for linear inverse problems, transferable to HSI denoising",
+      "llm_evidence_cn": "基于扩散的线性逆问题后验采样方法，可迁移至高光谱图像去噪",
+      "llm_evidence": "基于扩散的线性逆问题后验采样方法，可迁移至高光谱图像去噪",
+      "canonical_evidence": "基于扩散的线性逆问题后验采样方法，可迁移至高光谱图像去噪",
+      "llm_tldr_en": "Proposes a provable diffusion-based posterior sampler (pDDIM) for linear inverse problems, offering a lightweight DDIM-type update with theoretical guarantees, directly applicable to HSI denoising as an enabling method.",
+      "llm_tldr_cn": "该工作针对线性逆问题提出了一种可保证后验采样的扩散方法(pDDIM)，通过对标准DDIM更新进行轻量级坐标修正并显式嵌入测量模型，实现了高效且理论可靠的逆问题求解。该方法可直接应用于高光谱图像去噪任务，作为通用逆问题求解器具备良好的迁移性与性能保障。实验验证了其在多种线性逆问题上的有效性，为高光谱去噪提供了新范式。",
+      "llm_tldr": "该工作针对线性逆问题提出了一种可保证后验采样的扩散方法(pDDIM)，通过对标准DDIM更新进行轻量级坐标修正并显式嵌入测量模型，实现了高效且理论可靠的逆问题求解。该方法可直接应用于高光谱图像去噪任务，作为通用逆问题求解器具备良好的迁移性与性能保障。实验验证了其在多种线性逆问题上的有效性，为高光谱去噪提供了新范式。",
+      "llm_tags": [
+        "query:hsi-denoise:composite"
+      ],
+      "matched_query_tag": "query:hsi-denoise:composite",
+      "matched_query_text": "Papers central to 高光谱影像噪声去除, especially work that connects or combines: low-rank representation for denoising; stripe noise removal in hyperspectral remote sensing images; high-dimensional tensor data recovery for hyperspectral images; relative radiometric correction for remote sensing images; hyperspectral image denoising methods; spectral-spatial denoising for hyperspectral images; hyperspectral image denoising using deep neural networks; state of the art hyperspectral image restoration and denoising methods; hyperspectral image stripe noise removal using deep learning; tensor based approaches for hyperspectral image anomaly detection and restoration.",
+      "matched_requirement_id": "req-composite-hsi-denoise",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,1982 @@
+Title: Kernel Regression with Tensor Trains and Hadamard Overparameterization
+
+URL Source: https://arxiv.org/pdf/2607.17390v2
+
+Published Time: Wed, 22 Jul 2026 00:59:35 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+# Kernel Regression with Tensor Trains and Hadamard Overparameterization 
+
+Duc Thien Nguyen 1
+
+> 1
+
+Institute of Science Tokyo, Dept. Information and Communications Engineering, Yokohama, Japan 
+
+Konstantinos Slavakis 1
+
+> 1
+
+Institute of Science Tokyo, Dept. Information and Communications Engineering, Yokohama, Japan 
+
+Eleftherios Kofidis 2
+
+> 2
+
+University of Piraeus, Dept. Statistics and Insurance Science, Greece 
+
+Dimitris Pados 3
+
+> 3
+
+Florida Atlantic University, Center for Connected Autonomy and Artificial Intelligence & Dept. Electrical Engineering and Computer Science, USA 
+
+Abstract 
+
+Kernel regression with tensor trains and Hadamard overparameterization (KReTTaH) is introduced as a training-data-free, interpretable, and nonparametric framework for multi-way data imputation. The imputation problem is reformulated as regression in reproducing kernel Hilbert spaces (RKHS), where the tensor regres-sion coefficients are explicitly constrained to lie on fixed-rank tensor-train (TT) manifolds and structured via Hadamard overparameterization to promote sparsity and high representational efficiency. Rather than relying on costly cross-validation, KReTTaH jointly optimizes the TT coefficient tensors and the kernel covariance ma-trices within a Riemannian product-manifold framework—the former on fixed-rank TT manifolds, the latter on the manifold of positive-definite matrices—thereby enabling automated kernel-hyperparameter selection. Nu-merical tests on two challenging applications—imputation of high-dimensional functional magnetic resonance imaging (fMRI) data and recovery of missing edge flows in dynamic graphs—demonstrate that KReTTaH consis-tently outperforms state-of-the-art tensor-, Bayesian-, and neural-network-based baselines in terms of modeling accuracy. 
+
+# 1 Introduction 
+
+Multi-way data, naturally represented as multi-dimensional arrays or tensors [1], often contain missing entries due to imperfections in data acquisition or measurement limitations. Tensor completion (TC) [2] aims to recover these missing values by exploiting strong correlations induced by an underlying low-rank structure. To this end, tensor rank is defined implicitly through tensor decomposition (TD) models, which approximate a tensor as a product of smaller core tensors and matrices. Two prominent TD examples are canonical polyadic decomposition (CPD) and Tucker decomposition (TKD) [1]. CPD, the simplest model with milder uniqueness conditions, yields more inter-pretable results but may prove overly restrictive for certain datasets. TKD, conversely, provides greater flexibility but at the expense of reduced interpretability and higher computational and memory costs. An intermediate alternative is the tensor-train (TT) decomposition [3] and its variants, such as tensor ring de-composition (TRD) [4]. Compared with CPD, TT decomposition (TTD) improves feature extraction, accuracy, and stability, while its core ranks are more readily determined [5]. Relative to TKD, TTD achieves greater compactness 1arXiv:2607.17390v2 [stat.ML] 21 Jul 2026 and mitigates the curse of dimensionality by using only low-order ( ≤ 3) core tensors [6]. Notably, all tensors of fixed TT rank form low-dimensional Riemannian manifolds embedded within high-dimensional ambient spaces [7, 8]—a rich geometric structure exploited in the present work for both analytical and computational purposes. Although TD models—by definition multilinear—have shown success in TC [2], they do not explicitly incor-porate nonlinear feature mappings, limiting their ability to capture the stronger nonlinear relations latent in data from numerous application domains. Such nonlinear relations can be critical for imputation as well, and can be incorporated into TD models via kernel methods, which are known for their ability to capture complex nonlinear dependencies by mapping data into high-dimensional feature spaces through reproducing kernels [9–11]. Kernels have already been incorporated into several tensor models—CPD [12–14], TKD [15], TTD [16], and TRD [17]—to encode side information or serve as implicit basis functions. Nevertheless, methods based on CPD [12–14] may face limitations from its restrictive nature, while those based on TKD [15] suffer from rotational ambiguity. Mean-while, variational Bayesian-inference methods [14, 17] place Gaussian priors on the core-tensor entries—effectively imposing Gaussian kernel structure as side information—to achieve TC, but appear to entail high computational complexity (see Section 4.1). This work introduces a novel model that captures nonlinear relations in multi-way data, targeting missing data imputation. More specifically, it formulates regression in a reproducing kernel Hilbert space (RKHS) [9–11], en-abling nonlinear and nonparametric approximation [18] within TTD. Extending earlier work on two-way data [19– 21], and unlike [22, 23], which impose the TTD geometric structure on the data tensor itself, the proposed framework imposes it on the regression parameter tensors, yielding a new data model (see (6)). While [19, 20] adopt an implicit manifold-learning approach, where manifolds are unknown to the user, this work employs an explicit construction, constraining the regression coefficients to lie on TT manifolds of user-defined fixed rank, which are known to pos-sess a rich Riemannian structure [7]. To further enhance approximation capabilities, HP is applied to the parameter tensors—a feature hitherto unexplored in kernel-based TD [16]; when combined with smooth regularizers in the learning objective, HP promotes sparsity and yields substantial dimensionality reduction [24–27]. The proposed framework is termed kernel regression with tensor trains and Hadamard overparameterization (KReTTaH). 
+
+Extending preliminary results [28], this work offers additional flexibility by employing multiple Gaussian ker-nels whose covariance matrices, constrained to lie on the Riemannian manifold of positive-definite (PD) matri-ces, are jointly learned. This circumvents the painstaking kernel hyperparameter tuning typically carried out by cross-validation (see a similar approach in the context of support vector machines [29]); to the best of the authors’ knowledge, the present work is the first to integrate this approach into a TT regression framework. Making use of the underlying Riemannian geometry of the fixed-rank TT and PD-matrix manifolds, as well as the sparsity-inducing structure of HP, KReTTaH naturally yields a smooth inverse problem constrained on a Cartesian-product Riemannian manifold, solvable via any user-defined (first- or second-order) Riemannian opti-mization method. KReTTaH thus distinguishes itself from [12, 15–17], which employ alternating minimization or stochastic gradient descent (SGD) on tensor factors, and from standard ℓp-norm ( p ∈ (0 , 1] ) regularized sparsity-promoting algorithms that optimize non-smooth objectives. In contrast to many “black-box” neural-network (NN) methods that require external training data, KReTTaH operates in a training-free manner, providing an interpretable 
+
+solution through regression in an RKHS—one that enjoys the familiar geometric structure of linear vector spaces, further enriched by Riemannian manifold geometry, and transparent sparsity-promoting regularization. The contributions of this paper are summarized as follows. 
+
+(C1) Introduce KReTTaH, a training-data-free and interpretable regression framework for multi-way data, capable of nonlinear and nonparametric data modeling via reproducing kernels, dimensionality reduction via TTD, sparse coding via HP, and streamlined computations via Riemannian optimization. 2(C2) Generalize earlier work on two-way data [19–21] to multi-way settings by adopting an explicit Riemannian manifold construction—constraining regression coefficients to lie on fixed-rank TT manifolds—in contrast to the implicit manifold-learning approach of [19, 20], where the underlying manifold remains unspecified. 
+
+(C3) Extend [28] to handle multiple Gaussian kernels with learnable covariance matrices, constrained to the mani-fold of positive-definite matrices. Covariance learning is seamlessly integrated within an overarching Rieman-nian optimization framework, enabling automated hyperparameter selection and eliminating costly manual kernel hyperparameter tuning. The rest of the paper is organized as follows. Section 2 introduces necessary concepts and properties of TTD and Riemannian manifolds, with mathematically involved arguments deferred to the appendices. Section 3 presents KReTTaH’s data model, its inverse problem and algorithmic solution, together with a discussion on the computa-tional complexity. To showcase the effectiveness of KReTTaH, Section 4 details its application to the following challenging tasks: imputation of 4D-fMRI real data (Section 4.1) and imputation of time-varying edge flows in networks (Section 4.2). Finally, Section 5 summarizes the paper and outlines potential future research directions. 
+
+# 2 Preliminaries 
+
+2.1 Basic concepts 
+
+Let N, N∗, R and R++ be the sets of all nonnegative integers, positive integers, real numbers and positive real numbers, respectively. Given i1, i 2 ∈ N, with i1 ≤ i2, let also Ji1, i 2K := {i1, i 1 + 1 , . . . , i 2}. All vectors in the sequel are considered to be column ones. Given two vectors a, a′ of equal dimension I ∈ N∗, a  a′ stands for 
+
+ai ≤ a′
+
+> i
+
+, where ai and a′ 
+
+> i
+
+are the ith entries of a and a′, respectively, ∀i ∈ J1, I K. Vector a = [ a1, . . . , a I ]⊺, where 
+
+⊺ denotes vector/matric transposition, will be also denoted as (a1, . . . , a I ).For N ∈ N∗, consider any order-N tensors X , X1, X2 ∈ RI1×I2×···× IN . The (i1, i 2, . . . , i N )th entry of X
+
+is denoted by X (i1, i 2, . . . , i N ), ∀ij ∈ J1, I j K, ∀j ∈ J1, N K. Fixing one index while varying all others yields a “slice” of X , e.g., X ( : , . . . , : , i ), where : denotes a full range of indices. The vectorization of X —according to a user-defined ordering of the tensor indices—yields the (I1I2 · · · IN ) × 1 column vector vec( X ). The inner product 
+
+〈X1 | X2〉 := vec ⊺(X1) vec( X2). The Frobenius norm of X is defined as ‖X ‖F := 〈X | X 〉1/2, while its ℓp-norm ‖X ‖p := ( ∑ 
+
+> i1,i 2,...,i N
+
+|X (i1, i 2, . . . , i N )|p)1/p as the ℓp-norm of vec( X ) for p ∈ R++ . The (i1, i 2, . . . , i N )th entry of the Hadamard (entry-wise) product X1 X2 ∈ RI1×I2×···× IN is defined as (X1 X2)( i1, i 2, . . . , i N ) := 
+
+X1(i1, i 2, . . . , i N )X2(i1, i 2, . . . , i N ). The Kronecker product between two matrices is denoted by ⊗ [30]. The identity matrix of size d × d is denoted by Id, while the zero matrix of size d1 × d2 is denoted by 0d1×d2 . The trace of a square matrix is denoted by tr( ·). The pseudo-inverse of a matrix is denoted by (·)†.Although the rank of a tensor can be defined in several ways depending on the decomposition used (e.g., CPD or TKD rank), the following definition, taken from [3], will be used throughout this work. 
+
+Definition 1 (Rank [3]) . The mth unfolding of X , for m ∈ J1, N − 1K, is defined as the reshaping of X into the matrix X ⟨m⟩ ∈ R(I1··· Im)×(Im+1 ··· IN ). The rank of X is defined as the (N + 1) × 1 vector rank( X ) := (1 , rank( X ⟨1⟩), . . . , rank( X ⟨N −1⟩), 1) , where rank( X ⟨m⟩) stands for the rank of matrix X ⟨m⟩, ∀m ∈ J1, N − 1K.
+
+Fact 2 (Addition of tensors [3, Section 4.1]) . For any tensors X1, X2 of size I1 × · · · × IN , rank( X1 + X2) 
+
+rank( X1) + rank( X2).
+
+Fact 3 (Hadamard product of tensors [3, Section 4.2]) . For any tensors X1, X2 of size I1 × · · · × IN , rank( X1
+
+X2)  rank( X1) rank( X2).3I2
+
+I1
+
+I3
+
+A(3 , 3, 1) 
+
+# =
+
+A1(: , 3, :) 
+
+A2(: , 3, :) 
+
+A3(: , 1, :) Figure 1: A visualization of an order-3 TT tensor (see Definition 5). The (3 , 3, 1) th entry of a TT-tensor A ∈ R4×4×4 is computed by the matrix multiplication of the (lateral) slices of the core tensors, i.e., A(3 , 3, 1) = A1(: , 3, :) A2(: , 3, :) A3(: , 1, :) . The core tensors 
+
+A1 ∈ R1×4×4, A2 ∈ R4×4×3, A3 ∈ R3×4×1 yield the TT compression rank crank TT (A) = (1 , 4, 3, 1) .
+
+2.2 Background on tensor trains 
+
+Definition 4 (Tensor contraction [31]) . For the order-N tensor X ∈ RI1×···× IN and the order-M tensor W ∈
+
+RJ1×···× JM , with In = Jm for some (n, m ) ∈ J1, N K × J1, M K, contraction ×mn yields the order-(N + M − 2) 
+
+tensor Z := X ×mn W ∈ RI1×···× In−1×In+1 ×···× IN ×J1×···× Jm−1×Jm+1 ×···× JM , with entries 
+
+Z(i1, . . . , i n−1, i n+1 , . . . , i N , j 1, . . . , j m−1, j m+1 , . . . , j M ):= ∑
+
+> in∈J1,I nK
+
+X (i1, . . . , i n−1, i n, i n+1 , . . . , i N ) W(j1, . . . , j m−1, i n, j m+1 , . . . , j M ) .
+
+Tensors can be contracted in several modes, e.g., ×m1,m 2 
+
+> n1,n 2
+
+means contracting over modes n1, m 1 and n2, m 2, with 
+
+In1 = Jm1 and In2 = Jm2 . The contraction ×1 
+
+> N
+
+is also written as ×1.
+
+Definition 5 (Tensor trains [3]) . Given positive integers 1 =: r0, r 1, . . . , r N −1, r N =: 1 , and a number of N
+
+order-3 core tensors {Aj ∈ Rrj−1×Ij ×rj | j ∈ J1, N K}, the associated order-N tensor train (TT) is defined as 
+
+A := A1 ×1 A2 ×1 · · · × 1 AN ∈ RI1×···× IN . The TT (compression) rank of the TT A is defined as the (N + 1) × 1
+
+vector crank TT (A) := (1 := r0, r 1, . . . , r N −1, r N =: 1) . It can be verified that the (i1, . . . , i N )th entry of A is expressed as the following product [3]: 
+
+A(i1, . . . , i N ) = A1(1 , i 1, :) A2(: , i 2, :) · · · AN −1(: , i N −1, :) AN (: , i N , 1) ,
+
+where Aj (: , i j , :) are matrices for j ∈ J2, N − 1K, while A1(1 , i 1, :) and AN (: , i N , 1) are row and column vectors, respectively; see also Figure 1. 
+
+Fact 6 ([3]) . The rank of a TT A—see Definition 1—satisfies rank( A)  crank TT (A).
+
+Definition 7 (Tensor train decomposition [3]) . Given r := (1 , r 1, . . . , r N −1, 1) ∈ NN +1  
+
+> ∗
+
+, define the set of all order-
+
+N TTs of size I1 × · · · × IN , with TT compression rank  r, as TT ⪯ r := 
+
+{
+
+A = A1 ×1 A2 ×1 · · · × 1 AN
+
+∣∣∣∣∣
+
+Aj ∈ Rr′  
+
+> j−1×Ij×r′
+> j
+
+, j ∈ J1, N K,
+
+crank TT (A)  r
+
+}
+
+.
+
+4Algorithm 1 TT-SVD [3] 
+
+Input: A tensor X ∈ RI1×···× IN and target TT compression rank r = (1 , r 1, . . . , r N −1, 1) .
+
+Output: ASVD   
+
+> X,r
+
+= A1 ×1 A2 ×1 · · · × 1 AN . 
+
+> 1:
+
+Initialize the auxiliary matrix T1 = [1] ∈ R1×1. 
+
+> 2:
+
+for m = 1 to N − 1 do  
+
+> 3:
+
+Compute the SVD of (Tm ⊗ IIm )⊺X ⟨m⟩ = UmΣmV⊺ 
+
+> m
+
+with singular values in descending order.  
+
+> 4:
+
+A⟨2⟩ 
+
+> m
+
+← first rm column vectors of Um. Recall that the size of A⟨2⟩ 
+
+> m
+
+is (rm−1Im) × rm. 
+
+> 5:
+
+Am ← reshape A⟨2⟩ 
+
+> m
+
+to rm−1 × Im × rm. 
+
+> 6:
+
+Tm+1 ← (Tm ⊗ IIm )A⟨2⟩ 
+
+> m
+
+. The size of Tm+1 is (∏mi=1 Ii) × rm. 
+
+> 7:
+
+end for  
+
+> 8:
+
+A⟨2⟩ 
+
+> N
+
+← T⊺ 
+
+> N
+
+X ⟨N −1⟩. Reshape to rN −1 × IN × 1 to get AN .The TT decomposition (TTD) of a tensor X ∈ RI1×···× IN is defined then as a TT A∗  
+
+> X,r
+
+s.t. 
+
+A∗  
+
+> X,r
+
+∈ arg min    
+
+> A∈TT ⪯r
+
+‖X − A‖2 
+
+> F
+
+. (1) The TTD of a tensor X can be computed by the TT singular value decomposition (TT-SVD) of Algorithm 1. While this statement belies considerable mathematical depth, the details are deferred to Appendix A to keep the exposition here accessible. 
+
+2.3 Background on Riemannian geometry 
+
+This section briefly reviews key concepts from Riemannian geometry; for a comprehensive treatment, the reader is referred to [8, 32]. For the not necessarily open subsets U ⊂ Rd and V ⊂ Rd′
+
+, a map L : U → V is called smooth, if it is infinitely many times differentiable [8, §2.1]. A diffeomorphism is a bijection L : U → V where both L and its inverse L−1
+
+are smooth—in such a case, U and V are called diffeomorphic to each other. An d-dimensional smooth manifold M, embedded in an Euclidean space E, is a set such that (s.t.) any point 
+
+Θ ∈ M has an open neighborhood that is diffeomorphic to an open subset of Rd [8, Def. 2.1.3]. A tangent vector of M at Θ is the “velocity” ˙γ(0) := lim t→0[γ(t) − γ(0)] /t of a smooth curve γ : R → M : t 7 → γ(t)
+
+that crosses Θ, i.e., γ(0) = Θ [8, Def. 2.2.1]; see Figure 2a. The tangent space TΘM of M at Θ is the d-dimensional linear vector subspace of E that comprises all tangent vectors of M at Θ [8, Def. 2.2.1], and the tangent bundle T M is the collection of all tangent spaces TΘM, ∀Θ ∈ M, which can be defined as T M := {(Θ, ξ) |
+
+Θ ∈ M, ξ ∈ TΘM} [8, Def. 2.6.6]. For the smooth map L : M → R, the derivative of L at Θ ∈ M is the linear map DL(Θ) : TΘM → R : ξ 7 → DL(Θ)[ ξ] := lim t→0[L(γ(t)) − L (Θ)] /t , for any smooth curve γ : R → M with 
+
+γ(0) = Θ and ˙γ(0) = ξ [8, §2.2.2]. By the Riesz representation theorem, the unique vector ∇L (Θ) ∈ TΘM s.t. 
+
+DL(Θ)[ ξ] = 〈∇L (Θ) | ξ〉E , ∀ξ ∈ TΘM, is called the gradient of L at Θ.A Riemannian manifold M is a smooth manifold equipped with a Riemannian metric, i.e., a collection of inner products 〈· | ·〉 Θ, defined at every Θ ∈ M and on pairs of tangent vectors in TΘM, s.t. it induces a specific smooth map for every pair of vector fields on M [8, Def. 3.7.1]. The metric naturally defines the norm ‖·‖ Θ := 〈· | ·〉 1/2 
+
+> Θ
+
+.For a smooth function L : M → R, the Riemannian gradient of L at Θ, denoted by grad L(Θ), is the unique tangent vector in TΘM that satisfies [32, (3.31)] 
+
+〈grad L(Θ) | ξ〉Θ = DL(Θ)[ ξ] , ∀ξ ∈ TΘM . (2) 5M                                            
+
+> TΘM
+> ξ= ˙ γ(0)
+> RΘ(ξ)
+> Θ=γ(0) (a) Riemannian manifold and retraction M
+> TΘ(n)M
+> −tA
+> nξ(n)
+> Θ(n+1)
+> −tA
+> n∇L (Θ(n))
+> RΘ(n)
+> Θ(n)(b) A single iteration in Algorithm 2
+> Figure 2: (a) Illustration of a smooth manifold M. The tangent space TΘMat Θcomprises all tangent vectors ξof Mat Θ. The retraction map RΘ(ξ)maps a tangent vector ξ∈TΘMto a point in M; it serves as an extension and a tractable alternative of the exponential map; see Definition 15 in Appendix B. (b) Illustration of one Riemannian-gradient descent step in Algorithm 2. The Euclidean gradient of a smooth loss L(·)at Θ(n)is first projected onto the tangent space TΘ(n)M, i.e., ξ(n):= PTΘ(n)M(∇L (Θ(n)) ) , and then retracted back to the manifold Mby RΘ(n). Symbol tA
+> nstands for the (Armijo) step-size, computed via line search.
+
+In optimization over manifolds, one needs to properly map a tangent vector back to the manifold. An example of such a map is the exponential map Exp Θ : TΘM → M [8, Def. 4.3.5]. In many cases, the exponential map does not admit a simple closed-form expression, and computing it via numerical solvers can be computationally demanding. To surmount such obstacles, the retraction map RΘ : TΘM → M serves as a computationally tractable generalization of the exponential map [32, Def. 4.1.1]; see Definition 15 in Appendix B. An illustration of the aforementioned concepts pertaining smooth manifolds is given in Figure 2a. 
+
+Fact 8 (Tensors of fixed-rank [7]) . Given r := (1 , r 1, . . . , r N −1, 1) ∈ NN +1  
+
+> ∗
+
+, the set of all tensors with rank equal to r (Definition 1), namely, 
+
+Mr := {X ∈ RI1×···× IN
+
+∣∣ rank( X ) = r} , (3) is a Riemannian manifold of dimension ∑Nj=1 rj−1Ij rj − ∑N −1 
+
+> j=1
+
+r2 
+
+> j
+
+. The Riemannian metric in Mr is inherited from the Euclidean inner product of tensors (Section 2.1), i.e., 〈ξ | η〉X := 〈ξ | η〉, where the tangent vectors 
+
+ξ, η ∈ TX Mr are tensors in the ambient RI1×···× IN [22], and TX Mr is the tangent space of Mr at X . Necessary and sufficient conditions for Mr to be nonempty are rj−1 ≤ Ij rj and rj ≤ Ij rj−1, ∀j ∈ J1, N K [33, (9.32)]. A parameterization of the tangent space TX Mr is given in Fact 16 in Appendix B. Then, under the light of Fact 17 in Appendix B, the Riemannian gradient (2) of a smooth function L : Mr → R is given by the orthogonal projection of the Euclidean gradient ∇L (X ) onto the tangent space, i.e., grad L(X ) = PTX Mr (∇L (X )) [32]; see also Figure 2b. The exponential map for manifold Mr does not admit a closed-form expression. To surmount this obstacle and to relax the burden of computing the exponential map, the following retraction map RX : TX Mr → M r : ξ 7 → RX (ξ)
+
+with 
+
+RX (ξ) := TT-SVD (X + ξ) , (4) was introduced in [22], with TT-SVD provided by Algorithm 1. More details on (4) can be found in Remark 18 of Appendix B. The Riemannian geometry of positive-definite matrices, which will be used in the sequel, is discussed in detail in Fact 19 of Appendix B; its treatment is deferred there to avoid overcrowding the present section with mathematical details. 63 The KReTTaH Framework 
+
+3.1 Navigator data and landmark points 
+
+In the following, Y denotes the observed I1 × · · · × IN data tensor. In the context of imputation, not all of its entries are observed. To this end, let Ω denote all those indices (i1, . . . , i N ) ∈ J1, I 1K × · · · × J1, I N K where Y(i1, . . . , i N )
+
+are observed. The “sampling map” PΩ : RI1×···× IN → RI1×···× IN is defined by PΩ(Y)( i1, . . . , i N ) := 
+
+Y(i1, . . . , i N ), if (i1, . . . , i N ) ∈ Ω, and PΩ(Y)( i1, . . . , i N ) := 0 , otherwise. To capture structural information from sparsely and irregularly observed tensor data, the concept of navigator data , has been introduced in MRI reconstruction and motion correction. Even when only a small fraction of entries are observed, groups of those entries often exhibit strong spatial and temporal dependencies. Accordingly, let 
+
+{Ωk}Nnav 
+
+> k=1
+
+, for some Nnav ∈ N∗, be user-defined index sets with Ωk ⊂ Ω and |Ωk| = Dnav , ∀k, where Dnav is chosen to be smaller than |Ω|. The collection {Ωk}Nnav  
+
+> k=1
+
+is designed to accommodate diverse settings and domains; modeling image patches or temporal windows, for instance. The data {Y(i1, . . . , i N ) | (i1, . . . , i N ) ∈ Ωk} are vectorized to form yk ∈ RDnav , and the vectors {yk}Nnav  
+
+> k=1
+
+constitute the navigator data. Most likely, Nnav and Dnav are large. It is conceivable that the most meaningful information in {yk}Nnav  
+
+> k=1
+
+lies in a space of dimensionality Dl, much smaller than Dnav . Motivated by [34, 35], the popular local linear embed-ding (LLE) technique is employed to reduce the dimensionality of the navigator data to Dl and yield the lower-dimensional representations {ˇyk}Nnav  
+
+> k=1
+
+⊂ RDl of the original navigator data {yk}Nnav  
+
+> k=1
+
+⊂ RDnav . The small dimen-sionality Dl will also facilitate the optimization of covariance matrices on the SDl 
+
+> ++
+
+manifold (see Fact 19 and (7)). Further, to reduce the computational burden imposed by a large Nnav , vectors {lj }Nl 
+
+> j=1
+
+⊂ RDl , referred to as land-mark points [36, 37], with Nl < N nav , are selected from {ˇyk}Nnav  
+
+> k=1
+
+via a user-defined strategy. Landmark points may be selected in various ways—randomly, via greedy max-min-distance sampling, or via clustering [19, 36, 37]. The max-min strategy [37] is generally preferable, as the resulting {lj }Nl 
+
+> j=1
+
+provides good coverage of the original point cloud {ˇyk}Nnav 
+
+> k=1
+
+.
+
+3.2 Reproducing kernel Hilbert spaces (RKHSs) 
+
+To model intricate “nonlinear” correlations present in the landmark points {lj }Nl
+
+> j=1
+
+, this paper utilizes the well-established theory of reproducing kernel Hilbert spaces (RKHS) [9–11]. An RKHS H is a Hilbert space of func-tions f : RDl → R : l 7 → f (l), equipped with an inner product 〈· | ·〉 H and a reproducing kernel κ(·, ·) : RDl ×
+
+RDl → R that satisfies κ(l, ·) ∈ H , ∀l ∈ RDl , as well as the reproducing property: f (l) = 〈f | κ(l, ·)〉H , ∀f ∈
+
+H , ∀l ∈ RDl . The kernel function defines also the feature map φ : RDl → H : l 7 → φ(l) := κ(l, ·). The reproduc-ing property establishes the kernel trick: 〈φ(l′) | φ(l)〉H = 〈κ(l′, ·) | κ(l, ·)〉H = κ(l′, l), ∀(l′, l) ∈ RDl × RDl ,that is, inner products in the (potentially high- or infinite-dimensional) feature space H can be computed implicitly via simple evaluations of the kernel function, without explicitly constructing the feature map φ(·).The landmark points {lj }Nl 
+
+> j=1
+
+⊂ RDl are mapped to {φ(lj )}Nl 
+
+> j=1
+
+⊂ H , and the kernel matrix K is defined as the Nl × Nl matrix with entries K(j, j ′) := 〈φ(lj ) | φ(lj′ )〉H = κ(lj , lj′ )—see (7) for an example based on the celebrated anisotropic Gaussian reproducing kernel. Loosely speaking, K encodes “linear” correlations among 
+
+{φ(lj )}Nl
+
+> j=1
+
+, or alternatively, “nonlinear” correlations among the landmark points {lj }Nl
+
+> j=1
+
+.Kernel functions have already been incorporated within tensor models for imputation tasks; these models include CPD [12–14], TKD [15], TTD [16], and TRD [17]. Among these approaches, [12, 13, 15, 16] approximate missing entries via RKHS-based arguments, with coefficients learned through alternating minimization or gradient descent. In contrast, [14, 17] adopt a variational Bayesian-inference approach by placing Gaussian priors on latent variables and core tensors in the decomposition. 73.3 Data modeling and regression 
+
+To exploit the structural information contained in the navigator data and the associated landmark points gathered via Section 3.1, each entry of the tensor Y is approximated by nonlinear functions belonging to an RKHS described in Section 3.2. In particular, for a chosen splitting index m ∈ J1, N − 1K, the (i1, i 2, . . . , i N )th entry of Y is approximated as 
+
+Y(i1, i 2, . . . , i N ) ≈ fi1,...,i m ( ˇ μim+1 ,...,i N ) = 〈fi1,...,i m | φ( ˇ μim+1 ,...,i N )〉H , (5) where fi1,...,i m (·) : RDl → R, taken from the user-defined RKHS H equipped with a reproducing kernel κ, is a function to be identified, ˇμim+1 ,...,i N is a Dl × 1 vector to be also inferred, and the last equality in (5) is be-cause of the reproducing property of H [9, 10]. As noted in Section 3.2, thanks to the reproducing property, the unknown entities fi1,...,i m and ˇμim+1 ,...,i N can be estimated via the kernel function κ, evaluated at the land-mark points. Specifically, motivated by the representer theorem [10, 11], fi1,...,i m is assumed to belong to the linear span of {φ(lj )}Nl
+
+> j=1
+
+, i.e., fi1,...,i m = ∑Nl 
+
+> j=1
+
+ui1,...,i m,j φ(lj ), for some learnable parameters {ui1,...,i m,j } ⊂ R.Similarly, φ( ˇ μim+1 ,...,i N ) = ∑Nl 
+
+> j′=1
+
+vj′,i m+1 ,...,i N φ(lj′ ), for some also learnable parameters {vj′,i m+1 ,...,i N } ⊂ R,so that the linear property of the inner product in (5) yields the kernel-based regression Y(i1, i 2, . . . , i N ) ≈
+
+∑ 
+
+> j,j ′
+
+ui1,...,i m,j vj′,i m+1 ,...,i N κ(lj , lj′ ). Towards concise data modeling, define tensors U ∈ RI1×···× Im×Nl and 
+
+V ∈ RNl ×Im+1 ×···× IN , with U (i1, . . . , i m, j ) := ui1,...,i m,j and V(j, i m+1 , . . . , i N ) := vj,i m+1 ,...,i N , j ∈ J1, N l K.As a result, it can be verified by Definition 4 that the original tensor Y is approximated as 
+
+Y ≈ U ×1 K ×1 V ,
+
+where K is the kernel matrix appearing in Section 3.2. To enforce low-rank structure and lend greater flexibility to the previous model, several extensions are introduced as modeling assumptions below. 
+
+Modeling Assumptions 9. (i) The data tensor is approximated via the following multi-kernel model 
+
+Y ≈
+
+> NK
+
+∑
+
+> ν=1
+
+( Pp=1 Uν,p 
+
+)︸ ︷︷ ︸
+
+> Uν
+
+×1 Kν ×1 ( Qq=1 Vν,q 
+
+)︸ ︷︷ ︸
+
+> Vν
+
+, (6) where the kernel matrices {Kν ∈ RNl ×Nl | ν ∈ J1, N K K} are defined as follows, 
+
+Kν (j, j ′) := exp[ − 12 (l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)⊺(Cν )−1(l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+) ] , (7) the covariance matrices {Cν | ν ∈ J1, N K K}, which are also to be learned, belong to the Riemannian manifold of positive definite matrices SDl 
+
+> ++
+
+introduced in Fact 19, and {l(ν) 
+
+> j
+
+∈ RDl | j ∈ J1, N l K, ν ∈ J1, N K K} are landmark points generated according to Section 3.1. 
+
+(ii) Tensors Uν and Vν are overparameterized via the Hadamard product as Uν := Pp=1 Uν,p and Vν := Qq=1 Vν,q 
+
+by the learnable tensors {Uν,p }ν,p ⊂ RI1×···× Im×Nl and {Vν,q }ν,q ⊂ RNl ×Im+1 ×···× IN .
+
+(iii) For user-defined ranks r1, r2, tensors {Uν,p ∈ RI1×···× Im×Nl | ν ∈ J1, N K K, p ∈ J1, P K} belong to the Riemannian manifold Mr1 of rank r1, and {Vν,q ∈ RNl ×Im+1 ×···× IN | ν ∈ J1, N K K, p ∈ J1, P K} belong to the Riemannian manifold Mr2 of rank r2—see Fact 8. Modeling Assumptions 9 significantly extend earlier works [19–21] from two-way to multi-way data. While [19, 820] adopt an implicit manifold-learning perspective, in which the underlying manifold remains unspecified, the present framework explicitly constrains the solution to Riemannian manifolds of fixed-rank tensors. Furthermore, the implicit manifold assumption in [19, 20] induces a composite-convex subproblem (involving nonsmooth ℓ1-norm regularization and affine constraints that needs to be solved iteratively), which can be computationally heavy. Modeling Assumption 9(i) employs multiple kernels that can capture correlations within different sets of landmark points. Multiple kernel functions κν , corresponding to different RKHSs Hν , diversify the feature spaces for non-linear regression. Moreover, by the addition property of TT tensors in Fact 2, when NK > 1, it is possible to set the ranks of Uν,p and Vν,q smaller than those required when NK = 1 . This can lead to more efficient computation and narrower grid-search ranges for the ranks, since Uν,p and Vν,q may reside on manifolds of smaller ranks when 
+
+NK > 1.By treating Cν as a learnable parameter on the manifold of positive-definite matrices, the manual tuning of ker-nel hyperparameters—e.g., the bandwidth of Gaussian kernels, as required in [19–21] and the conference version of this paper [28]—can be sidestepped. A popular alternative to Riemannian manifolds is to factorize the covari-ance matrix via its Cholesky decomposition Cν = Lν L⊺ 
+
+> ν
+
+(with Lν lower triangular) and learn the entries of Lν
+
+in a standard Euclidean space [38]. Nevertheless, to ensure positive definiteness, the diagonal entries of Lν are typically re-parameterized as exp( αi) for learnable parameters αi. When composed with the Gaussian kernel, this re-parameterization yields a double-exponential expression that can cause numerical instabilities such as exploding or vanishing gradients. In contrast, by directly learning Cν on the Riemannian manifold of symmetric positive-definite matrices (see Fact 19), KReTTaH naturally respects the geometric constraints of the search space, avoids intricate re-parameterizations, and integrates seamlessly with the Riemannian optimization already performed on the TT tensors. Modeling Assumption 9(ii) is motivated by recent research [24–27], which, perhaps contrary to intuition, demonstrates that the overparameterization U = Pp=1 Up, when combined with smooth regularization of the asso-ciated inverse problem via the Frobenius norms of the Hadamard factors, ∑Pp=1 ‖Up‖2 
+
+> F
+
+(as in (8)), promotes sparsity in U (likewise in V). Indeed, this approach effectively induces the non-convex and non-smooth quasi-norm reg-ularizer ‖U ‖2/P  
+
+> 2/P
+
+for P > 2, which yields sparser and less biased solutions than classical ℓ1-norm methods [27]. This strategy, namely introducing additional parameters to promote sparsity, can also improve accuracy through increasing the degrees of freedom and hence the representation capacity of the model [27]. Additionally, based on the property in Fact 3, when P > 1 (or Q > 1), the ranks of Up (or Vq) can be set smaller than those when P = 1 
+
+(or Q = 1 ). Again, this may lead to cheaper computational costs and rank-search. Modeling Assumption 9(iii) enhances dimensionality reduction by constraining the coefficient tensors {Uν,p }ν,p 
+
+and {Vν,q }ν,q to reside in the low-dimensional manifolds Mr1 and Mr2 , respectively. These manifolds are chosen to utilize the rich geometric structure and algorithmic benefits of Riemannian geometry [8, 32]. Relying on manifolds of fixed rank structure for coefficient tensors rather than the data tensor appears to be novel in the literature on kernel-based tensor regression and functional approximation. 
+
+3.4 Inverse problem and its algorithmic solution 
+
+The previous discussion motivates the following inverse problem: 
+
+min  
+
+> Θ
+
+L(Θ) := 12 ‖PΩ(Y) − PΩ(X )‖2
+
+> F
+
+︸ ︷︷ ︸ 
+
+> F(Θ)
+
++R(Θ)
+
+9+ λ
+
+2
+
+∑NK
+
+> ν=1
+
+(∑Pp=1 ‖Uν,p ‖2 
+
+> F
+
++ ∑Qq=1 ‖Vν,q ‖2
+
+> F
+
+)︸ ︷︷ ︸
+
+> H(Θ)
+
+, (8a) subject to X := ∑NK
+
+> ν=1
+
+( Pp=1 Uν,p 
+
+) ×1 Kν ×1 ( Qq=1 Vν,q 
+
+)
+
+, (8b) 
+
+Θ := ( {Uν,p }, {Vν,q }, {Cν }) ∈ M , (8c) 
+
+M := MNK P 
+
+> r1
+
+× M NK Q 
+
+> r2
+
+× SNK D 
+
+> ++
+
+. (8d) The data-fidelity term F (Θ) enforces learning of parameters Θ such that model (8b) approximates the observed data PΩ(Y). The regularization term H(Θ), arising from the Hadamard overparameterization in Modeling As-sumption 9(ii), promotes sparsity in the coefficient tensors Uν and Vν of kernel regression. The hyperparameter 
+
+λ ∈ R++ controls the sparsity of Uν and Vν when P, Q > 1. The smooth regularizer R(Θ) imposes prior knowl-edge specific to the application at hand, as in Section 4.2, but can also be set to zero, as in Section 4.1. Owing to the modeling assumptions, the objective in (8a) is smooth and the Cartesian-product manifold M
+
+in (8d) is itself a Riemannian manifold, thereby enabling the powerful toolbox of Riemannian optimization [32]. The procedure summarized in Algorithm 2, and schematically depicted in Figure 2b, addresses (8) via a Riemannian gradient-descent (R-GD) method equipped with line search for accelerated convergence and theoretical convergence guarantees [32]. All entries of Θ ∈ M in (8c) are updated concurrently at each R-GD step, so that parallel imple-mentations can further boost computational efficiency. Due to the Cartesian product of Riemannian manifolds, the Riemannian gradient grad L(Θ(n)) in Line 4 of Algorithm 2 consists of the partial Riemannian gradients 
+
+grad L(Θ(n)) = 
+
+(
+
+. . . , grad Uν,p L, . . . , grad Vν,q L, . . . , grad Cν L, . . . 
+
+) ( 
+
+Θ(n))
+
+,
+
+computed according to Proposition 10. Additionally, the retraction in Line 7 of Algorithm 2 is computed by TT-SVD—see Algorithm 1—for the coefficient tensors, and by (14) for the covariance matrices. 
+
+RΘ(n) =
+
+(
+
+. . . , R U (n)
+
+> ν,p
+
+, . . . , R V(n)
+
+> ν,q
+
+, . . . , R C(n)
+
+> ν
+
+, . . . 
+
+)
+
+.
+
+Lines 6 and 7 involve constants α ∈ R++ , β ∈ (0 , 1) , and γ ∈ (0 , 1) . In practice, one can simply choose α = 1 , β =0.5, and γ = 10 −4 [39]. Provided that the step sizes are not too large, TT-SVD is a retraction that maps a point from the tangent space back to the manifold. While the precise conditions on the step sizes guaranteeing that the retraction indeed maps a point back to the manifold remain an open theoretical question (see also the discussion below (4)), evidence suggests that step sizes found by line search are sufficiently small for the retraction to be valid [22, 40]; see also Section 3.5. It is worth noting that Algorithm 2 departs from the block coordinate descent and alternating minimization approaches commonly adopted in tensor methods, which are often more sensitive to initialization and more prone to overfactoring due to separate block updates [41, 42]. Instead, the proposed R-GD scheme jointly updates all factors along a smooth trajectory on the product manifold, reducing the risk of overfitting to mode-specific noise. Line search (Line 6) adaptively controls step sizes, ensuring stable descent and mitigating sensitivity to poor initialization. Interestingly, the proposed R-GD approach also facilitates extension of Algorithm 2 to stochastic and online learning from streaming data; a promising direction for future work. 
+
+Proposition 10 (Computing Riemannian gradients of L in (8a)) . To reduce notational clutter, all variables— including Θ below—carry an implicit index (n) denoting their values at the nth iteration, which is omitted through-10 Algorithm 2 Solving (8) via Riemannian gradient descent 
+
+Output: Sequence of iterates {Θ(n)}n∈N∗,n ≤Niter .
+
+1: Initialize Θ(0) ∈ M, then compute X (n).
+
+2: for n = 1 to Niter do 
+
+3: Available is Θ(n) = ( . . . , U (n) 
+
+> ν,p
+
+, . . . , V(n) 
+
+> ν,q
+
+, . . . , C(n) 
+
+> ν
+
+, . . . ).
+
+4: Compute the Riemannian gradient ξ(n) := grad L(Θ(n)).
+
+5: Set the descent direction as η(n) = −ξ(n).
+
+6: (Backtracking line search) Find the smallest integer t s.t. 
+
+L(Θ(n)) − L (RΘ(n) (αβ tη(n))) ≥ − γ〈ξ(n) | αβ tη(n)〉 .
+
+7: Update by retraction Θ(n+1) = RΘ(n) (tA 
+
+> n
+
+η(n)), where the Armijo step-size is tA 
+
+> n
+
+:= αβ t.
+
+8: Compute X (n) via (9a). 
+
+9: if ‖X (n) − X (n−1) ‖F/‖X (n)‖F < ϵ then 
+
+10: Terminate 
+
+11: end if 
+
+12: end for 
+
+out. Based on the nth estimate of Θ, let 
+
+X := 
+
+> NK
+
+∑
+
+> ν=1
+
+( Pp=1 Uν,p ) ×1 Kν ×1 ( Qq=1 Vν,q ) , (9a) 
+
+Kν (j, j ′) := exp( − 12 (l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)⊺
+
+(Cν )−1(l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)) . (9b) Let also 
+
+∆ := PΩ(X − Y) + ∇X R(X ) , (9c) 
+
+Uν := Pp=1 Uν,p , (9d) 
+
+Uν, ̸ =p := Pi=1 ,i ̸ =pUν,i , (9e) 
+
+Vν := Qq=1 Vν,q , (9f) 
+
+Vν, ̸ =q := Qj=1 ,j ̸ =qVν,j , (9g) 
+
+˜Kν (j, j ′) := 
+
+(
+
+∆ ×1,...,m  
+
+> 1,...,m
+
+Uν (: , . . . , :, j )
+
+)
+
+×2,...,N −m+1 1,...,N −m Vν (j′, :, . . . , :) , (9h) 
+
+˜Cν (j, j ′, :, :) := 12 Kν (j, j ′)( Cν )−1(l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)( l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)⊺
+
+(Cν )−1 . (9i) 1. The Euclidean gradient w.r.t. Cν is 
+
+∇Cν L(Θ) = ˜Kν ×1,21,2 ˜Cν . (9j) In the case of the AffI metric, the Riemannian gradient w.r.t. Cν is computed via (13) in Fact 19 
+
+grad Cν L(Θ) = Cν ∇Cν L(Θ)Cν .
+
+2. The Euclidean gradients w.r.t. Uν,p and Vν,q are 
+
+∇Uν,p L(Θ) = 
+
+(
+
+∆ ×m+1 ,...,N m+1 ,...,N Vν ×1 Kν
+
+)
+
+Uν, ̸ =p + λUν,p , (9k) 11 ∇Vν,q L(Θ) = 
+
+[
+
+Kν ×1 (
+
+Uν ×1,...,m  
+
+> 1,...,m
+
+∆
+
+)] 
+
+Vν, ̸ =q + λVν,q . (9l) The Riemannian gradients are computed by the orthogonal projections of the Euclidean gradients onto the respective tangent spaces via Fact 17 in Appendix B: 
+
+grad Uν,p L(Θ) = PTUν,p Mr1
+
+(∇Uν,p L(Θ)) , (9m) 
+
+grad Vν,q L(Θ) = PTVν,q Mr2
+
+(∇Vν,q L(Θ)) . (9n) 
+
+Proof. See Appendix C. 
+
+3.5 Performance analysis 
+
+By [32, Thm. 4.3.1], every limit point Θ(∗) of the sequence of iterates {Θ(n)} in Algorithm 2 is a critical point of the smooth loss function L, i.e., grad L(Θ(∗)) = 0. However, since Mr is not closed—its closure is the set of tensors of ranks bounded by r— the limit points of the coefficient tensors’ iterates may not reside in the respective manifolds [22, 40]. One workaround is regularization [22, 40], which penalizes 
+
+λ
+
+2
+
+
+
+> m
+
+∑
+
+> i=1
+
+‖U ⟨i⟩
+
+> ν,p
+
+‖2 
+
+> F
+
++ 
+
+> N−m
+
+∑
+
+> j=1
+
+‖V⟨j⟩ 
+
+> ν,q
+
+‖2
+
+> F
+
+︸ ︷︷ ︸
+
+> Term 1
+
++ λ
+
+2
+
+
+
+> m
+
+∑
+
+> i=1
+
+‖(U ⟨i⟩
+
+> ν,p
+
+)†‖2 
+
+> F
+
++ 
+
+> N−m
+
+∑
+
+> j=1
+
+‖(V⟨j⟩ 
+
+> ν,p
+
+)†‖2
+
+> F
+
+︸ ︷︷ ︸
+
+> Term 2
+
+.
+
+Note that Term 1 is incidentally included in L in (8a), but in tandem with the Hadamard product for the purpose of sparsification. Meanwhile, Term 2 prevents the singular values from approaching zeros. With these extra regular-ization terms, it can be shown that there exists a limit point in the manifold, and lim n→∞ ‖grad L(Θ(n))‖Θ(n) =0 [22, 40]. For a matrix X of rank r, the gradient of X 7 → ‖ X‖2 
+
+> F
+
++ ‖X†‖2 
+
+> F
+
+is 2U(Σ − Σ−3)V⊺ where X = UΣV ⊺
+
+and the diagonal elements of Σ are σ1 > σ 2 > . . . > σ r > 0 [40]. Note also that λ can be chosen arbitrarily small, e.g., equal to the machine-precision level. In fact, numerical tests [22, 40] suggest that convergence still holds in practice even when λ = 0 . Therefore, this paper does not employ Term 2. Convergence rates can also be obtained for Algorithm 2. Specifically, Algorithm 2 can achieve linear conver-gence rate w.r.t. the value of the loss function, up to a constant that depends on the eigenvalues of the Riemannian Hessian at the critical points; see [32, Thm. 4.5.6]. 
+
+3.6 Computational complexity 
+
+Assume that I1 = I2 = · · · = IN = I, and r1 = r2 = (1 , r, . . . , r, 1) . Computing the kernel matrices costs 
+
+O(NK (D3 
+
+> l
+
++ N 2 
+
+> l
+
+Dl)) , and the computation of the loss over Ω requires O(|Ω|NK N 2 
+
+> l
+
+) operations. The cost of com-puting the Euclidean gradients w.r.t. Uν,p and Vν,q is O(|Ω|NK (P + Q)Nl ), and O(NK (P + Q)N r 2I) operations are required for finding the subsequent Riemannian gradients. The step of computing the Riemannian gradients w.r.t. the covariance matrices costs O(|Ω|NK N 2 
+
+> l
+
+). The retractions of Uν,p and Vν,q add a computational overhead of O(NK (P + Q)N r 3I), while the retraction of Cν costs O(NK D3 
+
+> l
+
+). In practice, NK ≤ 10 , D l ≤ 10 , Nl ≤ 100 ,and P, Q ≤ 2 can achieve a good trade-off between reconstruction quality and runtime. 12 4 Applications 
+
+4.1 4D functional MRI reconstruction 
+
+The proposed method is evaluated with two publicly available 4D-fMRI datasets. In both cases, the data tensor 
+
+Y ∈ RI1×I2×I3×I4 has three spatial modes and one temporal mode. 
+
+COBRE Dataset The Center for Biomedical Research Excellence (COBRE) dataset contains resting-state fMRI scans which were acquired on a 3T scanner using a T2 ∗-weighted gradient-echo EPI sequence (TR = 2 s, TE = 29 ms, flip angle = 75 ◦, 32 axial slices, voxel size 3 ×3×4 mm 3). The preprocessing pipeline follows [43], including slice-timing correction, motion correction, spatial normalization to the Montreal Neurological Institute (MNI) space, and spatial smoothing using a Gaussian kernel with a Full Width at Half Maximum (FWHM) of 5 mm. After preprocessing, the resulting 4D tensor has dimensions (53, 64, 52, 146). 
+
+BOLD5000 Dataset [44] The BOLD5000 dataset is a event-related fMRI study where participants viewed 5000 naturalistic images across multiple functional sessions. Preprocessing was performed using fMRIprep [45], a robust and automated neuroimaging pipeline. The steps involved motion correction, susceptibility-derived dis-tortion estimation and correction, and precise co-registration to the individual T1w anatomical templates. After preprocessing, the resulting dimensions are (72, 92, 70, 194). The proposed method KReTTaH is compared against several state-of-the-art tensor completion methods: RTTC [22], a fixed-rank manifold optimization method (see also [23]), VKBTR [17], a Bayesian TRD frame-work, and NCP [12], a kernel-based (nonparametric) CPD. Observed entries are uniformly randomly sampled at sampling ratios s ∈ { 0.1, 0.2, 0.3, 0.4, 0.5}. The reported results are averages of 10 runs with different sampled entries and initializations. The methods ran on an 8-core Intel(R) i7-11700 2.5 GHz CPU with 32 GB RAM. Note that VKBTR [17] consumes a large amount of memory, and the memory can only fit the initial TR-ranks setting of 20. As a figure of merit, the normalized root mean squared error (NRMSE) is employed, defined as NRMSE := 
+
+‖X (∗) − Y‖F/‖Y‖F (the lower the better), where X (∗) is the reconstruction computed from the output of the algorithm. All methods are finely tuned to reach their lowest NRMSE. The reported results are averages of 10 
+
+runs with different sampled index sets and initializations. Navigator data {yn}Nnav  
+
+> n=1
+
+are formed by the columns of PΩ(Y)⟨m⟩ for m ∈ { 1, 2, 3} in order to cover multi-way dependencies. Landmark points are then selected with the greedy max-min-(Euclidean)-distance strategy [37], then compressed to vectors in RDl by using locally linear embedding (LLE) [34] to capture the low-dimensional geometry as well as to enable the optimization of 
+
+Cν . Hyperparameters are selected by grid search: Nl = 10 l for l ∈ J5, 15 K; r1 = (1 , 8r1, 8r1, . . . , 8r1, 1) and 
+
+r2 = (1 , 8r2, 8r2, . . . , 8r2, 1) for r1, r 2 ∈ J1, 12 K; P, Q ∈ { 1, 2}. The hyperparameter λ in (8a) can be selected using a well-known L-curve criterion [46] by plotting the trade-off between the data-fidelity loss F and the regular-ization term H at different λ, then locate the λ at the corner of the L-curve; see Figure 14. Figure 3 reports NRMSE of competing methods across different sampling ratios. KReTTaH achieves the low-est error across all tested sampling ratios in both datasets. Figure 4 compares the computational time of tested methods, where KReTTaH is second only to NCP [12] in speed. By optimizing coefficient tensors instead of the whole data tensor, KReTTaH runs faster than RTTC [22]. Figure 5 plots the computational times which include the hyperparameter-search step of the ranks and the kernel hyperparameters of each competing method. 
+
+4.2 Graph-flow imputation 
+
+A graph G = ( V, E ) is defined by a set of nodes V and a set of edges E ⊆ V × V . Let T be the set of its triangles, defined as fully connected subgraphs, each comprising three nodes. Let N0 = |V | be the number of 13 0.1 0.2 0.3 0.4 0.5
+
+> 0.004
+> 0.005
+> 0.007
+> 0.01
+> 0.012
+> Sampling Ratio
+> NRMSE (log scale)
+
+(a) COBRE 0.1 0.2 0.3 0.4 0.5 
+
+> 0.02
+> 0.03
+> 0.04
+> 0.05
+> 0.06
+> 0.08
+> 0.1
+> Sampling Ratio
+> NRMSE (log scale)
+
+(b) BOLD 
+
+Figure 3: Mean NRMSE value curves ( ↓) vs. sampling ratios. RTTC [22]: , VKBTR [17]: , NCP [12]: , KReTTaH (NK = 1) : .RTTC NCP VKBTR (1 , 1) (1 , 2) (2 , 1) 
+
+0
+
+20 
+
+40 
+
+60 
+
+80 
+
+100 
+
+120 
+
+140 
+
+Methods 
+
+> Time (minutes)
+
+COBRE 
+
+BOLD 
+
+Figure 4: Average run-time (in minutes) across all sampling ratios (with hyperparameters achieving the lowest NRMSE) in the 4D-fMRI application. The horizontal axis labels in brackets denote KReTTaH at different (P, Q ). Time is measured until a stopping criterion, similar to the one in Line 9 of Algorithm 2 with ϵ = 10 −4, is satisfied. RTTC NCP VKBTR (1 , 1) (1 , 2) (2 , 1) 
+
+5
+
+6
+
+7
+
+8
+
+9
+
+Methods 
+
+> Time (hours)
+
+COBRE 
+
+BOLD 
+
+Figure 5: Average run-time (in hours) across all sampling ratios in the 4D-fMRI application. The horizontal axis labels in brackets denote KReTTaH at different (P, Q ). Measured time includes the hyperparameter-tuning step. 
+
+14 n1
+
+n2
+
+n3
+
+n4
+
+> e1
+> e2
+> e3
+
+e4
+
+τ1
+
+G = ( V, E )
+
+V = {ni}4 
+
+> i=1
+
+, E = {ej }4 
+
+> j=1
+
+, T = {τ1}
+
+Incidence matrices: 
+
+B1 =
+
+
+
+−1 0 0 01 −1 0 −10 1 −1 00 0 1 1
+
+ , B2 =
+
+
+
+011
+
+−1
+
+     
+
+> Figure 6: An example of a graph, G= ( V, E ), and its set of triangles, T.
+
+nodes, N1 = |E| the number of edges, and N2 = |T | the number of triangles of G [47–50]. The incidence matrix 
+
+B1 ∈ RN0×N1 captures the node-to-edge adjacencies, while B2 ∈ RN1×N2 encodes the edge-to-triangle ones. These incidence matrices depend on an arbitrary choice of orientation: the e-th edge is oriented as an ordered pair of nodes (i, j ), and the τ -th triangle as (i, j, w ). Accordingly, the entries of the node-to-edge incidence matrix are 
+
+B1(i, e ) = −B1(j, e ) = −1, with B1(w, e ) = 0 for all w 6 = i, j . In the incidence matrix B2, the entry B2(e, τ )
+
+is zero unless e is an edge of τ ; it equals 1 if e and τ share the same orientation and -1 otherwise. An example of a graph G with its incidence matrices is shown in Figure 6. Further details are available in [47–50]. Time-varying edge-flow signals, such as traffic or communication flows, are arranged in a tensor Y ∈ RI1×I2×I3 ,where Y(i1, i 2, i 3) denotes the flow on edge i1 at the i2th time point of the i3th time interval. Here, I1 = N1 is the number of edges, I2 the number of time points per interval (e.g., hours per day), and I3 the number of intervals (e.g., days). Each column of the 1st unfolding Y⟨1⟩ ∈ RI1×I2I3 thus represents a snapshot of flows at a particular time 
+
+t ∈ J1, I 2I3K. Common assumptions for edge flows are that they are typically approximately divergence-free, i.e., nearly conserved at nodes, which can be expressed as ‖B1Y⟨1⟩‖F ≈ 0, or approximately curl-free, i.e., summing to nearly zero around triangles, that is, ‖B⊺
+
+> 2
+
+Y⟨1⟩‖F ≈ 0 [49–51]. Incidence matrices have been combined with vector autoregressive (VAR) modeling, generating the simplicial VAR (S-VAR) model [52, 53], which approximates an edge signal by the simplicial shifts of its past signals. Hodge Laplacians [48], defined from the incidence matrices, have been incorporated into Gaussian processes on edges [54]. Simplicial filters, defined from polynomials of Hodge Laplacians, have also been incorporated into NNs [55–59]. In this context, KReTTaH is tested on traffic-flow data for the Eastern-Massachusetts (EMA) network ( 74 nodes, 
+
+258 edges, and 33 triangles) and the Berlin-Friedrichshain (BF) network ( 224 nodes, 523 edges, and 67 trian-gles) [60]. Time-varying edge-flow signals of I1 edges over I2 time points are generated by the traffic-flow simulator UXsim [61], which runs I3 times with different initial states and traffic volumes to generate an I1 × I2 × I3 tensor 
+
+Y: 258 × 400 × 7 for the EMA network and 523 × 350 × 8 for the BF network. KReTTaH is compared against the state-of-the-art edge-flow imputation methods PS [62], S-VAR [52, 53], and the NN-based HodgeNet [63], which operate on the 1st unfolding of the data tensor. The network used in this paper is larger than those used in the studies of [52, 53, 62, 63]. Also, because these methods are not designed for tensor data, they take Y⟨1⟩ as input. Competing tensor methods are RTTC [22], a fixed-rank manifold optimization method (see also [23]), STTC [64], a TRD for traffic-data imputation, NCP [12], a kernel-based (nonparametric) CPD, and VKBTR [17], a parametric Bayesian TRD-based framework. NRMSE is again used as the figure of merit. All methods are finely tuned to reach their lowest NRMSE. The reported results are averages of 10 runs with different sampled index sets and initializations. With sampling ratio 
+
+s ∈ { 0.1, 0.2, 0.3, 0.4, 0.5}, signals of dI1 · se edges are randomly sampled per time instant t ∈ J1, I 2I3K, where 15 0.1 0.2 0.3 0.4 0.5                     
+
+> 0.05
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> Sampling Ratio
+> NRMSE (log scale) (a) Eastern-Massachusetts network 0.10.20.30.40.5
+> 0.03
+> 0.05
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> Sampling Ratio
+> NRMSE (log scale) (b) Berlin-Friedrickshain network
+> Figure 7: Mean NRMSE value curves ( ↓) vs. sampling ratios. HodgeNet [63]: , S-VAR [52, 53]: , PS [62]: , RTTC [22]: , STTC [64]: ,NCP [12]: , VKBTR [17]: , KReTTaH (NK= 1) :, KReTTaH (NK= 6) :.
+
+d·e is the ceiling function. This sampling pattern suggests that the number of observations is consistent over time. Navigator data and landmark points are also built in the same manner as in Section 4.1. Hyperparameters are selected by grid search: Nl = 10 l for l ∈ J5, 15 K; r1 = (1 , 8r1, 8r1, . . . , 8r1, 1) and r2 = (1 , 8r2, 8r2, . . . , 8r2, 1) 
+
+for r1, r 2 ∈ J1, 12 K; P, Q ∈ { 1, 2, 3}.The inverse problem (8) can include smooth regularization functions depending on domains. In the partic-ular case of edge flows, where the common prior is being approximately divergence-free or curl-free, R(Θ) := (λl/2) ‖B1X ⟨1⟩‖2 
+
+> F
+
++ ( λu/2) ‖B⊺
+
+> 2
+
+X ⟨1⟩‖2 
+
+> F
+
+in Eq. (8). It is important to note that via the numerical tests, it appears that KReTTaH achieves its lowest NRMSE values even without such priors, i.e., when λl = λu = 0 . Setting 
+
+λl, λ u ≥ 10 −3 actually degrades the performance of KReTTaH. Figure 7 reports NRMSE of competing methods across different sampling ratios. KReTTaH achieves the lowest errors except in the BF network at s = 0 .1, where it ranks second to PS [62]. HodgeNet [63] performs the second-best in the EMA dataset but degrades sharply in the BF one, while S-VAR [52, 53] exhibits the highest errors across all ratios due to reliance on incomplete past data. Figure 8 reports the effect of (P, Q ) on NRMSE, with (1 , 2) 
+
+consistently giving the lowest NRMSE in both datasets, supporting the use of HP. Figure 9 further underscores the efficiency of KReTTaH: at the lowest-NRMSE setting (P, Q ) = (1 , 2) , the run-time is lower than that of HodgeNet [63], STTC [64], and NCP [12], and comparable to that of RTTC [22]. Ad-ditionally, Figure 10 plots the computational times which include the hyperparameter-tuning step of the competing methods, such as the selection of the ranks and kernel hyperparameters in the TD methods, and the selection of the NN architecture in HodgeNet. As seen in Figure 11, using larger P and Q increases sparsity. Notably, the (1 , 2) setting achieves the lowest NRMSE while reducing parameter storage by more than 40 %. In Figure 12, NK = 6 performs better than NK = 1 
+
+for both KReTTaH and KReTTaH σ, suggesting the benefits of using multiple kernels. Moreover, the best ranks found for NK = 6 are indeed smaller than those for NK = 1 by three to eight times, advocating the rank-increase property of addition in Fact 2. In another view, denote KReTTaH σ the case where all covariance matrices of the kernels are fixed, i.e., for each ν ∈ J1, N K K, Cν = σz IDl , where the bandwidths σz ∈ [10 −2, 10] need to be carefully chosen to achieve the lowest NRMSE. The performance of KReTTaH matches that of KReTTaH σ, showing that KReTTaH manages to overcome the arduous kernel hyperparameter tuning task. Meanwhile, Figure 13 shows the performance at different rank-selection for one dataset from each application, evaluated at sampling ratio s = 0 .5,16 1
+
+> 2
+> 3
+> P
+> 1
+> 2
+> 3
+> Q
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 0.25
+> 0.30
+> 0.35
+> NRMSE
+
+(a) Eastern-Massachusetts network 1 
+
+> 2
+> 3
+> P
+> 1
+> 2
+> 3
+> Q
+> 0.00
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> NRMSE
+
+(b) Berlin-Friedrickshain network 
+
+Figure 8: The impact of different (P, Q ) values in (6) ( NK = 1 ) on performance. NRMSE values are averaged over all sampling ratios. HodgeNet 
+
+RTTC 
+
+STTC 
+
+NCP 
+
+VKBTR 
+
+(1 , 1) 
+
+(1 , 2) 
+
+(1 , 3) 
+
+(2 , 1) 
+
+(2 , 2) 
+
+(2 , 3) 
+
+(3 , 1) 
+
+(3 , 2) 
+
+(3 , 3) 
+
+0
+
+5
+
+10 
+
+15 
+
+20 
+
+25 
+
+30 
+
+Methods 
+
+> Time (minutes)
+
+EMA 
+
+BF 
+
+Figure 9: Average run-time (in minutes) across all sampling ratios (with hyperparameters achieving the lowest NRMSE) in the edge-flow estimation application. The horizontal axis labels in brackets are KReTTaH at different (P, Q ). Time is measured until a stopping criterion, similar to the one in Line 9 of Algorithm 2 with ϵ = 10 −4, is satisfied. The notation (P, Q ) refers to KReTTaH with P, Q corresponding to the Hadamard products in (6). Run-times for PS [62] and S-VAR [52, 53] are not displayed ( < 1 minute). 
+
+17 HodgeNet 
+
+RTTC 
+
+STTC 
+
+NCP 
+
+VKBTR 
+
+(1 , 1) 
+
+(1 , 2) 
+
+(1 , 3) 
+
+(2 , 1) 
+
+(2 , 2) 
+
+(2 , 3) 
+
+(3 , 1) 
+
+(3 , 2) 
+
+(3 , 3) 
+
+40 
+
+60 
+
+80 
+
+100 
+
+120 
+
+140 
+
+160 
+
+Methods 
+
+> Time (minutes)
+
+EMA 
+
+BF Figure 10: Average run-time (in minutes) across all sampling ratios in the edge flow imputation task. The horizontal axis labels in brackets denote KReTTaH at different (P, Q ). Measured time includes the hyperparameter-tuning step. (1 , 1) (1 , 2) (1 , 3) (2 , 1) (2 , 2) (2 , 3) (3 , 1) (3 , 2) (3 , 3) 
+
+10 
+
+20 
+
+30 
+
+40 
+
+50 
+
+60 
+
+70 
+
+80 
+
+90 
+
+100 
+
+(P, Q )
+
+> Sparsity (%)
+
+ˆ (∗)
+
+ˆ(∗)
+
+Figure 11: Average sparsity of the U (∗) 
+
+> ν
+
+and V(∗) 
+
+> ν
+
+tensors depending on the number of HP factors P and Q in the EMA dataset, when 
+
+NK = 1 . U (∗) 
+
+> ν
+
+and V(∗) 
+
+> ν
+
+are calculated from the outputs of Algorithm 2. The sparsity is measured as the percentage of the tensor entries with absolute value less than 10 −3 after having normalized all entries to a maximum of unity. 0.1 0.2 0.3 0.4 0.5
+
+> 0.05
+> 0.07
+> 0.11
+> 0.12
+> 0.15
+> Sampling Ratio
+> NRMSE (log scale)
+
+(a) Eastern-Massachusetts network 0.1 0.2 0.3 0.4 0.5 
+
+> 0.03
+> 0.05
+> 0.1
+> 0.2
+> 0.3
+> Sampling Ratio
+> NRMSE (log scale)
+
+(b) Berlin-Friedrickshain network 
+
+Figure 12: Mean NRMSE value curves ( ↓) vs. sampling ratios. KReTTaH σ (NK = 1) : , KReTTaH (NK = 1) : , KReTTaH σ (NK =6) : , KReTTaH (NK = 6) : . KReTTaH σ (dashed line) denote the case of KReTTaH where, for all ν ∈ J1, N K K, Cν = σz IDl is fixed and σz need to be tuned to achieve to lowest NRMSE. 
+
+18 50 
+
+> 60
+> 70
+> 80
+> 90
+> 100
+> r1
+> 50
+> 60
+> 70
+> 80
+> 90
+> 100
+> r2
+> 0.000
+> 0.001
+> 0.002
+> 0.003
+> 0.004
+> 0.005
+> 0.006
+> 0.007
+> NRMSE
+
+(a) COBRE 40 48 56 64 72 80 88  
+
+> r1
+> 40
+> 48
+> 56
+> 64
+> 72
+> 80
+> 88
+> r2
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+> NRMSE
+
+(b) EMA 
+
+Figure 13: Effect of ranks r1 and r2. Both datasets are set at a sampling ratio s = 0 .5. P = Q = 1 , N l = 100 , D l = 5 .
+
+P = Q = 1 , N l = 100 , D l = 5 .Rank selection is a crucial and challenging aspect of TD methods. While this paper proposes KReTTaH that uses grid-search to locate the ranks, it acknowledges that there are techniques to improve, e.g., the sparsifying effect in Bayesian TD [14, 17] or the classic MDL [65]. This will be a future direction for a general problem of unknown and possibly dynamic ranks. 
+
+# 5 Conclusions 
+
+This paper proposed KReTTaH, a multi-way data imputation framework using kernel regression and Hadamard overparameterization via Riemannian optimization on manifolds of fixed-rank tensors and positive definite matrices. KReTTaH approximated the data using kernels and sparse coding, with tensor factors constrained to lie on fixed-rank manifolds. To enable smooth and tractable optimization on manifolds, Hadamard overparameterization was employed for sparsity-promoting regularization. KReTTaH was validated with 4D fMRI reconstruction and dynamic graph flow imputation, where it was shown to outperform existing alternatives while incurring an advantageous computational cost. Possible future research directions include automatic rank selection methods, the use of more abundant kernel functions beyond the Gaussian ones, and extensions to online or stochastic learning from streaming multi-way data. 
+
+# Acknowledgements 
+
+The work of D. T. Nguyen was supported by JST SPRING, Japan Grant Number JPMJSP2180. The work of D. A. Pa-dos was supported by the US AFOSR under Grant W911NF-20-1-028. 
+
+# References 
+
+[1] N. D. Sidiropoulos, L. De Lathauwer, X. Fu, K. Huang, E. E. Papalexakis, and C. Faloutsos, “Tensor decomposition for signal processing and machine learning,” IEEE Trans. Signal Process. , vol. 65, no. 13, pp. 3551–3582, 2017. 
+
+19 10 2  
+
+> Data-fidelity loss term F(log scale)
+> 10 2
+> 3 × 10 1
+> 4 × 10 1
+> 6 × 10 1
+> Regularization term  H (log scale)
+> = 1e-03
+> = 1e-02
+> = 5e-02
+> = 1e-01
+> = 5e-01
+> = 1e+00
+> = 1e+01
+> = 1e+02
+
+Figure 14: L-curve for the selection of the regularization hyperparameter λ in Eq. (8a). The plot displays the data-fidelity loss term F versus the regularization term H in logarithmic scale at different λ (Eq. (8a)). According to [46], a good value of λ is located at the corner of the L-shaped curve ( λ = 0 .1). [2] Q. Song, H. Ge, J. Caverlee, and X. Hu, “Tensor completion algorithms in big data analytics,” ACM Trans. Knowl. Disc. Data , vol. 13, no. 1, pp. 1–48, Jan. 2019. [3] I. V. Oseledets, “Tensor-train decomposition,” SIAM J. Sci. Comput. , vol. 33, no. 5, pp. 2295–2317, 2011. [4] Q. Zhao, G. Zhou, S. Xie, L. Zhang, and A. Cichocki, “Tensor ring decomposition,” arXiv:1606.05535 [cs.NA], Jun. 2016. [5] D. Brandoni, “Tensor-train decomposition for image classification problems,” Ph.D. dissertation, University of Bologna, 2022. [Online]. Available: https://amsdottorato.unibo.it/id/eprint/10121/3/phd_thesis_DomitillaBrandoni_final.pdf [6] C. F. Van Loan, “The Tucker and Tensor Train decompositions,” CIME-EMS Summer School, Cetraro, Italy, Jun. 2015. [Online]. Available: https://www.dm.unibo.it/~simoncin/CIME/vanloan3.pdf [7] S. Holtz, T. Rohwedder, and R. Schneider, “On manifolds of tensors of fixed TT-rank,” Numer. Math. , vol. 120, no. 4, pp. 701–731, 2012. [8] J. W. Robbin and D. A. Salamon, Introduction to Differential Geometry . Berlin: Springer, 2022. [9] N. Aronszajn, “Theory of reproducing kernels,” Trans. Amer. Math. Soc. , vol. 68, no. 3, pp. 337–404, 1950. [10] B. Schölkopf and A. J. Smola, Learning with Kernels . Cambridge, MA: MIT Press, 2002. [11] G. Kimeldorf and G. Wahba, “Some results on Tchebycheffian spline functions,” J. Math. Anal. Appl. , vol. 33, no. 1, pp. 82–95, Jan. 1971. [12] J. A. Bazerque, G. Mateos, and G. B. Giannakis, “Nonparametric low-rank tensor imputation,” in Proc. SSP , Ann Arbor, MI, Aug. 2012. [13] B. W. Larsen, T. G. Kolda, A. R. Zhang, and A. H. Williams, “Tensor decomposition meets RKHS: Efficient algorithms for smooth and misaligned data,” arXiv preprint arXiv:2408.05677 , 2024. [14] S. Li, S. Fang, L. Cheng, F. Yin, Y.-C. Wu, P. Gerstoft, and S. Theodoridis, “When bayesian tensor completion meets multioutput gaussian processes: Functional universality and rank learning,” IEEE Transactions on Signal Processing , vol. 73, pp. 5319–5335, 2025. [15] Q. Zhao, G. Zhou, T. Adalı, L. Zhang, and A. Cichocki, “Kernel-based tensor partial least squares for reconstruction of limb move-ments,” in Proc. IEEE ICASSP , Vancouver, Canada, May 2013. [16] A. A. Gorodetsky and J. D. Jakeman, “Gradient-based optimization for regression in the functional tensor-train format,” J. Comput. Phys. , vol. 374, pp. 1219–1238, 2018. [17] Z. Huang, G. Zhou, Y. Qiu, X. Chen, and Q. Zhao, “Kernel Bayesian tensor ring decomposition for multiway data recovery,” Neural Netw. , p. 107500, 2025. [18] L. Györfi, M. Kohler, A. Krzyżak, and H. Walk, A Distribution-Free Theory of Nonparametric Regression . New York: Springer, 2010. [19] D. T. Nguyen and K. Slavakis, “Multilinear kernel regression and imputation via manifold learning,” IEEE Open J. Signal Process. ,vol. 5, pp. 1073–1088, Nov. 2024. [20] D. T. Nguyen, K. Slavakis, and D. Pados, “Imputation of time-varying edge flows in graphs by multilinear kernel regression and manifold learning,” Signal Process. , vol. 237, Dec. 2025. [21] ——, “Estimating dynamic graph flows with kernel models and Hadamard-structured Riemannian constraints,” in 2025 Asia Pacific 
+
+20 Signal and Information Processing Association Annual Summit and Conference (APSIPA ASC) , 2025, pp. 1538–1543. [22] M. Steinlechner, “Riemannian optimization for high-dimensional tensor completion,” SIAM J. Sci. Comput. , vol. 38, no. 5, 2016. [23] I. Belyaeva, S. Bhinge, Q. Long, and T. Adalı, “Taking the 4D nature of fMRI data into account promises significant gains in data completion,” IEEE Access , vol. 9, pp. 145 334–145 362, 2021. [24] P. D. Hoff, “LASSO, fractional norm and structured sparse estimation using a Hadamard product parametrization,” Comput. Stat. & Data Anal. , vol. 115, pp. 186–198, Nov. 2017. [25] G. Li, S. Li, D. Li, and C. Ma, “The tail-Hadamard product parametrization algorithm for compressed sensing,” Signal Process. , vol. 205, p. 108853, 2023. [26] L. Ziyin and Z. Wang, “SPRED: solving L1 penalty with SGD,” in Proc. ICML . Honolulu, HI: PMLR, Jul. 2023. [27] C. Kolb, C. L. Müller, B. Bischl, and D. Rügamer, “Smoothing the edges: Smooth optimization for sparse regularization using Hadamard overparametrization,” arXiv:2307.03571v3 [cs.LG], Apr. 2024. [28] D. T. Nguyen, K. Slavakis, E. Kofidis, and D. Pados, “Kernel regression via tensor trains with Hadamard overparametrization and imputation of dynamic graph edge flows,” in Proc. IEEE ICASSP , Barcelona, Spain, May 2026. [29] H. Laanaya, F. Abdallah, H. Snoussi, and C. Richard, “Learning general Gaussian kernel hyperparameters of SVMs using optimization on symmetric positive-definite matrices manifold,” Pattern Recogn. Lett. , vol. 32, no. 13, pp. 1511–1515, 2011. [30] T. G. Kolda and B. W. Bader, “Tensor decompositions and applications,” SIAM Rev. , vol. 51, no. 3, pp. 455–500, 2009. [31] A. Cichocki, N. Lee, I. Oseledets, A.-H. Phan, Q. Zhao, and D. P. Mandic, “Tensor networks for dimensionality reduction and large-scale optimization—Part 1: Low-rank tensor decompositions,” Foundations and Trends in Machine Learning , vol. 9, no. 4–5, pp. 249–429, 2016. [32] P.-A. Absil, R. Mahony, and R. Sepulchre, Optimization Algorithms on Matrix Manifolds . Princeton University Press, 2008. [33] A. Uschmajew and B. Vandereycken, “Geometric methods on low-rank matrix and tensor manifolds,” in Handbook of Variational Methods for Nonlinear Geometric Data . Springer, 2020, pp. 261–313. [34] S. T. Roweis and L. K. Saul, “Nonlinear dimensionality reduction by locally linear embedding,” Science , vol. 290, no. 5500, pp. 2323–2326, 2000. [35] E. Elhamifar and R. Vidal, “Sparse manifold clustering and embedding,” Advances in neural information processing systems , vol. 24, 2011. [36] C. Williams and M. Seeger, “Using the Nyström method to speed up kernel machines,” Advances in neural information processing systems , vol. 13, 2000. [37] V. De Silva and J. B. Tenenbaum, “Sparse multidimensional scaling using landmark points,” Stanford University, Tech. Rep., Jun. 2004. [Online]. Available: https://graphics.stanford.edu/courses/cs468-05-winter/Papers/Landmarks/Silva_landmarks5.pdf [38] J. C. Pinheiro and D. M. Bates, “Unconstrained parametrizations for variance-covariance matrices,” Statist. Comput. , vol. 6, no. 3, pp. 289–296, 1996. [39] J. Nocedal and S. J. Wright, Numerical optimization . Springer, 2006. [40] B. Vandereycken, “Low-rank matrix completion by Riemannian optimization,” SIAM Journal on Optimization , vol. 23, no. 2, pp. 1214–1236, 2013. [41] Z. Chen, Y. Li, and J. Lu, “Tensor ring decomposition: Optimization landscape and one-loop convergence of alternating least squares,” 
+
+SIAM J. Matrix Anal. Appl. , vol. 41, no. 3, pp. 1416–1442, 2020. [42] B. Gao, R. Peng, and Y.-X. Yuan, “Riemannian preconditioned algorithms for tensor completion via tensor ring decomposition,” 
+
+Comput. Optim. Appl. , vol. 88, no. 2, pp. 443–468, 2024. [43] P. Bellec, Y. Benhajali, F. Carbonell, C. Dansereau, G. Albouy, M. Pelland, C. Craddock, O. Collignon, J. Doyon, E. Stip et al. , “Impact of the resolution of brain parcels on connectome-wide association studies in fMRI,” Neuroimage , vol. 123, pp. 212–228, 2015. [44] N. Chang, J. A. Pyles, A. Marcus, A. Gupta, M. J. Tarr, and E. M. Aminoff, “BOLD5000, a public fMRI dataset while viewing 5000 visual images,” Sci. Data , vol. 6, no. 1, p. 49, 2019. [45] O. Esteban, C. J. Markiewicz, R. W. Blair, C. A. Moodie, A. I. Isik, A. Erramuzpe, J. D. Kent, M. Goncalves, E. DuPre, M. Snyder 
+
+et al. , “fMRIPrep: a robust preprocessing pipeline for functional MRI,” Nature Meth. , vol. 16, no. 1, pp. 111–116, 2019. [46] F. Lu, Q. Lang, and Q. An, “Data adaptive RKHS Tikhonov regularization for learning kernels in operators,” in Mathematical and Scientific Machine Learning . PMLR, 2022, pp. 158–172. [47] P. J. Giblin, Graphs, Surfaces, and Homology , 3rd ed. Cambridge University Press, 2010. [48] L.-H. Lim, “Hodge Laplacians on graphs,” SIAM Rev. , vol. 62, no. 3, pp. 685–715, 2020. [49] M. T. Schaub, Y. Zhu, J.-B. Seby, T. M. Roddenberry, and S. Segarra, “Signal processing on higher-order networks: Livin’ on the edge... and beyond,” Signal Process. , vol. 187, Oct. 2021. [50] S. Barbarossa and S. Sardellitti, “Topological signal processing over simplicial complexes,” IEEE Trans. Signal Process. , vol. 68, pp. 2992–3007, Mar. 2020. [51] F. Battiston, G. Cencetti, I. Iacopini, V. Latora, M. Lucas, A. Patania, J.-G. Young, and G. Petri, “Networks beyond pairwise interactions: Structure and dynamics,” Phys. Rep. , vol. 874, pp. 1–92, 2020. [52] J. Krishnan, R. Money, B. Beferull-Lozano, and E. Isufi, “Simplicial vector autoregressive models,” IEEE Trans. Signal Process. ,vol. 72, pp. 5454–5469, Nov. 2024. [53] R. Money, J. Krishnan, B. Beferull-Lozano, and E. Isufi, “Evolution backcasting of edge flows from partial observations using simplicial vector autoregressive models,” in Proc. IEEE ICASSP , Seoul, Korea, Apr. 2024. [54] M. Yang, V. Borovitskiy, and E. Isufi, “Hodge-compositional edge Gaussian processes,” in International Conference on Artificial Intelligence and Statistics . PMLR, 2024, pp. 3754–3762. 
+
+21 [55] S. Ebli, M. Defferrard, and G. Spreemann, “Simplicial neural networks,” in Topological Data Analysis and Beyond workshop at NeurIPS , 2020. [56] T. M. Roddenberry, N. Glaze, and S. Segarra, “Principled simplicial neural networks for trajectory prediction,” in Proc. ICML . PMLR, 2021, pp. 9020–9029. [57] M. Yang, E. Isufi, and G. Leus, “Simplicial convolutional neural networks,” in Proc. IEEE ICASSP , 2022, pp. 8847–8851. [58] H. Wu, A. Yip, J. Long, J. Zhang, and M. K. Ng, “Simplicial complex neural networks,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 46, no. 1, pp. 561–575, 2024. [59] T. Papamarkou, T. Birdal, M. M. Bronstein, G. E. Carlsson, J. Curry, Y. Gao, M. Hajij, R. Kwitt, P. Lio, P. Di Lorenzo et al. , “Position: Topological deep learning is the new frontier for relational learning,” in Proc. ICML , Vienna, Austria, Jul. 2024. [60] Transportation Networks for Research Core Team, “Transportation networks for research,” accessed: Nov. 23, 2024. [Online]. Available: https://github.com/bstabler/TransportationNetworks [61] T. Seo, “UXsim: Lightweight mesoscopic traffic flow simulator in pure Python,” J. Open Source Softw. , vol. 10, no. 106, Feb. 2025. [62] T. M. Roddenberry, V. P. Grande, F. Frantzen, M. T. Schaub, and S. Segarra, “Signal processing on product spaces,” in Proc. IEEE ICASSP , Rhodes Island, Greece, Jun. 2023. [63] T. M. Roddenberry and S. Segarra, “HodgeNet: Graph neural networks for edge data,” in Proc. ACSSC , Pacific Grove, CA, Nov. 2019. [64] L. Yu, C. Guan, H. Wang, Y. He, W. Cao, and C.-S. Leung, “Robust tensor ring decomposition for urban traffic data imputation,” IEEE Trans. Intell. Transp. Syst. , vol. 26, no. 6, pp. 8707–8719, Jun. 2025. [65] X. Gong, W. Chen, J. Chen, and B. Ai, “Tensor denoising using low-rank tensor train decomposition,” IEEE Signal Processing Letters ,vol. 27, pp. 1685–1689, 2020. [66] C. J. Hillar and L.-H. Lim, “Most tensor problems are NP-hard,” Journal of the ACM (JACM) , vol. 60, no. 6, pp. 1–39, 2013. [67] P.-A. Absil and J. Malick, “Projection-like retractions on matrix manifolds,” SIAM Journal on Optimization , vol. 22, no. 1, pp. 135–158, 2012. [68] C. Lubich, I. V. Oseledets, and B. Vandereycken, “Time integration of tensor trains,” SIAM Journal on Numerical Analysis , vol. 53, no. 2, pp. 917–941, 2015. [69] N. Boumal, An introduction to optimization on smooth manifolds . Cambridge University Press, 2023. 
+
+# A Background on Tensor Trains 
+
+Fact 11 ([3, Thm. 2.1]) . Given r := (1 , r 1, . . . , r N , 1) ∈ NN +1  
+
+> ∗
+
+, any X ∈ RI1×···× IN has a TTD A∗ 
+
+> X,r
+
+. Computing 
+
+A∗  
+
+> X,r
+
+is an NP-hard problem in general [66]. The TT singular value decomposition (TT-SVD) [3]—see Algo-rithm 1—computes a TT ASVD   
+
+> X,r
+
+, of size I1 × · · · × IN and TT compression rank crank TT (ASVD   
+
+> X,r
+
+) = r, that turns out to be “quasi-optimal”: 
+
+‖X − A∗ 
+
+> X,r
+
+‖F ≤ ‖ X − ASVD   
+
+> X,r
+
+‖F ≤ √N − 1 ‖X − A∗ 
+
+> X,r
+
+‖F . (10) 
+
+Fact 12 ([3, Thm. 2.1]) . In the case where r := rank( X ), a TTD A∗  
+
+> X,r
+
+= A∗   
+
+> X,rank( X)
+
+achieves rank( X ), in the sense of crank TT (A∗  
+
+> X,rank( X)
+
+) = rank( X ), and at the same time nullifies the least-squares loss in (1), that is, 
+
+X = A∗  
+
+> X,rank( X)
+
+. Consequently, any order-N tensor X can be expressed as a TT with compression rank equal to rank( X ). In this case, the TT-SVD is able to compute the TTD of X , that is, ASVD    
+
+> X,rank( X)
+
+= A∗  
+
+> X,rank( X)
+
+, as suggested by (10). Notice also by X = A∗   
+
+> X,rank( X)
+
+that 
+
+crank TT (ASVD   
+
+> X,rank( X)
+
+) = crank TT (A∗  
+
+> X,rank( X)
+
+) = rank( X )= rank( A∗  
+
+> X,rank( X)
+
+) = rank( ASVD   
+
+> X,rank( X)
+
+) ; 
+
+see also Fact 6. 
+
+Remark 13. TT-SVD in Algorithm 1 is able to compute the “exact” TTD of a tensor X whenever its rank is known 
+
+precisely. On the other hand, if the rank of a tensor is not known precisely, and if the user-defined r is set so that 
+
+r ≺ rank( X ), then the output ASVD   
+
+> X,r
+
+of Algorithm 1 is “quasi-optimal” (see Fact 11). Moreover, if rank( X )  r,then A∗   
+
+> X,rank( X)
+
+∈ TT ⪯ r solves (1) according to Fact 12. Hence, A∗   
+
+> X,rank( X)
+
+serves also as a solution A∗ 
+
+> X,r
+
+, or, by a slight abuse of notation, A∗  
+
+> X,r
+
+= A∗  
+
+> X,rank( X)
+
+, where equality here is considered with regards to their entries 22 as size I1 × · · · × IN tensors. Consequently, to be able to compute an “exact” TTD of X in cases where rank( X ) is unknown to the user, as in the real-world applications of Section 4, a rule of thumb is to choose a large-enough r to over-estimate rank( X ),and then mobilize TT-SVD to compute ASVD   
+
+> X,r
+
+, which turns out to be equal to X , because whenever rank( X )  r,
+
+A∗  
+
+> X,r
+
+= A∗  
+
+> X,rank( X)
+
+, then X = A∗   
+
+> X,rank( X)
+
+= A∗  
+
+> X,r
+
+by Fact 12, and thus X = A∗  
+
+> X,r
+
+= ASVD   
+
+> X,r
+
+by Fact 11. This suggests also by Fact 6 that 
+
+r = crank TT (ASVD   
+
+> X,r
+
+)  rank( ASVD   
+
+> X,r
+
+) = rank( X ) .
+
+Evidently, a drawback of overestimating the actual rank of a tensor in TT-SVD computations is that the core tensors of ASVD   
+
+> X,r
+
+are in general of larger size than those of A∗   
+
+> X,rank( X)
+
+= ASVD   
+
+> X,rank( X)
+
+.
+
+Definition 14 (m-orthogonal TT) . A TT A, with core tensors {Aj ∈ Rrj−1×Ij ×rj | j ∈ J1, N K}, is called m-orthogonal if 
+
+
+
+(A⟨2⟩ 
+
+> j
+
+)⊺A⟨2⟩ 
+
+> j
+
+= Irj , ∀j ∈ J1, m − 1K ,
+
+A⟨1⟩ 
+
+> j
+
+(A⟨1⟩ 
+
+> j
+
+)⊺ = Irj−1 , ∀j ∈ Jm + 1 , N K .
+
+It can be verified that the output of TT-SVD in Algorithm 1 is an N -orthogonal TT. Note that m-orthogonalizing a given TT A can be achieved via recursive QR decompositions [22], which only change the TT cores of A instead of its entries. 
+
+# B Background on Riemannian Manifolds 
+
+Definition 15 (Retraction map [67, Def. 1]) . Let M be a smooth manifold embedded in an Euclidean space E.Denote as 0Θ the zero element of TΘM. A map R : T M → M is a retraction on M around Θ ∈ M if there exists a neighborhood U of (Θ, 0Θ) within T M s.t. the following properties hold true: (i) U ⊆ dom (R) and R : U → M
+
+is smooth; (ii) R(Θ′, 0Θ′ ) = Θ′ for all (Θ′, 0Θ′ ) ∈ U ; and (iii) the derivative DR (Θ′, 0Θ′ ) satisfies the local rigidity condition DR (Θ′, 0Θ′ )[0 Θ′ , ξ] = ξ for all (Θ′, ξ) ∈ U . Hereafter, retraction refers to the restriction of R
+
+to TΘM, denoted by RΘ : TΘM → M. The domain of the retraction needs not be all of TΘM—a retraction only needs to be locally defined to facilitate optimization over manifolds [22, 40, 67]. 
+
+Fact 16 (Parameterization of TX Mr [7, Thm. 4.2]) . Suppose X ∈ M r admits the following N - and 1-orthogonal TT formats, respectively (see Fact 12 and Definition 14), 
+
+X = A1 ×1 A2 ×1 · · · × 1 AN , (A⟨2⟩ 
+
+> j
+
+)⊺A⟨2⟩ 
+
+> j
+
+= Irj , ∀j ∈ J1, N − 1K ,
+
+= A′ 
+
+> 1
+
+×1 A′ 
+
+> 2
+
+×1 · · · × 1 A′ 
+
+> N
+
+, A′⟨ 1⟩ 
+
+> j
+
+(A′⟨ 1⟩ 
+
+> j
+
+)⊺ = Irj−1 , ∀j ∈ J2, N K .
+
+Then, any tangent vector ξ ∈ TX Mr can be expressed as follows 
+
+ξ = ∆1 ×1 A′ 
+
+> 2
+
+×1 · · · × 1 A′
+
+> N
+
++ A1 ×1 ∆2 ×1 A′ 
+
+> 3
+
+×1 · · · × 1 A′
+
+> N
+
++ · · · + A1 ×1 A2 ×1 · · · × 1 ∆N ,
+
+for some {∆j ∈ Rrj−1×Ij ×rj | j ∈ J1, N K} with (A⟨2⟩ 
+
+> j
+
+)⊺∆⟨2⟩ 
+
+> j
+
+= 0rj ×rj , ∀j ∈ J1, N − 1K.23 Fact 17 (Projection onto TX Mr [68]) . Consider an arbitrarily fixed X ∈ M r and its N - and 1-orthogonal TT formats, as in Fact 16. Define, then, X≤j := A1 ×1 A2 ×1 · · · × 1 Aj and X≥j := A′ 
+
+> j
+
+×1 A′ 
+
+> j+1
+
+×1 · · · × 1
+
+A′ 
+
+> N
+
+, ∀j ∈ J1, N K. The orthogonal-projection mapping PTX Mr onto TX Mr takes then the following form: 
+
+PTX Mr : RI1×I2×···× IN → TX Mr : Z 7 → PTX Mr (Z), where 
+
+PTX Mr (Z) = ∆1 ×1 A′ 
+
+> 2
+
+×1 · · · × 1 A′
+
+> N
+
++ A1 ×1 ∆2 ×1 A′ 
+
+> 3
+
+×1 · · · × 1 A′
+
+> N
+
++ · · · + A1 ×1 A2 ×1 · · · × 1 ∆N , (11a) with 
+
+∆⟨2⟩ 
+
+> j
+
+:= 
+
+
+
+(Irj−1Ij − A⟨2⟩ 
+
+> j
+
+(A⟨2⟩ 
+
+> j
+
+)⊺)( IIj ⊗ (X ⟨j⟩≤j−1)⊺)Z⟨j⟩(X ⟨1⟩≥j+1 )⊺ , j ∈ J1, N − 1K ,
+
+(IIj ⊗ (X ⟨j⟩≤j−1)⊺)Z⟨j⟩ , j = N , (11b) and X ⟨1⟩≤0 := 1 .
+
+Remark 18 (Discussion on (4)) . Looking at Step 4 of Algorithm 1, it can be verified that if there exists a zero rj
+
+singular value, for some j ∈ J1, N − 1K, then the output of TT-SVD is not in Mr. In other words, strictly speaking, the domain of the retraction RX may not be the entire TX Mr. Fortunately, TT-SVD defines a retraction map from a neighborhood around the origin of TX Mr to a neighborhood around X in Mr [22, Prop. 4.3], which suffices for Riemannian optimization algorithms. Provided that ξ is “not too large”, TT-SVD maps X + ξ back to Mr in (4). Even though a theoretical characterization of such neighborhoods remains an open research question, it has been shown in practice that small step sizes, found by methods such as line search for example, are sufficient to ensure a well-defined retraction [22, 40]; see also Section 3.5. 
+
+Fact 19 (Positive definite matrices [8, §6.5.3]) . The set SDl 
+
+> ++
+
+of all real-valued Dl × Dl positive-definite matrices is a Riemannian manifold, with tangent space TCSDl 
+
+> ++
+
+= {Γ ∈ RDl×Dl | Γ⊺ = Γ} =: SDl , ∀C ∈ SDl
+
+> ++
+
+. The most popular Riemannian metric is the affine-invariant (AffI) one [8, (6.5.11)]: ∀C ∈ SDl
+
+> ++
+
+, ∀(Γ1, Γ2) ∈ TCSDl 
+
+> ++
+
+×
+
+TCSDl
+
+> ++
+
+,
+
+〈Γ1 | Γ2〉AffI  
+
+> C
+
+:= tr( C−1Γ1C−1Γ2) , (12) where tr( ·) stands for the trace of a matrix. The Riemannian gradient (2) of a smooth function L : SDl 
+
+> ++
+
+→ R with respect to the AffI metric takes the following form [69, (11.40)]: 
+
+grad L(C) = C ∇L (C) C , (13) where ∇L (C) ∈ SDl stands for the classical gradient of L at C.The exponential map Exp C(·) : TCSDl 
+
+> ++
+
+→ SDl 
+
+> ++
+
+: Γ 7 → Exp C(Γ) under the AffI metric takes the following form [8, (6.5.18)]: ∀C ∈ SDl
+
+> ++
+
+, ∀Γ ∈ TCSDl
+
+> ++
+
+,
+
+Exp C(Γ) = C1/2 exp( C−1/2 Γ C −1/2)C1/2 , (14) where exp( ·) stands for the classical matrix exponential [8, (2.5.4)]. Note here that an eigen-decomposition is usually needed to compute exp( ·).24 C Proof of Proposition 10 
+
+The derivation of the Euclidean gradients are given as follows. 1. The Euclidean gradient w.r.t. Cν is derived by the chain rule of differentiation as follows 
+
+∂L
+
+∂X (i1, . . . , i N ) = PΩ(X − Y)( i1, . . . , i N ) + ∂R
+
+∂X (i1, . . . , i N ) = ∆(i1, . . . , i N ) , (15a) 
+
+∂X (i1, . . . , i N )
+
+∂Kν (j, j ′) = Uν (i1, . . . , i m, j )Vν (j′, i m+1 , . . . , i N ) , (15b) 
+
+∂L
+
+∂Kν (j, j ′) = ∑
+
+> i1,...,i N
+
+∂L
+
+∂X (i1, . . . , i N )
+
+∂X (i1, . . . , i N )
+
+∂Kν (j, j ′) (15c) 
+
+= ∑
+
+> i1,...,i N
+
+∆(i1, . . . , i N )Uν (i1, . . . , i m, j )Vν (j′, i m+1 , . . . , i N ) (15d) 
+
+=
+
+(
+
+∆ ×1,...,m  
+
+> 1,...,m
+
+Uν (: , . . . , :, j )
+
+)
+
+×2,...,N −m+1 1,...,N −m Vν (j′, :, . . . , :) (15e) 
+
+= ˜Kν (j, j ′) , (15f) 
+
+∂Kν (j, j ′)
+
+∂Cν
+
+= Kν (j, j ′) ∂∂Cν
+
+(
+
+− 12 (l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)⊺
+
+(Cν )−1(l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)
+
+)
+
+(15g) 
+
+= 12 Kν (j, j ′)( Cν )−1(l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)( l(ν) 
+
+> j
+
+− l(ν) 
+
+> j′
+
+)⊺(Cν )−1 (15h) 
+
+= ˜Cν (j, j ′, :, :) , (15i) 
+
+∇Cν L(Θ) = ∑
+
+> j,j ′
+
+∂L
+
+∂Kν (j, j ′)
+
+∂Kν (j, j ′)
+
+∂Cν
+
+(15j) 
+
+= ∑
+
+> j,j ′
+
+˜Kν (j, j ′) ˜Cν (j, j ′, :, :) (15k) 
+
+= ˜Kν ×1,21,2 ˜Cν . (15l) 2. Notice that the map Uν,p 7 → (Uν,p Uν, ̸ =p) ×1 Kν ×1 Vν is a linear map w.r.t. Uν,p when Uν, ̸ =p, Vν , and 
+
+Kν are considered fixed. Therefore, the Euclidean gradient w.r.t. Uν,p is 
+
+∇Uν,p L(Θ) = ∇Uν,p (F + R)( Uν,p ) + λUν,p (15m) 
+
+=
+
+(
+
+∇X (F + R)( X ) ×m+1 ,...,N m+1 ,...,N Vν ×1 Kν
+
+)
+
+Uν, ̸ =p + λUν,p (15n) 
+
+=
+
+(
+
+∆ ×m+1 ,...,N m+1 ,...,N Vν ×1 Kν
+
+)
+
+Uν, ̸ =p + λUν,p . (15o) By similar arguments, the Euclidean gradient w.r.t. Vν,q is 
+
+∇Vν,q L(Θ) = ∇Vν,q (F + R)( Vν,q ) + λVν,q (15p) 
+
+=
+
+[
+
+Kν ×1 (
+
+Uν ×1,...,m  
+
+> 1,...,m
+
+∇X (F + R)( X )
+
+)] 
+
+Vν, ̸ =q + λVν,q (15q) 
+
+=
+
+[
+
+Kν ×1 (
+
+Uν ×1,...,m  
+
+> 1,...,m
+
+∆
+
+)] 
+
+Vν, ̸ =q + λVν,q . (15r) 25

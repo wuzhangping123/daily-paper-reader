@@ -6,32 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-21
-- 运行时间：2026-07-21 20:50:16 UTC
+- 最新运行日期：2026-07-22
+- 运行时间：2026-07-22 21:35:07 UTC
 - 运行状态：成功
-- 本次总论文数：4
+- 本次总论文数：3
 - 精读区：1
-- 速读区：3
+- 速读区：2
 
 ### 今日简报（AI）
-今日精选4篇论文，精读聚焦暗像素对图像去噪的“亮度偏差”鲁棒性问题。最值得关注的是《The Devil is in the Dark Pixels》（8.0分），其揭示了暗像素区域是去噪模型失效的关键。建议对图像去噪鲁棒性感兴趣的读者深入精读该文，速读部分可关注张量回归与动物再识别退化适应方法。
-- 详情：[/202607/21/README](/202607/21/README)
+今日精读高分论文《Kernel Regression with Tensor Trains and Hadamard Overparameterization》，并速读图像修复与扩散模型后验采样两篇。  
+最值得关注：张量训练与Hadamard过参数化在核回归中的创新，以及基于DDIM的扩散后验采样可证明方法。  
+建议优先阅读精读论文，探索过参数化技巧对高维数据处理的启发；速读论文可作为图像修复和扩散模型应用的补充。
+- 详情：[/202607/22/README](/202607/22/README)
 
 ### 精读区论文标签
-1. [The Devil is in the Dark Pixels: Toward Brightness Bias-Robust Denoising](/202607/21/2607.16320v1-the-devil-is-in-the-dark-pixels-toward-brightness-bias-robust-denoising)  
+1. [Kernel Regression with Tensor Trains and Hadamard Overparameterization](/202607/22/2607.17390v2-kernel-regression-with-tensor-trains-and-hadamard-overparameterization)  
    标签：评分：8.0/10、query:hsi-denoise
-   evidence：针对信号依赖噪声中亮度偏差的去噪方法
+   evidence：张量列车核回归多路数据插补，与高维张量数据恢复相关
 
 ### 速读区论文标签
-1. [Kernel Regression with Tensor Trains and Hadamard Overparameterization](/202607/21/2607.17390v1-kernel-regression-with-tensor-trains-and-hadamard-overparameterization)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：张量链回归用于多路数据插补
-2. [DARA: Degradation-Aware Low-Rank Residual Adaptation with Original-to-Corrupted Distillation for Corruption-Robust Animal Re-Identification](/202607/21/2607.16644v1-dara-degradation-aware-low-rank-residual-adaptation-with-original-to-corrupted-distillation-for-corruption-robust-animal-re-identification)  
+1. [QuReC: All-in-One Image Restoration with Query-Specific Guidance and Local-Global Response Calibration](/202607/22/2607.15097v2-qurec-all-in-one-image-restoration-with-query-specific-guidance-and-local-global-response-calibration)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：低秩残差适应用于退化鲁棒性
-3. [Iterated graph Laplacian for image restoration problems](/202607/21/2607.17313v1-iterated-graph-laplacian-for-image-restoration-problems)  
+   evidence：全合一图像修复包括去噪，具有查询特定引导
+2. [Provable diffusion-based posterior sampling for linear inverse problems via DDIM](/202607/22/2607.19333v1-provable-diffusion-based-posterior-sampling-for-linear-inverse-problems-via-ddim)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：迭代图拉普拉斯正则化用于图像恢复，可应用于高光谱图像去噪
+   evidence：基于扩散的线性逆问题后验采样方法，可迁移至高光谱图像去噪
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-22",
+  "date": "2026-07-22",
+  "generated_at": "2026-07-22T21:35:17",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/22/2607.17390v2-kernel-regression-with-tensor-trains-and-hadamard-overparameterization",
+      "section": "deep",
+      "title_en": "Kernel Regression with Tensor Trains and Hadamard Overparameterization",
+      "authors": "Duc Thien Nguyen, Konstantinos Slavakis, Eleftherios Kofidis, Dimitris Pados",
+      "date": "2026-07-19",
+      "pdf": "https://arxiv.org/pdf/2607.17390v2",
+      "score": "8.0",
+      "evidence": "张量列车核回归多路数据插补，与高维张量数据恢复相关",
+      "tldr": "多路数据插补面临高维缺失和模型选择难题。本文提出KReTTaH框架，将插补转化为再生核希尔伯特空间中的回归问题，显式约束张量回归系数在固定秩张量列流形上，并采用Hadamard过参数化促进稀疏性。通过黎曼积流形联合优化系数与核协方差矩阵，自动化核超参数选择。在fMRI与动态图边流数据上，KReTTaH精度超越多种基线方法。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Kernel regression with tensor trains and Hadamard overparameterization (KReTTaH) is introduced as a training-data-free, interpretable, and nonparametric framework for multi-way data imputation. The imputation problem is reformulated as regression in reproducing kernel Hilbert spaces (RKHS), where the tensor regression coefficients are explicitly constrained to lie on fixed-rank tensor-train (TT) manifolds and structured via Hadamard overparameterization to promote sparsity and high representational efficiency. Rather than relying on costly cross-validation, KReTTaH jointly optimizes the TT coefficient tensors and the kernel covariance matrices within a Riemannian product-manifold framework -- the former on fixed-rank TT manifolds, the latter on the manifold of positive-definite matrices -- thereby enabling automated kernel-hyperparameter selection. Numerical tests on two challenging applications -- imputation of high-dimensional functional magnetic resonance imaging (fMRI) data and recovery of missing edge flows in dynamic graphs -- demonstrate that KReTTaH consistently outperforms state-of-the-art tensor-, Bayesian-, and neural-network-based baselines in terms of modeling accuracy.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/22/2607.15097v2-qurec-all-in-one-image-restoration-with-query-specific-guidance-and-local-global-response-calibration",
+      "section": "quick",
+      "title_en": "QuReC: All-in-One Image Restoration with Query-Specific Guidance and Local-Global Response Calibration",
+      "authors": "Shen Zhou, Jinghui Zhang, Wenbo Huang, Xuwei Qian, Zhen Wu, Guangwen Peng, Zhiyuan Li, Ding Ding, Dian Shen, Fang Dong",
+      "date": "2026-07-16",
+      "pdf": "https://arxiv.org/pdf/2607.15097v2",
+      "score": "6.0",
+      "evidence": "全合一图像修复包括去噪，具有查询特定引导",
+      "tldr": "现有全合一图像恢复方法依赖图像级提示，在空间异质或混合退化场景下性能受限。本文提出QuReC框架，通过退化引导查询重构模块实现逐空间查询的自适应引导，并利用局部-全局响应校准模块提升特征聚合的可靠性与协调性。在多个基准上取得最优结果，为复杂退化恢复提供了细粒度自适应与全局局部协同的新方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "All-in-one image restoration aims to recover clean images degraded by multiple corruption types using a single unified model. Existing methods typically rely on image-level prompts or shared guidance to handle diverse degradations. However, such a paradigm becomes inadequate when degradations are spatially heterogeneous or even coexist in mixed forms within a single image. Yet spatially adaptive guidance alone is not sufficient, since accurate restoration also requires each spatial query to reliably aggregate complementary information from local neighborhoods and global contexts. To this end, we propose QuReC, a unified framework for all-in-one image restoration. QuReC consists of a Degradation-Guided Query Reconstruction Module (DQRM) and a Local-Global Response Calibration Module (LGRCM). Specifically, DQRM matches each spatial query against a degradation prototype space to reconstruct a query-specific degradation-aware representation, thereby providing fine-grained spatially adaptive restoration guidance. To further stabilize this query-wise matching process, we introduce a weakly supervised prototype matching learning strategy to improve optimization stability and degradation semantic consistency. Meanwhile, LGRCM performs local-global dual-branch aggregation and calibrates the aggregated responses with learnable priors, improving the reliability of feature aggregation and the coordination between local detail modeling and global context modeling. Extensive experiments demonstrate that QuReC achieves superior performance on multiple all-in-one image restoration benchmarks. The code is released at https://github.com/zhoushen1/QuReC.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/22/2607.19333v1-provable-diffusion-based-posterior-sampling-for-linear-inverse-problems-via-ddim",
+      "section": "quick",
+      "title_en": "Provable diffusion-based posterior sampling for linear inverse problems via DDIM",
+      "authors": "Yuchen Jiao, Na Li, Changxiao Cai, Yuxin Chen, Gen Li",
+      "date": "2026-07-21",
+      "pdf": "https://arxiv.org/pdf/2607.19333v1",
+      "score": "6.0",
+      "evidence": "基于扩散的线性逆问题后验采样方法，可迁移至高光谱图像去噪",
+      "tldr": "扩散模型在逆问题中表现优异但缺乏理论保证或计算昂贵。本文提出PDDIM，一种基于DDIM的轻量级后验采样算法，通过对每个奇异方向按信噪比切换扩散先验与测量预测，实现坐标修正。理论证明收敛于贝叶斯后验，实验在图像恢复任务上优于多数基线，兼具高效性与可证明性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Diffusion-based methods have achieved remarkable empirical success in solving inverse problems. However, many existing posterior samplers either lack rigorous theoretical guarantees or incur substantial computational overhead. We propose a simple and efficient algorithm, called \\pddim, for solving linear inverse problems with diffusion priors via a DDIM-type sampler. Our method requires only lightweight, coordinate-wise modifications to the standard DDIM update, while explicitly incorporating the measurement model. The key idea is to perform posterior sampling separately along each singular direction of the measurement operator: for each direction, the sampler follows the learned diffusion prior when the observation signal-to-noise ratio (SNR) is below the corresponding diffusion SNR, and switches to a calibrated measurement-based predictor otherwise. We prove that the proposed sampler converges to the Bayesian posterior conditioned on the measurements. Empirical results show that the proposed sampler performs favorably against existing diffusion-based posterior samplers across a range of image restoration tasks, achieving the best performance on the majority of evaluation metrics considered. Overall, our results convert posterior sampling for noisy linear inverse problems to simple coordinate-wise DDIM updates, yielding an efficient, easy-to-implement algorithm with provable posterior consistency.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
