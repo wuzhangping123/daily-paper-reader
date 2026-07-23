@@ -1,0 +1,3636 @@
+Title: Intrinsic Low-Tucker-Rank Theory and Unified Tensor CUR Decomposition for High-Dimensional Hyperinterpolation
+
+URL Source: https://arxiv.org/pdf/2607.19741v1
+
+Published Time: Thu, 23 Jul 2026 00:28:49 GMT
+
+Number of Pages: 48
+
+Markdown Content:
+# Intrinsic Low-Tucker-Rank Theory and Unified Tensor CUR Decomposition for High-Dimensional Hyperinterpolation 
+
+Maolin Che ∗ Yimin Wei † Chong Wu ‡
+
+July 23, 2026 
+
+Abstract 
+
+High-dimensional hyperinterpolation is severely hampered by the curse of dimensionality, as its coefficient tensors grow exponentially with the ambient dimension. Existing research predom-inantly focuses on heuristic algorithmic optimizations, often overlooking the inherent structural properties of these tensors. This paper establishes a rigorous theory of intrinsic low-ϵ-Tucker-rank for hyperinterpolation coefficient tensors, delivering near-optimal low-rank approximations with error bounds that are nearly independent of the dimension. We further construct a uni-fied, Tucker-compatible theoretical framework that integrates both Chidori-type and Fiber-type tensor CUR (TCUR) decompositions, deriving tight and stable Frobenius-norm error estimates that depend exclusively on tensor spectral properties and index set geometry. We mathemati-cally verify the convergence and numerical stability of greedy adaptive index selection schemes and prove their near-optimality, enabling a fully tensor-free hyperinterpolation workflow that avoids constructing the full coefficient array. Three practical greedy TCUR algorithms and a lightweight TCUR-to-Tucker recompression pipeline are proposed as direct corollaries of our structural theory. Numerical experiments across three distinct families of high-dimensional test functions validate all theoretical predictions and confirm the intrinsic low-rank compressibility of hyperinterpolation coefficients. In contrast to prior algorithm-centric studies, this work pri-oritizes rigorous theoretical characterization over implementation tricks, establishing a unified structural and mathematical foundation for high-dimensional hyperinterpolation. 
+
+Keywords: High-dimensional approximation; hyperinterpolation; tensor CUR decomposi-tion; Tucker decomposition; curse of dimensionality; greedy adaptive algorithm 
+
+AMS subject classifications: 68Q25, 68R10, 68U05, 65D15, 65F55, 41A10, 41A63. 
+
+> ∗
+
+E-mail: mlche@gzu.edu.cn and chncml@outlook.com. School of Mathematics and Statistics, Guizhou University, Guiyang, 550025, Guizhou, P. R. of China. This author is supported by the Special Posts of Guizhou University (No. [2025]06) and the National Natural Science Foundation of China (No. 12561095). 
+
+> †
+
+E-mail: ymwei@fudan.edu.cn and yimin.wei@gmail.com. School of Mathematical Sciences and Key Laboratory of Mathematics for Nonlinear Sciences, Fudan University, Shanghai, 200433, P. R. China. This author is supported by the National Natural Science Foundation of China under grant U24A2001 and the Science and Technology Commission of Shanghai Municipality under grant 23JC1400501. 
+
+> ‡
+
+E-mail: chongwu2-c@my.cityu.edu.hk and imroxaswc@gmail.com. Department of Electrical Engineering, City University of Hong Kong, Kowloon, Hong Kong SAR, P. R. of China. 
+
+1arXiv:2607.19741v1 [math.NA] 22 Jul 2026 1 Introduction 
+
+High-dimensional function approximation is a critical area at the intersection of classical ap-proximation theory, spectral numerical methods, and modern tensor algebra, underpinning scientific computing, uncertainty quantification, and large-scale data-driven machine learning. Among main-stream multivariate approximation tools, hyperinterpolation, firstly proposed by Sloan [48], stands out for its robust numerical stability, flexibility across domains, and rigorous error guarantees. The core innovation of hyperinterpolation replaces the continuous L2 orthogonal projection onto polynomial subspaces with a discrete projection built upon positive-weight cubature rules with high algebraic precision. This design eliminates the severe ill-conditioning and Runge phenomenon plaguing classical polynomial interpolation, making it a reliable choice for high-dimensional surro-gate modeling. The seminal work of [48] has sparked numerous investigations into finding suitable quadrature rules for different regions, thereby expanding the potential applications of hyperinter-polation [2, 4, 5]. Mathematically, the hyperinterpolation operator discretizes the Fourier integrals of the standard orthogonal projection via discrete quadrature summations. This foundational concept has led to a wealth of follow-up research, with scholars designing tailored cubature formulas for diverse geometries and integrating hyperinterpolation into engineering and statistical modeling workflows. As a mature multivariate approximation framework [22, 35, 36, 46, 55, 56], hyperinterpolation is now widely deployed for high-dimensional problems. However, it carries a fundamental computational bottleneck: computing its coefficients requires evaluating discrete inner products between the target function and tensor-product polynomial basis functions over a dense sampling grid. On the N -dimensional hypercube [ −1, 1] N , these coefficients naturally form an N -way tensor whose total number of entries grows exponentially with the dimension N and per-axis polynomial degree In.This exponential scaling is the canonical “curse of dimensionality”: even for moderately sized N
+
+and In, the full tensor construction, storage, and manipulation become computationally intractable. While functions in applications are often given as sampled data, the modern era of high-throughput data collection introduces significant noise. To address this, An and Wu developed Lasso hyperinterpolation [3], which employs a soft-thresholding operator to process all hyperinter-polation coefficients, yielding a sparse solution via ℓ1-regularized weighted discrete least squares, which is regarded as a convex relaxation of an ℓ0-regularized problem [29]. Although Lasso hyper-interpolation forgoes the projection property and basis invariance of the classical method, it offers an efficient approach for basis selection and denoising. Despite these methodological advances, existing work on tensor-compressed hyperinterpolation suffers from a critical blind spot: nearly all published algorithms are developed from a purely implementation-driven perspective. Researchers prioritize empirical runtime performance and cod-ing workflows, yet they fail to address the core structural question: why can hyperinterpolation coefficient tensors be accurately approximated with low-rank tensor formats? The prior literature lacks rigorous, dimension-robust existence theorems for low-rank approximations, and it fails to unify the two dominant TCUR variants under a shared analytical framework. Furthermore, the greedy index selection heuristics widely used in TCUR pipelines lack formal convergence and sta-bility proofs, leaving practitioners without provable stopping criteria or quantifiable error bounds for their workflows. This paper reverses the conventional research paradigm by centering structural mathematical theory before algorithm design. We formalize four unresolved foundational questions that motivate 2our work: (a) Do hyperinterpolation coefficient tensors possess intrinsic low-ϵ-Tucker-rank structure with approximation guarantees nearly independent of ambient dimension N ?(b) Can Chidori-type and Fiber-type TCUR decompositions be integrated into a single unified theoretical framework with parameter-free, intrinsic error bounds? (c) Can the greedy adaptive index selection schemes used in TCUR be rigorously justified as near-optimal, stable iterative procedures with explicit complexity bounds? (d) Is it possible to derive a single continuous chain of dimension-independent error estimates covering the full modeling pipeline: Sobolev regular target function, hyperinterpolation dis-cretization, TCUR tensor approximation and secondary Tucker recompression? We provide definitive affirmative answers to all four inquiries through four core foundational contributions: 1) A universal low-ϵ-Tucker-rank existence theorem for hyperinterpolation coefficient tensors, which quantifies the inherent compressibility of these arrays and delivers explicit, weakly dimension-dependent rank upper bounds; 2) A unified Tucker-compatible structural theory covering both Chidori-type and Fiber-type TCUR, paired with tight Frobenius-norm residual bounds dependent solely on tensor singular spectra and index set geometry; 3) Rigorous convergence, stability, and complexity analysis for greedy adaptive index selection, complete with mathematically certified stopping criteria that avoid full tensor assembly at every iteration; 4) An integrated end-to-end error analysis that links Sobolev function regularity, hyperinterpo-lation discretization error, TCUR sampling residual, and post-hoc Tucker recompression loss within one cohesive inequality. Unlike existing literature that treats low-rank compression as an ad-hoc engineering workaround, our analysis characterizes the inherent multilinear structure to explain why compression succeeds, rather than merely detailing how to implement it. The three greedy TCUR algorithms and the TCUR-to-Tucker recompression pipeline emerge as constructive corollaries derived directly from our structural theorems. This theory-first viewpoint reframes high-dimensional hyperinterpolation research to prioritize minimax optimality, provable error control, and unified structural insight over case-specific computational hacks. To empirically validate our theoretical derivations, we conduct numerical experiments across three distinct smoothness regimes of three-dimensional test functions. Our trials are not designed to benchmark raw computational speed; instead, they systematically verify the predicted ϵ-Tucker rank scaling, the tightness of our derived error bounds, the numerical stability of greedy index sampling, and the compression ratios enabled by intrinsic low-rank structure. All experimental observations align closely with our theoretical predictions, confirming that the structural properties we prove govern the practical behavior of hyperinterpolation coefficient tensors. By grounding high-dimensional hyperinterpolation in rigorous tensor structural analysis, this paper establishes a unified theoretical foundation and opens new research avenues for the structural characterization of other spectral and polynomial approximation methods. 31.1 Organizations 
+
+The remainder of this manuscript proceeds in a logically sequential structure that builds theory incrementally from preliminary definitions to numerical validation, with seamless cross-section con-nections outlined below. Section 2 collects all prerequisite notation, tensor algebra fundamentals, Tucker decomposition machinery, TCUR variants, and Sobolev space definitions. Section 3 ffor-malizes the hyperinterpolation problem over the N -dimensional hypercube, constructs the explicit form of the coefficient tensor, and restates the exponential storage bottleneck. This bridges classical approximation theory with tensor array representation. Section 4 delivers our flagship theoretical results: the intrinsic low-ϵ-Tucker-rank existence theorem, a critique of standard Tucker solvers, a unified TCUR approximation theory, and composite error bounds. Section 5 introduces three prov-ably convergent greedy adaptive TCUR algorithms, quantifying their computational complexity, and details the end-to-end pipeline for tensor-free hyperinterpolation. Section 6 presents numeri-cal experiments to validate the theoretical framework over three canonical three-dimensional test functions. Section 7 concludes the paper and outlines promising future extensions. This appendix develops a lightweight TCUR-to-Tucker recompression scheme with composite error bounds. 
+
+# 2 Preliminaries 
+
+This section lays out the universal notation, core tensor norm definitions, matrix ϵ-rank theory, Tucker decomposition and HOSVD algorithms, two canonical forms of tensor CUR decomposition, and the Sobolev space infrastructure. 
+
+2.1 Notations and basic definitions 
+
+We begin with standard index submatrix notation for matrices. Let I = {i1, i 2, . . . , i K } with 1 ≤ i1 < i 2 < · · · < i K ≤ I, and J = {j1, j 2, . . . , j L} with 1 ≤ j1 < j 2 < · · · < j L ≤ J. For any matrix A ∈ RI×J , we use A(: , J) to denote the I × L submatrix of A containing only those columns of A indexed by J, and A(I, :) to denote the K × J submatrix of A containing only those rows of 
+
+A indexed by I. The matrix Qn ∈ RIn×Rn is orthonormal if Q⊤ 
+
+> n
+
+Qn is the identity matrix. Consider an N -way tensor A ∈ RI1×I2×···× IN , its maximum absolute entry norm and Frobenius norm are, respectively, defined as 
+
+∥A∥ max = max 
+
+> in=1 ,2,...,I n
+> n=1 ,2,...,N
+
+|ai1i2...i N |, ∥A∥ F =
+
+vuut I1X
+
+> i1=1
+> I2
+
+X
+
+> i2=1
+
+· · · 
+
+> IN
+
+X 
+
+> iN=1
+
+a2 
+
+> i1i2...i N
+
+.
+
+Our low-rank tensor theory builds fundamentally upon the matrix ϵ-rank concept, a well-established tool for quantifying minimal rank matrix approximations under entrywise error tol-erances. We adopt the standard definition from Udell and Townsend [7]. 
+
+Definition 2.1. ([53, Definition 2.1]) Let X ∈ RI×J be a matrix and 0 < ϵ < 1 be a tolerance. The (absolute) ϵ-rank of X is given by 
+
+rank ϵ(X) = min {rank( A) : A ∈ RI×J , ∥X − A∥max ≤ ϵ}.
+
+That is, R = rank ϵ(X) is the smallest integer for which X can be approximated by a rank-R matrix, up to an accuracy of ϵ.
+
+4In plain terms, rank ϵ(X) records the smallest integer rank required to approximate X with uniform entrywise error no larger than ϵ. We later extend this matrix concept recursively to define the ϵ-Tucker rank of full N -way tensors in Section 4. 
+
+2.2 Tucker decomposition and T-HOSVD/ST-HOSVD 
+
+The Tucker decomposition is the foundational low-multilinear-rank tensor factorization we lever-age throughout this work. Given an N -tuple of positive integers ( R1, R 2, . . . , R N ) with Rn < I n,
+
+the Tucker decomposition (cf. [52]) factorizes an N -order tensor A ∈ RI1×I2×···× IN as: 
+
+A ≈ G × 1 U(1) ×2 U(2) · · · × N U(N ),
+
+where U(n) ∈ RIn×Rn are termed the mode-n factor matrices and G ∈ RR1×R2×···× RN is the core tensor . There exist several types of Tucker decomposition, including nonnegative Tucker decompo-sition (cf. [59]), the higher-order interpolatory decomposition, that is, tensor CUR decomposition in the Tucker format (cf. [10, 14, 26, 47]), and structure-preserving decomposition in the Tucker format (cf. [43]). For each n, the Tucker decomposition is closely related to the mode-n unfolding matrix A(n) ∈
+
+RIn×I1... (In−1In+1 ...I N ). In particular, one has 
+
+A(n) ≈ U(n)G(n)(U(N ) ⊗ · · · ⊗ U(n+1) ⊗ U(n−1) ⊗ · · · ⊗ U(1) )⊤,
+
+where G(n) ∈ RRn×(R1...R n−1Rn+1 ...R N ).It follows that the rank of A(n) is less than or equal to Rn, as the mode-n factor U(n) ∈ RIn×Rn
+
+at most has rank Rn. This motivates us to define the Tucker rank (denoted by Trank) of A as the 
+
+N -tuple ( R1, R 2, . . . , R N ), where the rank of A(n) is equal to Rn.Two standard truncated SVD pipelines compute approximate Tucker factorizations: Truncated Higher-Order SVD (T-HOSVD) (cf. [23, 34]) and Sequential T-HOSVD (ST-HOSVD) (cf. [54]), summarized compactly in Algorithm 2.1. Both iterate over each tensor mode to extract leading singular vectors for factor matrices, then contract the original tensor against transposed factors to produce the core tensor. ST-HOSVD permits arbitrary permutations of mode processing order from the symmetric group SN , while T-HOSVD strictly processes axes in fixed sequential order 1, 2, . . . , N .
+
+Algorithm 2.1 T-HOSVD and ST-HOSVD 
+
+Input : A tensor A ∈ RI1×I2×···× IN , and a Tucker rank ( R1, R 2, . . . , R N ) with Rn ≤ In and 1, 2, . . . , N .
+
+Output : The core tensor G ∈ RR1×R2×···× RN and the mode-n factor matrix Qn ∈ RIn×Rn such that A ≈ bA = G × 1 Q1 ×2 Q2 · · · × N QN . 
+
+> 1:
+
+Set a temporary tensor G := A. 
+
+> 2:
+
+for n = 1 , 2, . . . , N do  
+
+> 3:
+
+Form Qn by computing the first Rn left singular vectors of A(n) for T-HOSVD, or the first 
+
+Rn left singular vectors of G(n) for ST-HOSVD.  
+
+> 4:
+
+Update G = G × n Q⊤ 
+
+> n
+
+. 
+
+> 5:
+
+end for 
+
+5From Algorithm 2.1, we see that G = A × 1 Q⊤ 
+
+> 1
+
+×2 Q⊤ 
+
+> 2
+
+· · · × N Q⊤ 
+
+> N
+
+, which implies that bA =
+
+A × 1 (Q1Q⊤ 
+
+> 1
+
+) ×2 (Q2Q⊤ 
+
+> 2
+
+) · · · × N (QN Q⊤ 
+
+> N
+
+). Due to [54, Theorems 5.1 and 6.5], in terms of the Frobenius norm of a tensor, the error in approximating A using Algorithm 2.1 is shown in the following theorem. 
+
+Theorem 2.1. For a Tucker rank (R1, R 2, . . . , R N ) with Rn ≤ In and = 1 , 2, . . . , N , let bA := 
+
+G × 1 Q1 ×2 Q2 · · · × N QN be obtained by applying Algorithm 2.1 to A ∈ RI1×I2×···× IN . Then, one has 
+
+∥A − bA∥ 2 
+
+> F
+
+≤
+
+> N
+
+X
+
+> n=1
+
+∥A × n (IIn − QnQ⊤ 
+
+> n
+
+)∥2 
+
+> F
+
+=
+
+> N
+
+X
+
+> n=1
+> bIn
+
+X
+
+> i=Rn+1
+
+σi(A(n))2,
+
+where for each n, we denote bIn = min {In, I 1 . . . I n−1In+1 . . . I N }.
+
+In many practical settings, the true Tucker rank of a tensor is unknown in advance, and users instead specify a uniform error tolerance 0 < ϵ < 1. This motivates the ϵ-Tucker rank definition, extending matrix ϵ-rank to tensors. 
+
+Definition 2.2. Let A ∈ RI1×I2×···× IN be a tensor and 0 < ϵ < 1 be a tolerance. The (absolute) 
+
+ϵ-Tucker-rank of A is given by 
+
+Trank ϵ(A) = min {Trank( B) : B ∈ RI1×I2×···× IN , ∥A − B∥ max ≤ ϵ}.
+
+This minimal multilinear rank tuple under entrywise error tolerance forms the central object of our flagship theoretical result in Section 4. 
+
+2.3 Tensor CUR decompositions 
+
+Matrix CUR factorization approximates full matrices using a small subset of physical rows and columns, offering transparent interpretability absent from opaque SVD factor matrices. Tensor CUR (TCUR) generalizes this interpolatory subsampling paradigm to N -way tensors, with two dominant variants, i.e., Chidori-type and Fiber-type, both compatible with the Tucker factorization format we adopt for hyperinterpolation compression. We define both variants systematically here to establish the unified TCUR framework derived later in Section 4. We now overview the Chidori type (see [10, Figure 1]) for tensor CUR decomposition as follows. For each n, let In = {i(n)1 , i (n)2 , . . . , i (n) 
+
+> Sn
+
+} such that 1 ≤ i(n)1 < i (n)2 < · · · < i (n) 
+
+> Sn
+
+≤ In with Sn ≪ In.Suppose that the matrix Cn ∈ RIn× bSn is the mode-n folding of Cn = A(I1, . . . , In−1, :, In+1 , . . . , IN )with bSn = Q 
+
+> m̸=n
+
+Sm and G ∈ RS1×S2×···× SN is given by G = A(I1, I2, . . . , IN ), then the Chidori tensor CUR decomposition of A is given by 
+
+A ≈ A Chidori = G × 1
+
+
+
+C1U†
+
+> 1
+
+
+
+×2
+
+
+
+C2U†
+
+> 2
+
+
+
+· · · × N
+
+
+
+CN U†
+
+> N
+
+
+
+, (2.1) with Un = Cn(In, :). The difference between the Chidori and Fiber types for tensor CUR decomposition is the way to generate the N -tuple of matrices {C1, . . . , CN }. For clarity, this tuple is denoted by {C′
+
+> 1
+
+, . . . , C′ 
+
+> N
+
+}.For each n, we introduce another index Jn such that Jn = {j(n)1 , j (n)2 , . . . , j (n) 
+
+> S′
+> n
+
+} such that 1 ≤ j(n)1 <j(n)2 < · · · < j (n) 
+
+> S′
+> n
+
+≤ I1 . . . I n−1In+1 . . . I N . Then, for the Fiber type (see [10, Figure 2]), the matrix 
+
+Cn is given by C′ 
+
+> n
+
+= A(n)(: , Jn) and the Fiber tensor CUR decomposition of A is given by 
+
+A ≈ A Fiber = G × 1
+
+
+
+C′
+
+> 1
+
+U′† 
+
+> 1
+
+
+
+×2
+
+
+
+C′
+
+> 2
+
+U′† 
+
+> 2
+
+
+
+· · · × N
+
+
+
+C′ 
+
+> N
+
+U′† 
+
+> N
+
+
+
+. (2.2) 62.4 Basic definitions in Sobolev spaces 
+
+Let L2([ −1, 1]) denote the Hilbert space of square-integrable functions on [ −1, 1], equipped with the inner product 
+
+⟨f, g ⟩ =
+
+Z 1
+
+> −1
+
+f (x)g(x)w(x) dx, (2.3) and the induced norm ∥f ∥L2 := ⟨f, f ⟩1/2 with f, g ∈ L2([ −1, 1]), where w(x) is a weight function (e.g., w(x) = 1 /√1 − x2 for Chebyshev polynomials of the first kind). Let L2(Ω) denote the Hilbert space of square-integrable functions on Ω = {x = ( x1, x 2, . . . , x N ) ∈
+
+RN : −1 ≤ xn ≤ 1, n = 1 , 2, . . . , N }, equipped with the inner product 
+
+⟨f, g ⟩ =
+
+Z 1
+
+> −1
+
+Z 1
+
+> −1
+
+· · · 
+
+Z 1
+
+> −1
+
+f (x)g(x)w(x) dx,
+
+with dx := dx 1dx 2 . . . dx N , and the induced norm ∥f ∥L2 := ⟨f, f ⟩1/2 with f, g ∈ L2(Ω), where w(x)is a weight function. For any integer α > 0, the α-derivative Sobolev space on Ω is given as 
+
+Hα(Ω) = {f (x) ∈ L2(Ω) : ∥f ∥α < +∞} ,
+
+where ∥f ∥α is defined as 
+
+∥f ∥α =
+
+> α
+
+X
+
+> |k|=0
+
+∥Dkf (x)∥L2 , Dkf (x) = ∂|k|f (x)
+
+∂x k1 
+
+> 1
+
+∂x k2 
+
+> 2
+
+. . . ∂x kN
+
+> N
+
+with k = ( k1, . . . , k N ) and |k| = PNn=1 kn. Meanwhile, the seminorm of Hα(Ω) can be defined as 
+
+|f |α =
+
+ X
+
+> |k|=α
+
+∥Dkf (x)∥L2
+
+
+
+> 1/2
+
+.
+
+These seminorms directly govern the convergence rate of hyperinterpolation approximations as polynomial degrees increase, that is, approximation error theorems in Section 3. With all prerequisite tensor algebra, Tucker, TCUR, and Sobolev space notation firmly es-tablished, we now shift focus to constructing the hyperinterpolation coefficient tensor, that is, the central high-dimensional array whose intrinsic low-rank structure is our primary object of study. Section 3 translates continuous multivariate orthogonal polynomial projection into discrete hyperinterpolation via positive cubature rules, derives the explicit tensor representation of hyper-interpolation coefficients, and quantifies the exponential scaling cost that motivates our subsequent low-rank compression theory. 
+
+# 3 Hyperinterpolation and problem setting 
+
+This section fully formalizes the mathematical framework of hyperinterpolation over the N -dimensional hypercube Ω = [ −1, 1] N . We first build tensor-product orthonormal polynomial bases for multivariate L2 spaces, then introduce positive-weight tensor-product cubature rules to dis-cretize continuous orthogonal projection into the hyperinterpolation operator. We explicitly con-struct the N -way coefficient tensor storing discrete inner products between target functions and 7basis polynomials, and rigorously articulate the curse-of-dimensionality computational bottleneck arising from this tensor’s exponential storage cost. This tensor formulation establishes the pre-cise mathematical object whose intrinsic low-ϵ-Tucker-rank structure we prove in Section tensor-hyperinterpolation:sect4-main. 
+
+3.1 Hyperinterpolation on the hypercube 
+
+We first fix a univariate orthonormal polynomial basis {Φℓ}∞ 
+
+> ℓ=0
+
+on the interval [ −1, 1] associated with a given weight w(x). This basis satisfies orthonormality: 
+
+⟨Φℓ, Φℓ′ ⟩ =
+
+Z 1
+
+> −1
+
+Φℓ(x)Φ ℓ′ (x)w(x) d x = δℓℓ ′ ,
+
+and forms a complete orthogonal system on L2([ −1, 1]) by the Weierstrass approximation theorem. Any square-integrable univariate function f ∈ L2([ −1, 1]) admits an orthogonal Fourier expansion 
+
+f (x) = 
+
+> ∞
+
+X
+
+> k=0
+
+αkΦk(x), αk = ⟨f, Φk⟩,
+
+with Parseval’s identity guaranteeing ∥f ∥2 
+
+> L2
+
+= P∞ 
+
+> k=0
+
+α2
+
+> k
+
+. Let Π I ([ −1, 1]) denote the space of poly-nomials of total degree bounded by I. The orthogonal projection of f (x) onto Π I ([ −1, 1]) yields the truncated polynomial approximation: 
+
+pI (x) = 
+
+> I
+
+X
+
+> k=0
+
+αkΦk(x).
+
+We extend this univariate basis to the multivariate tensor-product setting over Ω = [ −1, 1] N .For each dimension n ∈ { 1, 2, . . . , N }, let {Φ(n) 
+
+> in
+
+(xn) : in = 0 , 1, 2, . . . } be an orthonormal basis of 
+
+L2([ −1, 1]) weighted by wn(xn). Any multivariate function f (x) ∈ L2(Ω) can be expressed into a tensor-product orthogonal series (cf. [50, (4.1)] and [41, Theorem 4.1]): 
+
+f (x) = 
+
+> ∞
+
+X
+
+> i1=0
+> ∞
+
+X
+
+> i2=0
+
+· · · 
+
+> ∞
+
+X 
+
+> iN=0
+
+ai1...i N Φ(1)  
+
+> i1
+
+(x1)Φ (2)  
+
+> i2
+
+(x2) . . . Φ(N ) 
+
+> iN
+
+(xN )where the expansion coefficients are defined via continuous multidimensional integration: 
+
+ai1i2...i N =
+
+Z 1
+
+> −1
+
+Z 1
+
+> −1
+
+· · · 
+
+Z 1
+
+> −1
+
+f (x)
+
+> N
+
+Y
+
+> n=1
+
+h
+
+Φ(n) 
+
+> in
+
+(xn)wn(xn)
+
+i
+
+dx.
+
+The L2(Ω) norm of f (x) can be recovered from these coefficients via a multivariate generalization of Parseval’s identity: 
+
+∥f ∥L2 =
+
+vuut
+
+> ∞
+
+X
+
+> i1=0
+> ∞
+
+X
+
+> i2=0
+
+· · · 
+
+> ∞
+
+X 
+
+> iN=0
+
+a2 
+
+> i1i2...i N
+
+.
+
+8For the prescribed polynomial degree In in the nth dimensional, we define the truncated poly-nomial subspace Π I1,I 2,...,I N (Ω) consisting of all tensor-product polynomials bounded by degree In
+
+along dimension n. The truncated orthogonal projection of f (x) onto this subspace reads: 
+
+pI1,I 2,...,I N (x) = 
+
+> I1
+
+X
+
+> i1=0
+> I2
+
+X
+
+> i2=0
+
+· · · 
+
+> IN
+
+X 
+
+> iN=0
+
+ai1i2...i N Φ(1)  
+
+> i1
+
+(x1)Φ (2)  
+
+> i2
+
+(x2) . . . Φ(N ) 
+
+> iN
+
+(xN ).
+
+The L2 approximation error of this continuous projection is controlled by the Sobolev regularity of f (x), as summarized in the following standard convergence result. 
+
+Theorem 3.1. (see [12, (5.8.20)]) For each f (x) ∈ Hα(Ω) , there exists a constant C, independent of f (x) and {I1, . . . , I N }, such that 
+
+∥pI1,I 2,...,I N (x) − f (x)∥L2 ≤ C · min {I1, I 2, . . . , I N }−α|f (x)|α.
+
+3.2 Hyperinterpolation via positive cubature rules 
+
+A critical practical limitation of the continuous orthogonal projection above is that the coeffi-cient integrals ai1...i N cannot be evaluated exactly when f (x) is only accessible via discrete samples. Hyperinterpolation, originally proposed by Sloan in the seminal paper [48], resolves this by replacing continuous inner products with discrete semi-inner products computed via positive-weight cubature rules exact for polynomials up to degree 2 I.We start with the univariate case. Consider a univariate quadrature rule on [ −1, 1] with nodes 
+
+{xm}Mm=1 and positive weights {wm}Mm=1 , which satisfies exact integration for all g(x) ∈ Π2I ([ −1, 1]): 
+
+Z 1
+
+> −1
+
+g(x)w(x) dx =
+
+> M
+
+X
+
+> m=1
+
+wmg(xm).
+
+The univariate hyperinterpolation operator LI : C([ −1, 1]) → ΠI ([ −1, 1]) is defined as 
+
+LI f (x) := 
+
+> I+1
+
+X
+
+> ℓ=1
+
+⟨f, Φℓ⟩M Φℓ(x),
+
+where ⟨· , ·⟩ M denotes the discrete quadrature-based semi-inner product: 
+
+⟨f, Φℓ⟩M =
+
+> M
+
+X
+
+> m=1
+
+wmf (xm)Φ ℓ(xm).
+
+This construction extends naturally to the multivariate hypercube Ω. For each n, we adopt a univariate quadrature scheme with nodes {x(n) 
+
+> mn
+
+}Mn 
+
+> mn=1
+
+and positive weights {w(n) 
+
+> mn
+
+}Mn
+
+> mn=1
+
+. The discrete analog of the continuous expansion coefficient ai1...i N is computed via tensor-product cu-bature: 
+
+eai1...i N =
+
+> M1
+
+X
+
+> m1=1
+
+· · · 
+
+> MN
+
+X 
+
+> mN=1
+
+f (x(1)  
+
+> m1
+
+, . . . , x (N ) 
+
+> mN
+
+)Φ (1)  
+
+> i1
+
+(x(1)  
+
+> m1
+
+) . . . Φ(N ) 
+
+> iN
+
+(x(N ) 
+
+> mN
+
+)w(1)  
+
+> m1
+
+. . . w (N )
+
+> mN
+
+:= 
+
+D
+
+f, Φ(1)  
+
+> i1
+
+. . . Φ(N )
+
+> iN
+
+E
+
+> M1,...,M N
+
+, (3.1) 9with in = 1 , 2, . . . , I n + 1 and n = 1 , 2, . . . , N . Then the multivariate hyperinterpolation polynomial is given by 
+
+LI1,...I N f (x) = 
+
+> I1+1
+
+X
+
+> i1=1
+
+· · ·  
+
+> IN+1
+
+X 
+
+> iN=1
+
+eai1...i N Φ(i1)1 (x(1) ) . . . Φ(iN ) 
+
+> N
+
+(x(N )). (3.2) The L2 approximation error of hyperinterpolation matches the asymptotic decay rate of con-tinuous orthogonal projection, formalized below. 
+
+Theorem 3.2. For each f (x) ∈ Hα(Ω) , there exists a constant C, independent of f (x) and 
+
+{I1, . . . , I N }, such that 
+
+∥L I1,...I N f (x) − f (x)∥L2 ≤ C · min {I1, . . . , I N }−α|f (x)|α.
+
+3.3 Sampling setup and tensor formulation 
+
+Let F ∈ RM1×M2×···× MN denote an N -way discrete data tensor sampled from an underlying multivariate function f (x). Each tensor entry corresponds to function evaluation at a grid node: 
+
+fm1m2...m N = f (x(1)  
+
+> m1
+
+, x (2)  
+
+> m2
+
+, . . . , x (N ) 
+
+> mN
+
+),
+
+and the full sampling grid (source grid) is defined as 
+
+Xsource =
+
+n 
+
+x(1)  
+
+> m1
+
+, . . . , x (N )
+
+> mN
+
+
+
+: mn = 1 , 2, . . . , M n, n = 1 , 2, . . . , N 
+
+o
+
+.
+
+A core practical task in multivariate approximation, such as function resampling, image upscal-ing/downscaling, and surrogate modeling, is reconstructing accurate approximations of the un-known function f (x) over a new grid Xtarget of size S1 × · · · × SN , denoted by 
+
+Xtarget = {(y(1)  
+
+> s1
+
+, . . . , y (N ) 
+
+> sN
+
+) : sn = 1 , 2, . . . , S n, n = 1 , 2, . . . , N }.
+
+The reconstructed output takes the form of a tensor R ∈ RS1×···× SN with entries rs1...s N ≈
+
+f (y(1)  
+
+> s1
+
+, . . . , y (N ) 
+
+> sN
+
+). The central challenge is to compute these target values solely from the discrete samples available on Xsource .Let Wn = diag 
+
+
+
+w(n)1 , w (n)2 , . . . , w (n)
+
+> Mn
+
+
+
+, An =
+
+h
+
+Φ(n) 
+
+> in
+
+(x(n) 
+
+> mn
+
+)
+
+i
+
+∈ R(In+1) ×Mn , and eA = [ eai1...i N ] ∈
+
+R(I1+1) ×···× (IN +1) . Over the source grid Xsource , the hyperinterpolation coefficient tensor eA admits a multilinear tensor-matrix product factorization: 
+
+F = eA × 1 (A1W1)⊤ · · · × N (AN WN )⊤.
+
+After constructing the coefficient tensor, function values over the target grid Xtarget are recovered via another tensor multiplication against basis matrices evaluated at target nodes. Define eAn =
+
+Φ(n) 
+
+> in
+
+(y(n) 
+
+> sn
+
+) ∈ R(In+1) ×Sn for each dimension n. The reconstructed tensor R is computed as: 
+
+R = eA × 1 eA⊤ 
+
+> 1
+
+· · · × N eA⊤ 
+
+> N
+
+.
+
+10 The total number of scalar entries stored in eA equals the product QNn=1 (In + 1), which grows exponentially with dimension N . Even for moderately sized polynomial degrees and moderate di-mensionality, explicitly constructing, storing, and manipulating the full coefficient tensor becomes computationally infeasible. This exponential scaling is the canonical curse of dimensionality moti-vating the low-rank tensor compression and tensor CUR decomposition (see [10, 14, 26])frameworks developed in subsequent sections. In the two-dimensional special case N = 2, the tensor eA degenerates to a standard matrix 
+
+eA ∈ R(I1+1) ×(I2+1) . Prior literature has designed greedy matrix CUR algorithms (see [13]) to avoid full matrix assembly for N = 2; this work generalizes such ideas to arbitrary higher-order tensors (N ≥ 3) within a unified tensor CUR decomposition in the Tucker framework paradigm. 
+
+# 4 General theory for approximating (3.2) 
+
+In Section 3 we fully formulated the hyperinterpolation framework over the N -dimensional hypercube Ω = [ −1, 1] N and derived the coefficient tensor eA that encodes discrete cubature inner products between the target function and tensor-product orthogonal polynomial basis functions. A fundamental computational bottleneck emerges immediately from this tensor representation: the total number of scalar entries of eA equals QNn=1 (In + 1), a quantity that grows exponentially with ambient dimension N and per-dimension polynomial degree In. This exponential scaling, widely known as the curse of dimensionality, renders explicit storage, full tensor assembly, and standard Tucker approximation pipelines, including T-HOSVD, ST-HOSVD, and HOOI, computationally intractable even for moderately large N and In, as all conventional Tucker solvers require full access to the mode-n unfoldings of eA, which demands evaluating every discrete cubature inner product defining eA.To circumvent this infeasible full-tensor construction, this section develops a unified rigorous theoretical framework for computing provably accurate low-multilinear-rank approximations of eA
+
+without explicitly assembling the complete coefficient tensor. Our core approximation objective is to construct a compact Tucker-format surrogate B ≈ eA with drastically reduced Tucker rank tuple (R1, R 2, . . . , R N ) satisfying Rn ≪ In + 1, such that the resulting compressed hyperinterpolation operator retains rigorous, dimension-robust approximation fidelity to the original Sobolev-regular target function f (x) ∈ Hα(Ω). We split the theoretical development into two core thematic blocks: first, we establish a universal intrinsic low-ϵ-Tucker-rank existence theorem for hyperinterpolation coefficient tensors that quantifies their inherent compressibility; second, we systematically diagnose the structural limitations of existing Tucker approximation algorithms when applied to hyperin-terpolation workflows, motivating the tensor CUR (TCUR) methodology developed in subsequent subsections. All structural results derived here serve as the rigorous mathematical foundation for the greedy TCUR sampling algorithms and end-to-end error chain analysis that unifies Sobolev regularity, hyperinterpolation discretization, and low-rank tensor compression. 
+
+4.1 Low-rank Tucker surrogates for compressed hyperinterpolation 
+
+Fix a Tucker rank ( R1, R 2, . . . , R N ) satisfying Rn < I n + 1, any Tucker-format tensor surrogate 
+
+B of eA takes the standard multilinear factorization: 
+
+B = G × 1 Q1 ×2 Q2 · · · × N QN , (4.1) 11 where G ∈ RR1×R2×···× RN is a core tensor and all Qn ∈ R(In+1) ×Rn are orthonormal for all n.Substituting this low-rank surrogate into the hyperinterpolation expansion yields a compressed approximation operator eLI1,...I N f (x), defined as: 
+
+eLI1,...I N f (x) = 
+
+> R1
+
+X
+
+> j1=1
+
+· · · 
+
+> RN
+
+X 
+
+> jN=1
+
+gj1,...,j N Ψ(1)  
+
+> j1
+
+(x(1) ) . . . Ψ(N ) 
+
+> jN
+
+(x(N )), (4.2) with compressed basis functions Ψ(n) 
+
+> jn
+
+(x(n)) = 
+
+> In+1
+
+X
+
+> in=1
+
+Qn(in, j n)Φ (n) 
+
+> in
+
+(x(n)).
+
+This compressed formulation delivers three decisive computational advantages over the full hyperinterpolation polynomial in (3.2) as follows: (a) Exponential storage reduction: The full expansion stores QNn=1 (In + 1) coefficients, while the Tucker surrogate only requires storing QNn=1 Rn core tensor entries. Since Rn ≪ In + 1, this eliminates the exponential storage overhead of the original coefficient tensor and removes the need for full assembly of eA.(b) Reduced basis complexity: The full tensor-product polynomial basis relies on PNn=1 (In +1) univariate basis functions, whereas the compressed operator only uses PNn=1 Rn linearly transformed basis functions across all dimensions. (c) Tensor-free evaluation compatibility: When paired with the TCUR sampling framework in-troduced in Section 5, this Tucker surrogate can be constructed by evaluating only a tiny subset of discrete cubature inner products, rather than computing every entry of eA.Despite these benefits, two foundational unresolved questions constrain practical deployment of this compressed hyperinterpolation framework: 1) Does the hyperinterpolation coefficient tensor eA admit an intrinsic low-ϵ-Tucker-rank struc-ture with approximation error bounds that are nearly independent of ambient dimension 
+
+N ?2) Can we compute the Tucker factorization {G ; Q1, Q2, . . . , QN } without explicitly constructing the full coefficient tensor eA?Section 4.2 resolves question (a) via a universal low-ϵ-Tucker-rank existence theorem, while Sec-tion 4.3 reviews existing Tucker algorithms to demonstrate that all standard methods fail question (b), which creates the critical motivation for the TCUR methodology developed in Section 5. 
+
+4.2 Universal low-ϵ-Tucker-rank theorems 
+
+This subsection establishes the core structural result of the paper: a rigorous existence the-orem proving that all hyperinterpolation coefficient tensors eA possess intrinsic low-ϵ-Tucker-rank approximations with entry-wise error bounds that scale weakly with dimension N . We build the 12 proof upon matrix ϵ-rank theory from Udell and Townsend [53], extended recursively to high-order tensors via sequential mode-wise low-rank approximation. For tolerance 0 < ϵ < 1, the ϵ-Tucker rank Trank ϵ( eA) denotes the minimal multilinear rank tuple (R1, R 2, . . . , R N ) such that there exists a Tucker-format tensor B satisfying ∥ eA − B∥ max ≤ ϵ. The following theorem quantifies the small magnitude of these required ranks for any hyperinterpolation coefficient tensor. 
+
+Theorem 4.1. Let eA ∈ R(I1+1) ×(I2+1) ×···× (IN +1) be defined in (3.1) and 0 < ϵ < 1. Then, there exists a Tucker-format tensor B ∈ R(I1+1) ×(I2+1) ×···× (IN +1) such that Trank( B) ≤ (R1, R 2, . . . , R N )
+
+and 
+
+∥ eA − B∥ max ≤ ϵ
+
+ aN − 1
+
+a − 1
+
+
+
+∥ eA∥ F , a =
+
+1 + ϵ
+
+vuut NY
+
+> n=1
+
+(In + 1) 
+
+ > 1,
+
+where each mode-n Tucker rank satisfies 
+
+Rn =
+
+&
+
+72 ln (In + 1) + 
+
+> n−1
+
+Y
+
+> k=1
+
+RkNY
+
+> l=n+1
+
+(Il + 1) + 1 
+
+!
+
+/ϵ 2
+
+'
+
+, n = 1 , 2, . . . , N. 
+
+Remark 4.1. Theorem 4.1 is the foundational structural theorem for this paper, proving that any hyperinterpolation coefficient tensor eA admits a low-Tucker-rank surrogate B with entrywise max-norm error control, and explicitly quantifies the required Tucker ranks (R1, R 2, . . . , R N ). Several key comments for this theorem are listed as follows: (a) The rank formula Rn =
+
+l
+
+72 ln 
+
+
+
+(In + 1) + Qn−1 
+
+> k=1
+
+Rk
+
+QNl=n+1 (Il + 1) + 1 
+
+
+
+/ϵ 2
+
+m
+
+only carries log-arithmic dependence on tensor dimensions and polynomial degrees, not polynomial/exponential scaling. This mathematically confirms hyperinterpolation tensors are inherently compressible, rather than just empirically compressible in small test cases. The error prefactor aN −1 
+
+> a−1
+
+grows mildly with N but remains manageable for moderate dimensions, establishing nearly dimension-independent approximation guarantees. (b) This theorem answers the core open question (a) posed in the introduction: it rigorously ex-plains why low-rank compression works for high-dimensional hyperinterpolation, instead of only demonstrating how to implement compression. All subsequent TCUR theory and greedy algo-rithms rest on this existence result. (c) As polynomial degrees In grow, Rn < I n+1 always holds, meaning the low-rank surrogate strictly reduces storage relative to the full coefficient tensor. For fixed tolerance ϵ, increasing dimension 
+
+N only slightly raises Rn, so the low-rank advantage persists even in ultrahigh dimensions. (d) The theorem holds for any permutation of mode processing order in symmetric group SN . No single dimension order yields drastically better rank bounds, which removes artificial tuning parameters from the structural theory. 
+
+Remark 4.2. The bound Rn < I n +1 holds for sufficiently large polynomial degrees In, meaning the low-rank surrogate is strictly more compact than the original tensor representation. The logarithmic dependence of Rn on tensor dimensions ensures the required ranks grow very slowly even as N and In
+
+increase, confirming the intrinsic compressibility of hyperinterpolation coefficients. As an example, Figure 1 illustrates that for some 0 < ϵ < 1,Theorem 4.1 is suitable for large scale Ins’. 
+
+13 Figure 1: Illustration of Theorem 4.1, with different values for the pair ( ϵ, N ), the values of each part in {R1/I 1, R 2/I 2, . . . , R N /I N }, where In = I and n = 1 , 2, . . . , N .We rely on a foundational matrix low-ϵ-rank result from Udell and Townsend [53] as the building block for the tensor proof. 
+
+Theorem 4.2. (see [53, Theorem 1.0]) Let A ∈ RI1×I2 and 0 < ϵ < 1. Then, there exists a matrix B ∈ RI1×I2 such that rank( B) ≤ R and 
+
+∥A − B∥max ≤ ϵ∥A∥2,
+
+with R = ⌈72 ln( I1 + I2 + 1) /ϵ 2⌉.
+
+The following corollary is easily obtained from Theorem 4.2. 
+
+Corollary 4.1. Let A ∈ RI1×I2 and 0 < ϵ < 1. Then, there exists a matrix B ∈ RI1×I2 such that 
+
+rank( B) ≤ R and 
+
+∥A − B∥max ≤ ϵ∥A∥F ,
+
+with R = ⌈72 ln( I1 + I2 + 1) /ϵ 2⌉.
+
+Remark 4.3. Theorem 4.2 and Corollary 4.1 show that any matrix can be approximated entrywise within a relative tolerance ϵ using a rank that scales logarithmically with the matrix dimensions, not polynomially or exponentially. 
+
+We now give a detailed proof for Theorem 4.1. 
+
+Proof. Note that when any tensor B ∈ R(I1+1) ×(I2+1) ×···× (IN +1) satisfies Trank( B) ≤ (R1, R 2, . . . , R N ), it can be represented by 
+
+B = G × 1 Q1 ×2 Q2 · · · × N QN ,
+
+14 where G ∈ RR1×R2×···× RN , and all the Qn ∈ R(In+1) ×Rn are orthonormal matrices with n =1, 2, . . . , N .Hence, without loss of generality, there exist ( N −1) tensors Bn ∈ RR1×···× Rn×(In+1 +1) ×···× (IN +1) 
+
+with n = 1 , 2, . . . , N − 1 such that 
+
+eA − B = eA − B 1 ×1 Q1 + B1 ×1 Q1 − B 2 ×1 Q1 ×2 Q2
+
++ · · · + BN −1 ×1 Q1 · · · × N −1 QN −1 − G × 1 Q1 · · · × N QN ,
+
+which implies that 
+
+∥ eA − B∥ max ≤ ∥ eA − B 1 ×1 Q1∥max + ∥B 1 ×1 Q1 − B 2 ×1 Q1 ×2 Q2∥max 
+
++ · · · + ∥B N −1 ×1 Q1 · · · × N −1 QN −1 − G × 1 Q1 · · · × N QN ∥max .
+
+First of all, by using Corollary 4.1, we have that 
+
+∥ eA − B 1 ×1 Q1∥max ≤ ϵ∥ eA∥ F
+
+with R1 = ⌈72 ln(( I1 + 1) + ( I2 + 1) . . . (IN + 1) + 1) /ϵ 2⌉, which implies that 
+
+∥B 1 ×1 Q1∥F ≤
+
+1 + ϵ
+
+vuut NY
+
+> n=1
+
+(In + 1) 
+
+ ∥ eA∥ F .
+
+Furthermore, for n = 2 , 3, . . . , N , it also follows from Corollary 4.1 that 
+
+∥B n−1 ×1 Q1 · · · × n−1 Qn−1 − B n ×1 Q1 · · · × n Qn∥max ≤ ϵ∥B n−1 ×1 Q1 · · · × n−1 Qn−1∥F
+
+with 
+
+Rn = ⌈72 ln(( In + 1) + R1 . . . R n−1(In+1 + 1) . . . (IN + 1) + 1) /ϵ 2⌉,
+
+which also implies that 
+
+∥B n ×1 Q1 · · · × n Qn∥F ≤
+
+1 + ϵ
+
+vuut NY
+
+> n=1
+
+(In + 1) 
+
+ ∥B n−1 ×1 Q1 · · · × n−1 Qn−1∥F .
+
+Here we set BN = G. Hence, the proof is complete. We now provide a more general expression for Theorem 4.1. 
+
+Remark 4.4. Suppose that SN is the N th order symmetric group on the set {1, 2, . . . , N }. Let 
+
+eA ∈ R(I1+1) ×···× (IN +1) and 0 < ϵ < 1. Then, for any processing order {p1, p 2, . . . , p N } ∈ SN , there exists a tensor B ∈ R(I1+1) ×···× (IN +1) such that Trank( B) ≤ { R1, R 2, . . . , R N } and 
+
+∥ eA − B∥ max ≤ ϵ
+
+ aN − 1
+
+a − 1
+
+
+
+∥ eA∥ F ,
+
+with a =
+
+
+
+1 + ϵ
+
+qQNn=1 (2 In + 1) 
+
+
+
+> 1, where 
+
+Rpn =
+
+&
+
+72 ln (Ipn + 1) + 
+
+> n−1
+
+Y
+
+> k=1
+
+Rpk
+
+> N
+
+Y
+
+> l=n+1
+
+(Ipl + 1) + 1 
+
+!
+
+/ϵ 2
+
+'
+
+with n = 1 , 2, . . . , N .
+
+15 By combining Theorems 3.2 and 4.1, we obtain the upper bound for ∥ eLI1,...,I N f (x) − f (x)∥L2 ,which is summarized in the following theorem. 
+
+Theorem 4.3. Let f (x) ∈ Hα(Ω) and eLI1,...,I N f (x) be in (4.2) . Under the conditions of Theorems 
+
+3.2 and 4.1 , one has 
+
+∥ eLI1,...,I N f (x) − f (x)∥L2
+
+≤ C · min {I1, . . . , I N }−α|f (x)|α + ϵ
+
+ aN − 1
+
+a − 1
+
+ vuut NY
+
+> n=1
+
+(In + 1) · ∥ eA∥ F
+
+with a = 1 + ϵ
+
+qQNn=1 (In + 1) , where the constant C is independent of f (x) and {I1, I 2, . . . , I N }.
+
+Remark 4.5. Theorem 4.3 combines the hyperinterpolation discretization error (Theorem 3.2) and tensor max-norm compression error (Theorem 4.1) into a unified bound for the compressed hyperinterpolation operator eLI1,...,I N : the first term is controlled only by function smoothness α
+
+and per-dimension polynomial degree In, independent of tensor compression, and the second term is controlled solely by tolerance ϵ and tensor norm ∥ eA∥ F , independent of the target function’s regularity. Meanwhile, the term 
+
+qQNn=1 (In + 1) converts max-norm tensor compression residual to L2 function error, connecting tensor-space approximation loss to the original function space metric relevant for scientific computing applications. Proof. Note that we have 
+
+eLI1,...,I N f (x) − f (x) = eLI1,...,I N f (x) − L I1,...,I N f (x) + LI1,...,I N f (x) − f (x),
+
+which implies that 
+
+∥ eLI1,...,I N f (x) − f (x)∥L2 ≤ ∥ eLI1,...,I N f (x) − L I1,...,I N f (x)∥L2 + ∥L I1,...,I N f (x) − f (x)∥L2
+
+Combining (3.2) and (4.2), one has 
+
+eLI1,...,I N f (x) − L I1,...,I N f (x) = 
+
+> I1+1
+
+X
+
+> i1=1
+
+· · · 
+
+> I2+1
+
+X 
+
+> iN=1
+
+(eαi1...i N − bi1...i N )Φ (i1)1 (x(1) ) . . . Φ(iN ) 
+
+> N
+
+(x(N )),
+
+where each eαi1...i N is given in (3.1) and bi1...i N is the ( i1, . . . , i N )-th entry of B in (4.1). For each 
+
+n, due to orthonormality of the basis {Φ(in) 
+
+> n
+
+(x(n)) : in = 1 , 2, . . . , I n + 1 } under the scaled inner product, 
+
+∥ eLI1,...,I N f (x) − L I1,...,I N f (x)∥2 
+
+> L2
+
+=
+
+> I1+1
+
+X
+
+> i1=1
+
+· · · 
+
+> I2+1
+
+X 
+
+> iN=1
+
+(eαi1...i N − bi1...i N )2 = ∥ eA − B∥ 2 
+
+> F
+
+.
+
+Using the inequality ∥ · ∥ F ≤
+
+qQNn=1 (In + 1) ∥ · ∥ max for an ( I1 + 1) × · · · × (IN + 1) tensor, 
+
+∥ eLI1,...,I N f (x) − L I1,...,I N f (x)∥L2 ≤
+
+vuut NY
+
+> n=1
+
+(In + 1) · ∥ eA − B∥ max .
+
+Therefore, the proof is complete by combining Theorems 3.2 and 4.1. 16 4.3 The existing algorithms and drawbacks 
+
+Given a tolerance ϵ, once the desired N -tuple ( R1, R 2, . . . , R N ) is deduced from Theorem 4.1, the problem of finding a ( N + 1)-tuple {G ; Q1, . . . , QN } from the coefficient tensor eA is called the fixed Tucker-rank problem. 
+
+Problem 4.1. (see [24, (4.1)] and [34, (4.3)]) For the coefficient tensor eA ∈ R(I1+1) ×···× (IN +1) 
+
+and N positive integers Rn < I n + 1 with n = 1 , 2, . . . , N , the objective is to find N orthonormal matrices Qn ∈ R(In+1) ×Rn such that 
+
+{Q1, . . . , QN } = argmin 
+
+> V1,..., VN
+
+eA − eA × 1 (V1V∗
+
+> 1
+
+) · · · × N (VN V∗ 
+
+> N
+
+) 2 
+
+> F
+
+,
+
+where all the matrices Vn ∈ R(In+1) ×Rn are orthonormal. 
+
+We overview two common algorithms for solving Problem 4.1. The first one is the alternating least squares (ALS) algorithm (cf. [24]). It is also called higher-order orthogonal iteration (HOOI) and is implemented by the function “tucker als” in MATLAB tensor toolbox [9]. In detail, the ALS algorithm updates one of the factor matrices along with the core tensor at a time, and is bottlenecked by the operation called the tensor times matrix-chain (TTMc). Several randomized variants for the ALS method are discussed in [11, 28, 37, 38, 51]. The truncated higher-order singular value decomposition (T-HOSVD) and the sequentially T-HOSVD (ST-HOSVD) are two other common algorithms for solving Problem 4.1. More details can be found in [23, 34] and their references. Note that T-HOSVD and ST-HOSVD is less accurate than the ALS algorithm but can provide a good initial value for the ALS algorithm. In the framework of T-HOSVD and/or ST-HOSVD, for each n, the main calculation for T-HOSVD and ST-HOSVD is to compute an exact SVD of the mode-n unfolding of the corresponding tensor. By using randomized SVD with the random projection and/or sampling techniques, different randomized variants of T-HOSVD and ST-HOSVD are presented recently, for example, see [1, 16, 17, 18, 19, 42, 43, 49, 60]. However, the N -tuple {R1, R 2, . . . , R N } is unknown in advance. Hence, the problem is summa-rized as the fixed precision problem. 
+
+Problem 4.2. (see [20, Problem 1.1] and [57, (3.1)]) For a given 0 < ϵ < 1 and the coefficient tensor eA ∈ R(I1+1) ×(I2+1) ×···× (IN +1) , the goal is to find N positive integers Rn and N orthonormal matrices Qn ∈ R(In+1) ×Rn such that 
+
+∥ eA − eA × 1 (Q1Q⊤ 
+
+> 1
+
+) · · · × N (QN Q⊤ 
+
+> N
+
+)∥F ≤ ϵ. 
+
+We now briefly review the existing results for solving Problem 4.2. For adaptive variants of T-HOSVD and ST-HOSVD, we need to calculate the truncated SVD with a given tolerance 0 < ϵ < 1of the mode-n unfolding of the corresponding tensor with n = 1 , 2, . . . , N . As shown in [15], an adaptive randomized variant for T-HOSVD and ST-HOSVD is presented by replacing the stan-dard Gaussian vectors used in the adaptive randomized range finder (see [30, Algorithm 4.2]) with the Khatri-Rao product of the standard Gaussian vectors. Minster et al. [43] deduced adaptive randomized algorithms for the fixed-precision problem of approximate Tucker decomposition by using a version of the adaptive randomized range finder algorithm in [40, 58]. Xiao and Yang [57] proposed a rank-adaptive (RA) variant of the ALS algorithm to calculate the truncated Tucker decomposition of higher-order tensors with a given tolerance 0 < ϵ < 1 and proved that the method 17 is locally optimal and monotonically convergent. Hashemi and Nakatsukasa [32] proposed an adap-tive randomized algorithm for approximate Tucker decomposition, denoted by RTSMS (Random-ized Tucker via Single-Mode-Sketching). Che et al. [20] modified several structured matrices for the adaptive randomized range finder algorithm in [58], when the standard Gaussian matrices are replaced by uniform random matrices, the Khatri-Rao product of the standard Gaussian matrices (or the uniform random matrices), and obtained the adaptive randomized variants for T-HOSVD and ST-HOSVD by using this modified algorithm to each mode unfolding of the input/intermediate tensor. This critical practical limitation, that is, all mainstream Tucker algorithms require full or partial assembly of the exponential-sized coefficient tensor, motivates our development of interpolatory tensor CUR (TCUR) decomposition, which constructs accurate low-rank surrogates by evaluating only a tiny, strategically selected subset of cubature inner products without constructing eA in full. 
+
+4.4 Revisiting Theorem 4.3 via TCUR approximation 
+
+For clear exposition throughout this subsection, we assume the target low multilinear Tucker rank tuple ( R1, R 2, . . . , R N ) from the ideal full Tucker surrogate (4.1) s pre-specified and fixed. To guarantee numerical stability of the interpolatory tensor CUR approximation, we enforce the strict rank ordering Rn < S n < I n + 1 with n = 1 , 2, . . . , N . For each n, let In = {i(n)1 , i (n)2 , . . . , i (n) 
+
+> Sn
+
+} such that 1 ≤ i(n)1 < i (n)2 < · · · < i (n) 
+
+> Sn
+
+≤ In + 1 and Jn = {ln, 1, l n, 2, . . . , l n,S ′ 
+
+> n
+
+} be a subset of {1, 2, . . . , J n}
+
+and Jn = Q
+
+> m̸=n
+
+(Im + 1) such that 1 ≤ ln, 1 < l n, 2 < · · · < l n,S ′ 
+
+> n
+
+≤ Jn and S′ 
+
+> n
+
+< J n. Furthermore, let 
+
+Cn = eA(n)(: , Jn) ∈ R(In+1) ×S′ 
+
+> n
+
+and G = eA(I1, . . . , IN ) ∈ RS1×S2×···× SN , where eA(n) is the mode-n
+
+folding of eA.We further define Un = Cn(In, :), the submatrix of Cn restricted to rows indexed by In; this matrix acts as the low-dimensional basis for the TCUR core’s projection onto the full tensor space. Mirroring the standard Tucker factorization structure from (4.1), the TCUR decomposition of eA
+
+takes the unified form: 
+
+eATCUR = G × 1
+
+
+
+C1U†
+
+> 1
+
+
+
+×2 · · · × N
+
+
+
+CN U†
+
+> N
+
+
+
+, (4.3) where U† 
+
+> n
+
+denotes the Moore–Penrose pseudoinverse of Un. We distinguish two canonical TCUR variants via the geometric definition of Jn:(a) Chidori-type TCUR : Jn is set to I1 ⊗ · · · ⊗ In−1 ⊗ In+1 ⊗ · · · ⊗ IN , meaning the column indices of Cn are tensor products of cross-mode row index sets Im, and the ( N + 1)-tuple 
+
+{G ; C1, . . . , CN } is obtained that the matrix Cn is the mode-n unfolding of Cn and the tensor 
+
+G is given by 
+
+G = Cn(: , . . . , :, In, :, . . . , :) . (4.4) where Cn ∈ RS1×···× Sn−1×(In+1) ×Sn+1 ×···× SN is defined as 
+
+Cn(j1, . . . , j n−1, i n, j n+1 , . . . , j N ) = 
+
+*
+
+f, Φ(1) 
+
+> i(1)
+> j1
+
+. . . Φ(n−1) 
+
+> i(n−1)
+> jn−1
+
+Φ(n) 
+
+> in
+
+Φ(n+1) 
+
+> i(n+1)
+> jn+1
+
+. . . Φ(N ) 
+
+> i(N)
+> jN
+
++
+
+> M1,...,M N
+
+(4.5) where in = 1 , 2, . . . , I n + 1, jm = 1 , 2, . . . , S m and i(m) 
+
+> jm
+
+∈ Im with m̸ = n.18 (b) Fiber-type TCUR : Jn is an arbitrary independent subset of the columns of eA(n), with no direct coupling to {Im : m̸ = n, m = 1 , 2, . . . , N }, and the ( N + 1)-tuple {G ; C1, . . . , CN } is obtained that G is the same as that for Chidori-type TCUR and the entries of C′ 
+
+> n
+
+∈ R(In+1) ×S′
+
+> n
+
+are given as 
+
+C′
+
+> n
+
+(in, j ) = 
+
+*
+
+f, Φ(1) 
+
+> s(1)
+> j1
+
+. . . Φ(n−1) 
+
+> s(n−1)
+> jn−1
+
+Φ(n) 
+
+> in
+
+Φ(n+1) 
+
+> s(n+1)
+> jn+1
+
+. . . Φ(N ) 
+
+> s(N)
+> jN
+
++
+
+> M1,...,M N
+
+(4.6) with in = 1 , 2, . . . , I n + 1, where for each ln,j with j = 1 , 2, . . . , S ′
+
+> n
+
+, there exists a unique (N − 1)-tuple ( s(1)  
+
+> j1
+
+, . . . , s (n−1)  
+
+> jn−1
+
+, s (n+1)  
+
+> jn+1
+
+, . . . , s (N ) 
+
+> jN
+
+) (see [6]) such that 
+
+j =s(1)  
+
+> j1
+
++ ( s(2)  
+
+> j2
+
+− 1)( I1 + 1) + · · · + ( s(n−1)  
+
+> jn−1
+
+− 1)( I1 + 1) . . . (In−2 + 1) + ( s(n+1)  
+
+> jn+1
+
+− 1)( I1 + 1) . . . (In−1 + 1) + · · · + ( s(N ) 
+
+> jN
+
+− 1)( I1 + 1) . . . (In−1 + 1)( In+1 + 1) . . . (IN + 1) .
+
+Remark 4.6. Note that the approximation given in (4.3) is called the structure-preserving Tucker decomposition (see [43]), which is generalized from a related decomposition of matrices (see [21]). Following Theorem 2 in [10], when the Trank of A is the N -tuple {R1, . . . , R N }, then (4.3) can be equivalent to eATCUR = eA × 1 (C1C†
+
+> 1
+
+) · · · × N (CN C† 
+
+> N
+
+). However, this formulation is not suitable because the computational complexity of obtaining the coefficient tensor eA is too high. 
+
+While (4.3) delivers a valid Tucker-compatible TCUR approximation eATCUR of the hyperin-terpolation coefficient tensor eA, the intermediate multilinear rank tuple {S1, . . . , S N } of eATCUR is consistently larger than the ideal target Tucker rank {R1, . . . , R N } required for minimal storage and fast function evaluation. As specified via the logarithmic scaling rules from [10], Sn = Rn log( In +1) for Chidori-type TCUR and S′ 
+
+> n
+
+= 2 Rn log   Q 
+
+> m̸=n
+
+(Im + 1)  for Fiber-type TCUR, meaning the TCUR core tensor G ∈ RS1×···× SN still carries redundant dimension overhead. Directly deploying 
+
+eATCUR for high-dimensional surrogate modeling, uncertainty quantification, or data reconstruc-tion would retain inflated computational cost for tensor multiplication and point evaluation. To eliminate this redundant subspace information without re-evaluating costly multilinear discrete cu-bature inner products or re-running the greedy index selection algorithms in Section 5, we develop the TCUR-to-Tucker recompression framework in Appendix A. This auxiliary pipeline takes the precomputed TCUR factorization as input and further truncates its multilinear rank down to the desired compact ( R1, R 2, . . . , R N ) via QR factorization and ST-HOSVD, with provable composite Frobenius error bounds in Theorem A.1 that fully account for both the initial TCUR approxi-mation residual and the secondary Tucker truncation error. The appendix therefore serves as a lightweight post-processing module that closes the full approximation chain, translating the over-complete TCUR interpolatory representation into an optimally compressed low-Tucker-rank tensor with minimal memory footprint and evaluation complexity. With the TCUR tensor surrogate fully defined, we rewrite the compressed hyperinterpolation operator induced by eATCUR to replace the full Tucker surrogate B from Section 4.1: 
+
+eLI1,...,I N f (x) = 
+
+> S1
+
+X
+
+> j1=1
+
+· · · 
+
+> SN
+
+X 
+
+> jN=1
+
+gj1,...,j N Ψ(1)  
+
+> j1
+
+(x(1) ) . . . Ψ(N ) 
+
+> jN
+
+(x(N )), (4.7) 19 where for each n, the function Ψ (n) 
+
+> jn
+
+(xn) is given by Ψ(n) 
+
+> jn
+
+(x(n)) = 
+
+> In+1
+
+X
+
+> in=1
+
+(CnU†
+
+> n
+
+)( in, j n)Φ (n) 
+
+> in
+
+(x(n)).
+
+Our primary analytical target for this subsection is to derive a tight, computable upper bound on the L2 approximation error ∥∥ eLI1,...,I N f (x)−f (x)∥L2 for the TCUR-compressed hyperinterpolation operator. From triangle inequality arguments established in Theorem 4.3, this L2 error decomposes additively into two independent components: (a) The hyperinterpolation discretization error ∥L I1,...,I N f (x)−f (x)∥L2 , which is controlled purely by the Sobolev regularity of f (x) and polynomial degrees {I1, . . . , I N } (Theorem 3.2); (b) The tensor compression error ∥ eLI1,...,I N f (x)−L I1,...,I N f (x)∥L2 , fully determined by the Frobenius-norm discrepancy ∥ eA − eATCUR ∥F between the full coefficient tensor and its TCUR approxi-mation. We first derive a recursive Frobenius error bound for ∥ eA − eATCUR ∥F by decomposing the tensor residual mode-by-mode, starting with the low-dimensional N = 3 case for intuitive geometric interpretation before generalizing to arbitrary N-order tensors. For clarity, we first consider the case of N = 3. Let B = eA(I1, :, :) and C = eA(I1, I2, :) = B(: , I2, :). Then, one has 
+
+eA − eATCUR = eA − G × 1 (C1U†
+
+> 1
+
+) ×2 (C2U†
+
+> 2
+
+) ×3 (C3U†
+
+> 3
+
+)= eA − B × 1 (C1U†
+
+> 1
+
+) + B × 1 (C1U†
+
+> 1
+
+) − C × 1 (C1U†
+
+> 1
+
+) ×2 (C2U†
+
+> 2
+
+)+ C × 1 (C1U†
+
+> 1
+
+) ×2 (C2U†
+
+> 2
+
+) − G × 1 (C1U†
+
+> 1
+
+) ×2 (C2U†
+
+> 2
+
+) ×3 (C3U†
+
+> 3
+
+),
+
+which implies that 
+
+∥ eA − eATCUR ∥F ≤ ∥ eA(1) − C1U†
+
+> 1
+
+B(1) ∥F + ∥C1U†
+
+> 1
+
+∥2∥B(2) − C2U†
+
+> 2
+
+C(2) ∥F
+
++ ∥C1U†
+
+> 1
+
+∥2∥C2U†
+
+> 2
+
+∥2∥C(3) − C3U†
+
+> 3
+
+G(3) ∥F
+
+= ∥ eA(1) − C1U† 
+
+> 1
+
+eA(1) (I1, :) ∥F + ∥C1U†
+
+> 1
+
+∥2∥B(2) − C2U†
+
+> 2
+
+B(2) (I2, :) ∥F
+
++ ∥C1U†
+
+> 1
+
+∥2∥C2U†
+
+> 2
+
+∥2∥C(3) − C3U†
+
+> 3
+
+C(3) (I3, :) ∥F ,
+
+with C1 = eA(1) (: , J1), C2 = eA(2) (: , J2) and C3 = eA(3) (: , J3). Note that B(2) = eA(2) (: , I1 ⊗ [I3 + 1]). Hence, we have 
+
+B(2) − C2U†
+
+> 2
+
+B(2) (I2, :) = eA(2) (: , I1 ⊗ [I3 + 1]) − C2U† 
+
+> 2
+
+eA(2) (I2, I1 ⊗ [I3 + 1]) = ( eA(2) − C2U† 
+
+> 2
+
+eA(2) (I2, :))(: , I1 ⊗ [I3 + 1]) ,
+
+C(3) − C3U†
+
+> 3
+
+C(3) (I3, :) = eA(3) (: , I1 ⊗ I2) − C3U† 
+
+> 3
+
+eA(3) (I3, I1 ⊗ I2)= ( eA(3) − C3U† 
+
+> 3
+
+eA(3) (I3, :))(: , I1 ⊗ I2),
+
+which implies that 
+
+∥B(2) − C2U†
+
+> 2
+
+B(2) (I2, :) ∥F ≤ ∥ eA(2) − C2U† 
+
+> 2
+
+eA(2) (I2, :) ∥F ,
+
+∥C(3) − C3U†
+
+> 3
+
+C(3) (I3, :) ∥F ≤ ∥ eA(3) − C3U† 
+
+> 3
+
+eA(3) (I3, :) ∥F .
+
+20 Based on the above descriptions, one has 
+
+∥ eA − eATCUR ∥F ≤
+
+> 3
+
+X
+
+> n=1
+> n−1
+
+Y
+
+> m=1
+
+∥CmU†
+
+> m
+
+∥2
+
+!
+
+∥ eA(n) − CnU† 
+
+> n
+
+eA(n)(In, :) ∥F . (4.8) Generally, according to the process for obtaining (4.8), we have 
+
+∥ eA − eATCUR ∥F ≤
+
+> N
+
+X
+
+> n=1
+> n−1
+
+Y
+
+> m=1
+
+∥CmU†
+
+> m
+
+∥2
+
+!
+
+∥ eA(n) − CnU† 
+
+> n
+
+eA(n)(In, :) ∥F . (4.9) For each n, we can find the index set In such that ∥ eA(n) − CnU† 
+
+> n
+
+eA(n)(In, :) ∥F is the minimum. In this case, the matrix eB(n) := CnU† 
+
+> n
+
+eA(n)(In, :) is a CUR matrix approximation of eA(n).
+
+Remark 4.7. For a general processing order {p1, p 2, . . . , p N } ∈ SN , it follows from (4.9) that 
+
+∥ eA − eATCUR ∥F ≤
+
+> N
+
+X
+
+> n=1
+> n−1
+
+Y
+
+> m=1
+
+∥Cpm U† 
+
+> pm
+
+∥2
+
+!
+
+∥ eA(pn) − Cpn U†
+
+> pn
+
+eA(pn)(Ipn , :) ∥F .
+
+Without loss of generality, we assume in this manuscript that the processing order is {1, 2, . . . , N }.For each n, let eA(n) = WnΣnV⊤ 
+
+> n
+
+be the SVD of eA(n), where Wn ∈ R(In+1) ×(In+1) and Vn ∈
+
+RQ 
+
+> m̸=n(Im+1) ×Q
+> m̸=n(Im+1)
+
+are orthonormal and Σn ∈ R(In+1) ×Q 
+
+> m̸=n(Im+1)
+
+is diagonal whose diago-nal entries are singular values of eA(n) and distributed in descending order. For a desired N -tuple 
+
+{R1, R 2, . . . , R N }, we assume that Rn < S n < I n + 1. According to Eckart–Young–Mirsky theo-rem (cf. [27, 44]), the best rank-Rn approximation to eA(n) is eA(n),R n = Wn,R n Σn,R n V⊤ 
+
+> n,R n
+
+with 
+
+Wn,R n = Wn(: , 1 : Rn), Σn,R n = Σn(1 : Rn, 1 : Rn) and Vn,R n = Vn(: , 1 : Rn). For each n on the right-hand side of (4.9), one has 
+
+∥ eA(n) − CnU† 
+
+> n
+
+eA(n)(In, :) ∥F ≤∥ eA(n) − eA(n),R n ∥F
+
++ ∥ eA(n),R n − CnU† 
+
+> n
+
+eA(n)(In, :) ∥F .
+
+It follows from Corollary 4.3 in [31] that the term ∥ eA(n),R n − CnU† 
+
+> n
+
+eA(n)(In, :) ∥F is bounded by 
+
+∥ eA(n),R n − CnU† 
+
+> n
+
+eA(n)(In, :) ∥F
+
+≤
+
+
+
+∥W† 
+
+> n,R n,In
+
+∥2 + ∥V† 
+
+> n,R n,Jn
+
+∥2 + 3 ∥W† 
+
+> n,R n,In
+
+∥2∥V† 
+
+> n,R n,Jn
+
+∥2
+
+
+
+∆Rn
+
++ ∥Un∥2
+
+
+
+∥W† 
+
+> n,R n,In
+
+∥2 + ∥V† 
+
+> n,R n,Jn
+
+∥2 + ∥W† 
+
+> n,R n,In
+
+∥2∥V† 
+
+> n,R n,Jn
+
+∥2 + 1 
+
+
+
+∆2 
+
+> Rn
+
+,
+
+with 
+
+Wn,R n,In = Wn,R n (In, :) , Vn,R n,Jn = Vn,R n (Jn, :) ,
+
+∆2 
+
+> Rn
+
+= ∥ eA(n) − eA(n),R n ∥2 
+
+> F
+
+. (4.10) According to the above discussion, an upper bound for ∥ eA − eATCUR ∥F is summarized in the following theorem. 21 Theorem 4.4. Let eA ∈ R(I1+1) ×···× (IN +1) be defined in (3.1) . For each n, let eA(n) = WnΣnV⊤ 
+
+> n
+
+be the SVD of eA(n), where Wn ∈ R(In+1) ×(In+1) and Vn ∈ RQ 
+
+> m̸=n(Im+1) ×Q
+> m̸=n(Im+1)
+
+are orthonormal and Σn ∈ R(In+1) ×Q 
+
+> m̸=n(Im+1)
+
+is diagonal whose diagonal entries are singular values of eA(n) and distributed in descending order. For each n, let In = {i(n)1 , i (n)2 , . . . , i (n) 
+
+> Sn
+
+} such that 1 ≤ i(n)1 < i (n)2 <
+
+· · · < i (n) 
+
+> Sn
+
+≤ In + 1 and Sn < I n + 1 , and Jn = {ln, 1, l n, 2, . . . , l n,S ′ 
+
+> n
+
+} be a subset of {1, 2, . . . , J n} and 
+
+Jn = Q
+
+> m̸=n
+
+(Im + 1) such that 1 ≤ ln, 1 < l n, 2 < · · · < l n,S ′ 
+
+> n
+
+≤ Jn and S′ 
+
+> n
+
+< J n.For a given N -tuple (R1, R 2, . . . , R N ) with Rn < min {Sn, S ′
+
+> n
+
+}, the best rank-Rn approximation to A(n) is denoted by eA(n),R n = Wn,R n Σn,R n V⊤ 
+
+> n,R n
+
+, where Wn,R n = Wn(: , 1 : Rn), Σn,R n = Σn(1 : 
+
+Rn, 1 : Rn) and Vn,R n = Vn(: , 1 : Rn). Define eATCUR in (4.3) with Cn being the mode-n unfolding of Cn and Un being the same as Cn(In, :) . Then, we have 
+
+∥ eA − eATCUR ∥F ≤
+
+> N
+
+X
+
+> n=1
+> n−1
+
+Y
+
+> m=1
+
+∥CmU†
+
+> m
+
+∥2
+
+! 
+
+αn,R n ∆Rn + βn,R n ∥U†
+
+> n
+
+∥2∆2
+
+> Rn
+
+
+
+,
+
+with 
+
+αn,R n = ∥W† 
+
+> n,R n,In
+
+∥2 + ∥V† 
+
+> n,R n,Jn
+
+∥2 + 3 ∥W† 
+
+> n,R n,In
+
+∥2∥V† 
+
+> n,R n,Jn
+
+∥2 + 1 ,βn,R n = ∥W† 
+
+> n,R n,In
+
+∥2 + ∥V† 
+
+> n,R n,Jn
+
+∥2 + ∥W† 
+
+> n,R n,In
+
+∥2∥V† 
+
+> n,R n,Jn
+
+∥2 + 1 .
+
+where for each n, the 3-tuple {Wn,R n,In , Vn,R n,Jn , ∆Rn } are given in (4.10) .
+
+Remark 4.8. In Theorem 4.4, we derive tight and computable upper bounds for ∥ eA − eATCUR ∥F ,valid for both Chidori-type and Fiber-type TCUR under a single unified framework, and links resid-ual magnitude to index set geometry and tensor singular spectra. (a) Answering the core open question (b) posed in the introduction : this theorem provides a shared residual formula with identical structural form for both Chidori-type and Fiber-type TCUR, differing only in the definition of column index sets Jn. This completes the paper’s core goal of building a single Tucker-compatible TCUR structural theory. (b) Every mode-n term splits loss into two well-understood parts: αn,R n ∆Rn (error from optimal rank-Rn SVD truncation of mode-n unfolding) and βn,R n ∥U †
+
+> n
+
+∥2∆2 
+
+> Rn
+
+(additional perturbation error introduced by subsampling tensor fibers via finite index sets In and Jn). (c) All stability constants αn,R n , β n,R n depend exclusively on pseudoinverse norms of submatrices sampled from mode SVD factors: ∥W† 
+
+> n,R n,In
+
+∥2 and ∥V† 
+
+> n,R n,Jn
+
+∥2. As analyzed earlier, optimizing index sets to maximize submatrix volume directly minimizes these constants and shrinks the entire error upper bound. (d) The product term Qn−1 
+
+> m=1
+
+∥CmU†
+
+> m
+
+∥2 reveals a critical numerical caveat: poorly conditioned index subsets on early modes amplify residual error for all subsequent dimensions. Index optimiza-tion cannot be performed per-mode in isolation and joint global selection over all {In, Jn} is mandatory to avoid compounded error blowup. (e) Unlike randomized tensor approximation error bounds that rely on distributional tuning param-eters, this bound only uses intrinsic tensor quantities: singular values of mode unfoldings and geometric volume properties of index submatrices. No artificial randomness constants appear, improving predictability for deterministic greedy TCUR algorithms. 
+
+22 Remark 4.9. With a given N -tuple (R1, R 2, . . . , R N ), let Aapp be the T-HOSVD or ST-HOSVD of eA. Then, one has eA = ATucker + ( eA − A Tucker ), which implies that 
+
+∥ eA − eATCUR ∥F ≤ ∥ eA − A Tucker ∥F + ∥A Tucker − eATCUR ∥F .
+
+Hence, we can also obtain the upper bound of ∥ eA − eATCUR ∥F by using Theorem 7 in [10] to the term ∥A Tucker − eATCUR ∥F .
+
+Following Theorem 4.4, there exist several terms ∥CmU†
+
+> m
+
+∥2, ∥U†
+
+> n
+
+∥2, ∥W† 
+
+> n,R n,In
+
+∥2 and ∥V† 
+
+> n,R n,I′
+> n
+
+∥2
+
+in the upper bound of ∥ eA− eATCUR ∥F , which are dependent on the choice of the indexes {I1, . . . , IN }
+
+and {J1, . . . , JN }. From Theorem 6.4 in [31] it follows that ∥CmU†
+
+> m
+
+∥2 = ∥W† 
+
+> m,R m,Im
+
+∥2. Note that 
+
+Un = Cn(In, :), which implies that 
+
+∥U†
+
+> n
+
+∥2 ≤ ∥ W† 
+
+> n,R n,In
+
+∥2∥V† 
+
+> n,R n,Jn
+
+∥2∥A†
+
+> (n)
+
+∥2.
+
+Then, under certain conditions, the upper bounds for ∥W† 
+
+> n,R n,In
+
+∥2 and ∥V† 
+
+> n,R n,Jn
+
+∥2, shown in the following remark (see [45, Lemma 1]): 
+
+Remark 4.10. Under the conditions of Theorem 4.4 , suppose that Wn,R n,In is the sub-matrix of 
+
+Wn,R n such that Wn,R n,In has maximal volume 1 among all Sn × Rn sub-matrices of Wn,R n , and 
+
+Vn,R n,Jn is the sub-matrix of Vn,R n such that Vn,R n,Jn has maximal volume among all Q 
+
+> m̸=n
+
+Sm ×
+
+Rn sub-matrices of Vn,R n . Then, one has 
+
+W† 
+
+> n,R n,In
+> 22
+
+≤ 1 + Rn(In + 1 − Sn)
+
+Sn − (Rn − 1) ,
+
+V† 
+
+> n,R n,Jn
+> 22
+
+≤ 1 + 
+
+Rn
+
+Q
+
+> m̸=n
+
+(Im + 1) − S′
+
+> n
+
+
+
+S′ 
+
+> n
+
+− (Rn − 1) .
+
+Similar to Theorem 4.3, the upper bound for ∥ eLI1,...,I N f (x)−f (x)∥L2 is followed from Theorems 3.2 with 4.4, which is summarized in the following theorem. 
+
+Theorem 4.5. Let f (x) ∈ Hα(Ω) and eLI1,...,I N f (x) be in (4.7) . Under the conditions of Theorem 
+
+4.4 , one has 
+
+∥ eLI1,...,I N f (x) − f (x)∥L2 ≤ C · min {I1, . . . , I N }−α|f (x)|α
+
++
+
+> N
+
+X
+
+> n=1
+> n−1
+
+Y
+
+> m=1
+
+∥CmU†
+
+> m
+
+∥2
+
+! 
+
+αn,R n ∆Rn + βn,R n ∥U†
+
+> n
+
+∥2∆2
+
+> Rn
+
+
+
+,
+
+where the constant C is independent of f (x) and {I1, I 2, . . . , I N }.
+
+Remark 4.11. Theorem 4.5 translates the TCUR tensor Frobenius residual bound from Theorem 4.4 into a function-space L2 error bound for the TCUR compressed hyperinterpolation operator, mirroring the structure of Theorem 4.3 but for interpolatory TCUR compression instead of ideal 
+
+> 1As shown in [8, Definition 1.1], the volume of any matrix is defined as the absolute value of the product of singular values of this matrix.
+
+23 full Tucker decomposition. The bound in Theorem 4.5, shares an identical Sobolev discretization term with Theorem 4.3 except for the tensor compression residual term. To be specific, TCUR introduces additional index-sampling perturbation relative to full T-HOSVD/ST-HOSVD, but elim-inates the exponential cost of assembling the full coefficient tensor eA. This theorem quantifies the exact accuracy tradeoff for the memory/computation savings of tensor-free TCUR. The bound also provides a verifiable stopping criterion for the adaptive index selection schemes in Section 5. Practitioners can precompute the maximum allowable TCUR residual contribution to meet a pre-scribed L2 error tolerance, then run the greedy index expansion loop until the bound falls below the required threshold. Furthermore, the statement holds for both Chidori-type and Fiber-type TCUR by swapping the definitions of CmU† 
+
+> m
+
+and C′
+
+> m
+
+U′† 
+
+> m
+
+, reaffirming the unified theoretical framework’s generality without separate case analysis for each decomposition variant. 
+
+All the above error analysis establishes rigorous theoretical bounds for TCUR approximation of hyperinterpolation coefficient tensors, yet a critical practical barrier remains: the index sets 
+
+{I1, . . . , IN } (for Chidori-type TCUR) and {J1, . . . , JN } (for Fiber-type TCUR) that define the core tensor G and factor matrices {Cn, C′
+
+> n
+
+} are unknown in advance. Direct brute-force enumera-tion of all candidate indices is computationally infeasible due to exponential scaling with dimension 
+
+N . To resolve this gap between the structural theory derived in Section 4 and implementable nu-merical pipelines, Section 5 constructs three provably convergent greedy adaptive index selection algorithms. These iterative schemes incrementally expand index subsets, rely only on partial dis-crete cubature inner products without full assembly of eA, embed rigorous stopping criteria tied to singular value stability, and yield the complete TCUR factorization required for compressed hyperinterpolation. We further integrate the two TCUR variants into a unified four-stage algorith-mic workflow and quantify the total number of multilinear inner products required for each greedy strategy to benchmark computational cost. 
+
+# 5 Efficient methods for approximating all coefficients 
+
+The theoretical TCUR error bounds derived in Section 4.4 hinge on carefully chosen index sets 
+
+{I1, . . . , IN } and {J1, . . . , JN }, but these index subsets cannot be precomputed without explicit access to the full coefficient tensor eA. Standard tensor decomposition solvers (T-HOSVD, HOOI, randomized Tucker variants) require full unfolding of eA, which is prohibited by the curse of dimen-sionality for high N and large per-dimension polynomial degrees In. This section develops three deterministic greedy adaptive algorithms to construct Chidori-type TCUR and Fiber-type TCUR factorizations without forming any full tensor entry. Each method iteratively expands index blocks, monitors numerical stability via singular value thresholds, and terminates with certified approxi-mation quality consistent with the Frobenius-norm error theory in Theorem 4.4. We quantify the computational complexity of each greedy strategy via the count of required discrete cubature inner products, then combine the Chidori and Fiber pipelines into a unified end-to-end algorithm for general hyperinterpolation compression. All four proposed greedy solvers inherit provable convergence and stability from the structural theory in Section 4: (a) Near-optimality : the incremental index selection process approximates maximum-volume submatrices of the mode-n singular factor matrices Wn,R n and Vn,R n , satisfying the volume-based pseudoinverse norm bounds in Remark 4.10. 24 (b) Stability : termination via singular value ratio thresholds ensures all pseudoinverse terms 
+
+∥CmU†
+
+> m
+
+∥2 and ∥U†
+
+> n
+
+∥2 in Theorem 4.4 remain uniformly bounded, eliminating uncontrolled error blowup in high dimensions. (c) Tensor-free computation : no full assembly of eA is required at any stage and all cubature inner products are evaluated only for the incremental index blocks selected by the greedy loop. (d) Error composability : the output TCUR factorization feeds directly into the TCUR-to-Tucker recompression scheme in Appendix A, forming a complete chain from raw function samples to optimally compressed low-rank Tucker format with unified end-to-end L2 error bounds (Theorem 4.5). 
+
+5.1 Greedy adaptive algorithms for Chidori-type TCUR 
+
+Chidori-type TCUR relies solely on row index sets {I1, . . . , IN } to build cross-mode tensor factors 
+
+{C 1, . . . , CN } and the core tensor G. We present two distinct greedy strategies differentiated by their stopping condition: one monitors the stability of the mode-n unfolded factor tensors Cn, and the second tracks singular value decay directly on the core tensor G for tighter early termination. Both algorithms operate on fixed small block sizes bn ≪ In to incrementally grow each index set In.For the first one, we obtain a deterministic adaptive algorithm (see Algorithm 5.1) for finding the N -tuple of matrices {C1, . . . , CN } and the N -tuple of indices {I1, . . . , IN }. Suppose that the 
+
+N -tuple of block sizes {b1, . . . , b N } satisfy bn ≪ In with n = 1 , 2, . . . , N . For each n, let In be the empty set. For each iteration k ≥ 1, we complete the following operations: (a) for each n, we set I′ 
+
+> n
+
+= [ kb n + 1 , . . . , (k + 1) bn] and update In = In ∪ I′
+
+> n
+
+;(b) for given ( N − 1)-tuples of indices {I1, . . . , In−1, In+1 , . . . , IN }, the tensor Cn is obtained ac-cording to (4.5); (c) if max {σmin (Cn)2/∥C n∥2 
+
+> F
+
+: n = 1 , 2, . . . , N } < τ 2 is not satisfied, then we continue Steps (a) and (b), where 0 < τ < 1 is a given parameter, and the factor matrix Cn is the mode-n
+
+unfolding of Cn.When max {σmin (Cn)2/∥C n∥2 
+
+> F
+
+: n = 1 , 2, . . . , N } < τ 2 is satisfied, the matrix Un is obtained as 
+
+Un = Cn(In, :) and the core tensor G is given as 
+
+G = Cn(: , . . . , :, In, :, . . . , :) .
+
+For clarity, we assume that the maximum number of iterations for Algorithm 5.1 is K. Then the approximation LI1,...I N f (x) is obtained according to (4.7) with Sn = Kb n and n = 1 , 2, . . . , N .Note that we cannot ensure that Cn ∈ R(In+1) ×Sn is of full rank for all n. The reason is that for some n, some singular values of Cn may be zero. For each k, Algorithm 5.1 needs 
+
+> N
+
+X
+
+> n=1
+
+kN −1(In + 1) b1 . . . b n−1bn+1 . . . b N
+
+25 Algorithm 5.1 Greedy Chidori-type TCUR (stopping criterion on factors Cn)
+
+Input : A function f (x) ∈ Hα(Ω), a given 0 < ϵ < 1, the N -tuple of block sizes {b1, b 2, . . . , b N },and a tolerance 0 < τ < 1. 
+
+Output : The ( N + 1)-tuple {G , C1U1, . . . , CN UN }, which is used to form the function 
+
+LI1,...I N f (x).  
+
+> 1:
+
+According to Theorem 3.2, we estimate the N -tuple {I1, I 2, . . . , I N } such that In = O((1 /ϵ )1/α ).  
+
+> 2:
+
+For each n, let In be the empty set.  
+
+> 3:
+
+for k = 1 , 2, . . . do  
+
+> 4:
+
+For each n, we set I′ 
+
+> n
+
+= [ kb n + 1 , . . . , (k + 1) bn] and update In = In ∪ I′
+
+> n
+
+. 
+
+> 5:
+
+The tensor Cn is obtained according to (4.5) with the (N − 1)-tuples of indices 
+
+{I1, . . . , In−1, In+1 , . . . , IN }. 
+
+> 6:
+
+Obtain tol = max {σmin (Cn)/∥C n∥F : n = 1 , 2, . . . , N }, where σmin (Cn) is the smallest nonzero singular value of Cn, and Cn is the mode-n unfolding of Cn. 
+
+> 7:
+
+if tol > τ then  
+
+> 8:
+
+Continue.  
+
+> 9:
+
+else  
+
+> 10:
+
+Stop and jump out of the for loop.  
+
+> 11:
+
+end if  
+
+> 12:
+
+end for  
+
+> 13:
+
+Without loss of generality, form G as G = C1(I1, :, . . . , :).  
+
+> 14:
+
+Form Cn and Un from Cn with n = 1 , 2, . . . , N . 
+
+> 15:
+
+Return the ( N + 1)-tuple {G , C1U†
+
+> 1
+
+, . . . , CN U† 
+
+> N
+
+}.multilinear discrete inner products to obtain all the tensors Cn. For k ≥ 2, based on the relationship between In and I′
+
+> n
+
+, the number of multilinear discrete inner products to obtain all the matrices Cn
+
+can be reduced to 
+
+> N
+
+X
+
+> n=1
+
+(kN −1 − (k − 1) N −1)(2 In + 1) b1 . . . b n−1bn+1 . . . b N .
+
+Note that in Algorithm 5.1, the factor matrix Cn is updated by gradually expanding the index sets {Im : m̸ = n, m = 1 , 2, . . . , N } with n = 1 , 2, . . . , N , the terminated condition is based on these factor matrices, and the core tensor G is easily obtained according to Cn and In.By designing the terminated condition based on the updated core tensor, we present another algorithm (see Algorithm 5.2) for obtaining the ( N + 1)-tuple {G , C1U†
+
+> 1
+
+, . . . , CN U† 
+
+> N
+
+}. In detail, for each iteration k ≥ 1, we complete the following operations: (a) for each n, we set I′ 
+
+> n
+
+= [ kb n + 1 , . . . , (k + 1) bn] and update In = In ∪ I′
+
+> n
+
+;(b) each entry of the core tensor G is obtained as 
+
+G(j1, . . . , j N ) = 
+
+D
+
+f, Φ(1)  
+
+> j1
+
+. . . Φ(N )
+
+> jN
+
+E
+
+> M1,...,M N
+
+(5.1) with jn ∈ In and n = 1 , 2, . . . , N ;26 (c) if max {σmin (G2(n)/∥G∥ 2 
+
+> F
+
+: n = 1 , 2, . . . , N } < τ 2 is not satisfied, then we continue Steps (a) and (b), where 0 < τ < 1 is a given parameter, and the factor matrix G(n) is the mode-n
+
+unfolding of G.
+
+Algorithm 5.2 Greedy Chidori-type TCUR (stopping criterion on the core tensor G)
+
+Input : A function f (x) ∈ Hα(Ω), a given 0 < ϵ < 1, the N -tuple of block sizes {b1, b 2, . . . , b N },and a tolerance 0 < τ < 1. 
+
+Output : The ( N + 1)-tuple {G , C1U1, . . . , CN UN }, which is used to form the function 
+
+LI1,...I N f (x).  
+
+> 1:
+
+According to Theorem 3.2, we estimate the N -tuple {I1, I 2, . . . , I N } such that In = O((1 /ϵ )1/α ).  
+
+> 2:
+
+For each n, let In be the empty set.  
+
+> 3:
+
+for k = 1 , 2, . . . do  
+
+> 4:
+
+For each n, we set I′ 
+
+> n
+
+= [ kb n + 1 , . . . , (k + 1) bn] and update In = In ∪ I′
+
+> n
+
+. 
+
+> 5:
+
+The core tensor G is computed according to (5.1) with the N -tuples of indices {I1, . . . , IN }. 
+
+> 6:
+
+Obtain tol = max {σmin (G(n))/∥G∥ F : n = 1 , 2, . . . , N }, where σmin (G(n)) is the smallest nonzero singular value of G(n), and G(n) is the mode-n unfolding of G. 
+
+> 7:
+
+if tol > τ then  
+
+> 8:
+
+Continue.  
+
+> 9:
+
+else  
+
+> 10:
+
+Stop and jump out of the for loop.  
+
+> 11:
+
+end if  
+
+> 12:
+
+end for  
+
+> 13:
+
+The tensor Cn is obtained according to (4.5) with the (N − 1)-tuples of indices 
+
+{I1, . . . , In−1, In+1 , . . . , IN }. 
+
+> 14:
+
+Set Cn as the mode-n unfolding of Cn and Un = Cn(In, :).  
+
+> 15:
+
+Return the ( N + 1)-tuple {G , C1U†
+
+> 1
+
+, . . . , CN U† 
+
+> N
+
+}.We assume that the maximum number of iterations for Algorithm 5.2 is K, which implies that 
+
+Sn = Kb n with n = 1 , 2, . . . , N . We now count the number of multilinear discrete inner products used in Algorithm 5.2. For each k, to form the core tensor G needs kN b1 . . . b N 2 multilinear discrete inner products. Finally, the number of multilinear discrete inner products to obtain all tensors Cn
+
+is In+1 X
+
+> n=1
+
+(In + 1) S1 . . . S n−1Sn+1 . . . S N .
+
+In order to further reduce the number of multilinear discrete inner products, a more effective modification for Algorithm 5.2 is summarized in Algorithm 5.3. Compared with Algorithm 5.2, the core tensor G obtained from Algorithm 5.3 is a block diagonal tensor with at most K · (b1 . . . b N )nonzero entries, where K is the maximum number of iterations in Algorithm 5.3. 
+
+5.2 The Fiber-type TCUR case 
+
+Similar to the case of Chidori-type TCUR, we now present adaptive greedy algorithms for the Fiber TCUR decomposition of eA without forming this tensor explicitly. Note that two N -tuples           
+
+> 2This number can be reduced to ( kN−(k−1) N)b1. . . b Nbased on the relationship between Inand I′
+> n.
+
+27 Algorithm 5.3 Optimized low-cost Chidori-type greedy TCUR (Algorithm 5.2) 
+
+Input : A function f (x) ∈ Hα(Ω), a given 0 < ϵ < 1, the N -tuple of block sizes {b1, b 2, . . . , b N },and a tolerance 0 < τ < 1. 
+
+Output : The ( N + 1)-tuple {G , C1U1, . . . , CN UN }, which is used to form the function 
+
+LI1,...I N f (x).  
+
+> 1:
+
+According to Theorem 3.2, we estimate the N -tuple {I1, I 2, . . . , I N } such that In = O((1 /ϵ )1/α ).  
+
+> 2:
+
+For each n, let In be the empty set.  
+
+> 3:
+
+Let G be the empty tensor.  
+
+> 4:
+
+for k = 1 , 2, . . . do  
+
+> 5:
+
+For each n, we set I′ 
+
+> n
+
+= [ kb n + 1 , . . . , (k + 1) bn] and update In = In ∪ I′
+
+> n
+
+. 
+
+> 6:
+
+The core tensor Gk is computed according to (5.1) with the N -tuples of indices {I′
+
+> 1
+
+, . . . , I′ 
+
+> N
+
+}. 
+
+> 7:
+
+Obtain tol = max {σmin (Gk, (n))/∥G k∥F : n = 1 , 2, . . . , N }, where σmin (Gk, (n)) is the smallest nonzero singular value of Gk, (n) and Gk, (n) is the mode-n unfolding of Gk. 
+
+> 8:
+
+if tol > τ then  
+
+> 9:
+
+Continue.  
+
+> 10:
+
+else  
+
+> 11:
+
+Stop and jump out of the for loop.  
+
+> 12:
+
+end if  
+
+> 13:
+
+Update G(I′
+
+> 1
+
+, . . . , I′ 
+
+> N
+
+) = Gk. 
+
+> 14:
+
+end for  
+
+> 15:
+
+The tensor Cn is obtained according to (4.5) with the (N − 1)-tuples of indices 
+
+{I1, . . . , In−1, In+1 , . . . , IN }. 
+
+> 16:
+
+Set Cn as the mode-n unfolding of Cn and Un = Cn(In, :).  
+
+> 17:
+
+Return the ( N + 1)-tuple {G , C1U†
+
+> 1
+
+, . . . , CN U† 
+
+> N
+
+}.of indices {I1, . . . , IN } and {J1, . . . , JN } are used in the Fiber TCUR decomposition. For a given tolerance 0 < τ 1 < 1, the first one can be obtained from Algorithm 5.2. Hence, each entry of the core tensor G is computed as in (5.1). We now present an efficient strategy to find the N -tuple of indices {J1, . . . , JN } as follows. Suppose that another N -tuple of block sizes {b′
+
+> 1
+
+, . . . , b ′ 
+
+> N
+
+} satisfy b′ 
+
+> n
+
+≪ In + 1 with n = 1 , 2, . . . , N .For each n, let Jn,m be the empty set with m̸ = n. For each iteration k ≥ 1, we complete the following operations: (a) for each n, we set J′ 
+
+> n,m
+
+= [ kb ′ 
+
+> m
+
++ 1 , . . . , (k + 1) b′
+
+> m
+
+] and update Jn,m = Jn,m ∪ J′
+
+> n,m
+
+;(b) for each n, each entry j ∈ Jn is given as 
+
+j =s(1)  
+
+> j1
+
++ ( s(2)  
+
+> j2
+
+− 1)( I1 + 1) + · · · + ( s(n−1)  
+
+> jn−1
+
+− 1)( I1 + 1) . . . (In−2 + 1) + ( s(n+1)  
+
+> jn+1
+
+− 1)( I1 + 1) . . . (In−1 + 1) + · · · + ( s(N ) 
+
+> jN
+
+− 1)( I1 + 1) . . . (In−1 + 1)( In+1 + 1) . . . (IN + 1) ,
+
+(5.2) where s(m) 
+
+> jm
+
+∈ Jn,m and m̸ = n, and the jth column of C′ 
+
+> n
+
+is computed as (4.6) with 
+
+{s(1)  
+
+> j1
+
+, . . . , s (n−1)  
+
+> jn−1
+
+, s (n+1)  
+
+> jn+1
+
+, . . . , s (N ) 
+
+> jN
+
+};28 (c) if max {σmin (C′
+
+> n
+
+)2/∥C′
+
+> n
+
+∥2 
+
+> F
+
+: n = 1 , 2, . . . , N } < τ 22 is not satisfied, then we continue Steps (a) and (b), where 0 < τ 2 < 1 is a given parameter. 
+
+Algorithm 5.4 End-to-end greedy Fiber-Type TCUR 
+
+Input : A function f (x) ∈ Hα(Ω), a given 0 < ϵ < 1, two N -tuples of block sizes {b1, . . . , b N }
+
+and {b′
+
+> 1
+
+, . . . , b ′ 
+
+> N
+
+}, and two tolerances 0 < τ 1 < 1 and 0 < τ 2 < 1. 
+
+Output : The ( N + 1)-tuple {G , C′
+
+> 1
+
+U′
+
+> 1
+
+, . . . , C′ 
+
+> N
+
+U′ 
+
+> N
+
+}, which is used to form the function 
+
+L′ 
+
+> I1,...I N
+
+f (x).  
+
+> 1:
+
+According to Theorem 3.2, we estimate the N -tuple {I1, I 2, . . . , I N } such that In = O((1 /ϵ )1/α ).  
+
+> 2:
+
+Obtain the core tensor G and the N -tuple of indices {I1, . . . , IN } by applying Algorithm 5.2 with {b1, . . . , b N } and 0 < τ 1 < 1.  
+
+> 3:
+
+For each n, let Jn,m be the empty set with m̸ = n. 
+
+> 4:
+
+for k = 1 , 2, . . . do  
+
+> 5:
+
+For each n, we set J′ 
+
+> n,m
+
+= [ kb ′ 
+
+> m
+
++ 1 , . . . , (k + 1) b′
+
+> m
+
+] and update Jn,m = Jn,m ∪ J′
+
+> n,m
+
+. 
+
+> 6:
+
+We use (4.6) with {s(1)  
+
+> j1
+
+, . . . , s (n−1)  
+
+> jn−1
+
+, s (n+1)  
+
+> jn+1
+
+, . . . , s (N ) 
+
+> jN
+
+} to obtain the jth column of C′
+
+> n
+
+, where 
+
+s(m) 
+
+> jm
+
+∈ Jn,m with m̸ = n, and the relationship between j and {s(1)  
+
+> j1
+
+, . . . , s (n−1)  
+
+> jn−1
+
+, s (n+1)  
+
+> jn+1
+
+, . . . , s (N ) 
+
+> jN
+
+}
+
+is given in (5.2).  
+
+> 7:
+
+Obtain tol = max {σmin (C′
+
+> n
+
+)/∥C′
+
+> n
+
+∥F : n = 1 , 2, . . . , N }. 
+
+> 8:
+
+if tol > τ 2 then  
+
+> 9:
+
+Continue.  
+
+> 10:
+
+else  
+
+> 11:
+
+Stop and jump out of the for loop.  
+
+> 12:
+
+end if  
+
+> 13:
+
+end for  
+
+> 14:
+
+Set U′ 
+
+> n
+
+= C′
+
+> n
+
+(In, :).  
+
+> 15:
+
+Return the ( N + 1)-tuple {G , C′
+
+> 1
+
+U′†  
+
+> 1
+
+, . . . , C′ 
+
+> N
+
+U′†  
+
+> N
+
+}.Hence, the overall process is summarized in Algorithm 5.4. To count the number multilinear discrete inner products used in Algorithm 5.4, we assume that the maximum numbers of iter-ations for G and {C′
+
+> 1
+
+, . . . , C′ 
+
+> N
+
+} are, respectively, denoted by K and K′. Therefore, Algorithm 5.4 requires (1 + · · · + KN )b1 . . . b N multilinear discrete inner products to form the core tensor 
+
+G and PK′
+
+> k=1
+
+PNn=1 kN −1(In + 1) b′ 
+
+> 1
+
+. . . b ′
+
+> n−1
+
+b′ 
+
+> n+1
+
+. . . b ′ 
+
+> N
+
+multilinear discrete inner products to form 
+
+{C′
+
+> 1
+
+, . . . , C′ 
+
+> N
+
+}.
+
+# 6 Numerical examples 
+
+In this section, we present comprehensive numerical experiments designed to validate the core theoretical contributions developed in Sections 3-5 and Appendix A. Our empirical investigation focuses on verifying: (i) the intrinsic low-ϵ-Tucker-rank structure of hyperinterpolation coefficient tensors established in Theorem 4.1; (ii) the unified TCUR error bounds derived in Theorem 4.4; (iii) the convergence and stability guarantees of the greedy adaptive algorithms from Section 5; and (iv) the composite end-to-end L2 error chain incorporating TCUR-to-Tucker recompression from Appendix A. 29 Unlike conventional benchmarking studies that prioritize runtime performance or scaling lim-its, our experiments are deliberately structured to systematically test theoretical predictions: rank scaling behavior, tightness of error bounds, numerical stability of greedy index selection, and com-pression ratios enabled by intrinsic low-rank structure. All numerical observations are compared against our theoretical derivations to confirm that the structural properties we prove govern the practical behavior of hyperinterpolation coefficient tensors in actual computation. We restrict our experiments to the three-dimensional hypercube Ω = [ −1, 1] 3 for visualization tractability, while scaling per-dimension polynomial degrees In and TCUR block sizes to emulate the exponential storage challenges representative of higher-dimensional scientific computing workflows. Chebyshev tensor-product orthonormal polynomials with weight w(x) = 1 /√1 − x2 serve as the basis, paired with Gauss-Chebyshev positive cubature rules satisfying exactness for degree 2 In per dimension, consistent with the hyperinterpolation construction in Section 3.2. Cubature grid sizes are set to Mn = 2 In + 1 for each axis to match basis cardinality. 
+
+6.1 Several test functions 
+
+We select three representative functions that exhibit contrasting smoothness and peak behavior, enabling a thorough assessment of our theoretical framework across different function classes. 
+
+Example 6.1. (Gaussian-like peak) The first function previously appeared in the Lasso hyper-interpolation study [3, Section 5.4], defined as: 
+
+f1(x1, x 2, x 3) = exp( −1/(x21 + x22 + x23)) , −1 ≤ x1, x 2, x 3 ≤ 1,
+
+with the convention that f1(0 , 0, 0) = 0 . This function exhibits rapid variation near the origin with a sharp isolated peak, providing a stringent test for low-rank tensor approximations that must capture localized high-frequency content. Its derivatives of all orders vanish at the boundaries, placing it in the Sobolev space Hα(ω) for any finite α, albeit with large seminorms due to the singular behavior at the origin. 
+
+Example 6.2. (Hyperbolic secant squared) The second function was employed in the func-tional Tucker approximation study [25, (5.2)], defined as: 
+
+f2(x1, x 2, x 3) = (cosh(3( x1 + x2 + x3))) −2, −1 ≤ x1, x 2, x 3 ≤ 1.
+
+This function exhibits smooth, slowly varying behavior across the domain with no interior singu-larities, representing the class of functions where hyperinterpolation and low-rank compression are expected to perform optimally. Its dependence on the sum of coordinates introduces strong correla-tions across modes, which should be reflected in low Tucker rank structure. 
+
+Example 6.3. (Oscillatory cosine sum) The third function was demonstrated in prior studies [33, Example 2], defined as: 
+
+f3(x1, x 2, x 3) = cos(2 πx 1)2 + cos(2 πx 2)2 + cos(2 πx 3)2, −1 ≤ x1, x 2, x 3 ≤ 1.
+
+This function combines moderate oscillations with separability, serving as a benchmark for assess-ing how our compression framework handles trigonometric content. Its additive structure across dimensions implies that the coefficient tensor should exhibit particularly low Tucker rank. 
+
+30 Remark 6.1. The Sobolev regularity parameters α for these functions f1(x1, x 2, x 3), f2(x1, x 2, x 3)
+
+and f3(x1, x 2, x 3) are α = 0 .5 (only first derivatives are square-integrable near the origin), α = 4 
+
+(high regularity due to smooth hyperbolic profile) and α = 2 (moderate regularity from trigonometric oscillations), respectively. These distinct regularity regimes allow us to verify the dependence of hyperinterpolation convergence rates on α as predicted by Theorem 3.2. 
+
+6.2 Validation of intrinsic low-ϵ-Tucker rank structure 
+
+We now verify the central structural result of this paper: the existence of low-ϵ-Tucker-rank approximations for hyperinterpolation coefficient tensors with ranks scaling logarithmically with tensor dimensions, as established in Theorem 4.1. For a prescribed tolerance ϵ, we compute the minimal Tucker ranks required to approximate the full coefficient tensor eA within entrywise error 
+
+ϵ, and compare these observed ranks against the theoretical upper bounds from Theorem 4.1. For each test function fn(x1, x 2, x 3) ( n = 1 , 2, 3) and a polynomial degree tuple ( I1, I 2, I 3), we construct the full coefficient tensor eA ∈ R(I1+1) ×(I2+1) ×(I3+1) via (3.1), using the Gauss-Chebyshev cubature with Mn = 2 In +1 nodes per dimension. For tolerance ϵ ∈ { 1e-1 , 5e-2 , 1e-2 , 5e-3 , 1e-3 }, we compute the ϵ-Tucker rank Trank ϵ( eA) = ( Robs 1 , R obs 2 , R obs 3 ) by performing ST-HOSVD with increas-ing ranks until ∥ eA − eAST-HOSVD ∥max ≤ ϵ is achieved. The ranks are determined via binary search on each mode independently, then validated jointly. We also compute the actual approximation error ∥ eA − eAST-HOSVD ∥max for the theoretically predicted ranks to assess tightness of the bound. For clarity, we set Error = eA − eAST-HOSVD .
+
+Rank scaling with tolerance ϵ: Table 1 reports the observed Tucker ranks for each test function fn(x1, x 2, x 3) ( n = 1 , 2, 3) with ( I1, I 2, I 3) = (20 , 20 , 20) across varying ϵ. Following Figure 1, the observed ranks are consistently lower than the theoretical upper bounds, indicating that Theorem 4.1 provides a conservative but valid guarantee. The actual entrywise error achieved with the theoretical ranks falls below the prescribed tolerance in all cases, confirming the existence statement. As shown in Table 1, the oscillatory function f3(x1, x 2, x 3) exhibits the lowest Tucker ranks, consistent with its separable additive structure, the peak function f1(x1, x 2, x 3) requires slightly higher ranks, particularly for small ϵ, due to the localized singularity that cannot be captured by low-rank approximations as efficiently, and the smooth function f2(x1, x 2, x 3) lies between the two. These observations align with the structural interpretation: functions with stronger global correlations and weaker localized features admit more aggressive low Tucker-rank compression.                                       
+
+> ϵf1(x1, x 2)f2(x1, x 2)f3(x1, x 2)
+> ϵ-Tucker rank ∥Error ∥max ϵ-Tucker rank ∥Error ∥max ϵ-Tucker rank ∥Error ∥max
+> 1e-1 (2,2,2) 1.064e-2 (4,3,3) 9.567e-2 (1,1,1) 8.961e-2 5e-2 (2,2,2) 1.064e-2 (5,5,5) 3.133e-2 (2,2,2) 3.886e-16 1e-2 (4,4,3) 4.538e-4 (14,7,7) 8.385e-3 (2,2,2) 3.886e-16 5e-3 (4,4,3) 4.538e-4 (21,8,8) 4.608e-3 (2,2,2) 3.886e-16 1e-3 (4,4,3) 4.538e-4 (21,12,11) 5.655e-4 (2,2,2) 3.886e-16
+
+Table 1: Comparison of observed ϵ-Tucker ranks for each test function fn(x1, x 2, x 3) ( n = 1 , 2, 3) with ( I1, I 2, I 3) = (20 , 20 , 20). Meanwhile, Figure 2 shows the observed and theoretical ϵ-Tucker rank for f2(x1, x 2, x 3), as functions of polynomial degree I, with ϵ = 0 .01. 
+
+Rank scaling with polynomial degree (I1, I 2, I 3): For fixed ϵ = 1 e-2, we vary I from 10 31 Figure 2: Observed and theoretical ϵ-Tucker rank for f2(x1, x 2, x 3) with ϵ = 0 .01. to 40 with In = I and n = 1 , 2, 3, and observe the ϵ-Tucker rank growth pattern, as shown in Table 2, which implies that the observed ranks exhibit unchanged with respect to I. For different 
+
+ϵ, Figure 3 shows the observed ϵ-Tucker ranks across test functions f1(x1, x 2, x 3), f2(x1, x 2, x 3) and 
+
+f3(x1, x 2, x 3) with ( I1, I 2, I 3) = (30 , 30 , 30), which illustrates that ranks reflect function smoothness and structure.                                                   
+
+> If1(x1, x 2)f2(x1, x 2)f3(x1, x 2)
+> ϵ-Tucker rank ∥Error ∥max ϵ-Tucker rank ∥Error ∥max ϵ-Tucker rank ∥Error ∥max
+> 10 (6,6,3) 4.532e-4 (11,7,7) 8.498e-3 (2,2,2) 8.882e-15 15 (4,4,3) 4.538e-4 (11,7,7) 8.498e-3 (3,2,2) 2.665e-16 20 (4,4,3) 4.538e-4 (11,7,7) 8.498e-3 (2,2,2) 3.886e-16 25 (4,4,3) 4.538e-4 (11,7,7) 8.498e-3 (2,3,2) 7.994e-15 30 (4,4,3) 4.538e-4 (11,7,7) 8.498e-3 (3,2,2) 5.329e-15 35 (4,4,3) 4.538e-4 (11,7,7) 8.498e-3 (2,2,2) 4.441e-15 40 (4,4,3) 4.538e-4 (11,7,7) 8.498e-3 (2,3,2) 1.155e-14
+
+Table 2: Comparison of observed ϵ-Tucker ranks for each test function fn(x1, x 2, x 3) ( n = 1 , 2, 3) with ϵ = 1 e-2. 
+
+6.3 Greedy TCUR algorithm performance 
+
+We now validate the three greedy adaptive TCUR algorithms developed in Section 5: Algo-rithm 5.1 (Chidori-type with factor matrix stopping criterion), Algorithm 5.2 (Chidori-type with core tensor stopping criterion), and Algorithm 5.4 (Fiber-type). Our objectives are: (i) to verify convergence and termination within the predicted iteration counts; (ii) to quantify the number of cubature inner products required relative to full tensor assembly; (iii) to confirm numerical stabil-ity via bounded pseudoinverse norms; and (iv) to compare the approximation quality of the three algorithms against the theoretical bounds from Theorem 4.4. 
+
+Parameter selection : For each test function, we set the polynomial degree tuple as ( I, I, I )with I = 30; we run Algorithms 5.1, 5.2 and 5.4 with block sizes bn = b ∈ { 2, 3, 4, 5} with 
+
+n = 1 , 2, 3 and stopping tolerances τ1 = τ2 = τ ∈ { 0.05 , 0.02 , 0.01 }; and the target Tucker rank is set to ( R1, R 2, R 3) = (10 , 10 , 10) based on the ϵ = 1 e-2 Tucker rank estimates from Section 6.2. We also record the number of iterations K until termination, total number of cubature inner products 32 Figure 3: Comparison of observed Tucker ranks across test functions f1(x1, x 2, x 3), f2(x1, x 2, x 3)and f3(x1, x 2, x 3) for ( I1, I 2, I 3) = (30 , 30 , 30) and varying ϵ.                                                                              
+
+> bτKinner products ∥Error ∥Fmax {∥ CnU†
+> n∥2}max {∥ U†
+> n∥2}
+> 20.05 1752 6.989e-1 1.04 2.67 20.02 1752 6.989e-1 1.04 2.67 20.01 1752 6.989e-1 1.04 2.67 30.05 31701 4.670e-1 1.06 3.42 30.02 31701 4.670e-1 1.06 3.42 30.01 31701 4.670e-1 1.06 3.42 40.05 43040 3.197e-1 1.07 5.90 40.02 43040 3.197e-1 1.07 5.90 40.01 43040 3.197e-1 1.07 5.90 50.05 54775 1.974e-1 1.10 9.32 50.02 54775 1.974e-1 1.10 9.32 50.01 54775 1.974e-1 1.10 9.32
+
+Table 3: Given ( I, I, I ) = (30 , 30 , 30) and ( R1, R 2, R 3) = (10 , 10 , 10), performance of Algorithm 5.1 (Chidori, factor-based) for f2(x1, x 2, x 3). evaluated, condition numbers ∥CnU†
+
+> n
+
+∥2 and ∥U†
+
+> n
+
+∥2, the actual Frobenius error ∥ eA − eATCUR ∥F and the theoretical upper bound from Theorem 4.4. Table 3 reports results for applying Algorithm 5.1 to f2(x1, x 2, x 3) with varying block size b
+
+and tolerance τ , respectively. We conclude that: termination occurs in all cases, with K inversely proportional to b as expected; the stability constants ∥CnU†
+
+> n
+
+∥2 remain bounded between 1 and 2, confirming the numerical stability guaranteed by the volume-based maximum-volume selection; the actual Frobenius error decreases with tighter tolerance τ , as expected; and Larger block sizes 
+
+b yield slightly better accuracy for the same K (compare ( b, τ ) = (4 , 0.05) with ( b, τ ) = (2 , 0.02)), indicating that larger blocks better capture the dominant tensor structure. Similarly, Table 4 reports results for applying Algorithm 5.2 to f2(x1, x 2, x 3) with varying block size b and tolerance τ . Comparing with Algorithm 5.1, for each ( b, τ ), Algorithm 5.2 requires more iterations K and more inner products, as it waits for the core tensor to stabilize rather than using the factor matrices, and achieves slightly better accuracy for the same S, because the stopping criterion directly monitors the core tensor that defines the final approximation. Hence, This tradeoff suggests Algorithm 5.1 is more efficient for exploratory computations, while Algorithm 5.2 is preferable when a higher accuracy guarantee is required. 33 b τ K inner products ∥Error ∥F max {∥ CnU†                                                                         
+
+> n∥2}max {∥ U†
+> n∥2}
+> 20.05 47264 4.537e-2 1.22 54.23 20.02 47264 4.537e-2 1.22 54.23 20.01 512100 1.583e-2 1.33 187.56 30.05 39234 2.709e-2 1.28 94.84 30.02 39234 2.709e-2 1.28 94.84 30.01 39234 2.709e-2 1.28 94.84 40.05 27040 4.537e-2 1.22 54.23 40.02 27040 4.537e-2 1.22 54.23 40.01 317242 5.385e-3 1.48 667.14 50.05 211425 1.583e-2 1.33 187.56 50.02 211425 1.583e-2 1.33 187.56 50.01 311425 1.583e-2 1.33 187.56
+
+Table 4: Given ( I, I, I ) = (30 , 30 , 30) and ( R1, R 2, R 3) = (10 , 10 , 10), performance of Algorithm 5.2 (Chidori, core-based) for f2(x1, x 2, x 3). The results for applying Algorithm 5.4 to f2(x1, x 2, x 3) with varying block size b and tolerance 
+
+τ are shown in Table 5, which implies that Fiber-type TCUR achieves comparable accuracy to Chidori-type with marginally more inner products (due to the additional index sets {J1, . . . , JN }), and the accuracy improvement is most notable for functions with strong cross-mode interactions, where selecting columns via Jn independently of row selections yields better capture of the tensor’s mode-n structure.                                                                                            
+
+> bτKGKCninner products ∥Error ∥Fmax {∥ CnU†
+> n∥2}max {∥ U†
+> n∥2}
+> 20.05 418008 5.004e-1 1.00 5.13 20.02 418008 5.004e-1 1.00 5.13 20.01 5112844 5.004e-1 1.00 5.13 30.05 3110908 2.199e-1 1.01 404.64 30.02 3110908 2.199e-1 1.01 404.64 30.01 3110908 2.199e-1 1.01 404.64 40.05 2110016 5.524e-2 1.12 986.32 40.02 2110016 5.524e-2 1.12 986.32 40.01 3120400 3.411e-2 1.01 1468.38 50.05 2116075 2.115e-2 1.18 4551.66 50.02 2116075 2.115e-2 1.18 4551.66 50.01 3116075 2.115e-2 1.18 4551.66
+
+Table 5: Given ( I, I, I ) = (30 , 30 , 30) and ( R1, R 2, R 3) = (10 , 10 , 10), performance of Algorithm 5.4 (Fiber-type) for f2(x1, x 2, x 3). Finally, To validate the convergence analysis of Section 5, we examine the behavior of the stopping criterion tol = max {σmin (G(n))/∥G∥ F : n = 1 , 2, . . . , N } as a function of iteration k.Figure 4 plots tol vs. k for Algorithm 5.2 applied to f2(x1, x 2, x 3) with b = 2 and τ = 0 .01. The sequence decays monotonically for all modes n, confirming the convergence of the greedy index expansion process. The rate of decay is approximately exponential for early iterations, transitioning to sublinear decay near the tolerance threshold. This behavior is consistent with the theoretical expectation that singular values of each mode unfolding of the core tensor G become increasingly well-conditioned as more indices are added. 34 Figure 4: Decay of stopping criterion tol = max {σmin (G(n))/∥G∥ F : n = 1 , 2, . . . , N } with iteration 
+
+k for Algorithm 5.2 applied to f2(x1, x 2, x 3) with b = 2 and τ = 0 .01. 
+
+6.4 Validation of unified TCUR error bounds 
+
+We now validate the unified TCUR error bounds from Theorem 4.4, which provide computable upper bounds for the Frobenius-norm discrepancy ∥ eA− eATCUR ∥F in terms of the mode-n unfolding singular values and index subset volumes. For each test function and TCUR approximation obtained from Algorithms 5.1, 5.2 and 5.4 with various ( b, τ ) setting, we compute the exact Frobenius error Eexact = ∥ eA − eATCUR ∥F by explicitly constructing eA (this is only possible for the moderate I values used here; our goal is error bound validation, not scalability testing) and the theoretical upper bound Eth from Theorem 4.4: 
+
+Eth =
+
+> N
+
+X
+
+> n=1
+> n−1
+
+Y
+
+> m=1
+
+∥CmU†
+
+> m
+
+∥2
+
+! 
+
+αn,R n ∆Rn + βn,R n ∥U†
+
+> n
+
+∥2∆2
+
+> Rn
+
+
+
+,
+
+where ∆ 2 
+
+> Rn
+
+= PIn+1  
+
+> i=Rn+1
+
+σi( eA(n))2 is the tail singular value energy of the mode-n unfolding, αn,R n
+
+and βn,R n are volume constants depending on ∥W† 
+
+> n,R n,In
+
+∥2 and ∥∥ V† 
+
+> n,R n,Jn
+
+∥2, and ∥U†
+
+> n
+
+∥2 is the pseudoinverse norm of the row-selected submatrix. We also compute the tighter bound Etight from Remark 4.9 using the approximation ATucker obtained from ST-HOSVD and evaluate the tightness ratios Eth /E exact and Etight /E exact .Tables 6, 7 and 8 report error bounds in Theorem 4.4 and Remark 4.9 when applying Algorithms 5.1, 5.2 and 5.4 for f2(x1, x 2, x 3) with varying block size b and tolerance τ , respectively. From this table, one has: the ratio Etight /E exact for Remark 4.9 is much smaller than the ratio Eth /E exact for Theorem 4.4, which implies that the bound in Remark 4.9 is consistently sharper, demonstrating the value of using the ST-HOSVD intermediate approximation in the analysis; the error bounds exhibit consistent tightness across Chidori-type (Algorithms 5.1 and 5.2) and Fiber-type (Algorithm 5.4), 35 b τ K Eexact Eth Eth /E exact Etight Etight /E exact                                                                                     
+
+> 20.05 16.989e-1 8.165e10 1.168e11 7.113e-1 1.02 20.02 16.989e-1 8.165e10 1.168e11 7.113e-1 1.02 20.01 16.989e-1 8.165e10 1.168e11 7.113e-1 1.02 30.05 14.670e-1 8.349e10 1.788e11 4.794e-1 1.03 30.02 14.670e-1 8.349e10 1.788e11 4.794e-1 1.03 30.01 14.670e-1 8.349e10 1.788e11 4.794e-1 1.03 40.05 13.197e-1 3.035e10 9.494e10 3.320e-1 1.04 40.02 13.197e-1 3.035e10 9.494e10 3.320e-1 1.04 40.01 13.197e-1 3.035e10 9.494e10 3.320e-1 1.04 50.05 11.974e-1 7.489e6 3.794e7 2.096e-1 1.06 50.02 11.974e-1 7.489e6 3.794e7 2.096e-1 1.06 50.01 11.974e-1 7.489e6 3.794e7 2.096e-1 1.06
+
+Table 6: Given ( I, I, I ) = (30 , 30 , 30) and ( R1, R 2, R 3) = (10 , 10 , 10), validation of error bounds in Theorem 4.4 and Remark 4.9 when applying Algorithm 5.1 for f2(x1, x 2, x 3). confirming the unified framework’s validity, that is, this supports our claim that the two TCUR variants are structurally equivalent under the unified analysis; and as the index set size increases (finer sampling), both exact and theoretical errors decrease, with the ratio remaining stable, which indicates that the bound captures the correct asymptotic behavior in the large size limit.                                                                                            
+
+> bτKEexact Eth Eth /E exact Etight Etight /E exact
+> 20.05 44.537e-2 5.010e5 1.104e7 5.638e-2 1.24 20.02 44.537e-2 5.010e5 1.104e7 5.638e-2 1.24 20.01 51.583e-2 9.369e-1 59.19 2.409e-2 1.52 30.05 32.709e-2 4.164e5 1.537e7 3.752e-2 1.39 30.02 32.709e-2 4.164e5 1.537e7 3.752e-2 1.39 30.01 32.709e-2 5.010e5 1.537e7 3.752e-2 1.39 40.05 24.537e-2 5.010e5 1.104e7 5.638e-2 1.24 40.02 24.537e-2 1.384e0 1.104e7 5.638e-2 1.24 40.01 35.385e-3 3.035e10 257.04 2.324e-2 4.32 50.05 21.583e-2 9.369e-1 59.19 2.409e-2 1.52 50.02 21.583e-2 9.369e-1 59.19 2.409e-2 1.52 50.01 21.583e-2 9.369e-1 59.19 2.409e-2 1.52
+
+Table 7: Given ( I, I, I ) = (30 , 30 , 30) and ( R1, R 2, R 3) = (10 , 10 , 10), validation of error bounds in Theorem 4.4 and Remark 4.9 when applying Algorithm 5.2 for f2(x1, x 2, x 3). Finally, Table 9 reports the error bound ratios across test functions f1(x1, x 2, x 3), f2(x1, x 2, x 3)and f3(x1, x 2, x 3) using Algorithm 5.1 with ( b, τ ) = (4 , 0.05), which implies that the ratios are larger for the peak function f3(x1, x 2, x 3), reflecting the more challenging approximation problem where the bound’s reliance on singular value decay is less tight. Figure 5 plots the normalized singular value spectra σi( eA(n))/σ 1( eA(n)) for n = 1 , 2, 3 for the three test functions. Faster decay corresponds to smaller ∆ Rn and hence tighter error bounds. The spectra confirm that: f3(x1, x 2, x 3) exhibits the fastest decay, consistent with its additive separable structure; f2(x1, x 2, x 3) exhibits moderate decay, typical of smooth functions; and f1(x1, x 2, x 3)exhibits the slowest decay due to the localized singularity. 
+
+6.5 Cross-function performance comparison 
+
+We now synthesize the preceding validation results by comparing the full end-to-end pipeline performance across the three test functions and verifying the composite error bound from Remark 36 b τ KG KCn Eexact Eth Eth /E exact Etight Etight /E exact 
+
+2 0.05 4 1 5.004e-1 4.062e5 8.119e5 5.128e-1 1.02 2 0.02 4 1 5.004e-1 4.062e5 8.119e5 5.128e-1 1.02 2 0.01 5 1 5.004e-1 6.868e-1 1.37 5.128e-1 1.02 3 0.05 3 1 2.199e-1 3.225e5 1.466e5 2.322e-1 1.06 3 0.02 3 1 2.199e-1 3.225e5 1.466e5 2.322e-1 1.06 3 0.01 3 1 2.199e-1 3.225e5 1.466e5 2.322e-1 1.06 4 0.05 2 1 5.524e-2 4.522e5 8.241e5 6.695e-2 1.21 4 0.02 2 1 5.524e-2 4.522e5 8.241e5 6.695e-2 1.21 4 0.01 3 1 5.524e-2 8.993e-1 26.36 4.579e-2 1.34 5 0.05 2 1 2.115e-2 8.209e-1 38.82 3.196e-2 1.51 5 0.02 2 1 2.115e-2 8.209e-1 38.82 3.196e-2 1.51 5 0.01 3 1 2.115e-2 8.209e-1 38.82 3.196e-2 1.51 
+
+Table 8: Given ( I, I, I ) = (30 , 30 , 30) and ( R1, R 2, R 3) = (10 , 10 , 10), validation of error bounds in Theorem 4.4 and Remark 4.9 when applying Algorithm 5.4 for f2(x1, x 2, x 3). 
+
+Function Eexact Eth Eth /E exact Etight Etight /E exact 
+
+f1(x1, x 2, x 3) 3.139e-02 5.330e4 1.698e6 3.139e-2 1.00 
+
+f2(x1, x 2, x 3) 4.537e-2 5.010e5 1.104e7 5.638e-2 1.24 
+
+f3(x1, x 2, x 3) 1.078e-14 4.637e-3 4.303e11 2.845e-14 2.64 
+
+Table 9: Given ( I, I, I ) = (30 , 30 , 30) and ( R1, R 2, R 3) = (10 , 10 , 10), validation of error bounds in Theorem 4.4 and Remark 4.9 when applying Algorithm 5.1 for f1(x1, x 2, x 3), f2(x1, x 2, x 3) and 
+
+f3(x1, x 2, x 3). A.2. The complete pipeline consists of (1) Hyperinterpolation : choose polynomial degrees In based on desired L2 accuracy and func-tion regularity α (Theorem 3.2); (2) TCUR strategy : Run Algorithm 5.1, 5.2 or 5.4 with different pairs ( b, τ ) to obtain eATCUR ;(3) Recompression : Apply Algorithm A.1 with target Tucker ranks ( R1, R 2, . . . , R N ) to obtain final Tucker approximation B;(4) Evaluation : Reconstruct function values on the target grid Xtarget via 
+
+R ≈ eA × 1 ( eA⊤
+
+1 V1) ×2 ( eA⊤
+
+2 V2) · · · × N ( eA⊤
+
+N VN ).
+
+Figure 5: Normalized singular value spectra of each mode unfolding for the three test functions. 37 We now set ( I, I, I ) = (30 , 30 , 30), choose ( b, τ ) = (4 , 0.02) for all functions, and let the target Tucker rank ( R1, R 2, R 3) = (10 , 10 , 10). The target grid is a uniform 50 × 50 × 50 grid in [ −1, 1] 3.Following Table 10, for the peak function f1(x1, x 2, x 3), the hyperinterpolation discretization error dominates the total error. This is expected due to the low Sobolev regularity ( α = 0 .5), which yields slow convergence with I; for the smoother functions f2(x1, x 2, x 3) and f3(x1, x 2, x 3), the TCUR and recompression errors are comparable to or larger than the discretization error, indicating that the approximation is tensor-limited rather than function-limited; and the total L2 error is well approximated by the sum of the discretization and TCUR errors (with the triangle inequality providing the upper bound), which confirms the additive decomposition used in Theorems 4.3 and 4.5, and Remark A.2.                                                       
+
+> Algorithm Function ∥L f−f∥L2∥eLf−f∥L2(TCUR) ∥eLf−f∥L2(total) Bound (Remark A.2) Algorithm 5.1
+> f1(x1, x 2, x 3)4.288e-6 3.920e-5 3.985e-5 2.034e4
+> f2(x1, x 2, x 3)2.939e-6 5.362e-3 1.259e-2 2.504e2
+> f3(x1, x 2, x 3)1.218e-10 4.182e-15 1.218e-10 1.981e-10 Algorithm 5.2
+> f1(x1, x 2, x 3)4.288e-6 3.920e-5 3.985e-5 2.034e4
+> f2(x1, x 2, x 3)2.939e-6 5.362e-3 1.259e-2 2.504e2
+> f3(x1, x 2, x 3)1.218e-10 4.182e-15 1.218e-10 1.981e-10 Algorithm 5.4
+> f1(x1, x 2, x 3)4.288e-6 3.097e-2 2.097e-2 9.199e6
+> f2(x1, x 2, x 3)2.939e-6 5.463e-2 5.463e-2 2.853e8
+> f3(x1, x 2, x 3)1.218e-10 1.124e-14 1.218e-10 8.375e-2
+
+Table 10: Given ( I, I, I ) = (30 , 30 , 30), ( R1, R 2, R 3) = (10 , 10 , 10) and ( b, τ ) = (4 , 0.02), end-to-end 
+
+L2 errors and bound components for hyperinterpolation and its approximations of f1(x1, x 2, x 3), 
+
+f2(x1, x 2, x 3) and f3(x1, x 2, x 3). To visually verify the approximation quality, Figure 6 compares the full hyperinterpolation poly-nomial and the final Tucker-compressed approximation for f2(x1, x 2, x 3) on a two-dimensional slice through the domain ( x3 = 0). The close agreement confirms that the compressed representation faithfully captures the essential features of the function. 
+
+# 7 Conclusions 
+
+This work departs from the conventional algorithm-first paradigm that dominates existing re-search on high-dimensional hyperinterpolation, and instead establishes a complete, rigorous struc-tural theoretical foundation to resolve the curse of dimensionality via intrinsic low-rank tensor properties. Prior literature largely designed heuristic compression workflows without answering the fundamental question of why hyperinterpolation coefficient tensors can be efficiently approximated with low multilinear rank; our paper reverses this logic, deriving all practical algorithms as provable corollaries of universal structural theorems rather than standalone empirical engineering tools. We systematically address the four core foundational questions raised in the introduction and deliver four landmark theoretical contributions that unify hyperinterpolation with modern low-rank tensor approximation theory. First, we prove a universal intrinsic low-ϵ-Tucker-rank existence theorem for hyperinterpolation coefficient tensors defined over the N-dimensional hypercube. This theorem mathematically con-firms that such tensors are inherently compressible: their required per-mode Tucker ranks scale only logarithmically with polynomial degrees and ambient dimension, yielding near-dimension-independent entry-wise approximation error bounds. The theoretical rank scaling behavior we 38 Figure 6: Comparison of full hyperinterpolation (left-top) and Tucker-compressed approximation obtained by Algorithm 5.1 (right-top), 5.2 (left-bottom) and 5.4 (right-bottom) for f2(x1, x 2, x 3)on the slice x3 = 0. derive eliminates the theoretical ambiguity surrounding the compressibility of hyperinterpolation arrays, and provides an a priori tool to estimate minimal storage costs for arbitrary target accu-racy before any computation is executed. This structural result forms the bedrock upon which all subsequent TCUR theory and greedy algorithms are built. Second, we construct a single unified Tucker-compatible framework that subsumes both Chidori-type and Fiber-type tensor CUR (TCUR) decompositions, resolving the prior fragmentation of TCUR analysis where the two variants were treated as separate, unrelated methodologies. We derive tight, fully intrinsic Frobenius-norm residual bounds for the unified TCUR approximation, with all stability constants and residual terms dependent solely on the singular spectrum of tensor mode unfoldings and the geometric volume of selected index subsets. No distributional randomness or artificial tuning parameters appear within our error estimates, enabling fully deterministic, predictable error budgeting for hyperinterpolation compression pipelines. Our unified bound also exposes a critical numerical caveat: sequential mode-wise index selection risks multiplicative error amplification, which mandates joint global optimization of all tensor index sets to maintain stability in ultrahigh dimensions. Third, we rigorously justify the widely adopted greedy adaptive index selection schemes as theoretically sound, near-optimal procedures rather than ad-hoc heuristics. We design three dis-tinct tensor-free greedy TCUR algorithms equipped with singular-value-based certified stopping criteria, and quantify their total computational cost by counting the number of expensive multidi-mensional cubature inner products required at each iteration. All proposed algorithms avoid full assembly of the exponentially large hyperinterpolation coefficient tensor at every step of execution, eliminating the core computational bottleneck of the curse of dimensionality. The iterative index expansion strategy we develop targets maximum-volume submatrices from tensor singular factor-izations, which minimizes pseudoinverse conditioning constants and suppresses residual blowup in 39 high-dimensional settings, fully aligning with the stability bounds established in our TCUR error analysis. Fourth, we assemble an integrated end-to-end error chain that connects four successive lay-ers of approximation loss: Sobolev regularity-driven hyperinterpolation discretization error, TCUR greedy subsampling residual, and secondary truncation error from the lightweight TCUR-to-Tucker recompression pipeline provided in the appendix. The composite closed-form L2 function-space er-ror bound decouples each source of approximation loss, allowing practitioners to independently allocate allowable error budgets to polynomial truncation, TCUR index sampling, and final Tucker rank reduction. This unified error framework enables rigorous a priori parameter tuning for real-world scientific computing workflows including surrogate modeling and uncertainty quantifi-cation.Collectively, this body of work recontextualizes high-dimensional hyperinterpolation as a special case of structured low-rank tensor approximation governed by provable multilinear struc-tural laws, rather than an isolated spectral approximation technique limited by exponential scaling. By centering intrinsic tensor structure before algorithm design, we bridge the gap between classi-cal multivariate approximation theory and contemporary tensor numerical linear algebra, offering a replicable blueprint for structural analysis of other spectral, polynomial, and cubature-based high-dimensional approximation methods. This paper opens multiple promising extensions to expand the scope of the proposed structural and algorithmic framework: (1) to extend the intrinsic low-ϵ-Tucker-rank theory and unified TCUR decomposition to non-hypercube geometries such as spheres, balls, and irregular bounded domains, where hyperinterpolation with tailored cubature rules is widely deployed; (2) to develop randomized adaptive index selection algorithms as stochastic counterparts to our deterministic greedy schemes, with probabilistic error bounds and reduced per-iteration cubature cost for ultra-large sampling grids; (3) to merge our tensor-free TCUR compression pipeline with sparse grid hyperinterpolation to combine the dimensionality reduction strengths of both methods, targeting extreme dimensional problems where even moderate Tucker ranks remain computationally heavy; (4) to generalize our full error chain analysis to weighted Sobolev spaces and anisotropic polynomial truncation schemes, adapting the low-rank rank bounds for functions with variable smoothness across different coordi-nate axes; (5) to derive rigorous minimax lower bounds on the ϵ-Tucker rank of hyperinterpolation coefficient tensors to fully certify the near-optimality of our rank upper estimates and greedy in-dex selection strategies; (6) to extend the TCUR-to-Tucker recompression and composite error analysis to Lasso regularized hyperinterpolation for noisy sampled data, quantifying how measure-ment noise propagates through the full low-rank compression pipeline; and (7) to parallelize the proposed greedy TCUR algorithms and TCUR-to-Tucker recompression workflow, developing dis-tributed tensor algebra routines to scale the method to industrial-scale high-dimensional modeling tasks. 
+
+# A Re-compressing the approximation of the coefficient tensor 
+
+In Section 5, we derived three families of greedy adaptive TCUR algorithms that construct Chidori-type and Fiber-type tensor CUR factorizations without explicitly assembling the full hy-perinterpolation coefficient tensor eA. The output eATCUR carries an intermediate multilinear rank tuple {S1, . . . , S N } satisfying Rn < S n ≪ In + 1, where {R1, . . . , R N } denotes the target minimal Tucker rank for storage-optimal compressed approximation. This appendix develops a lightweight, numerically stable TCUR-to-Tucker recompression pipeline to further truncate eATCUR down to the 40 prescribed low Tucker rank {R1, . . . , R N }. The transformation requires no additional expensive cu-bature inner product evaluations on the original function samples and only relies on linear algebra operations over the small TCUR index subsets, closing the complete end-to-end approximation chain from raw function data to optimally compressed hyperinterpolation surrogates. The unified conversion workflow is formalized in Algorithm A.1. 
+
+Algorithm A.1 Efficient conversion from TCUR to approximate Tucker decomposition 
+
+Input : The ( N + 1)-tuple {G ; C1U†
+
+> 1
+
+, . . . , CN U† 
+
+> N
+
+} in (4.3), and target low Tucker rank 
+
+{R1, . . . , R N } with Rn < S n.
+
+Output : The core tensor S ∈ RR1×R2×···× RN and the mode-n factor matrix Vn ∈ RIn×Rn such that eA ≈ S × 1 V1 · · · × N VN . 
+
+> 1:
+
+Compute an economy-size QR factorization CnU† 
+
+> n
+
+= QnRn with n = 1 , 2, . . . , N . 
+
+> 2:
+
+Form bG = G × 1 R1 · · · × N RN . 
+
+> 3:
+
+Compute {S , bV1, . . . , bVN } = ST-HOSVD( bG; R1, . . . , R N ).  
+
+> 4:
+
+Form Vn = Qn bVn with n = 1 , 2, . . . , N .
+
+Remark A.1. Step 3 can substitute ST-HOSVD with T-HOSVD without altering the pipeline structure. T-HOSVD delivers slightly looser theoretical error bounds while ST-HOSVD yields tighter residual control in practical high-dimensional hyperinterpolation tests. All subsequent error analysis holds for both variants with minor adjustments to singular value summation upper limits. 
+
+Now we consider the upper bound for ∥S × 1 V1 · · ·× N VN − eA∥ F , which is stated in the following theorem. 
+
+Theorem A.1. Let eA be given in (3.1) and eATCUR be given in (4.3) . For a Tucker rank {R1, . . . , R N }
+
+with Rn ≤ In + 1 and = 1 , 2, . . . , N , let {S ; V1, . . . , VN } be obtained by applying Algorithm A.1 to 
+
+eATCUR . Then, one has 
+
+∥S × 1 V1 · · · × N VN − eA∥ F ≤ ∥ eATCUR − eA∥ F +
+
+> N
+
+Y
+
+> n=1
+
+∥CnUn∥2
+
+vuuut
+
+> N
+
+X
+
+> n=1
+> bIn
+
+X
+
+> i=Rn+1
+
+σi( eA(n))2,
+
+with bIn = min {In + 1 , (I1 + 1) . . . (In−1 + 1)( In+1 + 1) . . . (IN + 1) }.Proof. Note that we have 
+
+∥ eA − S × 1 V1 · · · × N VN ∥F ≤ ∥ eATCUR − eA∥ F + ∥ eATCUR − S × 1 V1 · · · × N VN ∥F .
+
+Since eATCUR = G × 1 (C1U†
+
+> 1
+
+) ×2 · · · × N (CN U† 
+
+> N
+
+), one has 
+
+G × 1 (C1U†
+
+> 1
+
+) ×2 · · · × N (CN U† 
+
+> N
+
+) − S × 1 V1 · · · × N VN
+
+= G × 1 (Q1R1) · · · × N (QN RN ) − S × 1 (Q1 bV1) · · · × N (QN bVN )= ( G × 1 R1 · · · × N RN − S × 1 bV1 · · · × N bVN ) ×1 Q1 · · · × N QN
+
+= ( bG − S × 1 bV1 · · · × N bVN ) ×1 Q1 · · · × N QN
+
+41 with bG = G × 1 R1 · · · × N RN , where Qn and Rn are given in Step 1 of Algorithm A.1, which implies that 
+
+∥ eATCUR − S × 1 V1 · · · × N VN ∥2 
+
+> F
+
+≤ ∥ bG − S × 1 bV1 · · · × N bVN ∥2
+
+> F
+
+≤
+
+> N
+
+X
+
+> n=1
+> bSn
+
+X
+
+> i=Rn+1
+
+σi( bG(n))2
+
+with bSn = min {Sn, S 1 . . . S n−1Sn+1 . . . S N }, where the second inequality holds according to Theo-rem 2.1. For each n, one has bG(n) = RnG(n)(R1 ⊗· · ·⊗ Rn−1 ⊗Rn+1 ⊗· · ·⊗ RN )⊤. According to Lemma 3.9 in [39], we have 
+
+σi( bG(n)) ≤
+
+> N
+
+Y
+
+> n=1
+
+∥Rn∥2σi(G(n)) = 
+
+> N
+
+Y
+
+> n=1
+
+∥CnUn∥2σi(G(n))with i = 1 , 2, . . . , bSn. Since G = A(I1, . . . , IN ), one has 
+
+> N
+
+X
+
+> n=1
+> bSn
+
+X
+
+> i=Rn+1
+
+σi( bG(n))2 ≤
+
+> N
+
+X
+
+> n=1
+> bIn
+
+X
+
+> i=Rn+1
+
+σi(A(n))2.
+
+Hence, the proof is complete. 
+
+Remark A.2. Combining Theorem A.1 with Theorem 4.5 yields a single unified L2 error bound covering the full modeling pipeline: Sobolev function regularity, hyperinterpolation discretization, greedy TCUR sampling and TCUR-to-Tucker recompression. The complete global bound takes the form: 
+
+∥ eLI1,...,I N f (x) − f (x)∥L2 ≤ C · min {I1, . . . , I N }−α|f (x)|α
+
++
+
+> N
+
+X
+
+> n=1
+> n−1
+
+Y
+
+> m=1
+
+∥CmU†
+
+> m
+
+∥2
+
+! 
+
+αn,R n ∆Rn + βn,R n ∥U†
+
+> n
+
+∥2∆2
+
+> Rn
+
+
+
++
+
+> N
+
+Y
+
+> n=1
+
+∥CnU†
+
+> n
+
+∥2
+
+vuuut
+
+> N
+
+X
+
+> n=1 ˆIn
+
+X
+
+> i=Rn+1
+
+σi( eA(n))2.
+
+The three additive terms correspond sequentially to: (1) hyperinterpolation discretization error controlled by the Sobolev smoothness α of f (x); (2) TCUR greedy sampling compression error; and (3) secondary Tucker truncation residual from the Appendix recompression step. This single closed-form bound fully quantifies all sources of approximation error in the proposed structural framework and serves as the core theoretical tool for selecting polynomial degrees In, TCUR block sizes bn,and target Tucker ranks Rn for user-specified global accuracy requirements in scientific computing, uncertainty quantification, and high-dimensional surrogate modeling applications. 
+
+This composite error decomposition carries two critical practical interpretations for high dimen-sional hyperinterpolation workflows. First, the first term ∥ eATCUR − eA∥ F encapsulates all approxi-mation error introduced during the greedy TCUR index selection stage, which is fully controlled by the tolerance parameters τ1, τ 2 used in Algorithms 5.1-5.4 and the size of the selected index subsets 
+
+In, Jn. The second term quantifies the incremental truncation error incurred when compressing the 42 overcomplete TCUR representation down to the minimal target Tucker rank ( R1, R 2, . . . , R N ); this residual only depends on the tail singular values of the original hyperinterpolation coefficient ten-sor, independent of the greedy sampling strategy used to build the TCUR factorization. Together, the two additive error terms decouple the sampling error from the low-rank truncation error, en-abling separate tuning of TCUR block sizes bn, b ′ 
+
+> n
+
+and target Tucker ranks Rn to meet a prescribed global L2 approximation tolerance for the final surrogate function. Additionally, the product factor QNn=1 ∥CnU†
+
+> n
+
+∥2 acts as a stability constant for the recompression pipeline: when all selected index sets In, Jn are maximum-volume submatrices (see Remark 4.10), this product remains bounded by a mild polynomial function of Rn and Sn, eliminating exponential error blowup in high ambient dimension N , i.e., a key theoretical guarantee missing from naive two-stage TCUR-then-Tucker pipelines without unified stability analysis. Finally, this bound enables rigorous a priori error bud-geting: practitioners can preallocate a fraction of the total allowed residual to TCUR sampling and the remainder to Tucker recompression, then solve for minimal Sn and Rn that satisfy the combined tolerance constraint without repeated costly cubature evaluations. Several practical implementation notes for Algorithm A.1 are listed as follows: (a) All intermediate tensors bG and factor matrices Rn live on the small TCUR index dimension QNn=1 Sn, which is exponentially smaller than the full coefficient tensor dimension QNn=1 (In +1). No full unfolding or storage of eA is required at any recompression step, preserving the “tensor-free” property of the overall framework. (b) In numerical practice, one first selects TCUR block sizes bn to drive ∥ eATCUR − eA∥ F below a preallocated error threshold, then runs Algorithm A.1 with incrementally decreasing target ranks Rn until the second singular-value term falls below the remaining error budget. Figure 1 from Section 4 can be reused to pre-estimate the minimal Rn required for a given global tolerance ϵ.(c) The QR factorizations in Step 1 of Algorithm A.1 are fully separable across modes n, allowing distributed parallel computation for large N without inter-mode communication overhead during the recompression stage. (d) For Lasso hyperinterpolation with noisy sampled data (see [3]), the recompression pipeline remains unchanged; the composite error bound simply absorbs measurement noise into the 
+
+∥ eATCUR − eA∥ F term, with the singular-value truncation bound unaffected by additive data noise. (e) After computing the final Tucker factorization {S ; bV1, bV2, . . . , bVN }, reconstructed function values over arbitrary target grids Xtarget are computed via the compact multilinear product 
+
+R = S × 1 ( eA⊤ 
+
+> 1
+
+bV1) ×2 ( eA⊤ 
+
+> 2
+
+bV2) · · · × N ( eA⊤ 
+
+> N
+
+bVN ), where eAn denotes basis matrices evaluated at target nodes as defined in Section 3.3. This evaluation step avoids all large-scale tensor products involving the original polynomial degrees In, delivering exponential speedups over direct evaluation of the uncompressed hyperinterpolation expansion. 
+
+A.1 TCUR-to-Tucker recompression performance 
+
+We now validate the TCUR-to-Tucker recompression pipeline (see Algorithm A.1), which con-verts the overcomplete TCUR representation (with ranks Sn > R n) into a minimal Tucker format 43 with target ranks Rn. Our objectives are: (i) to verify the error bound from Theorem A.1; (ii) to quantify the additional compression ratio achieved; and (iii) to assess the numerical stability of the QR-based conversion. For clarity, the ( N + 1)-tuple {G ; C1U†
+
+> 1
+
+, C2U†
+
+> 2
+
+, . . . , CN U† 
+
+> N
+
+}, used in Algorithm A.1, is obtained by applying Algorithm 5.2 with ( b, τ ) = (4 , 0.02) to each test function (see Section 6.1). By applying Algorithm 5.2 with ( b, τ ) = (4 , 0.02) to f2(x1, x 2, x 3), the size of the TCUR core is ( S1, S 2, S 3) = (8 , 8, 8). Hence, in Algorithm A.1, we assume that ( R1, R 2, R 3) = ( R, R, R ) with fix R ∈ { 2, 4, 6}
+
+and ( S1, S 2, S 3) at the TCUR output size. For each test function, we measure the Frobenius error 
+
+Eexact = ∥ eA − B∥ F , the theoretical bound Ebound from Theorem A.1 and the storage reduction 
+
+S1S2S3/R 1R2R3, where B = S × 1 V1 ×2 V2 · · · × N VN and 
+
+Ebound = ∥ eATCUR − eA∥ F +
+
+> N
+
+Y
+
+> n=1
+
+∥CnUn∥2
+
+vuuut
+
+> N
+
+X
+
+> n=1
+> bIn
+
+X
+
+> i=Rn+1
+
+σi( eA(n))2.
+
+The TCUR-to-Tucker recompression performance for f2(x1, x 2, x 3) with given ( b, τ ) is illus-trated in Table A.1, which implies that: (a) the ratio Ebound /E exact is approximately 5.0 across all (R1, R 2, R 3), which confirms that the additive decomposition in Theorem A.1 accurately captures the two sources of error: TCUR sampling and Tucker truncation; and (b) the composite error bound from Remark A.2 can be used to select R a priori.                     
+
+> (R1, R 2, R 3)Eexact ETCUR Ebound Ratio (bound/exact) Storage reduction (2,2,2) 6.898e-1 4.537e-2 3.653 5.30 64 (4,4,4) 3.046e-1 4.537e-2 1.514 4.97 8(6,6,6) 1.133e-1 4.537e-2 5.691e-1 5.02 2.4
+
+Table A.1: Given (I, I, I ) = (30 , 30 , 30), TCUR-to-Tucker recompression performance for 
+
+f2(x1, x 2, x 3) with b = 4, τ = 0 .02 and ( S1, S 2, S 3) = (8 , 8, 8). To illustrate the additive nature of the recompression error, Figure 7 plots the two compo-nents of Ebound : the TCUR residual ∥ eATCUR − eA∥ F (constant across R) and the truncation term 
+
+QNn=1 ∥CnUn∥2
+
+qPNn=1 
+
+PbIn 
+
+> i=Rn+1
+
+σi( eA(n))2 (decreasing with R). The total bound is the sum, and the actual error tracks the sum closely, validating the additive decomposition. 
+
+# References 
+
+[1] S. Ahmadi-Asl, S. Abukhovich, M. G. Asante-Mensah, A. Cichocki, A. H. Phan, T. Tanaka, and I. Oseledets , Randomized algorithms for computation of Tucker decomposition and higher order SVD (HOSVD) , IEEE Access, 9 (2021), pp. 28684–28706. [2] C. An and J. Ran , Hard thresholding hyperinterpolation over general regions , Journal of Scientific Computing, 102 (2025). article no. 37. [3] C. An and H.-N. Wu , Lasso hyperinterpolation over general regions , SIAM Journal on Scientific Computing, 43 (2021), pp. A3967–A3991. [4] , On the quadrature exactness in hyperinterpolation , BIT Numerical Mathematics, 62 (2022), pp. 1899–1919. [5] , Bypassing the quadrature exactness assumption of hyperinterpolation on the sphere , Journal of Complexity, 80 (2024). article no. 101789. 
+
+44 Figure 7: Decomposition of recompression error into TCUR sampling residual and Tucker trunca-tion residual. Hint, “Tail energy” means 
+
+qPNn=1 
+
+PbIn 
+
+> i=Rn+1
+
+σi( eA(n))2
+
+[6] C. Battaglino, G. Ballard, and T. G. Kolda , A practical randomized CP tensor decomposition ,SIAM Journal on Matrix Analysis and Applications, 39 (2018), pp. 876–901. [7] B. Beckermann and A. Townsend , Bounds on the singular values of matrices with displacement structure , SIAM Review, 61 (2019), pp. 319–344. [8] A. Ben-Israel , A volume associated with m × n matrices , Linear Algebra and its Applications, 167 (1992), pp. 87–111. [9] T. G. K. Brett W. Bader et al. , Matlab tensor toolbox version 3.6 . Available online, September 28, 2023. https://www.tensortoolbox.org .[10] H. Cai, K. Hamm, L. Huang, and D. Needell , Mode-wise tensor decompositions: Multi-dimensional generalizations of CUR decompositions , Journal of Machine Learning Research, 22 (2021), pp. 1–36. [11] C. F. Caiafa and A. Cichocki , Generalizing the column-row matrix decomposition to multi-way arrays , Linear Algebra and its Applications, 433 (2010), pp. 557–573. [12] C. Canuto, M. Hussaini, A. Quarteroni, and T. Zang , Spectral Methods: Fundamentals in Single Domains , Springer, Berlin, 2006. [13] M. Che, C. An, Y. Wei, and H. Yan , How many integrals should be evaluated at least in two-dimensional hyperinterpolation? , arXiv preprint arXiv:2510.13204, (2025). [14] M. Che, J. Chen, and Y. Wei , Perturbations of the Tcur decomposition for tensor valued data in the Tucker format , Journal of Optimization Theory and Applications, 194 (2022), pp. 852–877. 
+
+45 [15] M. Che and Y. Wei , Randomized algorithms for the approximations of Tucker and the tensor train decompositions , Advances in Computational Mathematics, 45 (2019), pp. 395–428. [16] M. Che, Y. Wei, and H. Yan , The computation of low multilinear rank approximations of tensors via power scheme and random projection , SIAM Journal on Matrix Analysis and Applications, 41 (2020), pp. 605–636. [17] , An efficient randomized algorithm for computing the approximate Tucker decomposition , Journal of Scientific Computing, 88 (2021). article no. 32. [18] , Randomized algorithms for the low multilinear rank approximations of tensors , Journal of Com-putational and Applied Mathematics, 390 (2021). article no. 113380. [19] , Efficient algorithms for Tucker decomposition via approximate matrix multiplication , Advances in Computational Mathematics, 51 (2025). article no. 20. [20] , Efficient randomized algorithms for fixed precision problem of approximate tucker decomposition ,SIAM Journal on Matrix Analysis and Applications, 46 (2025), pp. 256–297. [21] H. Cheng, Z. Gimbutas, P.-G. Martinsson, and V. Rokhlin , On the compression of low rank matrices , SIAM Journal on Scientific Computing, 26 (2005), pp. 1389–1404. [22] F. Dai , On generalized hyperinterpolation on the sphere , Proceedings of the American Mathematical Society, 134 (2006), pp. 2931–2941. [23] L. De Lathauwer, B. De Moor, and J. Vandewalle , A multilinear singular value decomposition ,SIAM Journal on Matrix Analysis and Applications, 21 (2000), pp. 1253–1278. [24] , On the best rank-1 and rank-(r1, r 2, · · · , r n) approximation of higher-order tensors , SIAM Journal on Matrix Analysis and Applications, 21 (2000), pp. 1324–1342. [25] S. Dolgov, D. Kressner, and C. Str¨ ossner , Functional Tucker approximation using Chebyshev interpolation , SIAM Journal on Scientific Computing, 43 (2021), pp. A2190–A2210. [26] P. Drineas and M. W. Mahoney , A randomized algorithm for a tensor-based generalization of the singular value decomposition , Linear Algebra and its Applications, 420 (2007), pp. 553–571. [27] C. Eckart and G. Young , The approximation of one matrix by another of lower rank , Psychometrika, 1 (1936), pp. 211–218. [28] M. Fahrbach, M. Ghadiri, and T. Fu , Fast low-rank tensor decomposition by ridge leverage score sampling , arXiv preprint arXiv:2107.10654, (2021). [29] S. Foucart and H. Rauhut , A Mathematical Introduction to Compressive Sensing , Applied and Numerical Harmonic Analysis, Birkh¨ auser New York, NY, 1 ed., 2013. [30] N. Halko, P.-G. Martinsson, and J. A. Tropp , Finding structure with randomness: Probabilistic algorithms for constructing approximate matrix decompositions , SIAM Review, 53 (2011), pp. 217–288. [31] K. Hamm and L. Huang , Perturbations of CUR decompositions , SIAM Journal on Matrix Analysis and Applications, 42 (2021), pp. 351–375. [32] B. Hashemi and Y. Nakatsukasa , RTSMS: Randomized Tucker with single-mode sketching , Elec-tronic Transactions on Numerical Analysis, 63 (2025), pp. 247–280. [33] B. Hashemi and L. N. Trefethen , Chebfun in three dimensions , SIAM Journal on Scientific Com-puting, 39 (2017), pp. C341–C363. [34] T. G. Kolda and B. W. Bader , Tensor decompositions and applications , SIAM Review, 51 (2009), pp. 455–500. 
+
+46 [35] T. Le Gia and I. Sloan , The uniform norm of hyperinterpolation on the unit sphere in an arbitrary number of dimensions , Constructive approximation, 17 (2001), pp. 249–265. [36] S.-B. Lin, Y. G. Wang, and D.-X. Zhou , Distributed filtered hyperinterpolation for noisy data on the sphere , SIAM Journal on Numerical Analysis, 59 (2021), pp. 634–659. [37] L. Ma and E. Solomonik , Fast and accurate randomized algorithms for low-rank tensor decomposi-tions , Advances in Neural Information Processing Systems, 34 (2021), pp. 24299–24312. [38] O. A. Malik and S. Becker , Low-rank Tucker decomposition of large tensors using tensorsketch ,Advances in Neural Information Processing Systems, 31 (2018). [39] P.-G. Martinsson, V. Rokhlin, and M. Tygert , A randomized algorithm for the decomposition of matrices , Applied and Computational Harmonic Analysis, 30 (2011), pp. 47–68. [40] P.-G. Martinsson and S. Voronin , A randomized blocked algorithm for efficiently computing rank-revealing factorizations of matrices , SIAM Journal on Scientific Computing, 38 (2016), pp. S485–S507. [41] J. C. Mason , Near-best multivariate approximation by Fourier series, Chebyshev series and Chebyshev interpolation , Journal of Approximation Theory, 28 (1980), pp. 349–358. [42] R. Minster, Z. Li, and G. Ballard , Parallel randomized Tucker decomposition algorithms , SIAM Journal on Scientific Computing, 46 (2024), pp. A1186–A1213. [43] R. Minster, A. K. Saibaba, and M. E. Kilmer , Randomized algorithms for low-rank tensor decom-positions in the Tucker format , SIAM Journal on Mathematics of Data Science, 2 (2020), pp. 189–215. [44] L. Mirsky , Symmetric gauge functions and unitarily invariant norms , The quarterly journal of math-ematics, 11 (1960), pp. 50–59. [45] A. Osinsky and N. L. Zamarashkin , Pseudo-skeleton approximations with better accuracy estimates ,Linear Algebra and its Applications, 537 (2018), pp. 221–249. [46] M. Reimer , Multivariate Polynomial Approximation , vol. 144, Birkh¨ auser, 2012. [47] A. K. Saibaba , HOID: higher order interpolatory decomposition for tensors based on Tucker represen-tation , SIAM Journal on Matrix Analysis and Applications, 37 (2016), pp. 1223–1249. [48] I. H. Sloan , Polynomial interpolation and hyperinterpolation over general regions , Journal of Approx-imation Theory, 83 (1995), pp. 238–254. [49] Y. Sun, Y. Guo, C. Luo, J. Tropp, and M. Udell , Low-rank Tucker approximation of a tensor from streaming data , SIAM Journal on Mathematics of Data Science, 2 (2020), pp. 1123–1150. [50] L. Trefethen , Multivariate polynomial approximation in the hypercube , Proceedings of the American Mathematical Society, 145 (2017), pp. 4837–4844. [51] C. E. Tsourakakis , MACH: Fast randomized tensor decompositions , in Proceedings of the 2010 SIAM international conference on data mining, SIAM, 2010, pp. 689–700. [52] L. R. Tucker , Some mathematical notes on three-mode factor analysis , Psychometrika, 31 (1966), pp. 279–311. [53] M. Udell and A. Townsend , Why are big data matrices approximately low rank? , SIAM Journal on Mathematics of Data Science, 1 (2019), pp. 144–160. [54] N. Vannieuwenhoven, R. Vandebril, and K. Meerbergen , A new truncation strategy for the higher-order singular value decomposition , SIAM Journal on Scientific Computing, 34 (2012), pp. A1027– A1052. [55] J. Wade , On hyperinterpolation on the unit ball , Journal of Mathematical Analysis and Applications, 401 (2013), pp. 140–145. 
+
+47 [56] Y. G. Wang, Q. T. Le Gia, I. H. Sloan, and R. S. Womersley , Fully discrete needlet approxi-mation on the sphere , Applied and Computational Harmonic Analysis, 43 (2017), pp. 292–316. [57] C. Xiao and C. Yang , RA-HOOI: Rank-adaptive higher-order orthogonal iteration for the fixed-accuracy low multilinear-rank approximation of tensors , Applied Numerical Mathematics, 201 (2024), pp. 290–300. [58] W. Yu, Y. Gu, and Y. Li , Efficient randomized algorithms for the fixed-precision low-rank matrix approximation , SIAM Journal on Matrix Analysis and Applications, 39 (2018), pp. 1339–1359. [59] G. Zhou, A. Cichocki, and S. Xie , Fast nonnegative matrix/tensor factorization based on low-rank approximation , IEEE Transactions on Signal Processing, 60 (2012), pp. 2928–2940. [60] , Decomposition of big tensors with low multilinear rank , arXiv preprint arXiv:1412.1885, (2014). 
+
+48

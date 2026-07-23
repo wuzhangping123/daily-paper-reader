@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-23",
+  "date": "2026-07-23",
+  "generated_at": "2026-07-23T21:27:02",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/23/2607.19741v1-intrinsic-low-tucker-rank-theory-and-unified-tensor-cur-decomposition-for-high-dimensional-hyperinterpolation",
+      "section": "quick",
+      "title_en": "Intrinsic Low-Tucker-Rank Theory and Unified Tensor CUR Decomposition for High-Dimensional Hyperinterpolation",
+      "authors": "Maolin Che, Yimin Wei, Chong Wu",
+      "date": "2026-07-22",
+      "pdf": "https://arxiv.org/pdf/2607.19741v1",
+      "score": "6.0",
+      "evidence": "建立低Tucker秩理论和张量CUR分解用于高维数据",
+      "tldr": "针对高维超插值中系数张量指数增长的维数灾难问题，本文建立固有低ε-Tucker秩理论，给出近最优低秩逼近及与维度几乎无关的误差界。统一Chidori型和Fiber型TCUR分解框架，导出仅依赖张量谱和指标集几何的稳定Frobenius范数误差估计。证明贪婪自适应指标选择方案的收敛性与近最优性，实现完全无张量超插值流程。数值实验验证了理论预测和低秩可压缩性，为高维超插值提供统一结构与数学基础。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "High-dimensional hyperinterpolation is severely hampered by the curse of dimensionality, as its coefficient tensors grow exponentially with the ambient dimension. Existing research predominantly focuses on heuristic algorithmic optimizations, often overlooking the inherent structural properties of these tensors. This paper establishes a rigorous theory of intrinsic low-$ε$-Tucker-rank for hyperinterpolation coefficient tensors, delivering near-optimal low-rank approximations with error bounds that are nearly independent of the dimension. We further construct a unified, Tucker-compatible theoretical framework that integrates both Chidori-type and Fiber-type tensor CUR (TCUR) decompositions, deriving tight and stable Frobenius-norm error estimates that depend exclusively on tensor spectral properties and index set geometry. We mathematically verify the convergence and numerical stability of greedy adaptive index selection schemes and prove their near-optimality, enabling a fully tensor-free hyperinterpolation workflow that avoids constructing the full coefficient array. Three practical greedy TCUR algorithms and a lightweight TCUR-to-Tucker recompression pipeline are proposed as direct corollaries of our structural theory. Numerical experiments across three distinct families of high-dimensional test functions validate all theoretical predictions and confirm the intrinsic low-rank compressibility of hyperinterpolation coefficients. In contrast to prior algorithm-centric studies, this work prioritizes rigorous theoretical characterization over implementation tricks, establishing a unified structural and mathematical foundation for high-dimensional hyperinterpolation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/23/2607.20138v1-conjugate-gradient-unrolled-network-with-psf-conditioning-for-non-diagonal-data-fidelity-in-cassi-reconstruction",
+      "section": "quick",
+      "title_en": "Conjugate Gradient Unrolled Network with PSF Conditioning for Non-Diagonal Data Fidelity in CASSI Reconstruction",
+      "authors": "Xiang Li, Qiuyu Yue, Yang Zhang, Zhenrong Zheng",
+      "date": "2026-07-22",
+      "pdf": "https://arxiv.org/pdf/2607.20138v1",
+      "score": "6.0",
+      "evidence": "涉及光谱成像重建的深度展开方法",
+      "tldr": "现有CASSI重建的深度展开方法假设理想光学系统，但实际中非对角的数据保真项因点扩散函数（PSF）的卷积耦合而失效。为此，本文提出共轭梯度（CG）展开网络，通过K步CG求解非对角正规方程，并设计波长自适应步长的梯度精炼模块及PSF条件惩罚估计器。在KAIST数据集上达到30.53 dB，比DPU基线提升2.73 dB，参数更少。该方法有效应对制造偏差，为实际CASSI系统提供了高性能重建方案。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Deep unfolding methods achieve state-of-the-art performance in coded aperture snapshot spectral imaging (CASSI) reconstruction but typically rely on closed-form data-fidelity updates that assume an ideal optical system. In practical CASSI systems, the field-dependent and wavelength-dependent point spread function (PSF) introduces convolutional coupling that breaks the diagonal structure of the normal equation, rendering closed-form updates inapplicable. We propose a deep unfolding framework that addresses this fundamental algorithmic challenge through three contributions: (1)~a $K$-step conjugate gradient (CG) unrolling that explicitly solves the non-diagonal normal equation under PSF-inclusive forward operators; (2)~a learned gradient refinement module with wavelength-adaptive step sizes generated from a per-wavelength PSF embedding; and (3)~a PSF-conditioned penalty estimator that adapts the ADMM regularization strength to the optical degradation severity. A Monte Carlo PSF training strategy further improves robustness to manufacturing-induced PSF variations. Our method achieves 30.53~dB on the KAIST dataset, +2.73~dB over the DPU baseline (1.27M) using a comparable number of parameters (1.42M), and +1.70~dB over a larger baseline (DPU-B+, 2.12M) using 33\\% fewer parameters.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

@@ -6,31 +6,27 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-22
-- 运行时间：2026-07-22 21:35:07 UTC
+- 最新运行日期：2026-07-23
+- 运行时间：2026-07-23 21:26:57 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：1
+- 本次总论文数：2
+- 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今日精读高分论文《Kernel Regression with Tensor Trains and Hadamard Overparameterization》，并速读图像修复与扩散模型后验采样两篇。  
-最值得关注：张量训练与Hadamard过参数化在核回归中的创新，以及基于DDIM的扩散后验采样可证明方法。  
-建议优先阅读精读论文，探索过参数化技巧对高维数据处理的启发；速读论文可作为图像修复和扩散模型应用的补充。
-- 详情：[/202607/22/README](/202607/22/README)
+今日精读2篇6分论文，聚焦高维超插值的张量CUR分解与CASSI重建的非对角数据保真技术。最值得关注方向：低秩张量理论及共轭梯度展开网络结合PSF条件化。建议关注张量分解与成像逆问题中数据保真项优化的交叉应用。
+- 详情：[/202607/23/README](/202607/23/README)
 
 ### 精读区论文标签
-1. [Kernel Regression with Tensor Trains and Hadamard Overparameterization](/202607/22/2607.17390v2-kernel-regression-with-tensor-trains-and-hadamard-overparameterization)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：张量列车核回归多路数据插补，与高维张量数据恢复相关
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [QuReC: All-in-One Image Restoration with Query-Specific Guidance and Local-Global Response Calibration](/202607/22/2607.15097v2-qurec-all-in-one-image-restoration-with-query-specific-guidance-and-local-global-response-calibration)  
+1. [Intrinsic Low-Tucker-Rank Theory and Unified Tensor CUR Decomposition for High-Dimensional Hyperinterpolation](/202607/23/2607.19741v1-intrinsic-low-tucker-rank-theory-and-unified-tensor-cur-decomposition-for-high-dimensional-hyperinterpolation)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：全合一图像修复包括去噪，具有查询特定引导
-2. [Provable diffusion-based posterior sampling for linear inverse problems via DDIM](/202607/22/2607.19333v1-provable-diffusion-based-posterior-sampling-for-linear-inverse-problems-via-ddim)  
+   evidence：建立低Tucker秩理论和张量CUR分解用于高维数据
+2. [Conjugate Gradient Unrolled Network with PSF Conditioning for Non-Diagonal Data Fidelity in CASSI Reconstruction](/202607/23/2607.20138v1-conjugate-gradient-unrolled-network-with-psf-conditioning-for-non-diagonal-data-fidelity-in-cassi-reconstruction)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：基于扩散的线性逆问题后验采样方法，可迁移至高光谱图像去噪
+   evidence：涉及光谱成像重建的深度展开方法
 
 
 <div class="dpr-home-promo-card">

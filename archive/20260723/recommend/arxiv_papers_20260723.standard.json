@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-23T21:24:37.443086+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.19741v1",
+      "source": "arxiv",
+      "title": "Intrinsic Low-Tucker-Rank Theory and Unified Tensor CUR Decomposition for High-Dimensional Hyperinterpolation",
+      "abstract": "High-dimensional hyperinterpolation is severely hampered by the curse of dimensionality, as its coefficient tensors grow exponentially with the ambient dimension. Existing research predominantly focuses on heuristic algorithmic optimizations, often overlooking the inherent structural properties of these tensors. This paper establishes a rigorous theory of intrinsic low-$ε$-Tucker-rank for hyperinterpolation coefficient tensors, delivering near-optimal low-rank approximations with error bounds that are nearly independent of the dimension. We further construct a unified, Tucker-compatible theoretical framework that integrates both Chidori-type and Fiber-type tensor CUR (TCUR) decompositions, deriving tight and stable Frobenius-norm error estimates that depend exclusively on tensor spectral properties and index set geometry. We mathematically verify the convergence and numerical stability of greedy adaptive index selection schemes and prove their near-optimality, enabling a fully tensor-free hyperinterpolation workflow that avoids constructing the full coefficient array. Three practical greedy TCUR algorithms and a lightweight TCUR-to-Tucker recompression pipeline are proposed as direct corollaries of our structural theory. Numerical experiments across three distinct families of high-dimensional test functions validate all theoretical predictions and confirm the intrinsic low-rank compressibility of hyperinterpolation coefficients. In contrast to prior algorithm-centric studies, this work prioritizes rigorous theoretical characterization over implementation tricks, establishing a unified structural and mathematical foundation for high-dimensional hyperinterpolation.",
+      "authors": [
+        "Maolin Che",
+        "Yimin Wei",
+        "Chong Wu"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-22T04:12:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.19741v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "establishes low-Tucker-rank theory and tensor CUR decomposition for high-dimensional data",
+      "llm_evidence_cn": "建立低Tucker秩理论和张量CUR分解用于高维数据",
+      "llm_evidence": "建立低Tucker秩理论和张量CUR分解用于高维数据",
+      "canonical_evidence": "建立低Tucker秩理论和张量CUR分解用于高维数据",
+      "llm_tldr_en": "Proves intrinsic low-epsilon-Tucker-rank for hyperinterpolation tensors and unifies tensor CUR decompositions, enabling near-optimal low-rank approximations.",
+      "llm_tldr_cn": "该文建立了高维超插值系数张量的内在低ε-Tucker秩理论，并统一了Chidori型和Fiber型张量CUR分解框架，提供了接近最优的低秩近似误差界，为高光谱张量数据恢复提供了理论基础和实用分解工具。",
+      "llm_tldr": "该文建立了高维超插值系数张量的内在低ε-Tucker秩理论，并统一了Chidori型和Fiber型张量CUR分解框架，提供了接近最优的低秩近似误差界，为高光谱张量数据恢复提供了理论基础和实用分解工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.20138v1",
+      "source": "arxiv",
+      "title": "Conjugate Gradient Unrolled Network with PSF Conditioning for Non-Diagonal Data Fidelity in CASSI Reconstruction",
+      "abstract": "Deep unfolding methods achieve state-of-the-art performance in coded aperture snapshot spectral imaging (CASSI) reconstruction but typically rely on closed-form data-fidelity updates that assume an ideal optical system. In practical CASSI systems, the field-dependent and wavelength-dependent point spread function (PSF) introduces convolutional coupling that breaks the diagonal structure of the normal equation, rendering closed-form updates inapplicable. We propose a deep unfolding framework that addresses this fundamental algorithmic challenge through three contributions: (1)~a $K$-step conjugate gradient (CG) unrolling that explicitly solves the non-diagonal normal equation under PSF-inclusive forward operators; (2)~a learned gradient refinement module with wavelength-adaptive step sizes generated from a per-wavelength PSF embedding; and (3)~a PSF-conditioned penalty estimator that adapts the ADMM regularization strength to the optical degradation severity. A Monte Carlo PSF training strategy further improves robustness to manufacturing-induced PSF variations. Our method achieves 30.53~dB on the KAIST dataset, +2.73~dB over the DPU baseline (1.27M) using a comparable number of parameters (1.42M), and +1.70~dB over a larger baseline (DPU-B+, 2.12M) using 33\\% fewer parameters.",
+      "authors": [
+        "Xiang Li",
+        "Qiuyu Yue",
+        "Yang Zhang",
+        "Zhenrong Zheng"
+      ],
+      "primary_category": "physics.optics",
+      "categories": [
+        "physics.optics"
+      ],
+      "published": "2026-07-22T13:40:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.20138v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "addresses CASSI spectral reconstruction with deep unfolding",
+      "llm_evidence_cn": "涉及光谱成像重建的深度展开方法",
+      "llm_evidence": "涉及光谱成像重建的深度展开方法",
+      "canonical_evidence": "涉及光谱成像重建的深度展开方法",
+      "llm_tldr_en": "Proposes a conjugate gradient unrolled network for CASSI reconstruction handling non-diagonal data fidelity due to PSF, enabling practical spectral image recovery.",
+      "llm_tldr_cn": "该文针对实际CASSI系统中点扩散函数导致的正规方程非对角问题，提出一种共轭梯度展开的深度网络，显式求解非对角数据保真项，实现了更准确的快照光谱图像重建，对高光谱图像恢复具有方法借鉴意义。",
+      "llm_tldr": "该文针对实际CASSI系统中点扩散函数导致的正规方程非对角问题，提出一种共轭梯度展开的深度网络，显式求解非对角数据保真项，实现了更准确的快照光谱图像重建，对高光谱图像恢复具有方法借鉴意义。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
