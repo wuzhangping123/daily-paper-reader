@@ -1,0 +1,3725 @@
+Title: Accelerated Exact Recovery from Noisy Data via Averaging and Noise-Aware Adaptive Bregman-Kaczmarz
+
+URL Source: https://arxiv.org/pdf/2607.16003v1
+
+Published Time: Mon, 20 Jul 2026 01:01:27 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# Accelerated Exact Recovery from Noisy Data via Averaging and Noise-Aware Adaptive Bregman–Kaczmarz 
+
+Lionel Tondji ∗
+
+, Abakar A. Mahamat †
+
+, Idriss Tondji ‡
+
+July 20, 2026 
+
+Abstract 
+
+The adaptive Bregman–Kaczmarz method recovers the exact, noise-free solution of a linear inverse problem even when every measurement it queries is corrupted, provided the corruption is fresh, independent and zero-mean. A block version was proposed for parallel hardware, but whether larger blocks actually converge faster was left open. We show the answer hinges on how the block is used: replacing the block sum with a block average col-lapses the analysis onto a single positive-semidefinite matrix, through which we prove that the guaranteed convergence improves monotonically with the batch size, with a total gain governed by the stable rank of the system matrix. We then address heterogeneous noise by introducing a noise-aware weighting that down-weights unreliable measurements, and prove it is strictly better than uniform weighting whenever the noise is not proportional to the row norms — a condition that essentially never holds in practice. The two im-provements are compatible and their benefits combine. Finally, we show the adaptive step size interpolates automatically between a fast initial phase and a slowly vanishing tail that carries the error exactly to zero, and we explain how its hyperparameters can be estimated without knowing the true solution. Numerical experiments under sparse, heterogeneous noise illustrate these findings and confirm that the heuristic estimates produce effective step sizes. 
+
+Keywords: Randomized Bregman-Kaczmarz method, adaptive stepsize, averaging, inverse problems 
+
+AMS Classification: 65F10, 15A29, 65F20 
+
+# 1 Introduction 
+
+Many problems in imaging, signal processing and data science reduce to recovering an unknown ˆx from indirect measurements modeled by a linear map A. The measurements are never exact: instead of the clean data b = Aˆx one has access only to a corrupted version, and the task is to reconstruct ˆ x from this corrupted data together with the known operator [4, 14]. When 
+
+A is large, forming or factorising it is impractical, and methods that touch only a handful of its rows per step become attractive. These row-action and block-action schemes trace back 
+
+> ∗
+
+Institute for Analysis and Algebra, TU Braunschweig, 38092 Braunschweig, Germany and African Institute for Mathematical Sciences (AIMS), tngoupeyou@aimsammi.org .
+
+> †
+
+African Institute for Mathematical Sciences (AIMS) and AMMI Senegal, amahamat@aimsammi.org 
+
+> ‡
+
+University of Pisa, Pisa, Italy, idriss.tondji@phd.unipi.it 
+
+1arXiv:2607.16003v1 [math.NA] 17 Jul 2026 to the Kaczmarz iteration [9], rediscovered in tomography as the algebraic reconstruction technique [5], and they remain a workhorse wherever the operator is too large to store densely. We study a generalization of the Kaczmarz method, namely the Bregman–Kaczmarz method. The Bregman-Kaczmarz method [11, 19] replaces the Euclidean projections of the classical it-eration by Bregman projections with respect to a strongly convex, everywhere-finite function 
+
+f , and thereby solves the constrained problem ˆx def 
+
+= argmin 
+
+> x∈Rn
+
+f (x) subject to Ax = b. (1) The difficulty addressed here is the noise. In the independent-noise model of the adaptive Bregman–Kaczmarz (ABK) method [27], each access to a row returns that entry of b per-turbed by a fresh, zero-mean error, yet an adaptively tuned step size still drives the iterates to the exact solution ˆ x. ABK includes a block variant for parallel hardware, but its analysis leaves open whether larger blocks actually converge faster. We resolve this by averaging the row contributions in each block rather than summing them and by additionally exploiting knowledge of the per-row noise levels through a non-uniform weighting. We call the method Adaptive Averaged Bregman–Kaczmarz (AABK), see Fig 1. 
+
+1.1. Problem statement. We are given a matrix A ∈ Rm×n with rows a⊤ 
+
+> 1
+
+, . . . , a ⊤ 
+
+> m
+
+and a 1-strongly convex function f : Rn → R (any strongly convex f may be rescaled to μ = 1). Assuming the system Ax = b is consistent, we seek the minimum-f solution ˆx = argmin 
+
+> x∈Rn
+
+f (x) subject to Ax = b. 
+
+We do not observe b directly. Each time the algorithm queries entry j at iteration k, it receives a fresh noisy sample ˜b(k) 
+
+> j
+
+= bij + ε(k) 
+
+> j
+
+, Eε
+
+ε(k)
+
+> j
+
+ = 0 , Eε
+
+(ε(k) 
+
+> j
+
+)2 = σ2 
+
+> j
+
+, (2) where the scalar noises ε(k) 
+
+> j
+
+are independent across both the row index j and the iteration k.We refer to (2) as the independent-noise model; it is precisely the freshness of the noise at each query that makes exact recovery of ˆ x possible, rather than mere convergence to a noise ball. We write Σ = Diag( σ21 , . . . , σ 2
+
+> m
+
+) and call σ = (Tr( Σ)) 1/2 the total noise level. The strongly convex 
+
+f resolves non-uniqueness when n > m and a suitable choice of f shapes the solution: taking 
+
+f (x) = λ∥x∥1 + 12 ∥x∥22 promotes sparsity, recovering the sparse Kaczmarz method of [19]. 
+
+1.2. Related work. The Kaczmarz literature is large; we organise it around the two ingre-dients this paper combines averaging a block of row updates and adapting the step size to handle noise—noting for each line what it achieves and what it leaves open. 
+
+Randomisation and the noise ball. Randomised Kaczmarz is due to Strohmer and Ver-shynin [23], who proved exponential expected convergence under the sampling rule pi ∝ ∥ ai∥2.Needell [16] extended it to inconsistent systems, where the iterates converge to a noise ball whose radius scales with the residual at the solution, the natural fixed-step picture. Zouzias and Freris [32] escape the ball via an extended scheme converging to the least-squares solution, later sharpened for sparse and impulsive-noise problems by Sch¨ opfer et al. [20]. These works treat noise as a fixed perturbation rather than something the algorithm can average away. 
+
+Bregman geometry. Sch¨ opfer and Lorenz [19] introduced the Bregman–Kaczmarz frame-work, replacing Euclidean projections by Bregman projections for a strongly convex f ; with 2f (x) = λ∥x∥1 + 12 ∥x∥22 one obtains a sparse solver, and the error-bound condition we use (As-sumption 3.2) originates here. A large body of work accelerates the (randomized) Kaczmarz method by other means; block strategies, alternative sampling schemes, and extrapolation among them; see for instance [1, 3, 7, 10, 17, 21, 25, 26, 28, 29, 31]. These analyses are noise-free. 
+
+Block methods and averaging. Necoara [15] analysed block Kaczmarz with extrapolation and rates depending on the block structure of A. Moorman et al. [13] introduced randomised Kaczmarz with averaging , producing a 1 /τ variance reduction; Tondji and Lorenz [24] carried averaging to the Bregman setting (their RSKA method) and treated the inconsistent case, where fixed-step averaging still converges only to a noise ball. 
+
+Adaptive step sizes and independent noise. A line complementary to the corruption-robust methods above keeps all entries of b noisy but assumes the corruptions are independent zero-mean random variables. Marshall and Mickelin [12] showed, for a fixed noisy right-hand side ˜b, that one can recover ˆ x to any accuracy given enough equations when rows are sampled 
+
+without replacement : this guarantees that the noise in each iterate is independent of the noise seen so far. Their guarantee, however, holds for only a single pass over the matrix at most 
+
+m iterations so it cannot in practice drive the error to zero after one epoch. The adaptive Bregman-Kaczmarz in [27] modifies this to the independent -noise model (2), in which every query returns a fresh independent sample, and proves that an adaptive step size shrinking at the right rate recovers ˆ x exactly over arbitrarily many iterations. A distinct, corruption-oriented response is the quantile line of work (see [2, 8, 22, 30]), which assumes a small fraction of entries are adversarially corrupted and rejects rows by residual quantile. 
+
+Where this paper sits. The two threads that meet our work are averaging ( [24]) and adaptive stepping ( [27]); they are complementary, as the table makes explicit. fixed step adaptive step (independent noise) no averaging RK [6, 16, 23], sparse RK [11, 19] ABK [12, 27] averaging RKA [13], RSKA [24] AABK (this paper) 
+
+RSKA averages but, in the inconsistent case, converges only to a noise ball; ABK recovers ˆx exactly but its block bound does not improve with τ , since its update is a sum rather than an average. Combining the two strengths is not a formality: it requires the spectral object T that governs the joint analysis, the proof that σmax (T) decreases monotonically in 
+
+τ (Proposition 2.2), and an adaptive step that respects this monotonicity. Moreover, none of the above works use the noise variances σ2 
+
+> i
+
+to design the sampling distribution; all default to 
+
+pi ∝ ∥ ai∥2, optimal for the noiseless geometry but blind to noise. Our Corollary 2.3 closes this gap with the rule pi ∝ σi∥ai∥, provably reducing the noise constant by a factor that is at most 
+
+m when the row norms are equal and grows without bound only when the most corrupted rows have small geometric influence. In short, AABK enjoys monotone acceleration in τ from averaging and exact recovery of ˆ x from adaptive stepping, in a single method whose analysis reduces to the matrix T.
+
+Contribution. Our main contributions are as follows. 1. We introduce the AABK method and derive its optimal adaptive step-size rule that guarantees convergence to the noise-free solution (Theorem 2.1). 32. We prove that the convergence rate of AABK is monotonically improving in the batch size τ , with an explicit limit and gain governed by the stable rank of A (Proposition 2.2), giving a clear theoretical justification for larger batches. 3. We develop a noise-aware non-uniform weighting scheme and prove its theoretical supe-riority: weights proportional to ∥ai∥/σ i yield a provably smaller rate constant (Corol-lary 2.3). 4. We analyse the asymptotic behaviour of the adaptive step size, showing the automatic transition from a constant-step (linear) regime to a decaying-step (stochastic) regime, and we discuss how the hyperparameters are estimated in practice ( §2.5–2.6). 
+
+# 2 Results 
+
+Let define the diagonal matrices : 
+
+D = Diag( ∥a1∥, . . . , ∥am∥), P = Diag( p1, . . . , p m), W = Diag( w1, . . . , w m),
+
+where pi is the probability of sampling row i and wi ≥ 0 its weight. Following common practice in the randomized Kaczmarz literature [13, 23, 24], we impose throughout the coupling 
+
+piwi
+
+∥ai∥2 = α
+
+∥A∥2
+
+> F
+
+for all i, equivalently PWD −2 = α
+
+∥A∥2
+
+> F
+
+I, (3) with relaxation parameter α > 0. The coupling ties the sampling distribution to the weights through the single scalar α; under it, the inner-product term in the analysis collapses to a clean Rayleigh quotient. Given the coupling, choosing the wi determines the pi and vice versa, and one of the two natural choices is provably better ( §2.4). 
+
+2.1. The algorithm. We were motivated by the following heuristic. Suppose xk is given and we query the i-th equation, but its noise variance σ2 
+
+> i
+
+is large. Then we should not take a full step that exactly satisfies this equation: the measurement is mostly noise, and trusting it blindly would undo the progress of earlier iterations. We should actively suppress equations whose incoming data ˜bi are known to be unreliable. Moreover, stepping on a single noisy equation prevents the iterate from ever settling. A natural remedy is therefore to query a batch of τ equations simultaneously, average their proposed updates so that the zero-mean noise partly cancels, and weight each equation inversely to its unreliability. Uniform averaging of updates is classical, it underlies mini-batch stochastic gradient descent and has been analysed for Kaczmarz methods in [13, 24]. We adopt this idea in the Bregman setting and add a dynamically shrinking step size ηk that drives the remaining averaged error exactly to zero. Concretely, at each iteration k we sample a batch of indices Bk ⊆ { 1, . . . , m } of size τ ,i.i.d. from p (with replacement), and form the weighted average of the individual Kaczmarz directions, 
+
+dk = 1
+
+τ
+
+X
+
+> j∈B k
+
+wi
+
+aij , x k − ˜b(k)
+
+> j
+
+∥aij ∥2 aij , (4) where ˜b(k) 
+
+> j
+
+is a fresh noisy measurement. We then update the dual and primal variables via 
+
+x∗ 
+
+> k+1
+
+= x∗ 
+
+> k
+
+− ηkdk, xk+1 = ∇f ∗(x∗
+
+> k+1
+
+). (5) 41○ Sample batch Bk                                                          
+
+> a⊤
+> 1
+> a⊤
+> 2
+> a⊤
+> 3
+> a⊤
+> 4
+> a⊤
+> 5
+> a⊤
+> 6
+> a⊤
+> 7
+> A∈Rm×n
+> row sampled
+> twice
+> τi.i.d. draws from p,
+> Bk= ( i1, . . . , i τ)
+> 2○Per-draw term (in parallel)
+> g1=wi1
+> ⟨ai1, x k⟩ − ˜b(k)1
+> ∥ai1∥2ai1
+> j= 1
+> g2=wi2
+> ⟨ai2, x k⟩ − ˜b(k)2
+> ∥ai2∥2ai2
+> j= 2
+> g3=wi3
+> ⟨ai3, x k⟩ − ˜b(k)3
+> ∥ai3∥2ai3
+> j= 3
+> fresh noise per draw j: ˜b(k)
+> j=bij+ε(k)
+> j
+> here i1=i3(same row) yet ε(k)1̸=ε(k)3
+> 3○Aggregate & update
+> dk= 1
+> τ
+> τ∑
+> j=1
+> gj
+> x∗
+> k+1 =x∗
+> k−ηkdk
+> xk+1 =∇f∗(x∗
+> k+1
+> )
+> step ηk
+> k←k+1
+
+Figure 1: Anatomy of one AABK iteration. Starting from xk = ∇f ∗(x∗
+
+k), the method 
+
+1○ samples a batch Bk = ( i1, . . . , i τ ) of τ rows i.i.d. from p (with replacement, so a row may recur—here i1 = i3); 2○ computes in parallel one residual term gj = wij
+
+D
+
+aij ,x k
+
+E
+
+−˜b(k)
+
+> j
+
+∥aij ∥2 aij per draw, each using a fresh noisy value ˜b(k)
+
+j = bij + ε(k)
+
+j (indexing noise by the draw j guarantees independence even when a row is drawn twice); and 3○ averages them into dk = 1
+
+τ
+
+Pτj=1 gj ,takes the adaptive dual step x∗
+
+k+1 = x∗
+
+k − ηkdk, and mirrors back via xk+1 = ∇f ∗(x∗
+
+k+1 ). The dashed arrow closes the loop for iteration k+1. The method rests on three pillars: the batch size τ to reduce variance, the weights wi
+
+to handle heteroskedasticity, and the adaptive step ηk to guarantee exact convergence. For 
+
+τ = 1 and uniform weights it reduces to ABK [27]; in the noiseless case with uniform weights it reduces to RSKA [24, 29]. Computing dk is a sparse matrix–vector product( §4.6) and is embarrassingly parallel across the batch. 
+
+Algorithm 1: Adaptive Averaged Bregman–Kaczmarz (AABK) 
+
+Input: A ∈ Rm×n; strongly convex f ; weights {wi} and probabilities {pi}
+
+satisfying (3); batch size τ ; initial x∗
+
+0, x0 = ∇f ∗(x∗
+
+0). 
+
+Output: Approximate minimum-f solution of Ax = b.
+
+1 for k = 0 , 1, 2, . . . until a stopping criterion holds do 
+
+2 Sample a batch Bk = {i1, . . . , i τ } ⊆ { 1, . . . , m }, |B k| = τ , i.i.d. from p;
+
+3 For each j ∈ B k query a fresh noisy value ˜b(k)
+
+j = bij + ε(k)
+
+j ;
+
+4 dk ← 1
+
+τ
+
+P
+
+j∈B k wij
+
+aij , x k − ˜b(k)
+
+j
+
+∥aij ∥2 aij ; // in parallel 
+
+5 Set ηk by (7); 
+
+6 x∗
+
+k+1 ← x∗
+
+k − ηkdk; xk+1 ← ∇ f ∗(x∗
+
+k+1 ); 
+
+7 return xk;
+
+2.2. Main convergence theorem. The convergence is controlled by a single symmetric, positive semidefinite matrix 
+
+T = 12τ W + α
+
+2∥A∥2
+
+F
+
+
+
+1 − 1
+
+τ
+
+
+
+AA ⊤. (6) 5Theorem 2.1 (Convergence of AABK) . Assume the coupling (3) and Assumption 3.2. With 
+
+T as in (6), define the adaptive step size and auxiliary sequence 
+
+ηk = αγβ k
+
+1 + 2 αγ σ max (T) βk
+
+, βk+1 = βk
+
+
+
+1 − αγη k
+
+> 2
+
+
+
+, (7) initialized at β0 = τ D x∗ 
+
+> 0
+> f
+
+(x0, ˆx)/ Tr( PW 2ΣD −2) (estimated as in §2.6). If ( xk) is generated by (4)–(5), then 
+
+E [∥xk − ˆx∥22] ≤ 2 Tr( PW 2ΣD −2)
+
+τ βk, (8) where βk is deterministic, strictly decreasing and converges to zero; in particular 
+
+E [∥xk − ˆx∥22] → 0.
+
+Interpretation of Theorem 2.1. The bound (8) factors the expected error into two pieces, 
+
+E [∥xk − ˆx∥22] ≤ 2 Tr( PW 2ΣD −2)
+
+τ| {z }
+
+> rate constant = 2 Cnoise /τ
+
+· βk
+
+|{z} 
+
+> monotone decay
+
+,
+
+each controlled by a different design choice. The prefactor is the noise injected per step; it depends on W, P, Σ and τ but not on k, and is what the noise-aware weighting of §2.4 minimises. The factor βk depends on k and on σmax (T) but not on the noise (in the uniform weight case), and is what the batch size accelerates (Proposition 2.2). Three consequences follow. (i) Exact recovery: since βk → 0, the iterates reach ˆ x exactly despite fresh noise at every step, unlike fixed-step averaging, which stalls at a noise ball [16, 24]. (ii) Composable knobs: τ
+
+primarily drives the decay factor βk while W primarily drives the noise prefactor Cnoise . Under the coupling (3) both depend on W and τ , so they are not strictly independent; but because the noise-optimal weights also satisfy the batch-monotonicity condition (Proposition 2.2), the two gains compose without conflict. (iii) Monotone in τ : both factors improve as τ grows, so the bound is non-increasing in τ at every fixed k; the justification for block parallelism that the original ABK analysis left open. 
+
+2.3. Larger batches help: monotonicity in τ .Proposition 2.2 (Monotone acceleration) . The following hold. 1. (Uniform weights.) For W = αI,
+
+σmax (T) = α
+
+2τ
+
+
+
+1 + (τ − 1) σ2max (A)
+
+∥A∥2
+
+> F
+
+
+
+,
+
+which is strictly decreasing in τ , with lim   
+
+> τ→∞
+
+σmax (T) = α σ 2max (A)2∥A∥2
+
+> F
+
+. The contraction factor at the optimal step thus improves monotonically in τ , and the improvement from τ = 1 to τ → ∞ equals the stable rank ∥A∥2 
+
+> F
+
+/σ 2max (A). 2. (General weights.) For arbitrary W, the guaranteed rate obtained by running (7) with 6the Lemma 4.3 upper bound U (τ ) := 12τ σmax (W) + α
+
+> 2∥A∥2
+> F
+
+
+
+1 − 1
+
+> τ
+
+
+
+σ2max (A) in place of 
+
+σmax (T) improves monotonically in τ whenever σmax (W) ≥ α σ 2max (A)/∥A∥2 
+
+> F
+
+which is legitimate, since ηk can be run with U in place of σmax (T) and the contraction bound (1 − αγ/ 4U ) then improves in τ . Because W and AA ⊤ need not commute, the true 
+
+σmax (T) itself may fail to be monotone for general W; the guarantee is on the certified bound U (τ ). 3. (Optimal noise-aware weights.) For the optimal weights of Corollary 2.3, the condi-tion in (ii) holds automatically: in fact σmax (W) ≥ α ≥ α σ 2max (A)/∥A∥2 
+
+> F
+
+, for every matrix A and every noise profile ( σi). Consequently the rate of AABK with optimal weights (via the bound U (τ ) of part (ii)) accelerates monotonically in τ uncondition-ally, so the monotone-acceleration and optimal-weighting guarantees compose with no compatibility condition. When τ = 1, σmax (T) = α/ 2 and we recover the single-row case. When τ → ∞ , σmax (T)shrinks by a factor equal to the stable rank of A: for matrices with a flat spectrum this can be as large as min( m, n ), so averaging is dramatic; for matrices dominated by one singular value it is close to 1 and averaging buys little. The unaveraged block bound of [27] does not exhibit this monotonicity precisely because its update sums rather than averages, so the variance-reduction term 1 /τ is absent. Part (iii) is worth emphasising: although the condition in part (ii) looks like a hypothesis the user must verify, the optimal scheme satisfies it with room to spare by a factor of at least the stable rank because it places its largest weight on the row that is most reliable relative to its geometric influence. The proof of part (iii) is given in Appendix A. 
+
+2.4. Uniform versus noise-aware weighting. Uniform weights treat all rows equally; the noise-aware scheme down-weights unreliable rows. The two are compared through the noise prefactor Cnoise := Tr( PW 2ΣD −2). 
+
+Corollary 2.3 (Uniform versus noise-aware weighting) .
+
+1. Uniform weights : with W = αI and pi = ∥ai∥2/∥A∥2 
+
+> F
+
+,Tr( PW 2ΣD −2) = α2
+
+∥A∥2
+
+> Fm
+
+X
+
+> i=1
+
+σ2 
+
+> i
+
+.
+
+A single row with large σ2 
+
+> i
+
+inflates the whole sum: the uniform scheme is brittle to outliers. 2. Optimal noise-aware weights : choosing wi ∝ ∥ ai∥/σ i and pi ∝ σi∥ai∥ (preserving the coupling (3)) gives Tr( PW 2ΣD −2) = α2
+
+∥A∥4
+
+> F
+
+ mX
+
+> i=1
+
+σi∥ai∥
+
+2
+
+,
+
+which is the minimum over all couplings. By Cauchy–Schwarz this is at most the uniform value, with equality if and only if σi ∝ ∥ ai∥ or all rows are corrupted equally. When the noise per-row are not equal, equality holds only when the per-row noise is propor-tional to the row norm. In practice this essentially never occurs; noise is a property of the 7measurement device while the row norm is a property of the operator so the strict improvement is generic. 
+
+2.5. Asymptotics of the step size and error. Since the decay of βk governs how fast Algorithm 1 converges to the noise-free solution ˆ x, we now quantify this decay. Let us denote by h(k) = α Tr( WΣ ) · βk/τ so that by (8), E [∥xk − ˆx∥22] ≤ 2h(k)/∥A∥2 
+
+> F
+
+. The following result generalizes the one from [12, 27] with full proof in Appendix E. 
+
+Corollary 2.4 (Asymptotic regimes) . Solving the recursion (7) via the Lambert-W function gives the closed form using W0 for the principal Lambert branch 
+
+h(k) = Tr( WΣ )2τ γσ max (T)W0
+
+
+
+c0 exp 
+
+ αγk 
+
+4σmax (T)
+
+ , c 0 = 12αγσ max (T)β0
+
+exp 
+
+ 12αγσ max (T)β0
+
+
+
+here W0 denotes the principal branch of the Lambert-W function, not the weight matrix W.Consequently: 1. (Vanishing noise, σi → 0 ∀ i.) With the other parameters fixed, 
+
+h(k) = ∥A∥2 
+
+> F
+
+exp 
+
+
+
+− αγk 
+
+4σmax (T)
+
+
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx) + 
+
+(
+
+O σ2, If W = αI
+
+O ¯σ2, Else where ¯ σ2 =
+
+P 
+
+> j
+
+σj ∥aj ∥
+
+2
+
+and ηk → 1/(2 σmax (T)): a constant step leading to linear convergence. 2. (Late iterations, k → ∞ .) With the other parameters fixed, 
+
+h(k) = 2Tr( WΣ )
+
+ατ γ 2k
+
+
+
+1 + O
+
+ ln (k)
+
+k
+
+ 
+
+, ηk ≈ 2
+
+αγk + 4 σmax (T) ,
+
+so that ηk ∼ 1/k (a Robbins–Monro tail) and E [∥xk − ˆx∥] ≲ 2 
+
+> γα √τ
+
+·
+
+q Tr( PW 2ΣD −2) 
+
+> k
+
+.
+
+Remark 2.5 (Two regimes of the step size) . The adaptive step interpolates automatically between two regimes. Early on , βk is large and ηk ≈ 1/(2 σmax (T)) the largest admissible step so the error decays like a deterministic linear iteration driven by a near-constant step size. Because σmax (T) shrinks as the batch grows (Proposition 2.2), this step can exceed 2: where ABK is confined to ηk ≤ 1 and hence under-relaxes, AABK is free to over-relax . To the best of our knowledge, this is the first time over-relaxation is shown to help in the noisy setting. Late on , βk is small and ηk ≈ αγβ k → 0, decaying as ηk ∼ 1/k a Robbins-Monro tail. It is this vanishing step that lets AABK absorb the residual noise and converge to the exact solution ˆ x, rather than settling at a noise ball. 
+
+2.6. Heuristic estimation of the hyperparameters. The step size (7) requires γ and 
+
+β0, both of which involve unknown quantities. We estimate them from one auxiliary run of Algorithm 1 using constant step ηk = 1 /2σmax (T), producing iterates x0, . . . , x N . Under uniform weights with τ = 1 and α = 1 one has σmax (T) = 1 /2, so this auxiliary step reduces to 8ηk = 1, the value used in [27] for their block version. The derivation in this part follows closely the one in [27] and generalizes their results. From the one-step bound with ηk = 1 /2σmax (T), 
+
+E[Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx)] ≤
+
+
+
+1 − αγ 
+
+4σmax (T)
+
+
+
+E[Dx∗ 
+
+> k
+> f
+
+(xk, ˆx)] + Cnoise 
+
+8τ σ 2max (T)which can be inferred inductively as follows: 
+
+E[Dx∗ 
+
+> k
+> f
+
+(xk, ˆx)] ≤
+
+
+
+1 − αγ 
+
+4σmax (T)
+
+k
+
+E[Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx)] + Cnoise 
+
+2τ αγσ max (T) .
+
+Assuming the initial error is above the noise level and eventually stagnates, we expect geomet-ric decay early and a plateau late. Using the approximation that xN ≈ ˆx and choosing an index 
+
+N0 < N for which we assume 1 ≤ j ≤ N0, that Dx∗ 
+
+> j+1
+> f
+
+(xj+1 , x N) ≈
+
+
+
+1 − αγ 
+
+4σmax (T)
+
+
+
+Dx∗ 
+
+> j
+> f
+
+(xj , x N)holds, gives the estimator ˜γ := 4σmax (T)
+
+α 1 − 1
+
+N0
+
+> N0
+
+X
+
+> j=1
+
+Dx∗ 
+
+> j
+> f
+
+(xj , x N )
+
+Dx∗ 
+
+> j−1
+> f
+
+(xj−1, x N )
+
+!
+
+, (9) and choosing N1 < N in the plateau phase for which we assume that N1 ≤ j < N , we then have the following 
+
+Dx∗ 
+
+> j
+> f
+
+(xj , ˆx) ≈ Tr( PW 2ΣD −2)2τ γασ max (T)giving ˜β0 := 12ασ max (T)
+
+˜γN1 
+
+> N−1
+
+X 
+
+> j=N−N1
+
+Dx∗ 
+
+> j
+> f
+
+(xj , x N )
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, x N )
+
+!−1
+
+. (10) In practice, the method is robust to an order-of-magnitude error in these estimates. 
+
+# 3 Basic notions 
+
+We will analyze the convergence of the Algorithm 1 with the help of the Bregman distance with respect to the objective function f . To this end, we recall some well-known concepts and properties of convex functions [18]. Let f : Rn → R be convex, and since it is finite everywhere, it is also continuous. The 
+
+subdifferential of f at any x ∈ Rn is defined by 
+
+∂f (x) def 
+
+= {x∗ ∈ Rn|f (y) ≥ f (x) + ⟨x∗, y − x⟩, ∀ y ∈ Rn},
+
+which is nonempty, compact, and convex. The function f is said to be μ-strongly convex , if for all x, y ∈ Rn and subgradients x∗ ∈ ∂f (x) we have 
+
+f (y) ≥ f (x) + ⟨x∗, y − x⟩ + μ 
+
+> 2
+
+· ∥ y − x∥22 .
+
+9If f is μ-strongly convex, then f is coercive, i.e. lim ∥x∥2→∞ f (x) = ∞, and its Fenchel conjugate 
+
+f ∗ : Rn → R given by 
+
+f ∗(x∗) def 
+
+= sup 
+
+> y∈Rn
+
+⟨x∗, y ⟩ − f (y)is also convex, finite everywhere and coercive. Additionally, f ∗ is differentiable with a Lipschitz-continuous gradient with constant Lf ∗ = 1 
+
+> μ
+
+, i.e. for all x∗, y ∗ ∈ Rn we have 
+
+∥∇ f ∗(x∗) − ∇ f ∗(y∗)∥2 ≤ Lf ∗ · ∥ x∗ − y∗∥2 ,
+
+which implies the estimate 
+
+f ∗(y∗) ≤ f ∗(x∗) + ⟨∇ f ∗(x∗), y ∗ − x∗⟩ + Lf ∗ 
+
+> 2
+
+∥x∗ − y∗∥22. (11) 
+
+Definition 3.1. The Bregman distance Dx∗ 
+
+> f
+
+(x, y ) between x, y ∈ Rn with respect to f and a subgradient x∗ ∈ ∂f (x) is defined as 
+
+Dx∗ 
+
+> f
+
+(x, y ) def 
+
+= f (y) − f (x) − ⟨ x∗, y − x⟩ .
+
+Fenchel’s equality states that f (x) + f ∗(x∗) = ⟨x, x ∗⟩ if x∗ ∈ ∂f (x) and implies that the Bregman distance can be written as 
+
+Dx∗ 
+
+> f
+
+(x, y ) = f ∗(x∗) − ⟨ x∗, y ⟩ + f (y) .
+
+We will use the function 
+
+f (x) def 
+
+= λ∥x∥1 + 12 ∥x∥22 (12) which is strongly convex with constant μ = 1. Its conjugate function is the soft shrinkage operator Sλ which is defined componentwise by ( Sλ(x)) j = max {| xj | − λ, 0} · sign( xj )
+
+f ∗(x∗) = 12 ∥Sλ(x∗)∥22, with ∇f ∗(x∗) = Sλ(x∗) .
+
+In general, for a μ-strongly convex function, we have that 
+
+Dx∗ 
+
+> f
+
+(x, y ) ≥ μ
+
+2 ∥x − y∥22, (13) see [11], and hence Dx∗ 
+
+> f
+
+(x, y ) = 0 ⇔ x = y. 
+
+We now prove convergence of the xk in Algorithm 1 to the solution ˆ x for our optimal step size sequence. To obtain convergence rates for the solution algorithm, we need to assume an error bound which relates the least-squares residual ∥Ax − b∥22 to the Bregman distance to the exact solution ˆ x for iterates of Algorithm 1. 
+
+Assumption 3.2 (Error bound) . Let R(A) denote the range space of A. There exists a constant θ(ˆ x) > 0 such that, for each x ∈ Rn with ∂f (x)∩R (A⊤)̸ = ∅ and x∗ ∈ ∂f (x)∩R (A⊤)we have : 
+
+∥Ax − b∥22 ≥ θ(ˆ x) Dx∗ 
+
+> f
+
+(x, ˆx)We set γ := θ(ˆ x)/∥A∥2 
+
+> F
+
+.For the function f (x) = λ∥x∥1 + 12 ∥x∥22, it holds that dom( f ) = Rn and Assumption (3.2) holds with an explicit constant θ depending on A and ˆ x, see [19, Lemma 3.1]. See also [20, Theorem 3.9] for a sufficient condition for Assumption (3.2) to hold. 10 4 Proofs 
+
+Throughout this section, we drop the iteration superscript ( k) for readability, writing ˜bj =
+
+bij + εj rather than ˜b(k) 
+
+> j
+
+= bij + ε(k) 
+
+> j
+
+. Every expectation is conditional on xk, so k is fixed and understood; the abbreviation is purely notational, the noise remains independent across iterations and its omission changes none of the proofs. At each iteration k, the algorithm draws two independent sources of randomness: the batch 
+
+Bk of τ indices sampled i.i.d. from p, and the fresh noise {ε(k) 
+
+> i
+
+} attached to the queried entries. We distinguish three expectations and use them consistently throughout: 
+
+• EB[ · ] — expectation over the batch indices Bk only, with the iterate xk and the noise held fixed; when τ = 1 this reduces to the single-draw expectation Ei∼p.
+
+• Eε[ · ] — expectation over the streaming noise {ε(k) 
+
+> i
+
+} only, with xk and the batch Bk held fixed; 
+
+• E[ · ] = E[ · ] — the total expectation over all randomness in the history (all batches and all noise up to and including iteration k). The next lemma will be used to prove convergence of Algorithm 1 for suitable step size. 
+
+4.1. One-step descent. Lemma 4.1. Let ( xk, x ∗
+
+> k
+
+) be generated by Algorithm 1. Then 
+
+Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx) ≤ Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) + ηk ⟨dk, ˆx − xk⟩ + η2
+
+> k
+
+2 ∥dk∥22.
+
+Proof. For 1-strongly convex f , the properties of the Bregman distance give 
+
+Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx) ≤ Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) − x∗ 
+
+> k+1
+
+− x∗
+
+> k
+
+, ˆx − xk+1 − 12 ∥xk+1 − xk∥22.
+
+Substituting x∗ 
+
+> k+1
+
+= x∗ 
+
+> k
+
+− ηkdk and writing 
+
+− x∗ 
+
+> k+1
+
+− x∗
+
+> k
+
+, ˆx − xk+1 = ηk ⟨dk, ˆx − xk⟩ − ηk ⟨dk, x k+1 − xk⟩
+
+then bounding the last two terms with −az − 12 z2 ≤ 12 a2 yields the claim. 
+
+4.2. The expected one-step bound. Lemma 4.2. Under the coupling (3) and Assumption 3.2, with T as in (6), the total expec-tation satisfies 
+
+E [Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx)] ≤  1 − γαη k(1 − ηkσmax (T))  E [Dx∗ 
+
+> k
+> f
+
+(xk, ˆx)] + η2
+
+> k
+
+2τ Tr( PW 2ΣD −2).
+
+Proof. We first compute the conditional expectation E[ · | xk] = EBEε[ · | xk] of Lemma 4.1 over the batch Bk and the noise. 11 Inner-product term. Writing rk = Axk − b and using ⟨ai, ˆx⟩ = bi, the noise enters linearly and is annihilated by Eε[εi] = 0; the surviving index-expectation is 
+
+E ⟨dk, ˆx − xk⟩ | xk
+
+ = −EB
+
+h
+
+wi
+
+(rk)2
+
+> i
+
+∥ai∥2
+
+i
+
+= −
+
+> m
+
+X
+
+> i=1
+
+piwi
+
+∥ai∥2 (rk)2
+
+> i
+
+= −(Axk − b)⊤PWD −2(Axk − b) = − α
+
+∥A∥2
+
+> F
+
+∥Axk − b∥22,
+
+the last step by (3). 
+
+Squared-norm term. Decompose dk = dnf  
+
+> k
+
+− dn 
+
+> k
+
+into noiseless and noise parts. The cross term vanishes because Eε[εi] = 0. Writing vi = wi(rk)iai/∥ai∥2 and using that the τ indices are i.i.d. under EB,
+
+EB [∥dnf  
+
+> k
+
+∥2] = 1
+
+τ EB∥vi∥2+ τ − 1
+
+τ ∥EBvi∥2 =
+
+D
+
+rk,
+
+ 1 
+
+> τ
+
+PW 2D−2+ τ −1 
+
+> τ
+
+PWD −2AA ⊤PWD −2
+
+rk
+
+E
+
+.
+
+The matrix in brackets equals 2α
+
+> ∥A∥2
+> F
+
+T, so EB [∥dnf  
+
+> k
+
+∥2] ≤ 2α
+
+> ∥A∥2
+> F
+
+σmax (T)∥rk∥2. For the noise part, 
+
+Eε acts first ( Eε[ε2 
+
+> i
+
+] = σ2 
+
+> i
+
+on the diagonal, the cross terms vanishing), then EB:
+
+EBEε [∥dn
+
+> k
+
+∥2] = 1
+
+τ EB
+
+h w2 
+
+> i
+
+σ2
+
+> i
+
+∥ai∥2
+
+i
+
+= 1
+
+τ
+
+> m
+
+X
+
+> i=1
+
+piw2 
+
+> i
+
+σ2
+
+> i
+
+∥ai∥2 = 1
+
+τ Tr( PW 2ΣD −2).
+
+Inserting both into Lemma 4.1 yields the conditional bound 
+
+EDx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx) | xk
+
+ ≤  1 − γαη k(1 − ηkσmax (T)) Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) + η2
+
+> k
+
+2τ Tr( PW 2ΣD −2),
+
+after applying Assumption 3.2; taking the total expectation E of both sides via the tower rule gives the stated result. Full details are in Appendix B. 
+
+4.3. Spectral bounds and proof of Proposition 2.2. Lemma 4.3. With T as in (6), 
+
+σmax (T) ≤ 12τ σmax (W) + α
+
+2∥A∥2
+
+> F
+
+
+
+1 − 1
+
+τ
+
+
+
+σ2max (A).
+
+If W = αI this holds with equality: σmax (T) = α
+
+> 2τ
+
+ 1 + ( τ − 1) σ2max (A)/∥A∥2
+
+> F
+
+. The detailed proof of this lemma can be found in [24]. 
+
+Proof of Proposition 2.2. For W = αI, differentiating the closed form of Lemma 4.3,  
+
+> ddτ
+
+σmax (T) = α 
+
+> 2τ2
+
+ σ2max (A)/∥A∥2 
+
+> F
+
+− 1 ≤ 0 since σ2max (A) ≤ ∥ A∥2 
+
+> F
+
+. Sending τ → ∞ gives the limit. The contraction factor at η⋆ = 1 /(2 σmax (T)) is 1 − γα/ (4 σmax (T)), monotone in 
+
+σmax (T); the ratio of τ = 1 to τ → ∞ values of σmax (T) is ∥A∥2 
+
+> F
+
+/σ 2max (A). 
+
+□
+
+4.4. Proof of Theorem 2.1. We sketch the argument; the full details are in Appendix D. To obtain a contraction rate q ∈ (0 , 1) we require 1 − ηkσmax (T) > 0, i.e. ηk < 1/σ max (T). Under this condition the one-step bound of Lemma 4.2 can be written as 
+
+E [Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx)] ≤ Dk(η) · 1
+
+τ Tr( PW 2ΣD −2), (14) 12 where the error sequence obeys the recurrence Dk(η) =  1−αγη k(1 −ηkσmax (T)) Dk−1(η)+ η2 
+
+> k
+> 2
+
+.Minimising Dk(η) over the single free variable ηk (the second derivative is positive, so this is a genuine minimum) gives the optimal step ηk = αγD k−1(η)/(1+2 αγσ max (T)Dk−1(η)). Estimat-ing the unknown Dk−1(η) by the deterministic sequence βk with β0 = τ D x∗ 
+
+> 0
+> f
+
+(x0, ˆx)/ Tr( PW 2ΣD −2)recovers the stated form (7); the admissibility ηk < 1/σ max (T) then holds automatically. Sub-stituting (7) back into the recurrence telescopes it to βk+1 = βk(1 − αγη k 
+
+> 2
+
+), so βk decreases to zero. Finally 1-strong convexity gives ∥xk − ˆx∥22 ≤ 2 Dx∗ 
+
+> k
+> f
+
+(xk, ˆx), which combined with (14) and 
+
+βk = Dk−1(η) yields the rate (8). □
+
+4.5. Optimal weights via Cauchy–Schwarz. We minimise Cnoise = Tr( PW 2ΣD −2) = P 
+
+> i
+
+piw2 
+
+> i
+
+σ2 
+
+> i
+
+/∥ai∥2 over all ( p, w ) satisfying the coupling (3) and P 
+
+> i
+
+pi = 1, pi ≥ 0. Eliminating 
+
+wi = α∥ai∥2/(pi∥A∥2 
+
+> F
+
+), 
+
+Cnoise = α2
+
+∥A∥4
+
+> Fm
+
+X
+
+> i=1
+
+σ2 
+
+> i
+
+∥ai∥2
+
+pi
+
+.
+
+Minimizing P 
+
+> i
+
+ci/p i subject to P 
+
+> i
+
+pi = 1 is a convex problem solved by pi ∝ √ci with optimal value ( P
+
+> i
+
+√ci)2 (Appendix F). With ci = σ2 
+
+> i
+
+∥ai∥2 this gives popt  
+
+> i
+
+∝ σi∥ai∥ and 
+
+Copt noise = α2
+
+∥A∥4
+
+> F
+
+ X 
+
+> i
+
+σi∥ai∥
+
+2
+
+, Cuni noise = α2
+
+∥A∥2
+
+> F
+
+X
+
+> i
+
+σ2 
+
+> i
+
+.
+
+With u = ( σi)i and v = ( ∥ai∥)i, Cauchy–Schwarz gives ( P 
+
+> i
+
+σi∥ai∥)2 ≤ (P 
+
+> i
+
+σ2 
+
+> i
+
+)( P
+
+> i
+
+∥ai∥2) = 
+
+∥A∥2
+
+> F
+
+P 
+
+> i
+
+σ2 
+
+> i
+
+, hence Copt noise ≤ Cuni noise , with equality iff σi ∝ ∥ ai∥ or all rows are corrupted equally. This proves Corollary 2.3. □
+
+4.6. Matrix–vector form and unbiasedness. Remark 4.4 (Matrix–vector form of dk). The batch Bk is sampled i.i.d. and is in general a 
+
+multiset . Let ni = Pτj=1 1{Ij = i} be the multiplicity of row i, where I1, . . . , I τ are the drawn indices. A row appearing ni times contributes ni terms to (4), each with an independent fresh sample ˜b(k, 1)  
+
+> i
+
+, . . . , ˜b(k,n i) 
+
+> i
+
+. Writing ¯˜b(k) 
+
+> i
+
+= n−1
+
+> i
+
+Pni 
+
+> j=1
+
+˜b(k,j ) 
+
+> i
+
+= bi + ¯ ε(k) 
+
+> i
+
+, ¯ε(k) 
+
+> i
+
+= n−1
+
+> i
+
+Pni 
+
+> j=1
+
+ε(k,j )
+
+> i
+
+dk = 1
+
+τ
+
+> m
+
+X
+
+> i=1
+
+ni
+
+wi
+
+∥ai∥2
+
+  ⟨ai, x k⟩ − ¯˜b(k)
+
+> i
+
+ai = A⊤Gk
+
+ Axk − ¯˜b(k),
+
+Gk = 1
+
+τ NkWD −2, Nk = Diag( n1, . . . , n m).
+
+Taking the batch expectation uses only EB[ni] = τ p i, which follows by linearity from EB[1{Ij =
+
+i}] = pi, and gives EB[Gk] = P
+
+> i
+
+(piwi/∥ai∥2)eie⊤ 
+
+> i
+
+= PWD −2. The coupling then collapses 
+
+EB[Gk] to ( α/ ∥A∥2 
+
+> F
+
+)I. The averaged noise ¯ ε(k) 
+
+> i
+
+has variance σ2 
+
+> i
+
+/n i, and multiplying by ni in the update reproduces exactly the prefactor τ −1 Tr( PW 2ΣD −2) of Lemma 4.2; the analysis is thus robust to sampling with or without replacement, provided each query returns fresh noise. In the large-τ regime one may replace Gk by EB[Gk] = PWD −2 for the matrix part, 
+
+provided the noise is still injected through the realised batch so that the 1 /τ suppression is retained. 13 5 Numerical experiments 
+
+We present several experiments to demonstrate the effectiveness of algorithm 1 under various conditions. 
+
+5.1. Synthetic experiments. In this part, we present several experiments to illustrate the result of Theorem 2.1. For all experiments we consider f (x) = λ · ∥ x∥1 + 12 ∥x∥22, where λ is the sparsity parameter which gives us ∇f ∗(x) = Sλ(x). Note that f is 1-strongly convex but not smooth. Synthetic data for the experiments are generated as follows: all elements of the data matrix A ∈ Rm×n (m = 2000 , n = 100) are chosen independently and identically distributed from the standard normal distribution N (0 , 1). To construct the sparse solution ˆ x ∈ Rn, we generate a random vector with s (≥ 0) non-zero entries from the standard normal distribution and we set it as ˆ x and the corresponding right-hand side is b = Aˆx ∈ Rm.The benefit of the ABK method over the standard RK has already been shown in [27], so in this part the comparison will focus more on the methods using adaptive step-size. To measure the performance, we used the plot of the relative error ∥xk − ˆx∥2/∥ˆx∥2 and the av-erage relative residual error ∥Axk −b∥2/∥b∥2 in a semilog plot against the number of iterations. To unify the implementation and for fair-comparison, we implement all the methods below under the same algorithm. Concretely, at each iteration k we sample a batch of block indices 
+
+Bk ⊆ { 1, . . . , M } of size τ , i.i.d. from p (with replacement), with 1 ≤ M ≤ m being the number of blocks and form the weighted average of the individual Kaczmarz directions, 
+
+dk = 1
+
+τ
+
+X
+
+> i∈B k
+
+wi
+
+A⊤
+
+> (i)
+
+(A(i)xk − ˜b(i))
+
+∥A(i)∥22
+
+(15) In this way we keep Algorithm 1 as it is but replace the update of the direction vector dk with the one in Eq (15). We compare the following six methods: 1. ABK : The Adaptive Bregman-Kaczmarz method [27], which can be derived from Algo-rithm 1(eq (15)), with number of block M = 100 , adaptive stepsize ηk defined by (7), batch size τ = 1 , an exact value for β0 (using the knowledge of the ground truth solution). 2. AABK uni : The Adaptive Averaged Bregman–Kaczmarz method, i.e. Algorithm 1, row-wise and Uniform weights with M = m, W = αI, an adaptive stepsize ηk defined by (7), batch size τ = 20 , an exact value for β0 (using the knowledge of the ground truth solution). 3. AABK gen : The Adaptive Averaged Bregman–Kaczmarz method, i.e. Algorithm 1, row-wise and Optimal noise-aware weights with M = m, w i ∝ ∥ ai∥/σ i, pi ∝ σi∥ai∥, an adaptive stepsize ηk defined by (7), batch size τ = 20 , an exact value for β0 (using the knowledge of the ground truth solution). 4. RK : The Randomized Kaczmarz method, block-wise, i.e. Algorithm 1 with M = 100 ,
+
+batch size τ = 1 , constant step size ηk = 1 (hence, neither γ nor β0 is needed, especially no ground truth knowledge is needed). 5. RBKA uni : The Randomized Batch Kaczmarz method, row-wise with uniform weights, i.e. Algorithm 1 with M = 2000 , batch size τ = 20 , η k = 1 (hence, neither γ nor β0 is needed, especially no ground truth knowledge is needed). 14 6. RBKA gen : The Randomized Batch Kaczmarz method, row-wise with optimal noise-aware weights, i.e. Algorithm 1 with M = 2000 , w i ∝ ∥ ai∥/σ i, pi ∝ σi∥ai∥, batch size 
+
+τ = 20 , η k = 1 (hence, neither γ nor β0 is needed, especially no ground truth knowledge is needed). For fair comparison, the batch size τ for RBKA/AABK and the block-size (bs) for RK/ABK are set equal so that all algorithms use the same number of rows in each iteration. The right-hand side is corrupted non-uniformly: a randomly chosen subset of Nlarge = 100 equations (5%) is assigned a large noise level σi = scale · σ0 = 0 .5 (with scale = 10 and σ0 = 0 .05), while the remaining 1900 equations (95%) retain σi = σ0 = 0 .05, producing a sparse but strongly heterogeneous noise profile. To tune the hyperparameters, we first fixed λ = 0 .5for both ABK and AABK, we independently select the best γ for each method from the grid 
+
+{0.001 , 0.005 , 0.01 , 0.05 , 0.1, 1, 2}. As shown in Figure 2, RK and both RBKA variants stagnate at the noise floor: their constant step size ηk = 1 prevents the iterates from progressing beyond the level imposed by the measurement noise. ABK, equipped with an adaptive step size, converges below this floor. AABK with uniform weights further improves over ABK by leveraging the batch structure to reduce variance. AABK with general (noise-adaptive) weights achieves the lowest error in both the τ = 1 and τ = 20 settings, and the gap over all baselines widens significantly as the batch size increases. 
+
+5.1.1 Effect of the number of corrupted rows and the per-iteration row budget Setup: We consider two experiments that assess how ABK (uniform weights, τ = 1) and AABK gen (optimal noise-aware weights) respond to the noise structure, keeping the per-iteration row budget equal for both methods throughout. 1. In the first experiment (left), we fix the system matrix A and vary the number of cor-rupted rows Nlarge ∈ { 5, 50 , 200 , 500 , 1000 }, each receiving noise scaled by a factor of 10 (hollow markers) or 800 (filled markers), and record the final relative error after a fixed iteration count. 2. In the second experiment (right), we fix Nlarge = 100 corrupted rows and vary the per-iteration row budget k ∈ { 5, 50 , 100 , 500 , 1000 } under two noise scales, 10 (hollow markers) and 500 (filled markers). ABK uses block size = k, τ = 1; AABK-gen uses 
+
+τ = k, block size = 1, so both access exactly k rows per iteration. 
+
+Interpretation : Figure 3 reports both experiments: the left panel shows the final relative error as a function of the number of corrupted rows Nlarge with large noise, and the right panel as a function of the per-iteration row budget k. Both reveal the same structural limitation of uniform weights. In the left panel, ABK’s error grows almost linearly with Nlarge and deteriorates sharply at scale 800, since uniform weights cannot discount the heavily corrupted rows; AABK gen’s noise-adapted weights (high σi ⇒ small wi) keep the error an order of magnitude lower across all regimes. In the right panel, at moderate noise (scale = 10) both methods improve as k grows, but AABK gen gains considerably more. At high noise (scale = 500), ABK’s error is essentially flat: grouping more rows into a single block provides no benefit when all rows are weighted equally. AABK gen, by contrast, drops by nearly two orders of magnitude as k increases — a larger τ averages out more noise per step, directly 15 0 2500 5000 7500 10000 12500 15000 17500 20000                                            
+
+> Iterations
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> xk x / x
+> AABK_gen ( =1)
+> AABK_uni ( =1)
+> RBKA_gen ( =1)
+> RBKA_uni ( =1)
+> ABK (bs=1, =1)
+> RK (bs=1, =1) 02500 5000 7500 10000 12500 15000 17500 20000
+> Iterations
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> k
+> RK
+> ABK
+> AABK_gen
+> AABK_uni 02500 5000 7500 10000 12500 15000 17500 20000
+> Iterations
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> xk x / x
+> AABK_gen ( =20)
+> AABK_uni ( =20)
+> RBKA_gen ( =20)
+> RBKA_uni ( =20)
+> ABK (bs=20, =1)
+> RK (bs=20, =1) 02500 5000 7500 10000 12500 15000 17500 20000
+> Iterations
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> 14
+> 16
+> k
+> RK
+> ABK
+> AABK_gen
+> AABK_uni
+
+Figure 2: A comparison of the six methods as described in Section 5.1 for m = 2000, n = 100, sparsity s = 10, α = 1, γ = 0 .01, λ = 0 .5. Left column: relative error ∥xk − ˆx∥/∥ˆx∥. Right column: adaptive step size ηk. Within each subfigure, the top plots correspond to the row-wise setting ( τ = 1, bs = 1), while the bottom plots correspond to the batched setting ( τ = 20, bs = 20 for RK/ABK). reducing the bias term in the convergence bound. Together, the two plots show that the gain from a larger row budget is only realised when weights are adapted to the noise structure. 
+
+5.2. CT reconstruction under heterogeneous noise. Setup. As an example on comput-erized tomography (CT), we used the implementation of the Radon transform from the Python 
+
+library skimage and use it to build a system matrix for a parallel beam CT for a phantom of size N × N with N = 50 and with 60 equispaced angles. Hence, the system matrix A has size 3000 × 2500, i.e. m = 3000 and n = 2500. A random subset of 30 rows corresponding to 1% of the total numbers of rows m are corrupted by very high heterogeneous Gaussian noise of σi = 10 σbase ≈ 33 .779 (i.e., scale= 10), while the rest is only corrupted by a noise level of 1% i.e we choose σbase = 10 −2∥b∥2 ≈ 3.3779. Fresh noise ε(k)
+
+i ∼ N (0 , σ 2
+
+i ) is drawn for each iteration. For reproducibility we fixed the random seed 42 and a relaxation parameter α = 1, we used different methods for reconstruction, each run for 40 epochs, i.e. for 120000 itera-16 5             
+
+> 50
+> 200
+> 500
+> 1000
+> Nlarge (number of corrupted rows with high noise)
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> xK x / x ABK (scale=10)
+> AABK_gen (scale=10)
+> ABK (scale=800)
+> AABK_gen (scale=800) 5
+> 50
+> 100
+> 500
+> 1000
+> k= #rows per iteration
+> 10 4
+> 10 3
+> 10 2
+> xK x / x
+> ABK (scale=10)
+> AABK gen (scale=10)
+> ABK (scale=500)
+> AABK gen (scale=500)
+
+Figure 3: A comparison of the ABK and AABK methods as described in Section 5.1 for 
+
+m = 2000, n = 100, sparsity s = 10, α = 1, γ = 0 .01, λ = 0 .5. Left: Effect of the number of corrupted rows Nlarge . Right: Effect of the per-iteration row budget. tions and using the function f (x) = λ∥x∥1 + 12 ∥x∥22 with λ = 30 since the phantom is 63 .5% sparse. For the comparison over the reconstruction, we use the following metrics: relative error, residual errors, SSIM and PSNR . As in synthetic experiments, we set the batch size τ
+
+for RBKA/AABK and the block-size for RK/ABK vice versa equal (see Table 1) so that all algorithms use the same budget in each iteration. Table 1: Algorithms compared in the CT experiment. Method Sampling Batch size ( τ ) Block size γ β0 Step size ( ηk)RK uniform 1 50 / / ηk = 1 ABK uniform 1 50 10 −4 1.08 × 10 −4 ηk from (7) RBKA uni uniform 50 1 / / ηk = 1 RBKA gen noise-aware 50 1 / / ηk = 1 AABK uni uniform 50 1 10 −4 5.43 × 10 5 ηk from (7) AABK uni heur uniform 50 1 1.1 × 10 −5 7.70 × 10 7 ηk from (7) AABK gen noise-aware 50 1 10 −4 9.20 × 10 5 ηk from (7) AABK gen heur noise-aware 50 1 4.1 × 10 −5 1.80 × 10 10 ηk from (7) 
+
+Methods. We compare four schemes (Table 1): RK (uniform, fixed step), ABK (uniform, adaptive step), RBKA (uniform and noise-aware weights, fixed step) and AABK (uniform and noise-aware weights, adaptive step). The noise-aware methods use wi ∝ ∥ ai∥/σ i, pi ∝ σi∥ai∥.The heuristic hyperparameters ˜ γ and ˜β0 for adaptive step size methods are estimated following Section 2.6 with N0 = 10 000 and the N1 = 25 000 , for each methods (block-wise, row-wise with uniform and noise-aware weights), namely AABK uni heur and AABK gen heur. Methods (ABK, AABK uni, and AABK gen) use a guessed γ = 0 .0001 with exact value of β0, computed for each method, while the heuristic variants estimate both γ and β0 as in §2.6. 
+
+Results. Figure 4 illustrates how the phantom projection via the Radon transform over 60 angles, yields a clean sinogram b = Aˆx. One realisation of the noisy sinogram ˜b = b + ϵ is built with heteroscedastic noise described above. The naive pseudo-inverse A†˜b reconstruction illustrates that direct inversion is unstable under noise background and therefore motivates the regularised iterative methods compared thereafter. Figure 5 shows that AABK with optimal noise-aware weights converges fastest and at-17 Phantom x                   
+
+> 010 20 30 40 50
+> Angle index
+> 0
+> 10
+> 20
+> 30
+> 40
+> Detector row
+> Clean sinogram b=Ax
+> Noisy reconstruction Ab
+> 010 20 30 40 50
+> Angle index
+> 0
+> 10
+> 20
+> 30
+> 40
+> Detector row
+> Noisy sinogram b=b+
+
+Figure 4: Pseudo-inverse reconstruction from noisy sinogram. 0 20000 40000 60000 80000 100000 120000 
+
+Iterations        
+
+> 10 1
+> 10 0
+> xk x / x
+> RK
+> ABK
+> RBKA_gen
+> RBKA_uni
+> AABK_gen
+> AABK_uni
+> AABK_gen_heur
+> AABK_uni_heur 020000 40000 60000 80000 100000 120000
+
+Iterations    
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> Ax k b / b
+> RK
+> ABK
+> RBKA_gen
+> RBKA_uni
+> AABK_gen
+> AABK_uni
+> AABK_gen_heur
+> AABK_uni_heur
+
+Figure 5: Comparison of relative error (left) and residual error (right) for different methods in the CT experiment. tains the smallest error at every iteration. The non-adaptive methods exhibit a transient spike early on in both relative and residual errors, caused by sampling heavily corrupted rows while the residual is still large; the adaptive step in ABK and AABK suppresses this overshoot by automatically down-weighting large-noise updates. Among row-wise methods, optimal noise-aware weights consistently outperform their uniform counterparts (AABK gen vs. AABK uni and RBKA gen vs. RBKA uni), confirming the effectiveness of the noise-aware weighting scheme under the heteroscedastic noise profile of this CT setting. The residual curves mirror the relative-error trends. The heuristic AABK variants remain competitive with their exact-hyperparameter counterparts throughout the run, confirming that the estimators 18 of §2.6 recover usable values of γ and β0 without any knowledge of the ground-truth solution ˆx: the only quantities the user must supply are the sparsity parameter λ and the two window indices N0 and N1 delimiting the decay and plateau phases used to estimate γ and β0. We note that the very large heuristic β0 (Table 1) keeps the step in its aggressive constant-step phase for longer, which can even improve the final metrics; the differences between the exact and heuristic rows in Table 2 therefore reflect the choice of γ and β0, not the fidelity of the estimation alone. Moreover, the relative and residual error curves of the adaptive methods continue to de-crease through the final epoch and are expected to improve further with more iterations. This is notable given that AABK operates only on corrupted measurements each query returning a fresh, independent perturbation of the true right-hand side yet still drives the error toward the noise-free solution. True solution RK RBKA_gen RBKA_uni ABK       
+
+> Least-squares AbAABK_gen AABK_uni AABK_gen_heur AABK_uni_heur
+
+Figure 6: Ground truth solution and reconstruction by the different methods under heteroge-neous noise. Figure 6 shows the ground truth image alongside the least-squares solution A†˜b and the re-constructions produced by different methods. The least-squares solution is severely corrupted by noise and yields no recognizable anatomical structure. The RK reconstruction exhibits strong graininess and visible horizontal streak artifacts, with the internal structures barely discernible. ABK and the two RBKA variants (uniform and general) partially recover the overall shape but retain significant noise in both the background and the non-zero regions. The AABK methods, by contrast, produce markedly cleaner reconstructions: the background is substantially suppressed and the anatomical structures of the phantom are more faithfully recovered, owing to the combination of the sparsity-promoting regularizer f and the adaptive noise-weighted averaging. Both the uniform and general variants of AABK achieve compara-ble visual quality, as do their heuristic counterparts, confirming that the heuristic parameter selection does not degrade reconstruction performance. To quantitatively assess reconstruction quality we report SSIM and PSNR in Table 2, two standard image quality metrics that measure perceptual similarity and signal fidelity relative to the ground truth. 19 Table 2: SSIM and PSNR metrics of all methods compared in the CT experiment. Method RK ABK RBKA uni RBKA gen AABK uni AABK uni heur AABK gen AABK gen heur SSIM ( ↑) 0.8563 0.8612 0.8645 0.8856 0.8863 0.8612 0.9409 0.9975         
+
+> PSNR ( ↑)24 .4112 24 .7586 24 .8529 26 .1943 26 .3740 24 .5479 31 .6334 49 .5461
+
+Discussion. Two orthogonal gains combine in AABK. Noise-aware sampling assigns low probability to noisy rows, avoiding the transient spikes and reducing estimator variance (shared with RBKA). The adaptive step tunes ηk to the current energy βk, preventing overshoot when the residual is large and accelerating near the solution (shared with ABK). Only AABK com-bines both, explaining its superior convergence and reconstruction quality. 
+
+# 6 Conclusion 
+
+We introduced Adaptive Averaged Bregman–Kaczmarz (AABK), which combines the variance reduction of averaged Kaczmarz updates with the exact recovery of adaptive stepping under in-dependent noise, in a single method whose convergence is governed by one positive-semidefinite matrix. This reduction settles a question left open by the block ABK analysis: with an aver-aged rather than summed update, larger batches provably help, and the maximal gain is exactly the stable rank of the system matrix. On top of this, a noise-aware weighting minimises the noise constant among all admissible couplings and is strictly better than uniform weighting whenever the noise is not proportional to the row norms. Crucially, the noise-optimal weights automatically preserve the batch-size acceleration, so the two gains compose. Our step-size analysis further shows that AABK interpolates on its own between a fast initial phase and a vanishing tail that drives the error exactly to zero, with hyperparameters estimable from a single auxiliary run. The quality of these estimates still rests on two user-chosen indices, N0
+
+and N1, which delimit the phases used to estimate γ and β0 respectively; although they play a significant role, good values can be identified by inspecting the residual decay of a standard Bregman–Kaczmarz run—selecting the steady linear-decay regime for γ and the stagnation regime for β0. Experiments on CT reconstruction under sparse, heterogeneous noise corrob-orate every prediction. Several directions remain open. Our guarantees are in expectation; high-probability bounds via martingale concentration are a natural next step. The coupling between sampling and weights is imposed for tractability, and the fully optimal pair may lie outside it. 
+
+# References 
+
+[1] Zhong-Zhi Bai and Wen-Ting Wu. On greedy randomized Kaczmarz method for solving large sparse linear systems. SIAM Journal on Scientific Computing , 40(1):A592–A606, 2018. (Cited on page 3) 
+
+[2] Nestor Coria, Jamie Haddock, and Jaime Pacheco. On quantile randomized kaczmarz for linear systems with time-varying noise and corruption. arXiv preprint arXiv:2403.19874 ,2024. (Cited on page 3) 
+
+20 [3] Yonina C Eldar and Deanna Needell. Acceleration of randomized Kaczmarz method via the Johnson-Lindenstrauss lemma. Numerical Algorithms , 58:163–177, 2011. (Cited on page 3) 
+
+[4] Heinz Werner Engl, Martin Hanke, and Andreas Neubauer. Regularization of inverse problems , volume 375. Springer Science & Business Media, 1996. (Cited on page 1) 
+
+[5] Richard Gordon, Robert Bender, and Gabor T Herman. Algebraic reconstruction tech-niques (art) for three-dimensional electron microscopy and x-ray photography. Journal of theoretical Biology , 29(3):471–481, 1970. (Cited on page 2) 
+
+[6] Robert M. Gower, Denali Molitor, Jacob Moorman, and Deanna Needell. On adaptive sketch-and-project for solving linear systems. SIAM Journal on Matrix Analysis and Applications , 42(2):954–989, 2021. (Cited on page 3) 
+
+[7] Jamie Haddock and Anna Ma. Greed works: An improved analysis of sampling Kaczmarz-Motzkin. SIAM Journal on Mathematics of Data Science , 3(1):342–368, 2021. (Cited on page 3) 
+
+[8] Jamie Haddock, Deanna Needell, Elizaveta Rebrova, and William Swartworth. Quantile-based iterative methods for corrupted systems of linear equations. SIAM Journal on Matrix Analysis and Applications , 43(2):605–637, 2022. (Cited on page 3) 
+
+[9] S. Kaczmarz. Angen¨ aherte Aufl¨ osung von Systemen linearer Gleichungen. Bull. Internat. Acad. Polon. Sci. Lettres A , pages 355–357, 1937. (Cited on page 2) 
+
+[10] Ji Liu and Stephen Wright. An accelerated randomized Kaczmarz algorithm. Mathematics of Computation , 85(297):153–178, 2016. (Cited on page 3) 
+
+[11] Dirk A Lorenz, Frank Sch¨ opfer, and Stephan Wenger. The linearized Bregman method via split feasibility problems: analysis and generalizations. SIAM Journal on Imaging Sciences , 7(2):1237–1262, 2014. (Cited on pages 2, 3, and 10) 
+
+[12] Nicholas F Marshall and Oscar Mickelin. An optimal scheduled learning rate for a random-ized kaczmarz algorithm. SIAM Journal on Matrix Analysis and Applications , 44(1):312– 330, 2023. (Cited on pages 3, 8, 30, and 33) 
+
+[13] Jacob D Moorman, Thomas K Tu, Denali Molitor, and Deanna Needell. Randomized kaczmarz with averaging. BIT Numerical Mathematics , 61(1):337–359, 2021. (Cited on pages 3 and 4) 
+
+[14] Jennifer L. Mueller and Samuli Siltanen. Linear and nonlinear inverse problems with practical applications , volume 10 of Computational Science & Engineering . Society for Industrial and Applied Mathematics (SIAM), Philadelphia, PA, 2012. (Cited on page 1) 
+
+[15] Ion Necoara. Faster randomized block kaczmarz algorithms. SIAM Journal on Matrix Analysis and Applications , 40(4):1425–1452, 2019. (Cited on page 3) 
+
+[16] Deanna Needell. Randomized kaczmarz solver for noisy linear systems. BIT Numerical Mathematics , 50(2):395–403, 2010. (Cited on pages 2, 3, and 6) 
+
+21 [17] Deanna Needell and Joel A Tropp. Paved with good intentions: analysis of a randomized block Kaczmarz method. Linear Algebra and its Applications , 441:199–221, 2014. (Cited on page 3) 
+
+[18] R. Tyrrell Rockafellar. Convex analysis , volume No. 28 of Princeton Mathematical Series .Princeton University Press, Princeton, NJ, 1970. (Cited on page 9) 
+
+[19] Frank Sch¨ opfer and Dirk A Lorenz. Linear convergence of the randomized sparse kaczmarz method. Mathematical Programming , 173(1):509–536, 2019. (Cited on pages 2, 3, and 10) 
+
+[20] Frank Sch¨ opfer, Dirk A Lorenz, Lionel Tondji, and Maximilian Winkler. Extended ran-domized kaczmarz method for sparse least squares and impulsive noise problems. Linear Algebra and its Applications , 652:132–154, 2022. (Cited on pages 2 and 10) 
+
+[21] Stefan Steinerberger. A weighted randomized Kaczmarz method for solving linear systems. 
+
+Mathematics of Computation , 90(332):2815–2826, 2021. (Cited on page 3) 
+
+[22] Stefan Steinerberger. Quantile-based random Kaczmarz for corrupted linear systems of equations. Information and Inference: A Journal of the IMA , 12(1):448–465, 2023. (Cited on page 3) 
+
+[23] Thomas Strohmer and Roman Vershynin. A randomized kaczmarz algorithm with expo-nential convergence. Journal of Fourier Analysis and Applications , 15(2):262–278, 2009. 
+
+> (Cited on pages 2, 3, and 4)
+
+[24] Lionel Tondji and Dirk A Lorenz. Faster randomized block sparse kaczmarz by averaging. 
+
+Numerical Algorithms , 93(4):1417–1451, 2023. (Cited on pages 3, 4, 5, 6, and 12) 
+
+[25] Lionel Tondji, Dirk A Lorenz, and Ion Necoara. An accelerated randomized bregman-kaczmarz method for strongly convex linearly constraint optimization. In 2023 European Control Conference (ECC) , pages 1–6. IEEE, 2023. (Cited on page 3) 
+
+[26] Lionel Tondji, Ion Necoara, and Dirk A Lorenz. Acceleration and restart for the random-ized bregman-kaczmarz method. Linear Algebra and its Applications , 699:508–538, 2024. 
+
+> (Cited on page 3)
+
+[27] Lionel Tondji, Idriss Tondji, and Dirk Lorenz. Adaptive bregman–kaczmarz: an ap-proach to solve linear inverse problems with independent noise exactly. Inverse Problems ,40(9):095006, 2024. (Cited on pages 2, 3, 5, 7, 8, 9, 14, 30, and 33) 
+
+[28] Lionel N Tondji, Maximilian Winkler, and Dirk A Lorenz. Linear convergence of a weighted randomized sparse kaczmarz method. In Conference: International Conference on Computational Harmonic Analysis , 2021. (Cited on page 3) 
+
+[29] Lionel Ngoupeyou Tondji. Advances in Bregman-Kaczmarz Methods: Accelerations and Inconsistency . PhD thesis, Technische Universit¨ at Braunschweig, 2024. (Cited on pages 3 and 5) 
+
+[30] Lu Zhang, Hongxia Wang, and Hui Zhang. Quantile-based random sparse Kaczmarz for corrupted, noisy linear inverse systems. arXiv preprint arXiv:2206.07356 , 2022. (Cited on page 3) 
+
+22 [31] Lu Zhang, Ziyang Yuan, Hongxia Wang, and Hui Zhang. A weighted randomized sparse kaczmarz method for solving linear systems. arXiv preprint arXiv:2306.06813 , 2023. (Cited on page 3) 
+
+[32] Anastasios Zouzias and Nikolaos M Freris. Randomized extended kaczmarz for solving least squares. SIAM Journal on Matrix Analysis and Applications , 34(2):773–793, 2013. 
+
+> (Cited on page 2)
+
+23 Appendix A Monotone acceleration for the optimal weights: proof of Proposition 2.2(iii) 
+
+We show that the optimal noise-aware weights of Corollary 2.3 satisfy the general-weight condition of Proposition 2.2(ii) automatically, with strict slack. 
+
+The optimal weights. Under the coupling (3), wi = α∥ai∥2/(pi∥A∥2 
+
+> F
+
+). Substituting the optimal sampling distribution popt  
+
+> i
+
+= σi∥ai∥/S with S := Pmj=1 σj ∥aj ∥ gives 
+
+wi = α∥ai∥2
+
+∥A∥2
+
+> F
+
+· Sσi∥ai∥ = α S 
+
+∥A∥2
+
+> F
+
+· ∥ai∥
+
+σi
+
+,
+
+so wi ∝ ∥ ai∥/σ i. As W = Diag( w1, . . . , w m) is diagonal with nonnegative entries, 
+
+σmax (W) = max  
+
+> 1≤i≤m
+
+wi = α S 
+
+∥A∥2
+
+> F
+
+max 
+
+> 1≤i≤m
+
+∥ai∥
+
+σi
+
+.
+
+A lower bound on σmax (W). Let r ∈ arg max i∥ai∥/σ i, so that ∥ar∥/σ r ≥ ∥ aj ∥/σ j for every 
+
+j. Then 
+
+S · ∥ar∥
+
+σr
+
+=
+
+ mX
+
+> j=1
+
+σj ∥aj ∥
+
+ ∥ar∥
+
+σr
+
+=
+
+> m
+
+X
+
+> j=1
+
+σj ∥aj ∥ · ∥ar∥
+
+σr
+
+≥
+
+> m
+
+X
+
+> j=1
+
+σj ∥aj ∥ · ∥aj ∥
+
+σj
+
+=
+
+> m
+
+X
+
+> j=1
+
+∥aj ∥2 = ∥A∥2 
+
+> F
+
+,
+
+where the inequality replaces ∥ar∥/σ r by the no-larger ∥aj ∥/σ j in each term. Therefore 
+
+σmax (W) = α S 
+
+∥A∥2
+
+> F
+
+· ∥ar∥
+
+σr
+
+≥ α
+
+∥A∥2
+
+> F
+
+· ∥ A∥2 
+
+> F
+
+= α. 
+
+Conclusion. The top eigenvalue of AA ⊤ never exceeds its trace, σ2max (A) ≤ Tr( AA ⊤) = 
+
+∥A∥2 
+
+> F
+
+, so α ≥ α σ 2max (A)/∥A∥2 
+
+> F
+
+. Combining, 
+
+σmax (W) ≥ α ≥ α σ 2max (A)
+
+∥A∥2
+
+> F
+
+,
+
+which is exactly the condition of Proposition 2.2(ii). The condition therefore holds for every A
+
+and every noise profile, and the slack between the two sides is at least the factor ∥A∥2 
+
+> F
+
+/σ 2max (A), the stable rank of A. □
+
+# B Detailed computation for Lemma 4.2 
+
+This appendix gives, in full, the two expectations appearing in the proof of Lemma 4.2: the inner-product term E[⟨dk, ˆx − xk⟩ | xk] and the squared-norm term E[∥dk∥2 | xk]. Throughout, the conditional expectation E[ · | xk] is taken over both the batch Bk (sampled i.i.d. from p)and the fresh noise; we drop the conditioning from the notation. We write rk = Axk − b for the residual, so that ( rk)i = ⟨ai, x k⟩ − bi, and recall from (2) that ˜bi = bi + εi with Eε[εi] = 0, 
+
+Eε[ε2 
+
+> i
+
+] = σ2 
+
+> i
+
+, the εi independent across i and of the index draw. 24 B.1 Preliminaries: two expectation identities under i.i.d. sampling . Let g : {1, . . . , m } → 
+
+Rn be any fixed (deterministic given xk) vector-valued function of the row index, and let 
+
+I1, . . . , I τ be the i.i.d. indices of the batch, each with P[Ij = i] = pi. We record two elementary facts used repeatedly below. 
+
+(a) Mean of a single draw. For one index I ∼ p,
+
+EB [g(I)] = 
+
+> m
+
+X
+
+> i=1
+
+pi g(i). (16) 
+
+(b) Mean of an average of τ i.i.d. draws. Put S = 1
+
+> τ
+
+Pτj=1 g(Ij ), where I1, . . . , I τ iid 
+
+∼ p. By linearity, since each Ij has the same marginal law p,
+
+EB[S] = 1
+
+τ
+
+> τ
+
+X
+
+> j=1
+
+EB[g(Ij )] = EB[g(I1)] = 
+
+> m
+
+X
+
+> i=1
+
+pi g(i). (17) 
+
+(c) Second moment of an average of τ i.i.d. draws. Put S = 1
+
+> τ
+
+Pτj=1 g(Ij ). Expanding the squared norm and separating diagonal from off-diagonal index pairs, 
+
+EB[∥S∥2] = 1
+
+τ 2 EB
+
+hD τX
+
+> j=1
+
+g(Ij ),
+
+> τ
+
+X
+
+> l=1
+
+g(Il)
+
+Ei 
+
+= 1
+
+τ 2 EB
+
+h τX
+
+> j=1
+
+∥g(Ij )∥2 +
+
+> τ
+
+X 
+
+> j,l =1
+> j̸=l
+
+⟨g(Ij ), g (Il)⟩
+
+i
+
+= 1
+
+τ 2
+
+h
+
+τ EB∥g(I)∥2 + τ (τ − 1) EB[g(I)] , EB[g(I)] 
+
+i
+
+= 1
+
+τ EB∥g(I)∥2 + τ − 1
+
+τ ∥EB[g(I)] ∥2, (18) where the third line uses that there are τ diagonal terms (each with the same distribution as a single draw) and τ (τ −1) off-diagonal pairs, and that for j̸ = l the indices Ij , I l are independent, so EB[⟨g(Ij ), g (Il)⟩] = ⟨EB[g(Ij )] , EB[g(Il)] ⟩ = ∥EB[g(I)] ∥2.
+
+B.2 The inner-product term. By the definition (4) of dk and using ˜bi = bi + εi together with ⟨ai, ˆx⟩ = bi, we first expand the inner product for a fixed batch. For a single sampled index i,
+
+D
+
+wi
+
+⟨ai, x k⟩ − ˜bi
+
+∥ai∥2 ai, ˆx − xk
+
+E
+
+= wi
+
+(rk)i − εi
+
+∥ai∥2 ⟨ai, ˆx − xk⟩ = −wi
+
+(rk)i − εi
+
+∥ai∥2 (rk)i,
+
+since ⟨ai, ˆx − xk⟩ = ⟨ai, ˆx⟩ − ⟨ ai, x k⟩ = bi − ⟨ ai, x k⟩ = −(rk)i. Averaging over the batch, 
+
+⟨dk, ˆx − xk⟩ = − 1
+
+τ
+
+X
+
+> i∈B k
+
+wi
+
+(rk)2
+
+> i
+
+∥ai∥2 + 1
+
+τ
+
+X
+
+> i∈B k
+
+wi
+
+εi (rk)i
+
+∥ai∥2 .
+
+Taking the conditional expectation E[ · | xk] = EBEε, the second sum vanishes because Eε[εi] = 0 and εi is independent of the index draw and of xk. For the first sum, applying (16) with 
+
+g(i) = wi(rk)2 
+
+> i
+
+/∥ai∥2 (a scalar here) and that the τ draws are identically distributed, 
+
+E[⟨dk, ˆx − xk⟩ | xk] = −EB
+
+h
+
+wi
+
+(rk)2
+
+> i
+
+∥ai∥2
+
+i
+
+= −
+
+> m
+
+X
+
+> i=1
+
+pi
+
+wi
+
+∥ai∥2 (rk)2 
+
+> i
+
+.
+
+25 Writing this as a quadratic form, with ei the canonical basis vectors and ( rk)i = e⊤ 
+
+> i
+
+rk,
+
+E[⟨dk, ˆx − xk⟩ | xk] = − r⊤
+
+> k
+
+ mX
+
+> i=1
+
+piwi
+
+∥ai∥2 eie⊤
+
+> i
+
+
+
+rk = − r⊤ 
+
+> k
+
+PWD −2 rk,
+
+where we used P 
+
+> ipiwi
+> ∥ai∥2
+
+eie⊤ 
+
+> i
+
+= PWD −2. Finally, the coupling (3), PWD −2 = ( α/ ∥A∥2 
+
+> F
+
+)I,gives 
+
+E[⟨dk, ˆx − xk⟩ | xk] = − α
+
+∥A∥2
+
+> F
+
+r⊤ 
+
+> k
+
+rk = − α
+
+∥A∥2
+
+> F
+
+∥Axk − b∥22. (19) 
+
+B.3 The squared-norm term: splitting off the noise. Decompose dk = dnf  
+
+> k
+
+− dn 
+
+> k
+
+into a noiseless part and a noise part, 
+
+dnf  
+
+> k
+
+= 1
+
+τ
+
+X
+
+> i∈B k
+
+vi, vi := wi
+
+(rk)i
+
+∥ai∥2 ai, dn 
+
+> k
+
+= 1
+
+τ
+
+X
+
+> i∈B k
+
+wi
+
+εi
+
+∥ai∥2 ai,
+
+obtained by substituting ˜bi = bi + εi into (4) and using ⟨ai, x k⟩ − bi = ( rk)i. Expanding the squared norm, 
+
+E[∥dk∥2 | xk] = EBEε[∥dnf  
+
+> k
+
+∥2] − 2 EBEε
+
+D
+
+dnf  
+
+> k
+
+, d n
+
+> k
+
+E
+
++ EBEε[∥dn
+
+> k
+
+∥2].
+
+The cross-term vanishes: with the batch fixed, the only randomness in dn 
+
+> k
+
+is the noise, which is zero-mean, so the noise expectation alone gives 
+
+Eε[
+
+D
+
+dnf  
+
+> k
+
+, d n
+
+> k
+
+E
+
+] = 1
+
+τ 2
+
+X
+
+> i,l ∈B k
+
+wiwl(rk)i
+
+∥ai∥2∥al∥2 Eε[εl] ⟨ai, a l⟩ = 0 .
+
+Since dnf  
+
+> k
+
+does not depend on the noise, EBEε[∥dnf  
+
+> k
+
+∥2] = EB[∥dnf  
+
+> k
+
+∥2], and we treat the two surviving parts separately. 
+
+B.4 The noiseless part. Apply (18) with g(i) = vi = wi(rk)iai/∥ai∥2:
+
+EB[∥dnf  
+
+> k
+
+∥2] = 1
+
+τ EB[∥vi∥2] + τ − 1
+
+τ ∥EB[vi]∥2. (20) We compute each moment as a quadratic form in rk.
+
+First moment (diagonal term). Since ∥ai∥2 = a⊤ 
+
+> i
+
+ai,
+
+∥vi∥2 = w2
+
+> i
+
+(rk)2
+
+> i
+
+∥ai∥4 ∥ai∥2 = w2
+
+> i
+
+(rk)2
+
+> i
+
+∥ai∥2 ,
+
+so by (16), 
+
+EB[∥vi∥2] = 
+
+> m
+
+X
+
+> i=1
+
+pi
+
+w2
+
+> i
+
+∥ai∥2 (rk)2 
+
+> i
+
+= r⊤
+
+> k
+
+ mX
+
+> i=1
+
+piw2
+
+> i
+
+∥ai∥2 eie⊤
+
+> i
+
+
+
+rk = rk, PW 2D−2rk ,
+
+where P 
+
+> ipiw2
+> i
+> ∥ai∥2
+
+eie⊤ 
+
+> i
+
+= PW 2D−2.
+
+Second moment (off-diagonal term). Using ( rk)i = e⊤ 
+
+> i
+
+rk = e⊤ 
+
+> i
+
+(Axk − b) and ai = A⊤ei,
+
+EB[vi] = 
+
+> m
+
+X
+
+> i=1
+
+pi wi
+
+(rk)i
+
+∥ai∥2 ai =
+
+> m
+
+X
+
+> i=1
+
+piwi
+
+∥ai∥2 A⊤ei (e⊤ 
+
+> i
+
+rk) = A⊤ mX
+
+> i=1
+
+piwi
+
+∥ai∥2 eie⊤
+
+> i
+
+
+
+rk = A⊤PWD −2rk.
+
+26 Therefore 
+
+∥EB[vi]∥2 =  A⊤PWD −2rk
+
+⊤ A⊤PWD −2rk
+
+ = r⊤ 
+
+> k
+
+PWD −2 AA ⊤ PWD −2 rk
+
+= rk, PWD −2AA ⊤PWD −2rk ,
+
+using ( PWD −2)⊤ = PWD −2 (diagonal matrices are symmetric). 
+
+Assembling the bracket. Substituting both moments into (20), 
+
+EB[∥dnf  
+
+> k
+
+∥2] = 
+
+D
+
+rk,
+
+ 1 
+
+> τ
+
+PW 2D−2 + τ −1 
+
+> τ
+
+PWD −2AA ⊤PWD −2| {z } 
+
+> =: Q
+
+rk
+
+E
+
+. (21) We now simplify Q using the coupling (3). In the second summand, replace one factor PWD −2
+
+by ( α/ ∥A∥2 
+
+> F
+
+)I and leave the other, and in the first summand write PW 2D−2 = W · PWD −2
+
+and replace PWD −2 likewise: 
+
+PW 2D−2 = W PWD −2 = α
+
+∥A∥2
+
+> F
+
+W,
+
+PWD −2AA ⊤PWD −2 = α
+
+∥A∥2
+
+> F
+
+PWD −2AA ⊤ = α2
+
+∥A∥4
+
+> F
+
+AA ⊤.
+
+Hence 
+
+Q = 1
+
+τ · α
+
+∥A∥2
+
+> F
+
+W + τ − 1
+
+τ · α2
+
+∥A∥4
+
+> F
+
+AA ⊤ = α
+
+∥A∥2
+
+> F
+
+ 1
+
+τ W + α
+
+∥A∥2
+
+> F
+
+τ − 1
+
+τ AA ⊤
+
+= 2α
+
+∥A∥2
+
+> F
+
+T,
+
+where the last equality is the definition (6) of T = 12τ W + α
+
+> 2∥A∥2
+> F
+
+(1 − 1 
+
+> τ
+
+)AA ⊤ (factor 12 pulled out). Substituting into (21) and bounding the Rayleigh quotient by the largest eigenvalue, 
+
+EB[∥dnf  
+
+> k
+
+∥2] = 2α
+
+∥A∥2
+
+> F
+
+⟨rk, Trk⟩ ≤ 2α
+
+∥A∥2
+
+> F
+
+σmax (T) ∥rk∥22, (22) where σmax (T) = ∥T∥2 since T is symmetric positive semidefinite (it is a nonnegative combi-nation of the positive semidefinite matrices W and AA ⊤). 
+
+B.5 The noise part. Write dn 
+
+> k
+
+= 1
+
+> τ
+
+P 
+
+> i∈B k
+
+ui with ui := wiεiai/∥ai∥2. We compute the conditional second moment EBEε[∥dn
+
+> k
+
+∥2], taking the noise expectation Eε first (with the batch fixed) and the batch expectation EB second. Expanding the squared norm and separating the diagonal from the off-diagonal index pairs, 
+
+EBEε[∥dn
+
+> k
+
+∥2] = 1
+
+τ 2 EB Eε
+
+h τX
+
+> j=1
+
+∥uIj ∥2 +
+
+> τ
+
+X 
+
+> j,l =1
+> j̸=l
+
+uIj , u Il
+
+i
+
+.
+
+For an off-diagonal pair j̸ = l, the indices Ij , I l are distinct draws so the noises εIj , ε Il are independent and zero-mean; the noise expectation alone already annihilates the term, 
+
+Eε[ uIj , u Il ] = wIj wIl Eε[εIj ] Eε[εIl ]
+
+∥aIj ∥2∥aIl ∥2 aIj , a Il = 0 ,
+
+27 since Eε[εIj ] = Eε[εIl ] = 0. Only the τ diagonal terms survive. For each, Eε[∥uIj ∥2] = 
+
+w2 
+
+> Ij
+
+Eε[ε2 
+
+> Ij
+
+] ∥aIj ∥2/∥aIj ∥4 = w2 
+
+> Ij
+
+σ2 
+
+> Ij
+
+/∥aIj ∥2, using Eε[ε2 
+
+> Ij
+
+] = σ2 
+
+> Ij
+
+. Hence 
+
+EBEε[∥dn
+
+> k
+
+∥2] = 1
+
+τ 2 · τ EB
+
+h w2 
+
+> I
+
+σ2
+
+> I
+
+∥aI ∥2
+
+i
+
+= 1
+
+τ EB
+
+h w2 
+
+> I
+
+σ2
+
+> I
+
+∥aI ∥2
+
+i
+
+.
+
+Applying the batch-mean identity (16), 
+
+EBEε[∥dn
+
+> k
+
+∥2] = 1
+
+τ
+
+> m
+
+X
+
+> i=1
+
+piw2 
+
+> i
+
+σ2
+
+> i
+
+∥ai∥2 = 1
+
+τ Tr  PW 2ΣD −2, (23) where the last equality recognises P 
+
+> i
+
+piw2 
+
+> i
+
+σ2 
+
+> i
+
+/∥ai∥2 as the trace of the diagonal matrix 
+
+PW 2ΣD −2 = Diag  piw2 
+
+> i
+
+σ2 
+
+> i
+
+/∥ai∥2.
+
+B.6 Assembling the one-step bound. Insert the inner-product identity (19) and the two squared-norm results (22)–(23) into the deterministic descent inequality of Lemma 4.1, 
+
+Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx) ≤ Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) + ηk ⟨dk, ˆx − xk⟩ + η2 
+
+> k
+> 2
+
+∥dk∥2, and take the conditional expectation 
+
+E[ · | xk] = EBEε (under which Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) and ∥Axk − b∥22 are constant): 
+
+EDx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx) | xk
+
+ ≤ Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) − ηk
+
+α
+
+∥A∥2
+
+> F
+
+∥Axk − b∥22
+
++ η2
+
+> k
+
+2
+
+ 2α
+
+∥A∥2
+
+> F
+
+σmax (T)∥Axk − b∥22 + 1
+
+τ Tr( PW 2ΣD −2)
+
+
+
+= Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) − αη k
+
+∥A∥2
+
+> F
+
+ 1 − ηkσmax (T)∥Axk − b∥22 + η2
+
+> k
+
+2τ Tr( PW 2ΣD −2),
+
+where we used EBEε[⟨dk, ˆx − xk⟩] from (19), EB[∥dnf  
+
+> k
+
+∥2] from (22), and EBEε[∥dn
+
+> k
+
+∥2] from (23). Now apply the error bound (Assumption 3.2), ∥Axk − b∥22 ≥ θ(ˆ x) Dx∗ 
+
+> k
+> f
+
+(xk, ˆx), with γ =
+
+θ(ˆ x)/∥A∥2 
+
+> F
+
+. The coefficient αη k
+
+> ∥A∥2
+> F
+
+(1 − ηkσmax (T)) is nonnegative for the admissible step 
+
+ηk ≤ 1/σ max (T), so multiplying the residual lower bound through preserves the inequality and gives the conditional bound 
+
+EDx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx) | xk
+
+ ≤  1 − γαη k(1 − ηkσmax (T))  Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) + η2
+
+> k
+
+2τ Tr( PW 2ΣD −2).
+
+Finally, taking the total expectation E of both sides and using the tower rule E[ · ] = EE[ · | xk]
+
+together with the linearity of E yields 
+
+E [Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx)] ≤  1 − γαη k(1 − ηkσmax (T))  E [Dx∗ 
+
+> k
+> f
+
+(xk, ˆx)] + η2
+
+> k
+
+2τ Tr( PW 2ΣD −2),
+
+which is exactly the statement of Lemma 4.2. □
+
+# C Spectral bounds: proof of Lemma 4.3 
+
+For the upper bound, the spectral-norm triangle inequality applied to the two summands of 
+
+T = 12τ W + α
+
+> 2∥A∥2
+> F
+
+(1 − 1 
+
+> τ
+
+)AA ⊤ gives 
+
+σmax (T) ≤ 12τ σmax (W) + α
+
+2∥A∥2
+
+> F
+
+
+
+1 − 1
+
+τ
+
+
+
+σ2max (A),
+
+28 since σmax (AA ⊤) = σ2max (A). For W = αI the two summands are simultaneously diagonalised by the eigenbasis of AA ⊤: writing AA ⊤ = P 
+
+> ℓ
+
+σ2 
+
+> ℓ
+
+uℓu⊤ 
+
+> ℓ
+
+,
+
+T = X
+
+> ℓ
+
+ α
+
+2τ + α
+
+2∥A∥2
+
+> F
+
+
+
+1 − 1
+
+τ
+
+
+
+σ2
+
+> ℓ
+
+
+
+uℓu⊤ 
+
+> ℓ
+
+,
+
+so the eigenvalues of T are increasing affine functions of σ2 
+
+> ℓ
+
+and the largest is attained at 
+
+σ2 
+
+> ℓ
+
+= σ2max (A), giving the stated identity σmax (T) = α
+
+> 2τ
+
+ 1 + ( τ − 1) σ2max (A)/∥A∥2
+
+> F
+
+. The monotonicity in τ and the limit then follow as in the proof of Proposition 2.2 in §4.3. □
+
+# D Full proof of Theorem 2.1 
+
+We give the complete argument abbreviated in §4.4, following the structure of the one-step bound (Lemma 4.2). To obtain a rate q ∈ (0 , 1) we need 1 − ηkσmax (T) > 0, that is ηk <
+
+1/σ max (T). From Lemma 4.2, it holds: 
+
+E [Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx)] ≤  1 − αγη k(1 − ηkσmax (T))  E [Dx∗ 
+
+> k
+> f
+
+(xk, ˆx)] + η2
+
+> k
+
+2τ Tr( PW 2ΣD −2). (24) 
+
+Step 1: unrolling the recurrence. Let η = ( η0, η 1, . . . ) collect the step sizes, and abbrevi-ate ρj := 1 − αγη j (1 − ηj σmax (T )). Iterating (24) from 0 to k and using that E [Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx)] = 
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx) is constant, we obtain 
+
+E [Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx)] ≤
+
+> k
+
+Y
+
+> j=0
+
+ρj E [Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx)] + Tr( PW 2ΣD −2)
+
+τ
+
+> k
+
+X
+
+> j=0
+
+η2
+
+> j
+
+2
+
+> k
+
+Y
+
+> i=j+1
+
+ρi, (25) with the convention that the empty product Qki=k+1 ρi = 1. Dividing through by 1 
+
+> τ
+
+Tr( PW 2ΣD −2)gives the closed form of the error sequence, 
+
+Dk(η) = 
+
+> k
+
+Y
+
+> j=0
+
+ρj
+
+τ D x∗ 
+
+> 0
+> f
+
+(x0, ˆx)Tr( PW 2ΣD −2) +
+
+> k
+
+X
+
+> j=0
+
+η2
+
+> j
+
+2
+
+> k
+
+Y
+
+> i=j+1
+
+ρi, (26) so that (24) reads 
+
+E [Dx∗ 
+
+> k+1
+> f
+
+(xk+1 , ˆx)] ≤ Dk(η) · 1
+
+τ Tr( PW 2ΣD −2), (27) which is (25) restated. From eq (27), It holds that Dk(η) satisfies the recurrence 
+
+Dk(η) =  1 − αγη k(1 − ηkσmax (T)) Dk−1(η) + η2
+
+> k
+
+2 . (28) 
+
+Step 2: the optimal step size. Using the empty-product convention, Dk(η) obeys the recurrence (28). Differentiating with respect to the single free variable ηk,
+
+∂D k(η)
+
+∂η k
+
+=   − αγ + 2 αγη kσmax (T)Dk−1(η) + ηk = 0 ,
+
+29 which gives the optimal adaptive step size 
+
+ηk = αγD k−1(η)1 + 2 αγσ max (T )Dk−1(η) . (29) Since ∂2Dk(η)/∂η 2 
+
+> k
+
+= 2 αγσ max (T)Dk−1(η) + 1 > 0, the value (29) minimises Dk(η). As 
+
+Dk−1(η) is unavailable in closed form, we estimate it, following [12, 27], by the deterministic sequence βk := Dk−1(η) with β0 = τ D x∗ 
+
+> 0
+> f
+
+(x0, ˆx)/ Tr( PW 2ΣD −2), giving 
+
+ηk = αγβ k
+
+1 + 2 αγσ max (T)βk
+
+. (30) 
+
+Step 3: admissibility. The requirement ηk < 1/σ max (T) holds automatically: 
+
+αγβ k
+
+1 + 2 αγσ max (T)βk
+
+< 1
+
+σmax (T) ⇐⇒ αγσ max (T)βk < 1+2 αγσ max (T)βk ⇐⇒ 0 < 1+ αγσ max (T)βk,
+
+which is always true since α, γ, σ max (T), β k ≥ 0. 
+
+Step 4: telescoping the auxiliary sequence. Substituting (30) into (28) and using the identity ηk
+
+ 1 + 2 αγσ max (T)βk
+
+ = αγβ k,
+
+βk+1 =  1 − αγη k(1 − ηkσmax (T)) βk + η2
+
+> k
+
+2= βk − αγβ kηk + η2
+
+> k
+
+2
+
+ 1 + 2 αγσ max (T)βk
+
+
+
+= βk − αγβ kηk + η2
+
+> k
+
+2 · αγβ k
+
+ηk
+
+= βk − αγβ kηk + αγβ kηk
+
+2 = βk
+
+
+
+1 − αγη k
+
+2
+
+
+
+.
+
+Thus βk is deterministic and strictly decreasing and since ηk > 0 for all k, it converges to zero. 
+
+Step 5: conclusion. Combining (27) with the identification βk = Dk−1(η) and the 1-strong-convexity inequality ∥xk − ˆx∥22 ≤ 2 Dx∗ 
+
+> k
+> f
+
+(xk, ˆx) yields 
+
+E [∥xk − ˆx∥22] ≤ 2 E [Dx∗ 
+
+> k
+> f
+
+(xk, ˆx)] ≤ 2 Tr( PW 2ΣD −2)
+
+τ βk,
+
+which is (8). □
+
+# E Proof of Corollary 2.4 
+
+The recursion 7 within the expression of ηk can be written as 
+
+γβ k+1 − γβ k
+
+γ = βk+1 − βk = − αγβ k
+
+2 ηk = − 12(αγβ k)2
+
+1 + 2 αγσ max (T)βk
+
+.
+
+30 Setting uk := γβ k, we obtain that 
+
+uk+1 − uk
+
+γ = − α2
+
+2
+
+u2
+
+> k
+
+1 + 2 ασ max (T)uk
+
+= − α
+
+4σmax (T)
+
+u2
+
+> k
+
+uk + 12ασ max (T)
+
+.
+
+This new recursion is a forward-Euler approximation to the ordinary differential equation ˙u = − α
+
+4σmax (T)
+
+u2
+
+u + 12ασ max (T)
+
+.
+
+It is straightforward to verify that the solution of this differential equation is 
+
+u(t) = 12ασ max (T)W0
+
+
+
+c0 exp 
+
+ αt 
+
+4σmax (T)
+
+ with c0 = 12ασ max (T)u0
+
+exp 
+
+ 12ασ max (T)u0
+
+
+
+the initial condition and W0 is the Lambert-W0 function, that is, the inverse of the function 
+
+x 7 → xe x. In addition, u is a convex function, because if we set c1 = α/ (4 σmax (T)) and c2 =1/ (2 ασ max (T)), it is easy to see that ¨ u(t) = c21u3(u + 2 c2)/(u + c2)3 ≥ 0 when u0 := u(0) ⩾ 0. We deduce that the error decreases rapidly at first and then slows down as it approaches the asymptote. Since the forward Euler method is a lower bound for convex functions, this means that 
+
+βk ≤ 12αγσ max (T)W0
+
+
+
+c0 exp 
+
+ αk 
+
+4σmax (T)
+
+ with c0 = 12αγσ max (T )β0
+
+exp 
+
+ 12αγσ max (T)β0
+
+
+
+.
+
+Now, let denote by h(k) = ατ · Tr( WΣ ) · βk so that by (8), E [∥xk − ˆx∥22] ≤ 2h(k)/∥A∥2 
+
+> F
+
+.Define ¯ σ = Pmi=1 σi∥ai∥; then we have 
+
+σ → 0 ⇔ σi → 0 ∀ i ⇔ ¯σ → 0.
+
+Uniform weights: We have the following Tr( WΣ ) = ασ 2, β 0 = τ ∥A∥2 
+
+> F
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx)/(α2σ2) and h(k) = ασ 2
+
+2τ γσ max (T)W0
+
+
+
+c0 exp 
+
+ αγk 
+
+4σmax (T)
+
+ 
+
+where          
+
+> c0=ασ 2
+> 2γτ σ max (T)∥A∥2
+> FDx∗
+> 0
+> f(x0,ˆx) exp ασ 2
+> 2γτ σ max (T)∥A∥2
+> FDx∗
+> 0
+> f(x0,ˆx)
+> !
+> .
+
+Define 
+
+c = 2 γτ σ max (T)∥A∥2 
+
+> F
+
+, a = 2 τ γσ max (T), and v = αγ 
+
+4σmax (T)31 In the regime σ → 0 the constant c0 → 0, so the argument c0evk → 0 at any fixed k; the principal branch then admits the small-argument expansion W0(x) = x + O(x2) as x → 0. Thus, 
+
+h(k) = ασ 2
+
+aW 0(c0evk ) = ασ 2
+
+aασ 2
+
+cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx) evk eασ 2
+
+cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx) + O (σ4)= cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx)
+
+a e−vk + O  σ2
+
+= ∥A∥2 
+
+> F
+
+exp 
+
+
+
+− αγk 
+
+4σmax (T)
+
+
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx) + O  σ2 .
+
+Optimal noise-aware weights : We have the following : Tr( WΣ ) = α¯σ2
+
+∥A∥2
+
+> F
+
+,h(k) = α¯σ2/∥A∥2
+
+> F
+
+2τ γσ max (T)W0
+
+
+
+c0 exp 
+
+ αγk 
+
+4σmax (T)
+
+ and β0 = τ ∥A∥4 
+
+> F
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx)/  α¯σ2 .
+
+with 
+
+c0 = α¯σ2
+
+2γτ σ max (T)∥A∥4 
+
+> F
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx) exp α¯σ2
+
+2γτ σ max (T)∥A∥4 
+
+> F
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx)
+
+!
+
+.
+
+The proof is similar to the previous one. To see this, rewrite h(k) as 
+
+h(k) = α¯σ2/∥A∥2
+
+> F
+
+aW 0(c0evk ) with c0 = ¯ασ 2
+
+cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx) exp 
+
+ ¯ασ 2
+
+cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx)
+
+
+
+where 
+
+c = 2 γτ σ max (T)∥A∥4 
+
+> F
+
+, a = 2 τ γσ max (T), and v = αγ 
+
+4σmax (T) ;Thus, 
+
+h(k) = α¯σ2/∥A∥2
+
+> F
+
+aW 0(c0evk ) = α¯σ2/∥A∥2
+
+> F
+
+aα ¯σ2
+
+cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx) evk eα¯σ2
+
+cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx) + O (¯ σ4)= cD x∗ 
+
+> 0
+> f
+
+(x0, ˆx)
+
+a∥A∥2
+
+> F
+
+e−vk + O  ¯σ2
+
+= ∥A∥2 
+
+> F
+
+exp 
+
+
+
+− αγk 
+
+4σmax (T)
+
+
+
+Dx∗ 
+
+> 0
+> f
+
+(x0, ˆx) + O  ¯σ2 .
+
+Now, we have a look at the case k → ∞ . The principal branch of the Lambert-W0 function has an asymptotic expansion 
+
+W0(ek) = k − ln (k) + O
+
+ ln (k)
+
+k
+
+
+
+k → ∞ ;32 For simplicity, define 
+
+K = Tr( WΣ )2τ γσ max (T) and v = αγ 
+
+4σmax (T) .
+
+Plugging these into h(k), we have 
+
+h(k) = Kvk 
+
+
+
+1 + O
+
+ ln (k)
+
+k
+
+ = 2Tr( WΣ )) 
+
+ατ γ 2k
+
+
+
+1 + O
+
+ ln (k)
+
+k
+
+ 
+
+=
+
+ 
+
+> 2σ2
+> τ γ 2k
+
+, If W = αI
+
+> 2¯ σ2
+> τ kγ 2∥A∥2
+> F
+
+, Else so that by (8), 
+
+E [∥xk − ˆx∥22] ≤ 2h(k)/∥A∥2 
+
+> F
+
+=
+
+
+
+> 4σ2
+> τ kγ 2∥A∥2
+> F
+
+, If W = αI
+
+> 4¯ σ2
+> τ kγ 2∥A∥4
+> F
+
+, Else = 4
+
+τ α 2γ2k Tr( PW 2ΣD −2)and 
+
+ηk = αγβ k
+
+1 + 2 αγ σ max (T)βk
+
+= αγτ h (k)/ (αTr( WΣ ))) 1 + 2 αγ σ max (T)τ h (k)/ (αTr( WΣ ))) = 2
+
+αγk + 4 σmax (T) .
+
+□
+
+It is worth mentioning that all the above results are more general and therefore results from [12, 27] can be obtained from our results. 
+
+# F Lagrange-multiplier derivation of the optimal distribution 
+
+Proposition F.1. For c1, . . . , c m > 0, the minimum of P 
+
+> i
+
+ci/p i over {p : pi ≥ 0, P 
+
+> i
+
+pi = 1 }
+
+is attained at popt  
+
+> i
+
+= √ci/ P
+
+> j
+
+√cj and equals ( P
+
+> i
+
+√ci)2.
+
+Proof. The Lagrangian L = P 
+
+> i
+
+ci/p i − λ(P 
+
+> i
+
+pi − 1) has ∂pk L = −ck/p 2 
+
+> k
+
+− λ = 0, so pk ∝ √ck;normalising gives popt  
+
+> k
+
+= √ck/ P
+
+> j
+
+√cj . Substituting back, P 
+
+> i
+
+ci/p opt  
+
+> i
+
+= ( P
+
+> j
+
+√cj ) P
+
+> i
+
+√ci =(P
+
+> i
+
+√ci)2.33
