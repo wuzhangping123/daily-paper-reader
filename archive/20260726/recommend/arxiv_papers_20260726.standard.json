@@ -1,0 +1,107 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-26T20:57:02.545749+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.17585v1",
+      "source": "arxiv",
+      "title": "Pixel-Space Diffusion Transformers",
+      "abstract": "Latent diffusion models (LDMs) enable efficient high-resolution image synthesis by denoising in a VAE-compressed latent space. However, fixed visual tokenizers can discard fine textures and structural details, while separate representation and diffusion training creates a mismatch between reconstruction and generation objectives. These limitations have renewed interest in pixel-space diffusion, which models raw pixels directly, removes the VAE bottleneck, and supports end-to-end optimization. This formulation better matches the demands of high-fidelity generation but introduces challenges in high-dimensional modeling, including noise scheduling, loss weighting, token efficiency, and scalable architecture design. Pixel-space modeling also offers a promising basis for unified multimodal systems: raw pixels, text, and task conditions can be represented in a shared token space and jointly processed by a single Transformer, narrowing the gap between visual understanding and generation. This paper reviews Pixel-Space Diffusion Transformers (pDiTs) from the perspectives of model architecture, continuous generative mechanisms, and unified multimodal modeling. We summarize representative methods, identify key technical challenges, and discuss future directions toward high-fidelity, end-to-end vision foundation models that integrate generation and understanding.",
+      "authors": [
+        "Renye Yan",
+        "Jikang Cheng",
+        "You Wu",
+        "Ling Liang",
+        "Wei Peng",
+        "Athanasios V. Vasilakos",
+        "Qingyu Zhao",
+        "Yu Zhang",
+        "Ehsan Adeli",
+        "Kilian M. Pohl",
+        "Guoying Zhao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-20T06:04:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.17585v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Pixel-space diffusion models remove VAE bottleneck for high-fidelity image generation, applicable to denoising",
+      "llm_evidence_cn": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "llm_evidence": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "canonical_evidence": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "llm_tldr_en": "Pixel-space diffusion transformers model raw pixels directly, removing the VAE bottleneck and enabling end-to-end optimization for high-fidelity image synthesis, offering strong denoising capability transferable to hyperspectral imaging.",
+      "llm_tldr_cn": "本文系统分析了像素空间扩散模型的优势与挑战。与潜在扩散模型不同，像素空间扩散直接在原始像素上建模，避免了VAE压缩导致的纹理细节丢失，并支持端到端优化。该方法在高保真图像生成中表现优异，其核心的扩散去噪过程可自然地迁移至高光谱图像去噪任务。文章还讨论了噪声调度、损失加权等关键设计问题，为后续研究提供了基础。",
+      "llm_tldr": "本文系统分析了像素空间扩散模型的优势与挑战。与潜在扩散模型不同，像素空间扩散直接在原始像素上建模，避免了VAE压缩导致的纹理细节丢失，并支持端到端优化。该方法在高保真图像生成中表现优异，其核心的扩散去噪过程可自然地迁移至高光谱图像去噪任务。文章还讨论了噪声调度、损失加权等关键设计问题，为后续研究提供了基础。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.17585v2",
+      "source": "arxiv",
+      "title": "Pixel-Space Diffusion Transformers",
+      "abstract": "Latent diffusion models (LDMs) enable efficient high-resolution image synthesis by denoising in a VAE-compressed latent space. However, fixed visual tokenizers can discard fine textures and structural details, while separate representation and diffusion training creates a mismatch between reconstruction and generation objectives. These limitations have renewed interest in pixel-space diffusion, which models raw pixels directly, removes the VAE bottleneck, and supports end-to-end optimization. This formulation better matches the demands of high-fidelity generation but introduces challenges in high-dimensional modeling, including noise scheduling, loss weighting, token efficiency, and scalable architecture design. Pixel-space modeling also offers a promising basis for unified multimodal systems: raw pixels, text, and task conditions can be represented in a shared token space and jointly processed by a single Transformer, narrowing the gap between visual understanding and generation. This paper reviews Pixel-Space Diffusion Transformers (pDiTs) from the perspectives of model architecture, continuous generative mechanisms, and unified multimodal modeling. We summarize representative methods, identify key technical challenges, and discuss future directions toward high-fidelity, end-to-end vision foundation models that integrate generation and understanding.",
+      "authors": [
+        "Renye Yan",
+        "Jikang Cheng",
+        "You Wu",
+        "Ling Liang",
+        "Wei Peng",
+        "Athanasios V. Vasilakos",
+        "Qingyu Zhao",
+        "Yu Zhang",
+        "Yimao Cai",
+        "Kilian M. Pohl",
+        "Guoying Zhao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-20T06:04:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.17585v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Pixel-space diffusion models remove VAE bottleneck for high-fidelity image generation, applicable to denoising",
+      "llm_evidence_cn": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "llm_evidence": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "canonical_evidence": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "llm_tldr_en": "Pixel-space diffusion transformers model raw pixels directly, removing the VAE bottleneck and enabling end-to-end optimization for high-fidelity image synthesis, offering strong denoising capability transferable to hyperspectral imaging.",
+      "llm_tldr_cn": "本文系统分析了像素空间扩散模型的优势与挑战。与潜在扩散模型不同，像素空间扩散直接在原始像素上建模，避免了VAE压缩导致的纹理细节丢失，并支持端到端优化。该方法在高保真图像生成中表现优异，其核心的扩散去噪过程可自然地迁移至高光谱图像去噪任务。文章还讨论了噪声调度、损失加权等关键设计问题，为后续研究提供了基础。",
+      "llm_tldr": "本文系统分析了像素空间扩散模型的优势与挑战。与潜在扩散模型不同，像素空间扩散直接在原始像素上建模，避免了VAE压缩导致的纹理细节丢失，并支持端到端优化。该方法在高保真图像生成中表现优异，其核心的扩散去噪过程可自然地迁移至高光谱图像去噪任务。文章还讨论了噪声调度、损失加权等关键设计问题，为后续研究提供了基础。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

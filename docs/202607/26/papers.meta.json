@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-26",
+  "date": "2026-07-26",
+  "generated_at": "2026-07-26T20:58:15",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/26/2607.17585v1-pixel-space-diffusion-transformers",
+      "section": "quick",
+      "title_en": "Pixel-Space Diffusion Transformers",
+      "authors": "Renye Yan, Jikang Cheng, You Wu, Ling Liang, Wei Peng, Athanasios V. Vasilakos, Qingyu Zhao, Yu Zhang, Ehsan Adeli, Kilian M. Pohl, Guoying Zhao",
+      "date": "2026-07-20",
+      "pdf": "https://arxiv.org/pdf/2607.17585v1",
+      "score": "6.0",
+      "evidence": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "tldr": "潜在扩散模型受限于VAE压缩导致细节丢失和训练目标不匹配。像素空间扩散直接建模原始像素，消除瓶颈并支持端到端优化，但面临高维建模挑战。本文综述像素空间扩散Transformer（pDiT）在架构、生成机制和多模态统一方面的进展。研究表明pDiT能更好实现高保真生成，并为端到端视觉基础模型整合生成与理解指明方向。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Latent diffusion models (LDMs) enable efficient high-resolution image synthesis by denoising in a VAE-compressed latent space. However, fixed visual tokenizers can discard fine textures and structural details, while separate representation and diffusion training creates a mismatch between reconstruction and generation objectives. These limitations have renewed interest in pixel-space diffusion, which models raw pixels directly, removes the VAE bottleneck, and supports end-to-end optimization. This formulation better matches the demands of high-fidelity generation but introduces challenges in high-dimensional modeling, including noise scheduling, loss weighting, token efficiency, and scalable architecture design. Pixel-space modeling also offers a promising basis for unified multimodal systems: raw pixels, text, and task conditions can be represented in a shared token space and jointly processed by a single Transformer, narrowing the gap between visual understanding and generation. This paper reviews Pixel-Space Diffusion Transformers (pDiTs) from the perspectives of model architecture, continuous generative mechanisms, and unified multimodal modeling. We summarize representative methods, identify key technical challenges, and discuss future directions toward high-fidelity, end-to-end vision foundation models that integrate generation and understanding.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/26/2607.17585v2-pixel-space-diffusion-transformers",
+      "section": "quick",
+      "title_en": "Pixel-Space Diffusion Transformers",
+      "authors": "Renye Yan, Jikang Cheng, You Wu, Ling Liang, Wei Peng, Athanasios V. Vasilakos, Qingyu Zhao, Yu Zhang, Yimao Cai, Kilian M. Pohl, Guoying Zhao",
+      "date": "2026-07-20",
+      "pdf": "https://arxiv.org/pdf/2607.17585v2",
+      "score": "6.0",
+      "evidence": "像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪",
+      "tldr": "潜在扩散模型因VAE压缩丢失细节且训练目标不匹配，限制了高保真生成。像素空间扩散直接建模原始像素，消除VAE瓶颈并支持端到端优化。本文综述像素空间扩散Transformer（pDiTs），从架构、生成机制和统一多模态建模角度总结代表性方法。pDiTs将原始像素、文本和任务条件统一到共享token空间，有望推动视觉理解与生成融合的基础模型发展。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Latent diffusion models (LDMs) enable efficient high-resolution image synthesis by denoising in a VAE-compressed latent space. However, fixed visual tokenizers can discard fine textures and structural details, while separate representation and diffusion training creates a mismatch between reconstruction and generation objectives. These limitations have renewed interest in pixel-space diffusion, which models raw pixels directly, removes the VAE bottleneck, and supports end-to-end optimization. This formulation better matches the demands of high-fidelity generation but introduces challenges in high-dimensional modeling, including noise scheduling, loss weighting, token efficiency, and scalable architecture design. Pixel-space modeling also offers a promising basis for unified multimodal systems: raw pixels, text, and task conditions can be represented in a shared token space and jointly processed by a single Transformer, narrowing the gap between visual understanding and generation. This paper reviews Pixel-Space Diffusion Transformers (pDiTs) from the perspectives of model architecture, continuous generative mechanisms, and unified multimodal modeling. We summarize representative methods, identify key technical challenges, and discuss future directions toward high-fidelity, end-to-end vision foundation models that integrate generation and understanding.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
