@@ -1,0 +1,213 @@
+Title: Singular value soft-thresholding via the polar decomposition
+
+URL Source: https://arxiv.org/pdf/2607.22484v1
+
+Published Time: Mon, 27 Jul 2026 00:57:54 GMT
+
+Number of Pages: 4
+
+Markdown Content:
+University of Colorado Boulder Technical Report, Department of Applied Mathematics 
+
+# Singular value soft-thresholding via the polar decomposition 
+
+Stephen Becker ∗
+
+July 27, 2026 
+
+Abstract 
+
+Singular value soft-thresholding can be computed via a reduction to the matrix polar decomposition, which allows one to exploit GPU-friendly algorithms for computing the polar decomposition. Empirically, there is a significant speed-up on GPUs compared to the standard approach using the SVD. We leave the investigation of robustness to future work, but note that due to the discontinuous nature of the sign function, the reduction to the polar decomposition is likely only suitable for low-accuracy applications. 
+
+# 1 Motivation 
+
+The polar decomposition can be computed via the SVD, but recently it has been popular to compute it to low-accuracy via communication-friendly algorithms such as the Newton-Schulz iteration (see, e.g., [Hig08]); this is done as a step in some transformer-based neural net training methods such as Muon. The dominant cost of Newton-Schulz based methods is almost exclusively in matrix-matrix multiplications, which is communication-friendly and fast on a GPU. Quoting [CC14], “The best communication cost of matrix-matrix multiplications is log p times smaller than that of LU and QR, where p is the number of processors” and presumably also has better communication cost compared to eigenvalue and singular value decomposi-tions. We show that polar decompositions can be used to compute singular value soft-thresholding, and therefore provide a low-communication GPU-friendly algorithm. There is already some work [TPG +26] showing that polar decompositions can be used to compute the SVD, and hence could do singular value soft-thresholding, but this still relies on an eigendecomposition and QR and is thus not as efficient as we would like. Our idea is to avoid computing the SVD altogether. 
+
+# 2 The algorithm 
+
+If A = U ΣV ⊤ is the SVD of a m × n matrix A, then the polar decomposition is P = U V ⊤. If A = A⊤ then the polar is equivalent to the matrix sign function (i.e., taking the sign of the eigenvalues). We’ll use both the symmetric and rectangular polar. Let Σ = 
+
+Σ1 00 Σ2
+
+
+
+where Σ 1 ⪰ τ I ≻ Σ2, and let U = [ U1, U 2] and 
+
+V = [ V1, V 2] according to the same partition. Our goal is to compute singular value soft-thresholding, 
+
+Aτ
+
+> def
+
+= U ⌊Σ − τ I ⌋+V ⊤ = U1(Σ 1 − τ I )V ⊤ 
+
+> 1
+
+(1) since it is a common subroutine used in proximal gradient methods involving the matrix nuclear norm; see, e.g., [CCS10]. Our main result is the following proposition: 
+
+Proposition 1. Let P = polar( A) and S = polar( A⊤A − τ I n), then Aτ = 12 (A + AS ) − τ 
+
+> 2
+
+(P + P S ).1                
+
+> ∗stephen.becker@colorado.edu , University of Colorado Boulder, USA
+> 1An equivalent statement holds with S= polar( AA ⊤−τ I m) and Aτ=12(A+SA )−τ
+> 2(P+SP ), which would be faster if
+> n > m .
+
+1arXiv:2607.22484v1 [math.NA] 24 Jul 2026 University of Colorado Boulder Technical Report, Department of Applied Mathematics 0 50 100 150 200 250 300                        
+
+> Singular value index (1-based)
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> Singular value
+> Singular values of A301 × 300 ,Aij (0, 1)
+> 1=2= 34
+> 2=151 = 14
+> 3=296 = 0.44 246810 12 14 16 18
+> Iterations in the polar decomposition
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> Relative Frobenius norm error in matrix shrinkage  = 34
+> = 14
+> = 0.44
+
+Figure 1: Accuracy test on a 301 × 300 iid Gaussian test matrix, looking at ∥Aτ − eAτ ∥F /∥Aτ ∥F for a range of τ values, where eAτ is the approximation from Proposition 1. Left: singular values of the matrix, and three test values of τ . Right: relative accuracy as a function of number of iterations used in the polar decomposition subroutine. The intuition in the proof is that the scalar thresholding function ⌊x⌋+
+
+> def
+
+= max( x, 0) can be written as 
+
+⌊x⌋+ = 12 (|x| + x). 
+
+Proof. This follows from the facts that P = U V ⊤ = U1V ⊤ 
+
+> 1
+
++ U2V ⊤ 
+
+> 2
+
+and also S = V1V ⊤ 
+
+> 1
+
+− V2V ⊤ 
+
+> 2
+
+. Thus 
+
+AS = U1Σ1V ⊤ 
+
+> 1
+
+− U2Σ2V ⊤ 
+
+> 2
+
+and P S = U1V ⊤ 
+
+> 1
+
+− U2V ⊤ 
+
+> 2
+
+, and after canceling some terms we get the result. Simplifying to the m = n case, it is clear that the algorithm is still O(n3) flops, no better than SVD-based methods, but it has much lower communication complexity. 
+
+Corollary 1. If σr is known (and assuming σr+1 > σ r ), then the best rank-r approximation [A]r can be computed using S = polar( A⊤A − τ I n) for τ = σr + ϵ and [A]r = 12 (A + AS ), where 0 < ϵ < σ r+1 − σr .
+
+# 3 Numerical Experiments 
+
+In the CPU, the code is much slower than running the standard SVD. However, on the GPU there is often an advantage. We use Polar Express [APMG25], which converts single precision to bfloat16 for even greater speed gains, at the expense of even less accuracy. This is an improved variant of Newton-Schulz and is fundamentally an iterative method, where the accuracy improves with more iterations. Thus our first test is to examine the accuracy as a function of number of iterations used inside the polar decomposition algorithm. The results in Fig. 1 show that, for one particular matrix, error decays quickly from about 4 to 6 iterations, and then stagnates. The error is always unacceptably large for some values of τ (e.g., close to σmax ) while reasonable (1%) for values of τ near σmin . On a GPU, running extra iterations has very little cost, so we suggest overestimating, such as choosing 20 iterations. Next, Fig. 2 compares the wall-clock runtime of the baseline SVD-based algorithm with the polar-based algorithm, for matrices of varying size m × n for m ∈ { 1000 , 2000 , 3000 , 4000 , 5000 } and n = m + 1, averaged over 5 draws of a random matrix, and using 25 iterations for the Polar Express subroutine. This was testesd on a range of GPUs available on Google Colab as of July 2026. We see that for all three GPUs, the polar-based algorithm is approximately 10 × faster for all matrix sizes. The scaling with m is roughly the same for both algorithms, which is expected. 2University of Colorado Boulder Technical Report, Department of Applied Mathematics 1000 1500 2000 2500 3000 3500 4000 4500 5000    
+
+> Matrix size m
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> Time (sec.)
+> SVD on L4 GPU
+> Polar on L4 GPU
+> SVD on A100-SXM4-80GB GPU
+> Polar on A100-SXM4-80GB GPU
+> SVD on RTX GPU
+> Polar on RTX GPU
+
+Figure 2: Comparing the speed of the baseline implementation versus the GPU-friendly polar decomposition version, on several GPUs. The solid lines show the reference SVD-based algorithm, while the dashed lines show the polar decomposition based algorithm from Proposition 1. The different colors correspond to different GPUs. For all three GPUs, the GPU-friendly version is approximately 10 × faster, consistently over a range of matrix sizes. 
+
+# 4 Code 
+
+Our implementation is in Python using Torch. Code for the reference algorithm: 
+
+1 def threshold_helper (U ,S , Vh , tau ): 
+
+2 """ Given A = U@diag ( S ) @Vh , this shrinks S by tau , cutoff at zero """ 
+
+3 return ( U * torch . maximum (S - tau , torch . tensor (0.))) @ Vh 
+
+45 def singular_value_threshold (A , tau ): 
+
+6 U , S , Vh = torch . linalg . svd (A , full_matrices = False ) 
+
+7 return threshold_helper (U ,S , Vh , tau ) 
+
+Code for the proposed algorithm, using Polar Express [APMG25], downloaded from https://raw. githubusercontent.com/NoahAmsel/PolarExpress/refs/heads/main/polar_express.py :
+
+1 from polar_express import PolarExpress 
+
+2 def s i n g u l a r _ v a l u e _ t h r e s h o l d _ v i a _Polar (A , tau , polarAlg = None , maxIts = 11): 
+
+3 # The PolarExpress algorithm works on the last two dimensions of the tensor , 
+
+4 # doing everything else batch . 
+
+5 # However , this code is not yet batch compatible 
+
+6 # e . g . , need to update torch . eye () 
+
+7 if polarAlg is None : 
+
+8 polarAlg = lambda A : PolarExpress (A , maxIts ). float () 
+
+9 # Note that PolarExpress returns dtype torch . bfloat16 
+
+10 if A . ndim != 2: raise ValueError ( " input ␣ tensor ␣ must ␣ be ␣ 2 D " ) 
+
+11 m , n = A . size ( -2) , A . size ( -1) # better than A . shape since ignores batch dim . 
+
+12 UV = polarAlg ( A ) 
+
+13 if n < m : 
+
+14 S = polarAlg ( A . mT @ A - tau **2 * torch . eye (n , device = A . device ) )
+
+15 Y = ( A + A@S )/2 - tau /2*( UV + UV@S ) 
+
+16 else : 
+
+17 S = polarAlg ( A @ A . mT - tau **2 * torch . eye (m , device = A . device )) 
+
+18 Y = ( A + S@A )/2 - tau /2*( UV + S@UV ) 
+
+19 return Y . float () # convert to float32 if not already 
+
+3University of Colorado Boulder Technical Report, Department of Applied Mathematics 
+
+# References 
+
+[APMG25] Noah Amsel, David Persson, Christopher Musco, and Robert M Gower, The polar express: Optimal matrix sign methods and their application to the muon algorithm , ICLR, 2025, arXiv:2505.16932. [CC14] Jie Chen and Edmond Chow, A stable scaling of Newton-Schulz for improving the sign function computation of a Hermitian matrix , Preprint. ANL/MCS-P5059-0114 (2014). [CCS10] Jian-Feng Cai, Emmanuel J Cand` es, and Zuowei Shen, A singular value thresholding algorithm for matrix completion , SIAM Journal on Optimization 20 (2010), no. 4, 1956–1982. [Hig08] Nicholas J Higham, Functions of matrices: theory and computation , SIAM, 2008. [TPG +26] Askar Tsyganov, Uliana Parkina, Ekaterina Grishina, Sergey Samsonov, and Maxim Rakhuba, 
+
+Faster SVD via accelerated Newton-Schulz iteration , ICLR Blogpost, 2026. 4

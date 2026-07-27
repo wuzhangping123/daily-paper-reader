@@ -1,6 +1,11 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-27 <!--dpr-date:20260727-->
+    * 精读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/27/2607.22484v1-singular-value-soft-thresholding-via-the-polar-decomposition" data-sidebar-item="{&quot;title&quot;: &quot;Singular value soft-thresholding via the polar decomposition&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.22484v1-singular-value-soft-thresholding-via-the-polar-decomposition&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;通过极分解的奇异值软阈值实现了用于去噪的低秩矩阵恢复的高效计算&quot;}">Singular value soft-thresholding via the polar decomposition</a>
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/27/2607.22262v1-variational-low-rank-tensor-decomposition-for-multisubject-spatiotemporal-data-analysis" data-sidebar-item="{&quot;title&quot;: &quot;Variational Low-rank Tensor Decomposition for Multisubject Spatiotemporal Data Analysis&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.22262v1-variational-low-rank-tensor-decomposition-for-multisubject-spatiotemporal-data-analysis&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;低秩张量分解用于时空数据&quot;}">Variational Low-rank Tensor Decomposition for Multisubject Spatiotemporal Data Analysis</a>
   * 2026-07-26 <!--dpr-date:20260726-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/26/2607.17585v1-pixel-space-diffusion-transformers" data-sidebar-item="{&quot;title&quot;: &quot;Pixel-Space Diffusion Transformers&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.17585v1-pixel-space-diffusion-transformers&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪&quot;}">Pixel-Space Diffusion Transformers</a>

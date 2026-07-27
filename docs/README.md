@@ -6,27 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-26
-- 运行时间：2026-07-26 20:58:08 UTC
+- 最新运行日期：2026-07-27
+- 运行时间：2026-07-27 21:34:17 UTC
 - 运行状态：成功
 - 本次总论文数：2
-- 精读区：0
-- 速读区：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-今日速读2篇，均聚焦同一篇《Pixel-Space Diffusion Transformers》（6.0/10）。该论文探索了像素空间中的扩散变换器架构，是理解扩散模型新方向的关键。建议深入阅读原文，并对比其与潜在空间扩散模型的差异。
-- 详情：[/202607/26/README](/202607/26/README)
+今天精读了通过极分解实现奇异值软阈值的论文，速读了多主体时空数据变分低秩张量分解研究。  
+最值得关注的是奇异值软阈值的新方法，利用极分解简化计算；低秩张量分解在时空数据分析中也有应用价值。  
+建议深入理解极分解与软阈值的关系，并尝试将低秩张量方法用于多主体数据分析。
+- 详情：[/202607/27/README](/202607/27/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Singular value soft-thresholding via the polar decomposition](/202607/27/2607.22484v1-singular-value-soft-thresholding-via-the-polar-decomposition)  
+   标签：评分：8.0/10、query:hsi-denoise
+   evidence：通过极分解的奇异值软阈值实现了用于去噪的低秩矩阵恢复的高效计算
 
 ### 速读区论文标签
-1. [Pixel-Space Diffusion Transformers](/202607/26/2607.17585v1-pixel-space-diffusion-transformers)  
+1. [Variational Low-rank Tensor Decomposition for Multisubject Spatiotemporal Data Analysis](/202607/27/2607.22262v1-variational-low-rank-tensor-decomposition-for-multisubject-spatiotemporal-data-analysis)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪
-2. [Pixel-Space Diffusion Transformers](/202607/26/2607.17585v2-pixel-space-diffusion-transformers)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：像素空间扩散模型去除VAE瓶颈实现高保真生成，可应用于去噪
+   evidence：低秩张量分解用于时空数据
 
 
 <div class="dpr-home-promo-card">

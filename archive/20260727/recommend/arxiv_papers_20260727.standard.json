@@ -1,0 +1,94 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-27T21:33:10.641241+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.22484v1",
+      "source": "arxiv",
+      "title": "Singular value soft-thresholding via the polar decomposition",
+      "abstract": "Singular value soft-thresholding can be computed via a reduction to the matrix polar decomposition, which allows one to exploit GPU-friendly algorithms for computing the polar decomposition. Empirically, there is a significant speed-up on GPUs compared to the standard approach using the SVD. We leave the investigation of robustness to future work, but note that due to the discontinuous nature of the sign function, the reduction to the polar decomposition is likely only suitable for low-accuracy applications.",
+      "authors": [
+        "Stephen Becker"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "cs.LG",
+        "math.OC"
+      ],
+      "published": "2026-07-24T16:55:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.22484v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "singular value soft-thresholding via polar decomposition enables efficient low-rank matrix recovery used in denoising",
+      "llm_evidence_cn": "通过极分解的奇异值软阈值实现了用于去噪的低秩矩阵恢复的高效计算",
+      "llm_evidence": "通过极分解的奇异值软阈值实现了用于去噪的低秩矩阵恢复的高效计算",
+      "canonical_evidence": "通过极分解的奇异值软阈值实现了用于去噪的低秩矩阵恢复的高效计算",
+      "llm_tldr_en": "This paper shows singular value soft-thresholding can be computed via polar decomposition, offering GPU speedup over SVD-based approaches, directly supporting low-rank representation techniques for denoising.",
+      "llm_tldr_cn": "该论文提出利用矩阵极分解计算奇异值软阈值操作，相比传统SVD方法在GPU上获得显著加速。奇异值软阈值是低秩矩阵恢复的核心步骤，而低秩表示是高光谱图像去噪的重要方法。因此，该工作为低秩去噪提供了更高效的底层计算工具，有助于提升低秩去噪算法的实际运行效率。",
+      "llm_tldr": "该论文提出利用矩阵极分解计算奇异值软阈值操作，相比传统SVD方法在GPU上获得显著加速。奇异值软阈值是低秩矩阵恢复的核心步骤，而低秩表示是高光谱图像去噪的重要方法。因此，该工作为低秩去噪提供了更高效的底层计算工具，有助于提升低秩去噪算法的实际运行效率。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.22262v1",
+      "source": "arxiv",
+      "title": "Variational Low-rank Tensor Decomposition for Multisubject Spatiotemporal Data Analysis",
+      "abstract": "Modeling shared and subject-specific structure in multisubject spatiotemporal data remains challenging, particularly in neuroimaging, where both spatial and temporal patterns exhibit rich variability across subjects. Existing matrix and tensor decompositions provide interpretable factorizations, but rely on fixed multilinear structures or coupling schemes that may limit their flexibility in capturing complex variability. In this work, we introduce a spatiotemporal variational tensor decomposition (ST-VTD) framework that combines a tensor factorization generative model with structured priors to jointly represent spatial maps and temporal dynamics. Spatial factors are regularized to promote a low-rank structure inspired by the LL1 decomposition, while temporal factors are modeled using a learned Long short-term memory (LSTM)-based prior, enabling flexible and adaptive dynamics. Posterior inference is performed using an amortized variational formulation by unrolling iterations of an optimization algorithm, leading to an interpretable and parameter-efficient architecture. The proposed inference framework employs a warm-start strategy based on group independent component analysis, which we found to improve optimization performance. Experiments on a realistic synthetic functional MRI (fMRI) dataset demonstrate that the proposed approach significantly improves latent factor recovery compared with representative classical and probabilistic decomposition benchmarks.",
+      "authors": [
+        "Laura M. Montaldo",
+        "Ricardo A. Borsoi",
+        "Sebastian Miron",
+        "Tulay Adali"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.LG",
+        "eess.SP"
+      ],
+      "published": "2026-07-24T12:55:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.22262v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "low-rank tensor decomposition for spatiotemporal data",
+      "llm_evidence_cn": "低秩张量分解用于时空数据",
+      "llm_evidence": "低秩张量分解用于时空数据",
+      "canonical_evidence": "低秩张量分解用于时空数据",
+      "llm_tldr_en": "ST-VTD combines tensor factorization with structured priors for multisubject spatiotemporal analysis, using low-rank LL1 decomposition to capture both shared and subject-specific patterns.",
+      "llm_tldr_cn": "针对多主体时空数据建模中的共享与特异结构问题，本文提出ST-VTD框架，将张量因子分解与结构化先验结合，通过LL1分解的低秩约束提取时空特征。该方法在神经影像数据集上有效分离了共享和个体化模式，优于传统耦合分解方法。该工作为高维张量数据恢复提供了可借鉴的低秩建模思路。",
+      "llm_tldr": "针对多主体时空数据建模中的共享与特异结构问题，本文提出ST-VTD框架，将张量因子分解与结构化先验结合，通过LL1分解的低秩约束提取时空特征。该方法在神经影像数据集上有效分离了共享和个体化模式，优于传统耦合分解方法。该工作为高维张量数据恢复提供了可借鉴的低秩建模思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

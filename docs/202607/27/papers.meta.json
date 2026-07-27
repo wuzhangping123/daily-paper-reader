@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-27",
+  "date": "2026-07-27",
+  "generated_at": "2026-07-27T21:34:25",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/27/2607.22484v1-singular-value-soft-thresholding-via-the-polar-decomposition",
+      "section": "deep",
+      "title_en": "Singular value soft-thresholding via the polar decomposition",
+      "authors": "Stephen Becker",
+      "date": "2026-07-24",
+      "pdf": "https://arxiv.org/pdf/2607.22484v1",
+      "score": "8.0",
+      "evidence": "通过极分解的奇异值软阈值实现了用于去噪的低秩矩阵恢复的高效计算",
+      "tldr": "奇异值软阈值是许多优化问题的关键操作，传统方法依赖SVD计算成本高。本文提出将其转化为矩阵极分解问题，利用GPU友好的极分解算法来加速。实验表明在GPU上相比标准SVD方法有显著加速。该工作为低精度应用提供了一种高效替代方案，但符号函数不连续性可能影响鲁棒性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Singular value soft-thresholding can be computed via a reduction to the matrix polar decomposition, which allows one to exploit GPU-friendly algorithms for computing the polar decomposition. Empirically, there is a significant speed-up on GPUs compared to the standard approach using the SVD. We leave the investigation of robustness to future work, but note that due to the discontinuous nature of the sign function, the reduction to the polar decomposition is likely only suitable for low-accuracy applications.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/27/2607.22262v1-variational-low-rank-tensor-decomposition-for-multisubject-spatiotemporal-data-analysis",
+      "section": "quick",
+      "title_en": "Variational Low-rank Tensor Decomposition for Multisubject Spatiotemporal Data Analysis",
+      "authors": "Laura M. Montaldo, Ricardo A. Borsoi, Sebastian Miron, Tulay Adali",
+      "date": "2026-07-24",
+      "pdf": "https://arxiv.org/pdf/2607.22262v1",
+      "score": "6.0",
+      "evidence": "低秩张量分解用于时空数据",
+      "tldr": "多主体时空数据中共享与个体结构建模困难，现有张量分解灵活性不足。提出ST-VTD框架，结合低秩空间因子（LL1）与LSTM时间先验，通过摊销变分推断展开优化迭代，并采用组ICA热启动。在合成fMRI数据中，该方法显著提升了潜在因子的恢复性能。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Modeling shared and subject-specific structure in multisubject spatiotemporal data remains challenging, particularly in neuroimaging, where both spatial and temporal patterns exhibit rich variability across subjects. Existing matrix and tensor decompositions provide interpretable factorizations, but rely on fixed multilinear structures or coupling schemes that may limit their flexibility in capturing complex variability. In this work, we introduce a spatiotemporal variational tensor decomposition (ST-VTD) framework that combines a tensor factorization generative model with structured priors to jointly represent spatial maps and temporal dynamics. Spatial factors are regularized to promote a low-rank structure inspired by the LL1 decomposition, while temporal factors are modeled using a learned Long short-term memory (LSTM)-based prior, enabling flexible and adaptive dynamics. Posterior inference is performed using an amortized variational formulation by unrolling iterations of an optimization algorithm, leading to an interpretable and parameter-efficient architecture. The proposed inference framework employs a warm-start strategy based on group independent component analysis, which we found to improve optimization performance. Experiments on a realistic synthetic functional MRI (fMRI) dataset demonstrate that the proposed approach significantly improves latent factor recovery compared with representative classical and probabilistic decomposition benchmarks.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
