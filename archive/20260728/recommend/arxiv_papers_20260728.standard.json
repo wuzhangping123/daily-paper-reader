@@ -1,0 +1,205 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-28T20:47:52.956140+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2607.24009v1",
+      "source": "arxiv",
+      "title": "Structural Loss Metrics for Tensor Approximation via Matrix Low-Rank Approximation",
+      "abstract": "Matricized low-rank approximation via SVD is a standard surrogate for tensor decompositions, but entry-wise reconstruction error fails to capture multiway geometric degradation. Under an orthogonal Tucker model, we characterize this degradation using two metrics: cross-mode Direction Loss, measuring geometric subspace deviation from rank truncation and noise rotation, and Interaction Loss, quantifying multilinear interaction distortion in the core tensor. We prove that squared relative reconstruction error orthogonally decomposes into interaction loss and out-of-subspace energy, and derive a Wedin-type bound establishing the stability of a plug-in Direction Loss estimator. Experiments on synthetic and hyperspectral datasets demonstrate that nearly identical reconstruction errors can yield markedly different structural-loss profiles; hyperspectral patches with comparable reconstruction errors exhibit up to a 4.6-fold difference in Direction Loss, correlating with severe visual blurring.",
+      "authors": [
+        "Hiroki Hasegawa"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-27T05:12:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.24009v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes structural loss metrics for tensor approximation and validates on hyperspectral datasets, directly relevant to tensor data recovery.",
+      "llm_evidence_cn": "提出了张量近似的结构损失度量，并在高光谱数据集上验证，直接相关于张量数据恢复。",
+      "llm_evidence": "提出了张量近似的结构损失度量，并在高光谱数据集上验证，直接相关于张量数据恢复。",
+      "canonical_evidence": "提出了张量近似的结构损失度量，并在高光谱数据集上验证，直接相关于张量数据恢复。",
+      "llm_tldr_en": "This paper introduces Direction Loss and Interaction Loss to measure multiway geometric degradation in tensor approximation, with theoretical decomposition and stability bounds; experiments on hyperspectral data confirm the metrics capture subspace and interaction distortions, aiding in tensor recovery assessment.",
+      "llm_tldr_cn": "本文针对正交Tucker模型下的张量近似问题，提出了跨模式方向损失和交互损失两种结构度量指标，分别量化子空间偏差和多线性交互失真。理论证明了重构误差的正交分解，并推导了方向损失估计器的Wedin型稳定性界。在高光谱数据集上的实验表明，这些指标能够有效捕捉截断和噪声引起的几何退化，为高光谱图像张量恢复提供更精细的评价工具。",
+      "llm_tldr": "本文针对正交Tucker模型下的张量近似问题，提出了跨模式方向损失和交互损失两种结构度量指标，分别量化子空间偏差和多线性交互失真。理论证明了重构误差的正交分解，并推导了方向损失估计器的Wedin型稳定性界。在高光谱数据集上的实验表明，这些指标能够有效捕捉截断和噪声引起的几何退化，为高光谱图像张量恢复提供更精细的评价工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.22272v1",
+      "source": "arxiv",
+      "title": "Efficient Spatial-Spectral Feature Extraction in Hyperspectral Images via Holistic Multivariance Decomposition",
+      "abstract": "Tensor decomposition serves as a foundational tool for feature extraction in hyperspectral image classification, a domain classically dominated by the Tucker and Canonical Polyadic decompositions. Although widely adopted, these schemes often struggle to fully encapsulate the deeply coupled geometric and intrinsic structures inherent to multidimensional hyperspectral data. Their structural reliance on rigid low-rank approximations successfully captures independent mode variations but systematically neglects complex, cross-domain spatial and spectral interdependencies. To overcome this limitation, we introduce the Holistic Multivariance Decomposition framework to achieve highly discriminative hyperspectral feature extraction. The Holistic Multivariance Decomposition provides a novel, structurally flexible tensor algorithm that explicitly models isolated spatial and spectral behaviors, alongside intricate, higher dimensional cooperative interactions. Comprehensive experimental evaluations across four benchmark hyperspectral datasets demonstrate that the proposed Holistic Multivariance Decomposition approximants consistently yield superior classification accuracy compared to conventional Tucker and Canonical Polyadic decomposition methods across diverse supervised learning algorithms. By effectively preserving essential joint multivariance features even under severe subspace compression, these results establish the Holistic Multivariance Decomposition as a robust, high fidelity computational framework for resolving complex multidimensional data structures in hyperspectral analysis.",
+      "authors": [
+        "Süha Tuna"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE",
+        "math.NA",
+        "math.RT"
+      ],
+      "published": "2026-07-24T13:08:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.22272v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "uses tensor decomposition and low-rank concepts for hyperspectral feature extraction, applicable to tensor-based denoising",
+      "llm_evidence_cn": "采用张量分解和低秩概念进行高光谱特征提取，可用于张量去噪方法",
+      "llm_evidence": "采用张量分解和低秩概念进行高光谱特征提取，可用于张量去噪方法",
+      "canonical_evidence": "采用张量分解和低秩概念进行高光谱特征提取，可用于张量去噪方法",
+      "llm_tldr_en": "Existing tensor decompositions like Tucker and CP neglect complex spatial-spectral interdependencies in hyperspectral data. This paper proposes Holistic Multivariance Decomposition (HMD) to capture cross-domain interactions beyond rigid low-rank approximations. Experiments demonstrate superior discriminative features for classification, offering potential for tensor-based denoising and restoration.",
+      "llm_tldr_cn": "针对现有张量分解方法在提取高光谱图像特征时忽略空间-光谱复杂依赖的问题，本文提出整体多方差分解（HMD）框架。该方法摒弃刚性低秩假设，通过捕获跨模态交互结构，生成更具判别力的特征。在分类实验上，HMD显著提升了精度，验证了其在捕捉高光谱数据深层结构上的优势。该工作为张量分解在高光谱恢复、去噪等领域的应用提供了新思路。",
+      "llm_tldr": "针对现有张量分解方法在提取高光谱图像特征时忽略空间-光谱复杂依赖的问题，本文提出整体多方差分解（HMD）框架。该方法摒弃刚性低秩假设，通过捕获跨模态交互结构，生成更具判别力的特征。在分类实验上，HMD显著提升了精度，验证了其在捕捉高光谱数据深层结构上的优势。该工作为张量分解在高光谱恢复、去噪等领域的应用提供了新思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23341v1",
+      "source": "arxiv",
+      "title": "Stabilizing Deep Reconstruction Operators with Contractive Anchoring",
+      "abstract": "Pretrained deep denoisers can be used to solve a wide range of model-based image reconstruction tasks via Plug-and-Play (PnP) and Regularization-by-Denoising (RED) algorithms, without retraining per task. These denoisers are trained only for single-step denoising. Using them as Image Reconstruction (IR) regularizers in an iterative process can destabilize reconstruction. A common failure mode is the peak-and-collapse behaviour: metrics such as PSNR improve for early iterations and then abruptly degrade, making these algorithms unreliable in practice. We propose a data-driven stabilization framework that (i) formalizes this instability of any IR operator through a local quantity and (ii) prevents collapse by regularizing this quantity adaptively, requiring no retraining or modification of the given pretrained network. Our key idea is to control the potentially unstable IR operator with a contractive operator whose stable iterates act as an anchor and prevent collapse. We further introduce an efficient family of trainable contractive operators that serve as strong anchors while remaining lightweight. Extensive experiments across proximal algorithms, denoiser architectures, noise levels, and imaging tasks show consistent, collapse-free performance and improved reliability of PnP and RED reconstruction.",
+      "authors": [
+        "Arghya Sinha",
+        "Trishit Mukherjee",
+        "Kunal N. Chaudhury"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.CV"
+      ],
+      "published": "2026-07-25T19:37:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.23341v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Stabilization framework for PnP/RED denoising, applicable to hyperspectral image denoising.",
+      "llm_evidence_cn": "用于PnP/RED去噪的稳定化框架，可应用于高光谱图像去噪。",
+      "llm_evidence": "用于PnP/RED去噪的稳定化框架，可应用于高光谱图像去噪。",
+      "canonical_evidence": "用于PnP/RED去噪的稳定化框架，可应用于高光谱图像去噪。",
+      "llm_tldr_en": "Proposes a data-driven stabilization framework for iterative image reconstruction using pretrained denoisers, preventing performance collapse; can be applied to hyperspectral image denoising.",
+      "llm_tldr_cn": "该文提出一种数据驱动的稳定化框架，通过自适应正则化防止深度重建算子在迭代过程中的性能崩溃。该方法基于预训练去噪器的PnP/RED算法，可泛化至高光谱图像去噪任务，为解决高光谱图像去噪中的不稳定问题提供了有效思路。",
+      "llm_tldr": "该文提出一种数据驱动的稳定化框架，通过自适应正则化防止深度重建算子在迭代过程中的性能崩溃。该方法基于预训练去噪器的PnP/RED算法，可泛化至高光谱图像去噪任务，为解决高光谱图像去噪中的不稳定问题提供了有效思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.24135v1",
+      "source": "arxiv",
+      "title": "LoTA-N2N: Local Trace Adaptation for Zero-Shot Self-Supervised Image Denoising",
+      "abstract": "Single-image self-supervised denoising replaces unavailable clean targets with surrogate targets constructed from noisy observations. Its effectiveness therefore depends on how closely the surrogate objective remains aligned with supervised denoising, especially when noise is correlated, spatially nonstationary, or unknown. We express the discrepancy between a broad class of MSE-based self-supervised objectives and supervised MSE as a parameter-independent constant and a trace interaction between the surrogate-target residual and the prediction error. The corresponding gradient discrepancy is determined by the gradient of this interaction. This formulation provides a common view of paired-noise, blind-spot, weak-noise, re-corruption, and sub-image methods, while revealing that a small global interaction may conceal substantial positive and negative regional interactions through spatial cancellation. Building on these observations, we propose LoTA-N2N, a two-stage zero-shot adaptation framework. Stage 1 trains a denoiser on complementary sub-image pairs and freezes it to construct detached clean-sub-image proxies. Stage 2 estimates the residual--prediction interaction using these proxies and suppresses its patch-wise absolute magnitude. We show that the local construction prevents spatial cancellation and upper-bounds the magnitude of the corresponding global interaction. Experiments across natural, confocal, and X-ray images, complemented by iteration-matched controls, controlled noise shifts, and gradient diagnostics, show consistent gains over MSE-only adaptation under IID, spatially varying, and mixed noise. Overall, LoTA-N2N demonstrates that estimated local interaction and spatial cancellation control provide effective design principles for single-image self-supervised denoising without paired clean targets, repeated acquisitions, or a predefined re-corruption model.",
+      "authors": [
+        "Jintong Hu",
+        "Bin Xia",
+        "Junlin Liu",
+        "Jiayue Liu",
+        "Wenming Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-27T08:16:15+00:00",
+      "link": "https://arxiv.org/pdf/2607.24135v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "self-supervised image denoising method with local trace adaptation",
+      "llm_evidence_cn": "自监督图像去噪方法，局部迹自适应",
+      "llm_evidence": "自监督图像去噪方法，局部迹自适应",
+      "canonical_evidence": "自监督图像去噪方法，局部迹自适应",
+      "llm_tldr_en": "Proposes LoTA-N2N, a zero-shot self-supervised denoising method that adapts local trace to align surrogate objectives with supervised MSE, handling correlated and nonstationary noise without clean targets.",
+      "llm_tldr_cn": "本文提出LoTA-N2N方法，针对单图像自监督去噪中代理目标与监督MSE的失配问题，通过局部迹自适应校正梯度偏差，在无需干净图像的情况下实现对相关噪声、非平稳噪声的有效去噪。该方法为通用图像去噪提供了新思路，可迁移至高光谱图像去噪任务。",
+      "llm_tldr": "本文提出LoTA-N2N方法，针对单图像自监督去噪中代理目标与监督MSE的失配问题，通过局部迹自适应校正梯度偏差，在无需干净图像的情况下实现对相关噪声、非平稳噪声的有效去噪。该方法为通用图像去噪提供了新思路，可迁移至高光谱图像去噪任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.24291v1",
+      "source": "arxiv",
+      "title": "RPG-VST: Robust Poisson-Gaussian Variance Stabilization for Blind RAW Denoising",
+      "abstract": "Variance stabilization with the generalized Anscombe transform (GAT) enables frozen Gaussian denoisers to process Poisson--Gaussian (PG) RAW noise, but its reliability depends on fitted shot/read-noise parameters. In blind single-image deployment, these parameters are estimated from low-texture RAW statistics that are often corrupted by residual texture, clipping, defective pixels, and read-noise floors. Such contamination yields heavy-tailed log-variance residuals, making ordinary least-squares PG calibration brittle and causing severe tail failures despite favorable average PSNR. We propose RPG-VST, a robust no-reference variance-stabilization framework for blind RAW denoising. RPG-VST estimates PG parameters separately for each color filter array (CFA) plane using a Student-$t$ log-variance objective with robust tile statistics and physical constraints. It then estimates the stabilized-domain noise level $σ_z$ from tile variance ratios and uses it as a reliability signal. For each image, RPG-VST selects the robust fit or the conventional OLS fit according to which produces $σ_z$ closer to unit variance, requiring no clean reference or learned threshold. On SID Sony SID$50$, SIDD, and ELD with frozen SwinIR and Restormer denoisers, RPG-VST improves mean PSNR in all six dataset--backbone settings. It reduces severe tails, defined as cases whose PSNR gain over Direct is below $-1$ dB, in four settings and leaves them unchanged in the other two. On SIDD, it yields $+1.83/+1.92$ dB and reduces severe tails from $44/36$ to $7/4$. Ablations show that the $σ_z$ gate prevents regressions of ungated robust fitting on read-noise-dominated ELD captures.",
+      "authors": [
+        "Wenbin Wang",
+        "Xiaotong Luo",
+        "Yuan Gao",
+        "Wenjun Zeng"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP",
+        "eess.IV"
+      ],
+      "published": "2026-07-27T11:39:03+00:00",
+      "link": "https://arxiv.org/pdf/2607.24291v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "robust variance stabilization for blind RAW denoising, method transferable to hyperspectral noise removal",
+      "llm_evidence_cn": "鲁棒方差稳定化用于盲RAW去噪，方法可迁移至高光谱噪声去除",
+      "llm_evidence": "鲁棒方差稳定化用于盲RAW去噪，方法可迁移至高光谱噪声去除",
+      "canonical_evidence": "鲁棒方差稳定化用于盲RAW去噪，方法可迁移至高光谱噪声去除",
+      "llm_tldr_en": "Proposes a robust no-reference variance-stabilization framework for blind RAW denoising that handles heavy-tailed residuals, enabling frozen Gaussian denoisers to process Poisson-Gaussian noise reliably.",
+      "llm_tldr_cn": "针对盲RAW去噪中泊松-高斯参数估计易受残留纹理、裁剪等污染导致尾部失败的问题，提出了鲁棒无参考方差稳定化框架RPG-VST。该方法分别估计每个颜色通道的噪声参数，显著提升了变稳定变换的鲁棒性。实验表明，即使在严重污染下也能保持稳定去噪性能，其思想可推广至高光谱图像的多通道噪声建模。",
+      "llm_tldr": "针对盲RAW去噪中泊松-高斯参数估计易受残留纹理、裁剪等污染导致尾部失败的问题，提出了鲁棒无参考方差稳定化框架RPG-VST。该方法分别估计每个颜色通道的噪声参数，显著提升了变稳定变换的鲁棒性。实验表明，即使在严重污染下也能保持稳定去噪性能，其思想可推广至高光谱图像的多通道噪声建模。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

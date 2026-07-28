@@ -6,28 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-27
-- 运行时间：2026-07-27 21:34:17 UTC
+- 最新运行日期：2026-07-28
+- 运行时间：2026-07-28 20:51:44 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：5
 - 精读区：1
-- 速读区：1
+- 速读区：4
 
 ### 今日简报（AI）
-今天精读了通过极分解实现奇异值软阈值的论文，速读了多主体时空数据变分低秩张量分解研究。  
-最值得关注的是奇异值软阈值的新方法，利用极分解简化计算；低秩张量分解在时空数据分析中也有应用价值。  
-建议深入理解极分解与软阈值的关系，并尝试将低秩张量方法用于多主体数据分析。
-- 详情：[/202607/27/README](/202607/27/README)
+今日推荐5篇论文，其中1篇精读张量逼近的结构损失度量研究高分9.0。最值得关注矩阵低秩逼近与高光谱特征提取方向。建议优先精读张量结构损失论文，并留意稳定重建与自监督去噪的新思路。
+- 详情：[/202607/28/README](/202607/28/README)
 
 ### 精读区论文标签
-1. [Singular value soft-thresholding via the polar decomposition](/202607/27/2607.22484v1-singular-value-soft-thresholding-via-the-polar-decomposition)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：通过极分解的奇异值软阈值实现了用于去噪的低秩矩阵恢复的高效计算
+1. [Structural Loss Metrics for Tensor Approximation via Matrix Low-Rank Approximation](/202607/28/2607.24009v1-structural-loss-metrics-for-tensor-approximation-via-matrix-low-rank-approximation)  
+   标签：评分：9.0/10、query:hsi-denoise
+   evidence：提出了张量近似的结构损失度量，并在高光谱数据集上验证，直接相关于张量数据恢复。
 
 ### 速读区论文标签
-1. [Variational Low-rank Tensor Decomposition for Multisubject Spatiotemporal Data Analysis](/202607/27/2607.22262v1-variational-low-rank-tensor-decomposition-for-multisubject-spatiotemporal-data-analysis)  
+1. [Efficient Spatial-Spectral Feature Extraction in Hyperspectral Images via Holistic Multivariance Decomposition](/202607/28/2607.22272v1-efficient-spatial-spectral-feature-extraction-in-hyperspectral-images-via-holistic-multivariance-decomposition)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：低秩张量分解用于时空数据
+   evidence：采用张量分解和低秩概念进行高光谱特征提取，可用于张量去噪方法
+2. [Stabilizing Deep Reconstruction Operators with Contractive Anchoring](/202607/28/2607.23341v1-stabilizing-deep-reconstruction-operators-with-contractive-anchoring)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：用于PnP/RED去噪的稳定化框架，可应用于高光谱图像去噪。
+3. [LoTA-N2N: Local Trace Adaptation for Zero-Shot Self-Supervised Image Denoising](/202607/28/2607.24135v1-lota-n2n-local-trace-adaptation-for-zero-shot-self-supervised-image-denoising)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：自监督图像去噪方法，局部迹自适应
+4. [RPG-VST: Robust Poisson-Gaussian Variance Stabilization for Blind RAW Denoising](/202607/28/2607.24291v1-rpg-vst-robust-poisson-gaussian-variance-stabilization-for-blind-raw-denoising)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：鲁棒方差稳定化用于盲RAW去噪，方法可迁移至高光谱噪声去除
 
 
 <div class="dpr-home-promo-card">
