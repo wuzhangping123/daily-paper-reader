@@ -1,0 +1,129 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-29T20:47:00.640194+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.23347v1",
+      "source": "arxiv",
+      "title": "Trainable Nonexpansive Denoisers for Contractive Image Reconstruction",
+      "abstract": "Trainable denoisers with Lipschitz control have become central to convergent image reconstruction. However, training neural networks that simultaneously offer strong denoising performance and global Lipschitz guarantees is challenging. Existing approaches enforce Lipschitz control only empirically, providing no guarantees beyond the training data. In this work, we show that by exploiting the action of permutations on the image lattice, we can constrain a neural architecture that is globally nonexpansive (Lipschitz bound $\\leqslant 1$). We integrate the proposed denoiser with forward imaging operators to develop a reconstruction mechanism that is provably contractive and therefore globally convergent. Experiments on standard inverse problems, such as superresolution and deblurring, demonstrate that our reconstruction performance is competitive with softly constrained baselines while providing Lipschitz guarantees.",
+      "authors": [
+        "Arghya Sinha",
+        "Aditya Banerjee",
+        "Trishit Mukherjee",
+        "Kunal N. Chaudhury"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.CV"
+      ],
+      "published": "2026-07-25T19:54:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.23347v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "trainable nonexpansive denoisers with Lipschitz control for contractive image reconstruction",
+      "llm_evidence_cn": "可训练的非扩张去噪器，具有Lipschitz控制，用于收缩图像重建",
+      "llm_evidence": "可训练的非扩张去噪器，具有Lipschitz控制，用于收缩图像重建",
+      "canonical_evidence": "可训练的非扩张去噪器，具有Lipschitz控制，用于收缩图像重建",
+      "llm_tldr_en": "Proposes a neural denoiser architecture that is globally nonexpansive (Lipschitz <= 1) by exploiting permutations on image lattice, integrated into a contractive reconstruction mechanism ensuring global convergence.",
+      "llm_tldr_cn": "训练同时具有强去噪性能和全局Lipschitz保证的神经网络具有挑战性。本文利用图像格点上的置换操作，设计了一种全局非扩张的神经网络去噪器，其Lipschitz常数小于等于1。将其与前向成像算子结合，形成收缩重建机制，确保全局收敛。在超分辨率和去噪等逆问题上取得了良好效果，为可收敛的深度学习图像重建提供了新方案。",
+      "llm_tldr": "训练同时具有强去噪性能和全局Lipschitz保证的神经网络具有挑战性。本文利用图像格点上的置换操作，设计了一种全局非扩张的神经网络去噪器，其Lipschitz常数小于等于1。将其与前向成像算子结合，形成收缩重建机制，确保全局收敛。在超分辨率和去噪等逆问题上取得了良好效果，为可收敛的深度学习图像重建提供了新方案。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.24138v1",
+      "source": "arxiv",
+      "title": "Randomized Krylov-Projected Iterated Tikhonov Regularization for Large-Scale Ill-posed Problems Under A Posteriori Stopping Rule",
+      "abstract": "We introduce two novel randomized iterative regularization frameworks, termed \\texttt{RIGKT} and \\texttt{RIAT}, for solving large-scale linear ill-posed inverse problems governed by systems of equations. The proposed methods combine randomized iterated Tikhonov regularization with Krylov subspace projection techniques, utilizing Golub--Kahan bidiagonalization for general rectangular systems (\\texttt{RIGKT}) and Arnoldi decomposition for square systems (\\texttt{RIAT}). Unlike existing deterministic schemes that rely on fixed iteration counts, our framework incorporates randomized equation selection, an adaptive step-size strategy, and a global, discrepancy-based a posteriori early-stopping rule tailored specifically to the stochastic setting. We present a comprehensive regularization analysis establishing Bregman-distance monotonicity, finite termination, exact-data convergence, and pathwise stability under noise. Furthermore, we prove that the stopped iterates converge almost surely and in the mean-square sense to the true solution, establishing a rigorous regularization property. To the best of our knowledge, this is the first theoretical framework to simultaneously account for randomization, Krylov-subspace dimension reduction, and implementable early stopping. Numerical experiments involving two-dimensional X-ray computed tomography (CT) and image deblurring demonstrate that \\texttt{RIGKT} and \\texttt{RIAT} reliably reconstruct structural features across various noise regimes.",
+      "authors": [
+        "Ravi Verma",
+        "Harshit Bajpai",
+        "Ankik Kumar Giri"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-27T08:18:16+00:00",
+      "link": "https://arxiv.org/pdf/2607.24138v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "randomized iterative regularization combining Tikhonov and Krylov projection for ill-posed inverse problems",
+      "llm_evidence_cn": "结合Tikhonov与Krylov投影的随机迭代正则化用于不适定反问题",
+      "llm_evidence": "结合Tikhonov与Krylov投影的随机迭代正则化用于不适定反问题",
+      "canonical_evidence": "结合Tikhonov与Krylov投影的随机迭代正则化用于不适定反问题",
+      "llm_tldr_en": "Proposes two randomized iterative regularization frameworks (RIGKT and RIAT) combining Tikhonov regularization with Krylov subspace projection, with adaptive step-size and discrepancy-based early stopping.",
+      "llm_tldr_cn": "大规模线性不适定反问题的求解需要高效的正则化方法。本文提出两种随机迭代正则化框架RIGKT和RIAT，结合了迭代Tikhonov正则化与Krylov子空间投影技术，并引入随机方程选择、自适应步长和基于差异的后验早停准则。这些方法在保证解质量的同时提升了计算效率，适用于图像去噪等反问题，为高光谱图像恢复提供了潜在工具。",
+      "llm_tldr": "大规模线性不适定反问题的求解需要高效的正则化方法。本文提出两种随机迭代正则化框架RIGKT和RIAT，结合了迭代Tikhonov正则化与Krylov子空间投影技术，并引入随机方程选择、自适应步长和基于差异的后验早停准则。这些方法在保证解质量的同时提升了计算效率，适用于图像去噪等反问题，为高光谱图像恢复提供了潜在工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25390v1",
+      "source": "arxiv",
+      "title": "Noise-Free One-Step LoRA for Task-Driven Image Restoration with Diffusion Priors",
+      "abstract": "Degraded images not only reduce visual quality but also impair downstream high-level vision tasks. Task-driven image restoration (TDIR) addresses this issue by jointly optimizing restoration quality and task performance. Recent works show that pretrained diffusion priors benefit TDIR, yet diffusion-based restoration is inherently stochastic, as the sampling process depends on a random noise term, which can undermine task consistency. In this paper, we show that a deterministic, noise-free one-step forward pass with pretrained diffusion priors can substantially improve TDIR, but the benefit critically depends on the adaptation module: LoRA yields consistent gains, whereas ControlNet-style conditioning does not. This enables one-step forwarding that surpasses conventional multi-step diffusion TDIR baselines. Furthermore, we introduce a task-preserving GAN training strategy that improves perceptual quality without sacrificing task performance. Extensive experiments on classification, segmentation, and detection demonstrate consistent gains over prior TDIR methods, and we further validate generalization on real-world degraded images and OCR.",
+      "authors": [
+        "Jaeha Kim",
+        "Kyoung Mu Lee"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-28T07:51:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.25390v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "noise-free one-step LoRA for task-driven image restoration using diffusion priors",
+      "llm_evidence_cn": "无噪声一步LoRA用于任务驱动图像恢复，使用扩散先验",
+      "llm_evidence": "无噪声一步LoRA用于任务驱动图像恢复，使用扩散先验",
+      "canonical_evidence": "无噪声一步LoRA用于任务驱动图像恢复，使用扩散先验",
+      "llm_tldr_en": "Shows that deterministic one-step diffusion prior with LoRA adaptation improves task-driven image restoration without stochastic noise.",
+      "llm_tldr_cn": "该论文针对扩散先验随机采样破坏下游任务一致性的问题，提出确定性一步前向传播结合LoRA适配的方式实现任务驱动图像恢复。实验表明LoRA带来稳定提升，而ControlNet则无效。该方法避免了随机噪声，为高效、确定性的扩散恢复提供了新思路，可推广至高光谱图像去噪。",
+      "llm_tldr": "该论文针对扩散先验随机采样破坏下游任务一致性的问题，提出确定性一步前向传播结合LoRA适配的方式实现任务驱动图像恢复。实验表明LoRA带来稳定提升，而ControlNet则无效。该方法避免了随机噪声，为高效、确定性的扩散恢复提供了新思路，可推广至高光谱图像去噪。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

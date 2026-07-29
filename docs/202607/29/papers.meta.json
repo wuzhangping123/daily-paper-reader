@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-29",
+  "date": "2026-07-29",
+  "generated_at": "2026-07-29T20:50:34",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/29/2607.23347v1-trainable-nonexpansive-denoisers-for-contractive-image-reconstruction",
+      "section": "deep",
+      "title_en": "Trainable Nonexpansive Denoisers for Contractive Image Reconstruction",
+      "authors": "Arghya Sinha, Aditya Banerjee, Trishit Mukherjee, Kunal N. Chaudhury",
+      "date": "2026-07-25",
+      "pdf": "https://arxiv.org/pdf/2607.23347v1",
+      "score": "8.0",
+      "evidence": "可训练的非扩张去噪器，具有Lipschitz控制，用于收缩图像重建",
+      "tldr": "图像重建中，可训练且具有Lipschitz控制能力的去噪器至关重要，但现有方法仅凭经验控制，缺乏全局保证。本文通过利用排列在图像晶格上的作用，约束神经网络架构实现全局非扩张性（Lipschitz界≤1），并将其与成像算子集成，形成收缩重建机制，具有全局收敛性。在超分辨率和去模糊等逆问题实验中，该方法性能与软约束基线相当，同时提供了严格的Lipschitz保证。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Trainable denoisers with Lipschitz control have become central to convergent image reconstruction. However, training neural networks that simultaneously offer strong denoising performance and global Lipschitz guarantees is challenging. Existing approaches enforce Lipschitz control only empirically, providing no guarantees beyond the training data. In this work, we show that by exploiting the action of permutations on the image lattice, we can constrain a neural architecture that is globally nonexpansive (Lipschitz bound $\\leqslant 1$). We integrate the proposed denoiser with forward imaging operators to develop a reconstruction mechanism that is provably contractive and therefore globally convergent. Experiments on standard inverse problems, such as superresolution and deblurring, demonstrate that our reconstruction performance is competitive with softly constrained baselines while providing Lipschitz guarantees.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/29/2607.24138v1-randomized-krylov-projected-iterated-tikhonov-regularization-for-large-scale-ill-posed-problems-under-a-posteriori-stopping-rule",
+      "section": "quick",
+      "title_en": "Randomized Krylov-Projected Iterated Tikhonov Regularization for Large-Scale Ill-posed Problems Under A Posteriori Stopping Rule",
+      "authors": "Ravi Verma, Harshit Bajpai, Ankik Kumar Giri",
+      "date": "2026-07-27",
+      "pdf": "https://arxiv.org/pdf/2607.24138v1",
+      "score": "6.0",
+      "evidence": "结合Tikhonov与Krylov投影的随机迭代正则化用于不适定反问题",
+      "tldr": "针对大规模线性病态逆问题，现有确定性正则化方法依赖固定迭代次数且缺乏随机场景下的早停准则。本文提出RIGKT和RIAT两种随机迭代正则化框架，融合随机化迭代Tikhonov与Krylov子空间投影，采用随机方程选择、自适应步长和基于差异的后验早停。理论分析证明了Bregman距离单调性、有限终止、精确数据收敛路径稳定性以及几乎必然和均方收敛性。数值实验表明，该方法在CT成像和图像去模糊中能可靠重建结构特征，首次同时实现了随机化、降维和可实现的早停。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We introduce two novel randomized iterative regularization frameworks, termed \\texttt{RIGKT} and \\texttt{RIAT}, for solving large-scale linear ill-posed inverse problems governed by systems of equations. The proposed methods combine randomized iterated Tikhonov regularization with Krylov subspace projection techniques, utilizing Golub--Kahan bidiagonalization for general rectangular systems (\\texttt{RIGKT}) and Arnoldi decomposition for square systems (\\texttt{RIAT}). Unlike existing deterministic schemes that rely on fixed iteration counts, our framework incorporates randomized equation selection, an adaptive step-size strategy, and a global, discrepancy-based a posteriori early-stopping rule tailored specifically to the stochastic setting. We present a comprehensive regularization analysis establishing Bregman-distance monotonicity, finite termination, exact-data convergence, and pathwise stability under noise. Furthermore, we prove that the stopped iterates converge almost surely and in the mean-square sense to the true solution, establishing a rigorous regularization property. To the best of our knowledge, this is the first theoretical framework to simultaneously account for randomization, Krylov-subspace dimension reduction, and implementable early stopping. Numerical experiments involving two-dimensional X-ray computed tomography (CT) and image deblurring demonstrate that \\texttt{RIGKT} and \\texttt{RIAT} reliably reconstruct structural features across various noise regimes.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/29/2607.25390v1-noise-free-one-step-lora-for-task-driven-image-restoration-with-diffusion-priors",
+      "section": "quick",
+      "title_en": "Noise-Free One-Step LoRA for Task-Driven Image Restoration with Diffusion Priors",
+      "authors": "Jaeha Kim, Kyoung Mu Lee",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25390v1",
+      "score": "6.0",
+      "evidence": "无噪声一步LoRA用于任务驱动图像恢复，使用扩散先验",
+      "tldr": "降质图像损害下游视觉任务，现有扩散先验的任务驱动图像恢复因随机采样导致任务不一致。本文提出无噪声一步前向传播结合LoRA适配器，实现确定性恢复，显著优于多步扩散基线。进一步引入任务保留GAN训练，提升感知质量而不牺牲任务性能。在分类、分割、检测及真实图像OCR上取得一致提升。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Degraded images not only reduce visual quality but also impair downstream high-level vision tasks. Task-driven image restoration (TDIR) addresses this issue by jointly optimizing restoration quality and task performance. Recent works show that pretrained diffusion priors benefit TDIR, yet diffusion-based restoration is inherently stochastic, as the sampling process depends on a random noise term, which can undermine task consistency. In this paper, we show that a deterministic, noise-free one-step forward pass with pretrained diffusion priors can substantially improve TDIR, but the benefit critically depends on the adaptation module: LoRA yields consistent gains, whereas ControlNet-style conditioning does not. This enables one-step forwarding that surpasses conventional multi-step diffusion TDIR baselines. Furthermore, we introduce a task-preserving GAN training strategy that improves perceptual quality without sacrificing task performance. Extensive experiments on classification, segmentation, and detection demonstrate consistent gains over prior TDIR methods, and we further validate generalization on real-world degraded images and OCR.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
