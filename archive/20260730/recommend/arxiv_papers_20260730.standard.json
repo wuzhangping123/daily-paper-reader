@@ -1,0 +1,171 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-30T21:34:06.260004+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.25338v1",
+      "source": "arxiv",
+      "title": "Dual-Domain Manifold Modeling for Hyperspectral Image Fusion",
+      "abstract": "Achieving a coherent integration of spectral richness and spatial fidelity remains a central objective in hyperspectral image fusion. However, existing hyperspectral image fusion methods struggle to effectively model geometric constraints. In the spatial domain, weak spatial-spectral interaction limits geometry-aware feature learning and suppresses high-frequency structural information, resulting in low-frequency bias and structural degradation. In the spectral domain, local manifold structures induced by spectral similarity are insufficiently exploited, limiting intrinsic pixel relationship modeling and fine-grained spectral reconstruction. To address these challenges, we propose a dual-domain manifold modeling (DDMM) framework. Specifically, we introduce a Topology-Aware Transformer (TPFormer) that combines global attention with neighborhood propagation, jointly modeling spatial topology and pixel-level feature manifold relationships to capture intrinsic spatial-spectral structures and improve topology-aware representation learning. Furthermore, a Frequency-Decoupled Spatial-Spectral Collaborative Fusion (FDSCF) module is devised, in which features are projected into the frequency domain via the discrete cosine transform and explicitly decoupled into low- and high-frequency components. Guided by a low-rank structural prior and spectral-driven spatial enhancement, FDSCF selectively enhances geometry-aware high-frequency features, strengthening spatia-spectral coupling and recovering sharper edges and finer textures. Extensive experiments on multiple benchmark datasets demonstrate that DDMM achieves superior overall performance over SoTA methods in terms of spatial structure preservation and spectral reconstruction.",
+      "authors": [
+        "Chengxin Xie",
+        "Qiya Song",
+        "Yangbangyan Jiang",
+        "Renwei Dian",
+        "Xudong Kang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-28T06:40:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.25338v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Dual-domain manifold modeling for hyperspectral image fusion, related to tensor data recovery",
+      "llm_evidence_cn": "双域流形建模用于高光谱图像融合，与张量数据恢复相关",
+      "llm_evidence": "双域流形建模用于高光谱图像融合，与张量数据恢复相关",
+      "canonical_evidence": "双域流形建模用于高光谱图像融合，与张量数据恢复相关",
+      "llm_tldr_en": "Proposes a dual-domain manifold modeling (DDMM) framework for hyperspectral image fusion, enhancing spatial-spectral interaction and manifold modeling, which can benefit hyperspectral denoising and restoration tasks.",
+      "llm_tldr_cn": "该论文提出双域流形建模（DDMM）框架，针对高光谱图像融合中空间-光谱交互弱和流形结构利用不足的问题，在空间域和谱域分别引入拓扑感知和流形约束，有效提升了融合质量。该方法的核心思想可迁移至高光谱去噪中的张量恢复和流形正则化。",
+      "llm_tldr": "该论文提出双域流形建模（DDMM）框架，针对高光谱图像融合中空间-光谱交互弱和流形结构利用不足的问题，在空间域和谱域分别引入拓扑感知和流形约束，有效提升了融合质量。该方法的核心思想可迁移至高光谱去噪中的张量恢复和流形正则化。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.25275v1",
+      "source": "arxiv",
+      "title": "ScaleResfusion: Residual Rectified Flow based on Residual Vector Field",
+      "abstract": "Real-world Image Restoration (Real-IR) aims to recover high-quality (HQ) images from complex and unknown degradations. Although recent diffusion-based methods have substantially improved perceptual quality, their current designs leave two key challenges unresolved. Methods that start from Gaussian noise are slow and often less faithful to the degraded input. Residual-based methods usually train from scratch, which makes it hard to exploit modern pre-trained generative priors. In this paper, we present ScaleResfusion, a scalable diffusion framework for real-world image restoration built on pre-trained text-to-image rectified-flow models. The core of our method is Residual Rectified Flow, which introduces the residual term R into Standard Rectified Flow. Instead of starting from pure noise, it uses a residual transport path that starts from noisy low-quality (LQ) images and admits an exact acceleration point. By learning the residual vector field, Residual Rectified Flow keeps the output distribution and linear diffusion process consistent with the pre-trained rectified-flow models. This makes parameter-efficient fine-tuning possible at scale. We further introduce a knowledge-distillation pipeline to reduce sampling cost while maintaining restoration quality. Extensive experiments on multiple real-world restoration tasks show that ScaleResfusion achieves state-of-the-art performance with much higher efficiency. These results suggest a practical and scalable way to adapt large pre-trained diffusion models to real-world image restoration. Our code and models are available at https://github.com/YukinoshitaLove/ScaleResfusion.",
+      "authors": [
+        "Zhenning Shi",
+        "Chen Xu",
+        "Junhao Zhang",
+        "Kefei Zhang",
+        "Linjie Liu",
+        "Zhedong Zheng",
+        "Tao Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T04:26:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.25275v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deep neural network based image denoising and restoration",
+      "llm_evidence_cn": "基于深度神经网络的图像去噪与恢复",
+      "llm_evidence": "基于深度神经网络的图像去噪与恢复",
+      "canonical_evidence": "基于深度神经网络的图像去噪与恢复",
+      "llm_tldr_en": "ScaleResfusion uses residual rectified flow on pre-trained text-to-image models for real-world image restoration including denoising, achieving high perceptual quality.",
+      "llm_tldr_cn": "针对真实世界图像恢复中退化复杂的问题，本文提出ScaleResfusion框架，基于预训练的文本到图像整流流模型，引入残差整流流进行去噪和恢复。实验表明该方法在保持高感知质量的同时有效处理复杂退化，为图像去噪提供了新方向。",
+      "llm_tldr": "针对真实世界图像恢复中退化复杂的问题，本文提出ScaleResfusion框架，基于预训练的文本到图像整流流模型，引入残差整流流进行去噪和恢复。实验表明该方法在保持高感知质量的同时有效处理复杂退化，为图像去噪提供了新方向。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25295v1",
+      "source": "arxiv",
+      "title": "Breaking the Periodicity Assumption: Robust Tensorial Multi-View Clustering via Graph-Spectral Low-Rank Learning",
+      "abstract": "Tensorial multi-view clustering (TMC) has achieved strong performance due to its ability to capture high-order correlations across multiple views. Most existing t-SVD-based TMC frameworks apply the Fast Fourier Transform (FFT) along the sample mode to impose frequency-domain low-rank constraints. However, we reveal that this widely adopted design critically relies on an implicit ``periodicity assumption'' induced by the sample arrangement. When samples are ordered by class, neighboring indices tend to be semantically similar, creating artificial local continuity along the sample mode and a favorable spectral structure for FFT-based low-rank regularization. Once this ordering is removed by random permutation, existing t-SVD-based TMC methods suffer severe performance degradation. This strong sensitivity to class ordering conflicts with the permutation-invariant nature of clustering and indicates that part of the reported performance may be attributed to a privileged sample arrangement rather than genuine high-order structure modeling. In this paper, we systematically investigate this phenomenon and its underlying algebraic and spectral mechanisms. To address this fundamental flaw, we further propose a graph-spectral low-rank tensor learning framework based on the Graph Fourier Transform (GFT), which replaces the fixed Fourier basis along the sample mode with a data-driven graph spectral basis, thereby capturing the intrinsic manifold structure without relying on a particular sample ordering. Moreover, we develop an anchor-based variant to address large-scale datasets efficiently. Extensive experiments on various benchmarks validate our findings and demonstrate the competitive or superior performance of the proposed methods compared with state-of-the-art TMC approaches.",
+      "authors": [
+        "Jintian Ji",
+        "Xingsu Li",
+        "Songhe Feng"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-28T05:07:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.25295v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "tensor low-rank learning for multi-view clustering, applicable to tensor data recovery",
+      "llm_evidence_cn": "张量低秩学习方法用于多视图聚类，可迁移至张量数据恢复",
+      "llm_evidence": "张量低秩学习方法用于多视图聚类，可迁移至张量数据恢复",
+      "canonical_evidence": "张量低秩学习方法用于多视图聚类，可迁移至张量数据恢复",
+      "llm_tldr_en": "Reveals periodicity assumption in t-SVD based TMC and proposes graph-spectral low-rank learning to handle arbitrary sample ordering, improving clustering robustness.",
+      "llm_tldr_cn": "现有基于t-SVD的张量多视图聚类框架隐式依赖样本排列的周期性假设，当样本随机排列时性能骤降。本文提出一种图谱低秩学习方法来取代标准FFT低秩约束，通过图结构捕捉真实相关性，从而打破周期性假设。实验证明该方法在随机排列下显著提升了聚类鲁棒性。该工作为张量低秩模型的实际应用提供了新视角。",
+      "llm_tldr": "现有基于t-SVD的张量多视图聚类框架隐式依赖样本排列的周期性假设，当样本随机排列时性能骤降。本文提出一种图谱低秩学习方法来取代标准FFT低秩约束，通过图结构捕捉真实相关性，从而打破周期性假设。实验证明该方法在随机排列下显著提升了聚类鲁棒性。该工作为张量低秩模型的实际应用提供了新视角。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "tensor based approaches for hyperspectral image anomaly detection and restoration",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.26951v1",
+      "source": "arxiv",
+      "title": "A Spectral-Domain Pseudo-Inverse Construction Method for Unitary Diagonalizable Linear Inverse Problems",
+      "abstract": "Linear inverse problems are prevalent in geophysics, signal processing, image restoration, and medical imaging. Mathematically, they can be formulated as $Gm = d$. When $G$ is ill-conditioned or singular, the problem becomes ill-posed and requires regularization methods or generalized inverse methods for a stable solution. However, both types of methods encounter significant computational difficulties for large-scale linear inverse problems. In this paper, we establish a spectral-domain pseudo-inverse construction method for a class of linear inverse problems that can be diagonalized by unitary matrices. The core idea is to construct a stable pseudo-inverse operator directly in the transform domain, starting from the unitary diagonalization structure of the matrix. We first provide the analytic Singular Value Decomposition (SVD) of this class of matrices, clarifying the correspondence between spectral decomposition and SVD. On this basis, we define spectral-domain regularization filtering factors, construct a stable spectral-domain pseudo-inverse operator, and prove its bounded stability as well as its consistency in converging to the Moore--Penrose generalized inverse. This construction is numerically equivalent to zeroth-order Tikhonov regularization and converges to the Moore--Penrose generalized inverse as $α\\to 0^+$, but its methodological path differs from both. This paper reveals that the stable generalized inverse of a class of structured matrices can be directly constructed from their spectral decomposition, providing an efficient solution method for large-scale structured inverse problems. The Fourier transform case is a special instance of this method when the unitary matrix is taken as the discrete Fourier transform matrix.",
+      "authors": [
+        "Shengchang Chen"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "physics.geo-ph"
+      ],
+      "published": "2026-07-29T14:18:28+00:00",
+      "link": "https://arxiv.org/pdf/2607.26951v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Spectral-domain pseudo-inverse for image restoration, applicable to denoising",
+      "llm_evidence_cn": "谱域伪逆方法适用于图像恢复，可迁移至去噪",
+      "llm_evidence": "谱域伪逆方法适用于图像恢复，可迁移至去噪",
+      "canonical_evidence": "谱域伪逆方法适用于图像恢复，可迁移至去噪",
+      "llm_tldr_en": "Proposes a spectral-domain pseudo-inverse construction for linear inverse problems diagonalizable by unitary matrices, enabling stable solution for large-scale problems including image restoration.",
+      "llm_tldr_cn": "该论文提出了一种谱域伪逆构造方法，适用于可被酉矩阵对角化的线性逆问题。通过直接在变换域构建稳定的伪逆算子，解决了大规模图像恢复等逆问题的计算困难。虽然未直接针对高光谱去噪，但其方法学可推广至类似任务。",
+      "llm_tldr": "该论文提出了一种谱域伪逆构造方法，适用于可被酉矩阵对角化的线性逆问题。通过直接在变换域构建稳定的伪逆算子，解决了大规模图像恢复等逆问题的计算困难。虽然未直接针对高光谱去噪，但其方法学可推广至类似任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "spectral-spatial denoising for hyperspectral images",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

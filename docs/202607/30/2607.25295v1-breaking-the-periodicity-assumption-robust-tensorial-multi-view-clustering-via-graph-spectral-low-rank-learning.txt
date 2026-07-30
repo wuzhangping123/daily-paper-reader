@@ -1,0 +1,1653 @@
+Title: Breaking the Periodicity Assumption: Robust Tensorial Multi-View Clustering via Graph-Spectral Low-Rank Learning
+
+URL Source: https://arxiv.org/pdf/2607.25295v1
+
+Published Time: Wed, 29 Jul 2026 00:37:01 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# Breaking the Periodicity Assumption: Robust Tensorial Multi-View Clustering via Graph-Spectral Low-Rank Learning 
+
+## Jintian Ji ∗
+
+jintian.ji@griffithuni.edu.au Griffith University Brisbane, QLD, Australia 
+
+## Xingsu Li ∗
+
+xlijp@connect.ust.hk Computer Science and Engineering The Hong Kong University of Science and Technology Hong Kong, China 
+
+## Songhe Feng †
+
+shfeng@bjtu.edu.cn School of Computer and Information Technology Beijing Jiaotong University, Beijing, China 
+
+Abstract 
+
+Tensorial multi-view clustering (TMC) has achieved strong perfor-mance due to its ability to capture high-order correlations across multiple views. Most existing t-SVD-based TMC frameworks ap-ply the Fast Fourier Transform (FFT) along the sample mode to im-pose frequency-domain low-rank constraints. However, we reveal that this widely adopted design critically relies on an implicit “pe-riodicity assumption” induced by the sample arrangement. When samples are ordered by class, neighboring indices tend to be seman-tically similar, creating artificial local continuity along the sample mode and a favorable spectral structure for FFT-based low-rank regularization. Once this ordering is removed by random permu-tation, existing t-SVD-based TMC methods suffer severe perfor-mance degradation. This strong sensitivity to class ordering con-flicts with the permutation-invariant nature of clustering and indi-cates that part of the reported performance may be attributed to a privileged sample arrangement rather than genuine high-order structure modeling. In this paper, we systematically investigate this phenomenon and its underlying algebraic and spectral mech-anisms. To address this fundamental flaw, we further propose a graph-spectral low-rank tensor learning framework based on the Graph Fourier Transform (GFT), which replaces the fixed Fourier basis along the sample mode with a data-driven graph spectral ba-sis, thereby capturing the intrinsic manifold structure without re-lying on a particular sample ordering. Moreover, we develop an anchor-based variant to address large-scale datasets efficiently. Ex-tensive experiments on various benchmarks validate our findings and demonstrate the competitive or superior performance of the proposed methods compared with state-of-the-art TMC approaches. 
+
+1 Introduction 
+
+Multi-view clustering (MVC) [25, 34] is a fundamental task in un-supervised learning that aims to integrate complementary infor-mation from multiple sources or feature spaces to obtain reliable data partitions [5]. By jointly exploiting the consensus and com-plementary information across views, MVC methods often achieve better clustering performance than single-view approaches, such as 𝑘 -means [2]. According to how multi-view information is rep-resented and organized, existing MVC methods can be broadly di-vided into matrix-based and tensor-based approaches. Matrix-based methods mainly include: (i) co-regularization methods [12, 32, 44], 
+
+> ∗Both authors contributed equally to this research.
+> †Corresponding author
+
+which enforce consistency among view-specific latent representa-tions; (ii) subspace learning methods [6, 43, 46], which project or factorize multiple views into a shared low-dimensional consensus space; and (iii) graph-based methods [8, 23, 42, 47], which learn a unified affinity matrix or manifold structure from heterogeneous views. Despite their effectiveness, matrix-based methods primar-ily characterize pairwise or view-wise relationships and may not explicitly capture high-order dependencies shared across multiple views. 
+
+Figure 1: The general workflow of t-SVD-based low-rank ten-sor learning for multi-view clustering. 
+
+Tensor-based multi-view clustering (TMC) methods [13, 14, 22, 39, 41, 45] address this problem by combining the representation matrices of different views into a third-order tensor and then lever-aging the low-rank tensor learning framework for the discovery of consistent clustering structure. The success of these tensor-based methods is largely built upon Tensor Singular Value Decomposi-tion (t-SVD) based on the Fast Fourier Transform (FFT) [28, 29, 41]. As shown in Figure 1, these frameworks first apply FFT along the sample mode to convert the representation tensor into the fre-quency domain, and then impose a low-rank constraint to exploit cross-view consistency. However, applying FFT along the sample mode implicitly treats independent, unordered samples as if they formed a circular sequence, imposing a hidden Periodicity Assump-tion . Class-contiguous ordering approximately induces the local 
+
+> 1arXiv:2607.25295v1 [cs.LG] 28 Jul 2026
+
+smoothness favored by the Fourier basis. However, such an or-dering is merely an artifact of how benchmark datasets are com-monly organized rather than an intrinsic property of the cluster-ing problem. The resulting dependence of model performance on this privileged arrangement fundamentally conflicts with permu-tation invariance [1], an essential property of clustering. Conse-quently, current TMC methods risk reporting an inflated, index-dependent notion of effectiveness: performance can appear strong on class-ordered datasets yet deteriorate sharply once samples are randomly shuffled, even though the ground-truth clustering re-mains unchanged. This observation motivates the following research questions: 
+
+RQ1. Why are FFT-based tensor regularizers applied along the sample mode sensitive to sample permutations? 
+
+RQ2. How can transform-based low-rank tensor learning be redesigned to remain robust to arbitrary sample indexing? 
+
+Answering these questions requires revisiting how transform-domain tensor regularization interacts with sample permutations. Although several recent studies [18, 24] have empirically observed the sensitivity of tensor-based MVC methods to sample ordering, they mainly provide experimental evidence and do not fully char-acterize its algebraic origin or establish a principled permutation-robust alternative. A seemingly straightforward workaround is to apply FFT along the feature or view mode instead of the sample mode. However, such a change merely avoids applying the fixed transform to the sample dimension and does not explain or resolve the underlying order dependence that arises when fixed spectral bases are used to model arbitrarily indexed samples. To address this gap, we systematically investigate the algebraic and spectral foundations of FFT-based low-rank tensor learning. For RQ1 , we show that the Fourier transform imposes a circulant structure along the sample mode and is generally non-equivariant to arbitrary sample permutations. From a spectral perspective, ran-dom reindexing disrupts the artificial local continuity induced by category ordering and redistributes structural energy across Fourier components. This spectral leakage weakens the energy concentra-tion and transform-domain low-rank structure exploited by exist-ing tensor regularizers, causing discriminative information to be excessively suppressed during low-rank shrinkage. For RQ2 , we propose a graph-spectral low-rank tensor learn-ing framework that replaces the fixed Fourier basis with a data-adaptive graph Fourier transform (GFT) basis. The graph Laplacian is constructed from the intrinsic relationships among samples and transforms consistently when the samples are permuted. We es-tablish spectral-subspace equivariance under a general graph spec-trum and exact GTR stability under a simple spectrum. When re-peated eigenvalues are present, the equivariance error of the re-sulting low-rank mapping is bounded by the spectral energy con-tained in the repeated-eigenvalue eigenspaces. Consequently, the recovered representation is no longer tied to an arbitrary sample order. To improve scalability, we further develop an anchor-based graph Fourier transform (AGFT), which uses a compact sample-to-anchor graph to approximate the graph-spectral subspace. This construction avoids the full graph eigendecomposition and reduces both computational and memory costs for large-scale datasets. Our main contributions are summarized as follows: 
+
+1. Diagnosis of Sample-Order Bias. We identify an under-examined sample-order dependence in FFT-based tensorial multi-view clustering, tracing its algebraic origin and connecting random sample permutations to spectral energy redistribution and the col-lapse of transform-domain low-rank structure. 
+
+2. Permutation-Robust Graph-Spectral Regularization. We develop a graph-spectral low-rank tensor learning framework that replaces the fixed Fourier basis with the graph Fourier basis, and establish spectral subspace equivariance under general graph spec-tra and exact GTR stability under the simple spectrum condition. 
+
+3. Scalable and Plug-and-Play Design. We introduce an anchor-based graph Fourier transform (AGFT) that approximates the graph-spectral subspace via a compact sample-to-anchor graph, improv-ing scalability over full-graph GFT. The resulting framework can be integrated into existing FFT-based TMC pipelines with minimal modification to their low-rank tensor learning modules. 
+
+4. Extensive Empirical Validation. We integrate the proposed transforms into multiple representative TMC methods and evalu-ate them under controlled random sample permutations, demon-strating substantially improved robustness to sample ordering and consistently competitive or superior clustering performance across datasets and baselines. 
+
+2 Preliminaries and Related Work 
+
+We first summarize the notation used throughout this paper. Scalars are denoted by lowercase letters, e.g., 𝑥 ; vectors by bold lowercase letters, e.g., 𝑥 ; and matrices by bold uppercase letters, e.g., X. For a matrix, the Frobenius norm, ℓ2,1 norm, and nuclear norm are de-noted by ‖X‖𝐹 , ‖X‖2,1 , and ‖X‖⊛, respectively. 1 and I denote an all-ones vector and the identity matrix, respectively. Third-order tensors are represented by calligraphic letters, e.g., 𝒳 ∈ ℝ 𝑛 1×𝑛 2×𝑛 3 ,and 𝒳 (𝑘) denotes its 𝑘 -th frontal slice. Given tensors 𝒳 ∈ ℝ 𝑛 1×𝑛 2×𝑛 3
+
+and 𝒴 ∈ ℝ 𝑛 2×𝑛 4×𝑛 3 , we next introduce several tensor operations and definitions [20] used in our framework: 
+
+Face-wise product: Given tensors 𝒳 ∈ ℝ 𝑛 1×𝑛 2×𝑛 3 and 𝒴 ∈ℝ𝑛 2×𝑛 4×𝑛 3 , the face-wise product is defined as: 
+
+(𝒳 Δ𝒴 )(𝑖) = 𝒳 (𝑖) 𝒴 (𝑖) , 𝑖 = 1, … , 𝑛 3. (1) 
+
+Mode-3 product : Given an 𝑛 3 × 𝑛 3 matrix M, the mode-3 product of tensor 𝒳 ∈ ℝ 𝑛 1×𝑛 2×𝑛 3 is: 
+
+(𝒳 ×3 M)(𝑖,𝑗,∶) = M𝒳 (𝑖,𝑗,∶) . (2) 
+
+Transform of Tensor: Given an invertible linear transform 𝒯 , the Transform of Tensor 𝒳 along mode-3 is ̄
+
+𝒳 = 𝒯 (𝒳 , T, 3) = 𝒳 ×3 T ∈ ℝ 𝑛 1×𝑛 2×𝑛 3 (3) where the linear transform 𝒯 is defined by an invertible matrix 
+
+T ∈ ℝ 𝑛 3×𝑛 3 . 𝒳 = 𝒯 −1 (̄ 𝒳 , T, 3) denotes the corresponding inverse mapping. 
+
+Generalized Tensor-Tensor product ( 𝒯 -product): Given an invertible linear transform 𝒯 , tensors 𝒳 ∈ ℝ 𝑛 1×𝑛 2×𝑛 3 and 𝒴 ∈ℝ𝑛 2×𝑛 4×𝑛 3 , the 𝒯 -product of 𝒳 and 𝒴 under 𝒯 is 
+
+𝒞 = 𝒳 ∗𝒯 𝒴 ∈ ℝ 𝑛 1×𝑛 4×𝑛 3 (4) where 𝒯 (𝒞 , T, 3) = 𝒯 (𝒳 , T, 3)Δ 𝒯 (𝒴 , T, 3) .
+
+Generalized Tensor Transpose: For any invertible linear trans-form 𝒯 , the generalized tensor transpose of 𝒳 under 𝒯 , denoted by 𝒳 ⊤, satisfies 𝒯 (𝒳 ⊤, T, 3) (𝑖) = ( 𝒯 (𝒳 , T, 3) (𝑖) )⊤, 𝑖 = 1, … , 𝑛 3.
+
+Generalized Identity Tensor: For any invertible linear trans-form 𝒯 , the generalized identity tensor ℐ ∈ ℝ 𝑛×𝑛×𝑛 3 is defined such that 𝒯 (ℐ, T, 3) (𝑖) is an identity matrix for each 𝑖 .
+
+Generalized Orthogonal Tensor: For any invertible linear trans-form 𝒯 , a tensor 𝒬 ∈ ℝ 𝑛×𝑛×𝑛 3 is orthogonal under 𝒯 if it satisfies 
+
+𝒬 ⊤ ∗𝒯 𝒬 = 𝒬 ∗𝒯 𝒬 ⊤ = ℐ.
+
+f-diagonal Tensor: A tensor is called f-diagonal if each of its frontal slices is a diagonal matrix. 
+
+Definition 2.1. Generalized Tensor Singular Value Decom-position (GT-SVD). Given any invertible linear transform 𝒯 , any tensor 𝒳 ∈ ℝ 𝑛 1×𝑛 2×𝑛 3 can be factorized as 
+
+𝒳 = 𝒰 ∗𝒯 𝒮 ∗𝒯 𝒱 ⊤, (5) where 𝒰 ∈ ℝ 𝑛 1×𝑛 1×𝑛 3 , 𝒱 ∈ ℝ 𝑛 2×𝑛 2×𝑛 3 are orthogonal, and 𝒮 ∈ℝ𝑛 1×𝑛 2×𝑛 3 is an f-diagonal tensor. 
+
+Definition 2.2. Generalized Tensor Rank [28]. Given any in-vertible linear transform 𝒯 , tensor 𝒳 ∈ ℝ 𝑛 1×𝑛 2×𝑛 3 and its GT-SVD 
+
+𝒳 = 𝒰 ∗𝒯 𝒮 ∗𝒯 𝒱 ⊤, the generalized tensor rank of 𝒳 under 𝒯 is defined as 
+
+‖𝒳 ‖𝒯 −GTR = 1𝑛 3𝑛 3
+
+∑
+
+> 𝑘=1 ℎ
+
+∑
+
+> 𝑖=1
+
+𝑟𝑎𝑛𝑘 ( 𝒯 (𝒮 , T, 3) (𝑘) (𝑖, 𝑖)) , (6) where ℎ = min (𝑛 1, 𝑛 2), 𝑟𝑎𝑛𝑘(⋅) means the rank function: 𝑟𝑎𝑛𝑘(𝑥) = 1, 𝑥 > 0; 𝑟𝑎𝑛𝑘(𝑥) = 0, 𝑜𝑡ℎ𝑒𝑟𝑤𝑖𝑠𝑒 . Here, various surrogate func-tions 𝜓 (⋅) (e.g., 𝜓 (𝑥) = 𝑥 ) are commonly used to approximate the true rank function [7, 19]. Accordingly, we define ‖𝒳 ‖𝜓  
+
+> 𝒯 -GTR
+
+=1/𝑛 3 ∑𝑛 3 
+
+> 𝑘=1
+
+∑ℎ𝑖=1 𝜓 ( 𝒯 (𝒮 , T, 3) (𝑘) (𝑖, 𝑖)) .
+
+2.1 Tensor-based Multi-view Clustering (TMC) 
+
+The success of tensor-based multi-view clustering (TMC) heavily relies on exploring global consensus through tensor low-rankness. Shifting from early spatial-domain methods [45], modern TMC pre-dominantly operates in the transform domain via the Fast Fourier Transform (FFT) [27, 41]. For a multi-view dataset with 𝑛 samples and 𝑚 views, {X(𝑣) }𝑚 𝑣=1 , where X(𝑣) ∈ ℝ 𝑑 𝑣 ×𝑛 , the generalized t-SVD-based TMC framework can be formulated as min 
+
+> {Z(𝑣) ,E(𝑣) }𝑚 𝑣=1
+
+‖𝒵 ‖𝜓  
+
+> fft −GTR
+
++ 𝛼 ℛ1({ E(𝑣) }𝑚 𝑣=1 ) + 𝛽 ℛ2({ Z(𝑣) }𝑚 𝑣=1 )𝑠.𝑡. ∀𝑣, { Z(𝑣) , E(𝑣) } = Ω( X(𝑣) ), 𝒵 = Φ( Z(1) , Z(2) , … , Z(𝑚) ), 
+
+(7) where the operator Ω(⋅) represents generalized feature construc-tion paradigms (e.g., subspace [11] or graph learning [38]) that extract view-specific representations Z(𝑣) ∈ ℝ 𝑑×𝑛 and their cor-responding reconstruction residuals E(𝑣) ∈ ℝ 𝑑 𝑣 ×𝑛 , and ℛ1, ℛ2 de-note regularization terms (e.g., sparsity or low-rankness). Φ(⋅) [41] stacks and rotates these view-specific representations into a repre-sentation tensor 𝒵 ∈ ℝ 𝑑×𝑚×𝑛 (features × views × samples). The core constraint, ‖𝒵 ‖𝜓 
+
+> fft −GTR
+
+, enforces cross-view consistency via spec-tral energy compaction. Subsequent research has largely evolved within this framework, primarily focusing on anchor-based scala-bility [4, 17, 37] to reduce tensor scale, and non-convex rank sur-rogates [10, 36, 40] to better approximate true low-rankness. To optimize this framework, methods typically employ the Alternat-ing Direction Method of Multipliers (ADMM), which isolates the tensor rank constraint into a proximal sub-problem: min  
+
+> 𝒵
+
+𝜆‖ 𝒵 ‖𝜓  
+
+> fft-GTR
+
++ 12 ‖𝒵 − 𝒴 ‖2𝐹 (8) where 𝒴 is the auxiliary tensor. This problem can be solved by ap-plying the Singular Value Thresholding (SVT) framework to each frequency slice after performing the Fast Fourier Transform (FFT) along the sample mode, as summarized in Algorithm 1. Although Algorithm 1 is computationally efficient and widely adopted in modern TMC methods, this FFT-based sub-problem ex-poses a critical vulnerability: pathological sensitivity to sample per-mutation. The FFT implicitly imposes an artificial periodic (circu-lant) structure along the sample mode, which fundamentally mis-matches the irregular, manifold-structured relationships of real-world multi-view data. Consequently, models often yield inflated performance on ”pre-sorted” benchmarks but collapse under ran-dom shuffling. Addressing this ”order-induced bias” necessitates transitioning from rigid trigonometric bases to data-adaptive trans-forms that respect the underlying data topology. 
+
+Algorithm 1 t-SVD-based Low-Rank Tensor Learning  
+
+> 1:
+
+Input: Representation tensor 𝒴 ∈ ℝ 𝑑×𝑚×𝑛 , parameter 𝜆 , prox-imal penalty function 𝜓 (⋅) . 
+
+> 2:
+
+Output: Recovered low-rank tensor 𝒵 .
+
+> 3:
+
+̄ 𝒴 ← 𝒯 fft (𝒴 , F, 3) ; 
+
+> 4:
+
+for 𝑘 = 1, … , 𝑛 do  
+
+> 5:
+
+[U𝑠𝑣𝑑 , Σ, V] ← SVD (̄ 𝒴 (𝑘) ); 
+
+> 6:
+
+Σnew = Prox 𝜓 ,𝜆 (Σ) [3]; 
+
+> 7:
+
+̄ 𝒵 (𝑘) ← U𝑠𝑣𝑑 Σnew V𝐻 ; 
+
+> 8:
+
+end for  
+
+> 9:
+
+𝒵 ← 𝒯 −1  
+
+> fft
+
+(̄ 𝒵 , F, 3) ;
+
+3 Permutation Sensitivity of FFT-Based Low-Rank Tensor Learning 
+
+The effectiveness of Algorithm 1 depends critically on the energy-compaction property, under which informative multi-view struc-tures are concentrated in a limited number of spectral components. However, to mathematically answer why this framework fails un-der sample shuffling, we must investigate the relationship between sample permutation and spectral energy distribution. For a multi-view representation tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 , the FFT along the sample mode is defined as ̄ 𝒳 = 𝒯 fft (𝒳 , F, 3) = 𝒳 ×3 F,where F ∈ ℂ 𝑛×𝑛 is the Discrete Fourier Transform matrix. We pro-pose the following theorem to characterize the pathological sensi-tivity of FFT in the tensor domain. 
+
+Theorem 3.1. (Permutation Sensitivity of FFT-based Tensor Transform) Let 𝒯 fft (𝒳 , F, 3) denote the Fast Fourier Transform of a representation tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 along its third dimension. For a generic non-identity permutation matrix P ∈ {0, 1} 𝑛×𝑛 , let 𝒳 ′ =0 0.2 0.4 0.6 0.8 1     
+
+> Shuffle Rate (0 to 1)
+> 00.2 0.4 0.6 0.8 1
+> Clustering Performance
+> 00.2 0.4 0.6 0.8 1
+> Normalized TV
+> Dataset: MSRCv1
+> ACC
+> Purity
+> Norm. TV 00.2 0.4 0.6 0.8 1
+> Shuffle Rate (0 to 1)
+> 00.2 0.4 0.6 0.8 1
+> Clustering Performance
+> 00.2 0.4 0.6 0.8 1
+> Normalized TV
+> Dataset: NGs
+> ACC
+> Purity
+> Norm. TV
+
+(a) Clustering Performance 5 10 15 20 25 30 35 40 45          
+
+> AC Frequency Index
+> 10 20 30 40 50 60 70 80 90 100
+> Spectral Energy
+> Spectral Energy vs. Sample Permutation
+> Shuffle Rate = 0.0
+> Shuffle Rate = 0.2
+> Shuffle Rate = 0.4
+> Shuffle Rate = 0.6
+> Shuffle Rate = 0.8
+> Shuffle Rate = 1.0 510 15 20 25 30 35 40 45
+> AC Frequency Index
+> 40 60 80 100 120 140 160 180 200
+> Spectral Energy
+> Spectral Energy vs. Sample Permutation
+> Shuffle Rate = 0.0
+> Shuffle Rate = 0.2
+> Shuffle Rate = 0.4
+> Shuffle Rate = 0.6
+> Shuffle Rate = 0.8
+> Shuffle Rate = 1.0
+
+(b) AC Spectral Energy 
+
+Figure 2: Impact of sample permutation on TLSpNM [15] on MSRCv1 and NGs. (a) Increasing the shuffle rate (the proportion of randomized samples) increases normalized CTV and degrades clustering accuracy. (b) Shuffling weakens low-frequency energy concentration and redistributes energy toward higher frequencies. 
+
+𝒳 ×3 P be the permuted version of 𝒳 . For generic 𝒳 , the following properties hold: 
+
+1. Spectral Non-Equivariance: 
+
+𝒯 fft (𝒳 ′, F, 3) ≠ 𝒯 fft (𝒳 , F, 3), 
+
+𝒯 fft (𝒳 ′, F, 3) ≠ 𝒯 fft (𝒳 , F, 3) × 3 P, (9) 
+
+2. Energy Redistribution Sensitivity: Define the non-direct-current (non-DC) energy vector as 𝑒( 𝒳 ) = [‖̄ 𝒳 (2) ‖2𝐹 , … , ‖̄ 𝒳 (𝑛) ‖2𝐹 ]⊤.The energy distribution is non-invariant under a generic permuta-tion: 
+
+𝑒( 𝒳 ×3 P) ≠ 𝑒( 𝒳 ). (10) 
+
+This implies that there exists at least one frequency 𝑘 ∈ {2, … , 𝑛} such that ‖̄ 𝒳 ′(𝑘) ‖2𝐹 ≠ ‖̄ 𝒳 (𝑘) ‖2𝐹 .
+
+The formal proof is provided in Appendix A. Theorem 3.1 es-tablishes that the FFT-domain low-rank structure exploited by ex-isting TMC methods is sensitive to the particular arrangement of samples. To formalize exactly how permutation degrades perfor-mance, we link this spectral redistribution to the Time-Domain Circular Total Variation (CTV). For 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 , we quantify its smoothness along the sample mode as: 
+
+𝐶𝑇 𝑉 ( 𝒳 ) = 
+
+𝑛−1 
+
+∑
+
+𝑡=1 
+
+‖𝒳 (𝑡+1) − 𝒳 (𝑡) ‖𝐹 + ‖ 𝒳 (1) − 𝒳 (𝑛) ‖𝐹 , (11) where 𝒳 (𝑡) denotes the 𝑡 -th sample slice. When samples are sorted by category, 𝒳 (𝑡+1) ≈ 𝒳 (𝑡) holds for most 𝑡 except at cluster bound-aries, so class-contiguous ordering typically yields a relatively small CTV. In contrast, a uniformly random permutation P is unlikely to preserve this local smoothness and therefore typically increases 
+
+𝐶𝑇 𝑉 ( 𝒳 ×3 P) relative to 𝐶𝑇 𝑉 ( 𝒳 ). The following proposition ex-plains why a small CTV provides a favorable condition for FFT-based low-rank tensor regularization. 
+
+Proposition 3.2. (Frequency Energy Bound) Let ̄ 𝒳 = 𝒯 fft (𝒳 , F, 3) 
+
+be the representation of the tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 in the Fourier domain. The Frobenius norm of the 𝑘 -th alternating-current (AC) frequency component is bounded by the Circular Total Variation (CTV) defined in Eq. (11) :
+
+‖̄ 𝒳 (𝑘) ‖𝐹 ≤ 𝐶𝑇 𝑉 ( 𝒳 )2 | sin (𝜋(𝑘 − 1)/𝑛)| , ∀𝑘 = 2, … , 𝑛. (12) Proposition 3.2 characterizes how sample-mode variation con-trols the magnitude of the non-DC Fourier components. Its proof is provided in Appendix B. Note that the DC component ( 𝑘 = 1 )is invariant to sample permutations and primarily captures the global mean, carrying limited information for distinguishing clus-ter structures. The sample-dependent structural variations relevant to clustering are primarily encoded in the non-DC components (𝑘 > 1 ), whose magnitudes are bounded by Proposition 3.2. When samples are arranged contiguously by category, 𝒳 ex-hibits an approximately piecewise-smooth structure with a rela-tively small 𝐶𝑇 𝑉 ( 𝒳 ). This tightens the upper envelope of the non-DC components and typically promotes stronger spectral energy concentration (Figure 2(b), shuffle rate = 0 ), providing a favorable spectral structure for low-rank regularization to recover the multi-view consensus. In contrast, random permutations destroy this lo-cal continuity and substantially increase 𝐶𝑇 𝑉 ( 𝒳 ). The resulting spectral redistribution spreads discriminative energy across a broader range of frequency slices. Consequently, low-rank shrinkage may excessively suppress these dispersed structural components, lead-ing to degradation in clustering accuracy observed in Figure 2(a). 
+
+4 Graph-Spectral Low-Rank Tensor Learning 
+
+The preceding analysis underscores that to overcome the ”peri-odic curse” of fixed trigonometric bases, a robust low-rank tensor framework necessitates a data-adaptive transformation character-ized by permutation equivariance. To this end, we introduce the Graph Fourier Transform (GFT) [9, 31, 33, 35] in the t-SVD-based low-rank tensor learning framework. 
+
+Definition 4.1. (Graph Fourier Transform of Tensor) Given a graph Laplacian matrix L = U￿U ⊤ ∈ ℝ 𝑛×𝑛 , where U = [𝑢 1, … , 𝑢 𝑛 ]
+
+is the orthonormal matrix of eigenvectors, the Graph Fourier Trans-form (GFT) of a signal 𝑥 ∈ ℝ 𝑛 is defined as ̄ 𝑥 = U⊤𝑥 . For a third-order tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 , the GFT along the third dimension is defined as: ̄
+
+𝒳 = 𝒯 gft (𝒳 , U⊤, 3) = 𝒳 ×3 U⊤ (13) where each tube 𝒳 (𝑖, 𝑗, ∶) is transformed by U⊤.This GFT-based formulation fundamentally departs from the clas-sical FFT approach by respecting the underlying topological struc-ture of the data rather than imposing an artificial sequential order. The significance of this geometric awareness is formalized in The-orem 4.2, which guarantees robustness against sample shuffling. 
+
+Theorem 4.2. (Permutation Equivariance of GFT-based Ten-sor Transform) Let 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 be a third-order tensor and L =U￿U ⊤ ∈ ℝ 𝑛×𝑛 be the graph Laplacian characterizing the relation-ships along the third mode. For any permutation matrix P ∈ {0, 1} 𝑛×𝑛 ,let 𝒳 ′ = 𝒳 ×3 P and L′ = PLP ⊤ = U′￿U ′⊤ be the permuted tensor and Laplacian, respectively. The following properties hold: 
+
+1. Spectral Subspace Equivariance: There exists a block-diagonal orthogonal matrix Q, whose blocks correspond to the eigenspaces as-sociated with repeated eigenvalues, such that U′ = PUQ and 
+
+𝒯 gft (𝒳 ′, U′⊤ , 3) = 𝒯 gft (𝒳 , U⊤, 3) × 3 Q⊤. (14) 
+
+2. GTR Rank Stability: Under the simple spectrum condition, the following equality holds: 
+
+‖𝒳 ′‖gft -GTR = ‖ 𝒳 ‖gft -GTR . (15) The formal proof is provided in Appendix D. By leveraging this permutation-equivariance property, we can mitigate the sample-order sensitivity of current TMC frameworks. We reformulate the low-rank tensor learning sub-problem by substituting the FFT con-straint with the GFT-enhanced norm: min  
+
+> 𝒵
+
+𝜆‖ 𝒵 ‖𝜓  
+
+> gft-GTR
+
++ 12 ‖𝒵 − 𝒴 ‖2𝐹 , (16) where 𝒴 is an auxiliary tensor. Similar to the classical framework, this sub-problem is efficiently solved by applying Singular Value Thresholding (SVT) to each graph-spectral slice ̄ 𝒴 (𝑘) in the graph-spectral domain, followed by the inverse GFT (Algorithm 2). Be-cause the GFT basis adapts to the sample manifold, the resulting low-rank regularizer is better aligned with the intrinsic data geom-etry and is less likely to suppress structural components solely be-cause of arbitrary sample indexing. Although exact slice-wise GTR invariance is guaranteed only under the simple spectrum condi-tion, the GFT-based low-rank mapping has a bounded permutation-equivariance error when repeated eigenvalues are present (see Ap-pendix E). 
+
+Algorithm 2 t-SVD-based Low-Rank Tensor Learning with GFT  
+
+> 1:
+
+Input: Representation tensor 𝒴 ∈ ℝ 𝑑×𝑚×𝑛 , parameter 𝜆 , prox-imal penalty function 𝜓 (⋅) , graph Fourier basis U. 
+
+> 2:
+
+Output: Low-rank tensor 𝒵 .
+
+> 3:
+
+̄ 𝒴 ∈ ℝ 𝑑×𝑚×𝑛 ← 𝒯 gft (𝒴 , U⊤, 3) ; 
+
+> 4:
+
+for 𝑘 = 1, … , 𝑛 do  
+
+> 5:
+
+[U𝑠𝑣𝑑 , Σ, V] ← SVD (̄ 𝒴 (𝑘) ); 
+
+> 6:
+
+Σnew = Prox 𝜓 ,𝜆 (Σ) ;
+
+> 7:
+
+̄ 𝒵 (𝑘) ← U𝑠𝑣𝑑 Σnew V⊤; 
+
+> 8:
+
+end for  
+
+> 9:
+
+𝒵 ← 𝒯 −1  
+
+> gft
+
+(̄ 𝒵 , U⊤, 3) ;
+
+4.1 Simple Graph Construction Strategy 
+
+Although the GFT removes the dependence on a fixed periodic ba-sis, its effectiveness depends critically on the quality of the under-lying graph Laplacian L. To capture the shared geometric structure across views with moderate computational overhead, we adopt a simple graph construction strategy, termed SimG .Given a normalized multi-view dataset {X(𝑣) }𝑚 𝑣=1 with 𝑚 views, where X(𝑣) ∈ ℝ 𝑑 𝑣 ×𝑛 contains 𝑛 samples with 𝑑 𝑣 features, we first form a global representation by vertically concatenating all views: 
+
+X𝑢𝑛𝑖𝑓 𝑖𝑒𝑑 = [ X(1) ; … ; X(𝑚) ] = [̂𝑥 1, … ,̂ 𝑥 𝑛 ] ∈ ℝ 𝑑 𝑎𝑙𝑙 ×𝑛 , (17) where 𝑑 𝑎𝑙𝑙 = ∑ 𝑚 𝑣=1 𝑑 𝑣 is the total feature dimensionality. To charac-terize the local connectivity of the sample manifold, we construct a 𝑘 𝑛 -nearest-neighbor ( 𝑘 𝑛 -NN) graph. The entries of the unified ad-jacency matrix W𝑢𝑛𝑖𝑓 𝑖𝑒𝑑 ∈ ℝ 𝑛×𝑛 are defined as: 
+
+W𝑢𝑛𝑖𝑓 𝑖𝑒𝑑 (𝑖, 𝑗) = { 1 if ̂ 𝑥 𝑗 ∈ 𝒩 𝑘 𝑛 (̂𝑥 𝑖 ) or ̂ 𝑥 𝑖 ∈ 𝒩 𝑘 𝑛 (̂𝑥 𝑗 ), 0 otherwise, (18) where 𝒩 𝑘 𝑛 (̂𝑥 𝑖 ) denotes the set of 𝑘 𝑛 nearest neighbors of sample ̂𝑥 𝑖 based on the Euclidean distance in the joint feature space. By employing the normalized Laplacian L = I − D−1/2 W𝑢𝑛𝑖𝑓 𝑖𝑒𝑑 D−1/2 ,we obtain the graph Fourier basis U through eigendecomposition. 
+
+4.2 Anchor-based Graph Fourier Transform 
+
+Although the GFT-based framework provides theoretical guaran-tees, the time and space complexities of GFT are both 𝒪 (𝑛 2). Such computational overhead limits the scalability of the algorithm for large-scale datasets. To alleviate this burden, we propose a com-putationally efficient framework termed Anchor-based Graph Fourier Transform (AGFT) .
+
+Definition 4.3. (Anchor-based Graph Fourier Transform, AGFT) 
+
+Given a concatenated multi-view feature matrix X𝑢𝑛𝑖𝑓 𝑖𝑒𝑑 ∈ ℝ 𝑑 𝑎𝑙𝑙 ×𝑛 
+
+in Eq. (17), let A = [𝑎 1, … , 𝑎 𝑘 𝑎 ] ∈ ℝ 𝑑 𝑎𝑙𝑙 ×𝑘 𝑎 be 𝑘 𝑎 anchors ( 𝑘 𝑎 ≪ 𝑛 ) ob-tained via anchor-selection methods. Let S ∈ ℝ 𝑛×𝑘 𝑎 be the anchor graph constructed following the method in [26], where S𝑖𝑗 mea-sures the similarity between sample ̂ 𝑥 𝑖 and anchor 𝑎 𝑗 . The AGFT of a tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 along the third dimension is defined as: ̄
+
+𝒳 = 𝒯 agft (𝒳 , U⊤𝑘 𝑎 
+
+, 3) = 𝒳 ×3 U⊤𝑘 𝑎 
+
+∈ ℝ 𝑑×𝑚×𝑘 𝑎 , (19) where U𝑘 𝑎 ∈ ℝ 𝑛×𝑘 𝑎 is the anchor-based graph Fourier basis. Specif-ically, let ￿ = diag (S⊤1) ∈ ℝ 𝑘 𝑎 ×𝑘 𝑎 and D = diag (S1 ) ∈ ℝ 𝑛×𝑛 
+
+be the degree matrices. We first construct the normalized anchor affinity matrix: ̂ S = D−1/2 S￿ −1/2 . Then, we compute the eigende-composition of the reduced matrix: ̂ S⊤̂ S = VΣ2V⊤, where V and Σ
+
+contain the corresponding right singular vectors and positive sin-gular values, respectively. The anchor-based graph Fourier basis is then constructed as: U𝑘 𝑎 =̂ SV Σ−1 = D−1/2 S￿ −1/2 VΣ−1 .
+
+Remark 4.4 . (Permutation Invariance of AGFT) The truncated spectral basis U𝑘 𝑎 exhibits permutation equivariance . Specifically, if the samples are permuted by P while the anchor set is kept fixed or selected by a permutation-invariant procedure, the sample-to-anchor matrix satisfies S′ = PS . Assuming distinct nonzero sin-gular values and a deterministic sign convention, the left singular basis obtained from the SVD of the normalized affinity ̂ S satisfies 
+
+U′𝑘 𝑎 
+
+= PU 𝑘 𝑎 . Consequently, the AGFT spectral coefficients are in-variant to sample ordering: 𝒯 agft (𝒳 ×3P, U′⊤ 𝑘 𝑎 
+
+, 3) = 𝒯 agft (𝒳 , U⊤𝑘 𝑎 
+
+, 3). 
+
+This ensures that the resulting truncated graph-spectral coefficients and the corresponding low-rank regularization remain consistent regardless of the sample sequence. Table 1: Clustering performance (mean(std)) of five baseline architectures on the MSRCv1 and NGs datasets. Baselines Variants Shuffled MSRCv1 Shuffled NGs 
+
+ACC NMI Purity F-score ARI ACC NMI Purity F-score ARI +FFT 81.43(2.38) 73.35(1.53) 81.81(2.38) 70.82(1.94) 65.99(2.30) 88.76(0.86) 74.82(1.24) 88.76(0.86) 80.22(1.29) 75.30(1.61) +FFT(view mode) 86.10(0.21) 77.90(0.50) 86.10(0.21) 75.90(0.28) 71.95(0.33) 99.00(0) 96.52(0) 99.00(0) 98.00(0) 97.51(0) 
+
++GFT(SimG) 88.57(0) 79.33(0) 88.57(0) 78.69(0) 75.52(0) 98.60(0) 95.13(0) 98.60(0) 97.21(0) 96.52(0) +GFT(GMC) 91.90(0) 84.34(0.37) 91.90(0) 84.44(0.04) 81.92(0.04) 98.28(0.11) 94.19(0.38) 98.28(0.11) 96.59(0.22) 95.74(0.27) +AGFT 88.86(0.43) 80.45(0.44) 88.86(0.43) 79.20(0.76) 75.80(0.90) 92.60(0) 79.37(0) 92.60(0) 85.75(0) 82.30(0) t-SVD-MVC +GFT(Ideal) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) +FFT 47.05(3.17) 30.04(2.06) 47.71(2.84) 30.82(1.77) 19.49(2.08) 68.68(1.67) 39.99(1.81) 68.68(1.67) 50.81(1.80) 38.50(2.28) +FFT(view mode) 54.95(2.62) 37.79(1.35) 55.14(2.46) 37.10(1.58) 26.75(1.78) 82.24(0.09) 61.22(0.31) 82.24(0.09) 68.50(0.16) 60.63(0.20) +GFT(SimG) 69.71(0.99) 56.56(1.19) 69.71(0.99) 62.11(0.84) 47.21(1.17) 85.00(0) 67.09(0) 85.00(0) 73.10(0) 66.39(0) +GFT(GMC) 74.48(4.59) 62.76(6.17) 74.86(4.50) 61.02(5.76) 54.57(6.73) 97.56(0.65) 92.23(1.63) 97.56(0.65) 95.20(1.24) 94.01(1.55) 
+
++AGFT 80.10(1.23) 66.56(1.03) 80.10(1.23) 66.36(1.15) 41.45(2.20) 75.00(0) 58.53(0) 75.00(0) 61.84(0) 52.14(0) TLSpNM +GFT(Ideal) 100(0) 100(0) 100(0) 100(0) 100(0) 99.84(0.09) 99.44(0.31) 99.84(0.09) 99.68(0.18) 99.60(0.22) +FFT 80.33(0.55) 69.82(1.38) 80.33(0.55) 67.70(2.11) 62.30(1.62) 95.32(0.19) 85.89(0.54) 95.32(0.19) 90.85(0.65) 88.58(0.46) +FFT(view mode) 80.29(0.43) 70.04(2.12) 80.29(0.43) 67.88(2.02) 62.59(2.37) 95.80(0) 87.84(0) 95.80(0) 91.78(0) 89.74(0) +GFT(SimG) 87.81(0.26) 80.03(0.48) 87.81(0.26) 77.58(0.33) 73.85(0.38) 97.16(0.09) 90.79(0.30) 97.16(0.09) 94.39(0.17) 93.00(0) +GFT(GMC) 91.62(0.26) 83.99(0.50) 91.62(0.26) 83.90(0.41) 81.28(0.48) 98.24(0.09) 94.02(0.23) 98.24(0.09) 96.51(0.17) 95.64(0) 
+
++AGFT 89.05(0) 80.05(0) 89.05(0) 79.07(0) 75.62(0) 90.84(0) 75.56(0) 90.84(0) 82.56(0) 78.21(0) ASR-ETR +GFT(Ideal) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) +FFT 77.81(1.74) 67.56(2.84) 77.81(1.74) 65.97(1.95) 60.41(2.29) 85.84(0.52) 67.72(0.77) 85.84(0.52) 73.99(1.08) 67.48(1.14) +FFT(view mode) 78.29(0.80) 70.23(0.52) 78.29(0.80) 67.28(0.50) 61.97(0.58) 86.44(0.09) 68.59(0.12) 86.44(0.09) 75.07(0.30) 68.64(0.17) +GFT(SimG) 85.05(1.53) 74.99(1.78) 85.05(1.53) 74.32(1.64) 70.06(1.92) 96.60(0) 89.53(0) 96.60(0) 93.33(0) 91.68(0) +GFT(GMC) 88.67(2.72) 79.58(4.08) 88.67(2.72) 78.75(4.75) 75.26(5.55) 98.20(0) 93.92(0) 98.20(0) 96.43(0) 95.54(0) 
+
++AGFT 87.81(0.26) 78.87(0.55) 87.81(0.26) 77.38(0.44) 73.61(0.51) 87.80(0) 71.35(0) 87.80(0) 77.53(0) 71.92(0) ESTMC +GFT(Ideal) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) 100(0) +FFT 85.24(0) 75.33(0) 85.24(0) 74.60(0) 70.34(0) 88.26(0.19) 70.02(0.72) 88.26(0.19) 78.32(0.34) 72.93(0.42) +FFT(view mode) 85.05(0.43) 76.21(0.63) 85.05(0.43) 75.83(1.21) 71.81(1.36) 91.40(0) 77.13(0) 91.40(0) 83.91(0) 79.93(0) +GFT(SimG) 83.81(2.13) 75.05(0.63) 84.38(0.85) 73.90(0.22) 69.57(0.25) 97.20(0) 91.26(0) 97.20(0) 94.46(0) 93.08(0) +GFT(GMC) 91.90(0) 84.52(0) 91.90(0) 84.48(0) 81.97(0) 98.20(0) 93.92(0) 98.20(0) 96.43(0) 95.54(0) 
+
++AGFT 84.76(0) 76.45(0) 84.76(0) 74.23(0) 69.93(0) 90.80(0) 76.95(0) 90.80(0) 82.86(0) 78.61(0) TLRLF4MVC +GFT(Ideal) 95.24(0) 90.53(0) 95.24(0) 91.07(0) 89.62(0) 100(0) 100(0) 100(0) 100(0) 100(0) 
+
+Remark 4.5 . (Intuitive Interpretation of AGFT) Since U𝑘 𝑎 ∈ℝ𝑛×𝑘 𝑎 is rectangular, AGFT is not an invertible transform over the original sample space, but a truncated projection onto a 𝑘 𝑎 -dimensional graph-spectral subspace. Intuitively, U𝑘 𝑎 retains the dominant smooth components characterized by the anchor graph, while the omitted orthogonal complement U⟂ is assumed to contain relatively little structural energy. Because the singular-value proximal operator maps zero matrices to zero, the discarded components remain inac-tive during low-rank shrinkage. AGFT can therefore be viewed as performing slice-wise low-rank learning within a compact graph-spectral subspace. Moreover, it reduces the per-tube cost of full GFT from 𝒪 (𝑛 2) to 𝒪 (𝑛𝑘 𝑎 ), where 𝑘 𝑎 ≪ 𝑛 , thereby improving scal-ability on large datasets. 
+
+5 Experiments 5.1 Experimental Setup 
+
+Datasets: We conduct experiments on eight benchmark datasets, including MSRCv1, NGs, BBCSport, Caltech101-20, CCV, Caltech101-all, Aloi-100, and Animal. For each trial, we generate a random per-mutation of the sample indices and apply the same permutation to all views and the ground-truth labels. This procedure removes class-contiguous ordering while preserving cross-view sample cor-respondence and the underlying clustering problem. Further de-tails are provided in Appendix F. 
+
+Baselines: To comprehensively evaluate the performance of our GFT-based framework, we benchmark it against five state-of-the-art TMC methods. These baselines represent the current frontier of FFT-based low-rank tensor learning, including t-SVD-MVC (IJCV 2018) [41], TLSpNM (TPAMI 2023) [15], ASR-ETR (ICCV 2023) 
+
+[16], ESTMC (TPAMI 2025) [19], and TLRLF4MVC (TPAMI 2025) 
+
+[26]. Further details are provided in Appendix F. 
+
+Evaluation Metrics: To quantitatively assess the clustering per-formance, we adopt five widely recognized evaluation metrics: Ac-curacy (ACC), Normalized Mutual Information (NMI), Purity, F-score, and Adjusted Rand Index (ARI). In addition to performance metrics, we also record the CPU runtime (including graph con-struction) to evaluate the computational efficiency. 
+
+Implementation Details: To ensure a rigorous comparison, we integrate the GFT-based transform into representative TMC baselines by replacing their sample-mode FFT components. We evaluate our framework using three graph construction strategies: a 𝑘 -nearest neighbor graph (SimG, 𝑘 𝑛 = 10 ), an adaptive graph (GMC [38]), and an ideal graph (oracle upper-bound reference). These variants are referred to as GFT(SimG) , GFT(GMC) , and 
+
+GFT(Ideal) , respectively. We also employ the AGFT (Theorem 4.3) with anchors selected via BKHK [30]. The number of anchors is set to 𝑘 𝑎 = 2 min (𝑐,10) , where 𝑐 denotes the number of clusters. Further-more, we include an FFT(view mode) variant [24] that performs FFT along the view mode to specifically benchmark against exist-ing efforts to mitigate sample-ordering sensitivity. All results are averaged over five independent trials with hyperparameters opti-mized via grid search. More details are provided in Appendix F. The code is available at https://github.com/jijintian/GFT-TMVC. 
+
+5.2 Results 
+
+The results of different baselines (with different variants) are shown in Table 1, where the best and second-best are highlighted in bold and underlined, respectively, excluding the GFT(Ideal). Based on these results, we make the following observations. 
+
+General Superiority of GFT over FFT . The experimental re-sults reveal that, in the vast majority of scenarios, our proposed GFT-based frameworks consistently and substantially outperform the traditional FFT-based framework. Notably, on Shuffled MSRCv1, GFT improves the ACC of the TLSpNM baseline from 47.05% to 
+
+74.48% . The fundamental reason for this consistent superiority lies in the nature of the transform basis. While the standard FFT em-ploys a fixed trigonometric basis that assumes a rigid, periodic structure, our GFT framework leverages a data-adaptive graph ba-sis. By constructing a graph that encapsulates the intrinsic mani-fold structure, the GFT ”aligns” its spectral atoms with the under-lying sample clusters. Consequently, while the FFT suffers from spectral dispersion and the collapse of the low-rank prior when sample relationships are disordered, the GFT maintains a highly compact energy distribution, leading to more robust and accurate clustering. 
+
+Limitations of FFT(view mode). Performing FFT along the view dimension avoids sample-order sensitivity, but its fixed si-nusoidal basis is not adapted to the heterogeneous dependencies among views. As shown in Table 1, its effectiveness varies con-siderably across baseline architectures. For example, on TLSpNM, FFT(view mode) underperforms +GFT(GMC) by 19.53 percentage points in ACC, whereas on ASR-ETR it yields only a 0.22-point NMI improvement over the original FFT variant. These results in-dicate that FFT(view mode) can be effective in some cases, but does not consistently capture cross-view dependencies as well as a data-adaptive graph-spectral transform. 
+
+Empirical Performance Lower and Upper Bounds. The near-ideal performance of GFT(Ideal) defines a high ceiling, proving that the efficacy of the GFT-based framework scales with graph qual-ity. Crucially, our SimG and AGFT serve as the performance floor of this paradigm. Despite using minimalist, non-optimized graphs, these configurations outperform FFT-based methods in most sce-narios. This underscores the inherent robustness of the GFT-based framework over order-dependent FFT-based pipelines, suggesting that GFT-based TMC offers a superior, scalable path toward opti-mal low-rank tensor learning as graph learning evolves. 
+
+Efficiency and Scalability of AGFT. As shown in Table 2, AGFT achieves substantially lower runtime than full-graph GFT variants and is competitive with FFT on large-scale datasets. By re-ducing the transform complexity per tube from 𝒪 (𝑛 2) (𝒪 (𝑛 log 𝑛) in FFT) to 𝒪 (𝑛𝑘 𝑎 ) (𝑘 𝑎 ≪ 𝑛 ), AGFT effectively eliminates the scalability bottleneck of traditional GFT. Remarkably, AGFT even surpasses FFT in efficiency; for instance, on Caltech101-all, it reduces main execution time from 110.59s to 37.98s—a nearly 3-fold speedup— while achieving the highest non-ideal ACC of 30.54%. These re-sults demonstrate that AGFT not only bridges the efficiency gap be-tween graph and Fourier-based methods but also provides a highly scalable solution for large-scale multi-view clustering. 
+
+5.3 Ablation Study 
+
+Influence of Shuffle Rates on GFT-based Methods. To eval-uate the robustness of our framework against data disorder, we conduct experiments with shuffle rates ranging from 0 to 1. As illustrated in Figure 3, with additional results provided in Appen-dix H, the performance of the FFT-based framework deteriorates sharply as the sample order becomes randomized; our GFT(SimG), GFT(GMC), and AGFT variants exhibit remarkable stability. Their clustering metrics remain nearly invariant as the shuffle rate in-creases, maintaining a near-constant plateau. This empirically val-idates that the graph-adaptive basis effectively captures the intrin-sic topology, making the spectral representation substantially more stable under sample permutations. 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1           
+
+> Shuffle Rate
+> 0.75 0.8 0.85 0.9 0.95 1
+> Clustering Accuracy (ACC)
+> SimG
+> GMC
+> AGFT
+> Ideal
+> FFT
+> (a) MSRCv1 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> Shuffle Rate
+> 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+> Clustering Accuracy (ACC)
+> SimG
+> GMC
+> AGFT
+> Ideal
+> FFT (b) NGs
+
+Figure 3: Influence of shuffle rates on different transform variants within the t-SVD-MVC framework. Spectral Energy Compaction Analysis. To investigate how sample reordering affects the learned spectral representation, we evaluate different methods over different shuffle rates and analyze the energy concentration of the transformed tensor. Specifically, the Cumulative Energy Ratio (CER) of the first 𝐾 non-DC compo-nents is defined as CER (𝐾 ) = ∑𝐾 +1 𝑖=2 𝐸 𝑖 
+
+∑𝑛 𝑖=2 𝐸 𝑖 
+
+, 𝐾 ∈ {1, 2, … , 𝑛 − 1}, (20) where 𝐸 𝑖 = ‖̄ 𝒵 (∶, ∶, 𝑖)‖ 2𝐹 denotes the energy of the 𝑖 -th frequency slice, ‖ ⋅ ‖ 𝐹 is the Frobenius norm, and the first slice is excluded as the DC component. As illustrated in Figure 4, with additional results provided in Ap-pendix H, the CER profile of FFT changes noticeably as the shuffle rate increases, indicating that its spectral energy allocation is sen-sitive to the sample order. In particular, sample reordering redis-tributes energy across a broader range of frequency components, weakening the concentration of energy in the leading components. By contrast, GFT(SimG), GFT(GMC), and GFT(Ideal) exhibit sub-stantially more consistent CER curves across different shuffle rates. This stability suggests that graph-adaptive transforms organize spec-tral components according to intrinsic sample relationships rather than their sequential indices, thereby preserving a more consistent energy representation under arbitrary permutations. Table 2: Runtime (main execution + transform matrix construction) and performance of TLRLF4MVC with different trans-forms. 
+
+Methods Shuffled CCV Shuffled Aloi-100 Shuffled Caltech101-all Shuffled Animal ACC Time (s) ACC Time (s) ACC Time (s) ACC Time (s) +FFT 26.53 21.55 + 0 72.08 65.52 + 0 26.17 110.59 + 0 19.42 88.09 + 0 +SimG 27.28 95.67 + 10.77 74 116.41 + 25.83 29.1 168.56 + 17.92 20.53 150.44 + 37.23 +GMC 28.11 63.75 + 157.38 75.06 142.09 + 284.13 28.72 167.91 + 207.36 21.57 131.58 + 279.72 +Ideal 65.38 36.7 + 10.66 82.44 126.91 + 26.50 65.75 195.85 + 16.89 68.96 122.93 + 33.10 +AGFT 26.87 11.68 + 0.62 75.06 33.17 + 1.60 30.54 37.98 + 12.81 20.82 22.48 + 35.66 10 20 30 40 50 60 
+
+> AC Frequency Index
+> 00.2 0.4 0.6 0.8 1
+> Cumulative Energy Ratio (CER)
+> FFT
+> SimG
+> GMC
+> Ideal
+
+(a) MSRCv1 10 20 30 40 50 60  
+
+> AC Frequency Index
+> 00.2 0.4 0.6 0.8 1
+> Cumulative Energy Ratio (CER)
+> FFT
+> SimG
+> GMC
+> Ideal
+
+(b) NGs 
+
+Figure 4: Comparison of the Cumulative Energy Ratio (CER) at shuffle rates of 0, 0.5 , and 1, where darker colors indicate higher shuffle rates. Influence of Different Tensor Transform Bases. We visual-ize the basis matrices on MSRCv1 (Figure 5) to examine how dif-ferent transforms encode sample relationships. For the GFT vari-ants, rows are ordered by ground-truth labels, and the first 30 low-frequency components are shown. The FFT basis (Figure 5(a)) ex-hibits fixed, data-independent periodic patterns that are not aligned with the underlying clusters. As a result, cluster-related variations may spread across a broader spectral range rather than concen-trate in the leading components. In contrast, the GFT-based ma-trices (Figure 5(b–d)) display clear block-wise patterns, with sev-eral low-frequency vectors approximately aligned with the cluster structure. This alignment can concentrate structural energy within a cluster-relevant subspace. Although the Ideal GFT serves as an or-acle reference, SimG and GMC (Figure 5(b–c)) recover qualitatively similar patterns, suggesting that GFT remains structure-aware even when built from estimated graphs. 
+
+Comparison with Other Transformations. To assess the con-tribution of GFT, we replace it with the random orthogonal basis, FFT, DCT, and wavelet transforms while keeping all other compo-nents of ESTMC unchanged. By keeping the optimization frame-work and all other settings unchanged, this controlled comparison attributes the differences solely to the spectral transform applied along the sample mode. As shown in Table 3, GFT consistently delivers the best performance across all four datasets. Compared with FFT, it improves ACC by 7.24%, 10.76%, 11.43%, and 12.39% on MSRCv1, NGs, BBCSport, and Caltech101-20, respectively. By con-trast, DCT and wavelet generally underperform FFT, suggesting that replacing FFT with another fixed transform does not improve clustering performance in the shuffled case. The advantage of GFT can be attributed to its data-adaptive basis, which is constructed Real Part          
+
+> 20 40 60 80 100 120 140 160 180 200
+> Frequency Index k
+> 20 40 60 80 100 120 140 160 180 200
+> Time Index t
+> -1 -0.8 -0.6 -0.4 -0.2 00.2 0.4 0.6 0.8 1
+
+(a) FFT GFT Basis Matrix Heatmap (Sorted by Labels)           
+
+> 20 40 60 80 100 120 140 160 180 200
+> Sample Index (Grouped by Clusters)
+> 510 15 20 25
+> Frequency Index (0<k<30)
+> 0.05 0.1 0.15 0.2 0.25 0.3
+
+(b) GFT(SimG) GFT Basis Matrix Heatmap (Sorted by Labels)          
+
+> 20 40 60 80 100 120 140 160 180 200
+> Sample Index (Grouped by Clusters)
+> 510 15 20 25
+> Frequency Index (0<k<30)
+> 00.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5
+
+(c) GFT(GMC) GFT Basis Matrix Heatmap (Sorted by Labels)           
+
+> 20 40 60 80 100 120 140 160 180 200
+> Sample Index (Grouped by Clusters)
+> 510 15 20 25
+> Frequency Index (0<k<30)
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8
+
+(d) GFT(Ideal) 
+
+Figure 5: Visualization of the transform basis matrices on the MSRCv1 dataset. Table 3: Comparison of different transforms with the ESTMC framework on shuffled datasets (ACC%). 
+
+Method MSRCv1 NGs BBCSport Caltech101-20 +Random 77.62 74.80 80.33 42.46 +FFT 77.81 85.84 83.42 41.93 +GFT(SimG) 85.05 96.60 94.85 54.32 
+
++DCT 74.76 69.24 68.64 36.48 +Wavelet 73.33 74.80 80.33 42.85 
+
+from the sample graph and thus better preserves the intrinsic re-lationships among samples under random permutations. These re-sults validate GFT as a more suitable transform for sample-mode low-rank tensor learning. 
+
+6 Conclusion 
+
+In this paper, we investigated the sample-order sensitivity of t-SVD-based tensorial multi-view clustering frameworks. We showed theoretically that applying a fixed Fourier basis along the sample mode does not preserve the spectral representation under generic sample permutations and can redistribute structural energy across frequency components. To address this issue, we proposed a graph-spectral low-rank tensor learning framework that replaces the fixed Fourier basis with a data-adaptive GFT basis. We further intro-duced an anchor-based variant that reduces the transform cost to 𝒪 (𝑛𝑘 𝑎 ) and improves scalability. Experiments across multiple datasets and representative TMC baselines demonstrate that the proposed graph-based transforms are substantially more robust to sample reordering while achieving competitive or improved clus-tering performance. These results highlight the importance of re-specting permutation structure when applying transform-domain tensor regularization to unordered samples. This work bridges the gap between graph signal processing and tensor learning, offering a more robust and scalable foundation for the TMC community. 
+
+References 
+
+[1] Margareta Ackerman, Shai Ben-David, and David Loker. 2010. Towards property-based classification of clustering paradigms. In Advances in Neural In-formation Processing Systems , Vol. 23. [2] Mohiuddin Ahmed, Raihan Seraj, and Syed Mohammed Shamsul Islam. 2020. The k-means algorithm: A comprehensive survey and performance evaluation. 
+
+Electronics 9, 8 (2020), 1295. [3] Jian-Feng Cai, Emmanuel J Candès, and Zuowei Shen. 2010. A singular value thresholding algorithm for matrix completion. SIAM Journal on Optimization 20, 4 (2010), 1956–1982. [4] Wei Chang, Huimin Chen, Feiping Nie, Rong Wang, and Xuelong Li. 2024. Tensorized and compressed multi-view subspace clustering via structured con-straint. IEEE Transactions on Pattern Analysis and Machine Intelligence 46, 12 (2024), 10434–10451. [5] Guoqing Chao, Shiliang Sun, and Jinbo Bi. 2021. A survey on multiview cluster-ing. IEEE Transactions on Artificial Intelligence 2, 2 (2021), 146–168. [6] Man-Sheng Chen, Chang-Dong Wang, Dong Huang, Jian-Huang Lai, and Philip S Yu. 2022. Efficient orthogonal multi-view subspace clustering. In Pro-ceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . 127–135. [7] Yongyong Chen, Shuqin Wang, Chong Peng, Zhongyun Hua, and Yicong Zhou. 2021. Generalized nonconvex low-rank tensor approximation for multi-view subspace clustering. IEEE Transactions on Image Processing 30 (2021), 4022–4035. [8] Hao Dai, Yang Liu, Peng Su, Hecheng Cai, Shudong Huang, and Jiancheng Lv. 2024. Multi-view clustering by inter-cluster connectivity guided reward. In Pro-ceedings of the 41st International Conference on Machine Learning . Article 390, 10 pages. [9] Lei Deng, Xiao-Yang Liu, Haifeng Zheng, Xinxin Feng, and Youjia Chen. 2021. Graph spectral regularized tensor completion for traffic data imputation. IEEE Transactions on Intelligent Transportation Systems 23, 8 (2021), 10996–11010. [10] Meng Ding, Jing-Hua Yang, Xi-Le Zhao, Jie Zhang, and Michael K Ng. 2025. Non-convex low-rank tensor representation for multi-view subspace clustering with insufficient observed samples. IEEE Transactions on Knowledge and Data Engi-neering 37, 6 (2025), 3583–3597. [11] Lele Fu, Sheng Huang, Lei Zhang, Jinghua Yang, Zibin Zheng, Chuanfu Zhang, and Chuan Chen. 2024. Subspace-contrastive multi-view clustering. ACM Trans-actions on Knowledge Discovery from Data 18, 9 (2024), 1–35. [12] Yu Gan, Yunning You, Junjie Huang, Sen Xiang, Chang Tang, Wei Hu, and Shan An. 2025. Multi-view clustering via multi-stage fusion. IEEE Transactions on Multimedia 27 (2025), 4571–4583. [13] Zhibin Gu and Songhe Feng. 2024. From dictionary to tensor: A scalable multi-view subspace clustering framework with triple information enhancement. In 
+
+Advances in Neural Information Processing Systems , Vol. 37. 103545–103573. [14] Zhibin Gu, Zhendong Li, and Songhe Feng. 2024. EDISON: Enhanced dictionary-induced tensorized incomplete multi-view clustering with Gaussian error rank minimization. In Proceedings of the 41st International Conference on Machine Learning . Article 658, 20 pages. [15] Jipeng Guo, Yanfeng Sun, Junbin Gao, Yongli Hu, and Baocai Yin. 2023. Logarith-mic Schatten-p norm minimization for tensorial multi-view subspace clustering. 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence 45, 3 (2023), 3396– 3410. [16] Jintian Ji and Songhe Feng. 2023. Anchor structure regularization induced multi-view subspace clustering via enhanced tensor rank minimization. In Proceedings of the IEEE/CVF International Conference on Computer Vision . 19343–19352. [17] Jintian Ji and Songhe Feng. 2023. High-order complementarity induced fast multi-view clustering with enhanced tensor rank minimization. In Proceedings of the 31st ACM International Conference on Multimedia . 328–336. [18] Jintian Ji and Songhe Feng. 2025. Anchors bring stability and efficiency: Fast tensorial multi-view clustering on shuffled datasets. In Proceedings of the 33rd ACM International Conference on Multimedia . 1676–1685. [19] Jintian Ji and Songhe Feng. 2025. Anchors crash tensor: Efficient and scalable tensorial multi-view subspace clustering. IEEE Transactions on Pattern Analysis and Machine Intelligence 47, 4 (2025), 2660–2675. [20] Eric Kernfeld, Misha Kilmer, and Shuchin Aeron. 2015. Tensor–tensor products with invertible linear transforms. Linear Algebra Appl. 485 (2015), 545–570. [21] Fei-Fei Li, R. Fergus, and P. Perona. 2004. Learning generative visual models from few training examples: An incremental Bayesian approach tested on 101 object categories. In 2004 Conference on Computer Vision and Pattern Recognition Workshop . 178–178. [22] Jing Li, Quanxue Gao, Qianqian Wang, Cheng Deng, and Deyan Xie. 2024. La-bel learning method based on tensor projection. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . 1599–1609. [23] Xuelong Li, Han Zhang, Rong Wang, and Feiping Nie. 2020. Multiview cluster-ing: A scalable and parameter-free bipartite graph fusion method. IEEE Transac-tions on Pattern Analysis and Machine Intelligence 44, 1 (2020), 330–344. [24] Jiyuan Liu, Xinwang Liu, Chuankun Li, Xinhang Wan, Hao Tan, Yi Zhang, Weix-uan Liang, Qian Qu, Yu Feng, Renxiang Guan, et al. 2025. Large-scale multi-view tensor clustering with implicit linear kernels. In Proceedings of the Computer Vi-sion and Pattern Recognition Conference . 20727–20736. [25] Xinwang Liu, Ke Liang, Jun Wang, Suyuan Liu, Xiangke Wang, and Huaimin Wang. 2025. Two decades of multi-view clustering: Taxonomy, application, and challenge. IEEE Transactions on Pattern Analysis and Machine Intelligence (2025), 1–20. [26] Zhen Long, Qiyuan Wang, Yazhou Ren, Yipeng Liu, and Ce Zhu. 2025. TL-RLF4MVC: Tensor low-rank and low-frequency for scalable multi-view cluster-ing. IEEE Transactions on Pattern Analysis and Machine Intelligence (2025). [27] Canyi Lu, Jiashi Feng, Yudong Chen, Wei Liu, Zhouchen Lin, and Shuicheng Yan. 2016. Tensor robust principal component analysis: Exact recovery of corrupted low-rank tensors via convex optimization. In IEEE Conference on Computer Vi-sion and Pattern Recognition (CVPR) . 5249–5257. [28] Canyi Lu, Jiashi Feng, Yudong Chen, Wei Liu, Zhouchen Lin, and Shuicheng Yan. 2019. Tensor robust principal component analysis with a new tensor nuclear norm. IEEE Transactions on Pattern Analysis and Machine Intelligence 42, 4 (2019), 925–938. [29] Tingjin Luo, XiangYao Li, Zhangqi Jiang, Shuanghui Zhang, and Dewen Hu. 2026. ESTIM: Efficient and scalable tensorial incomplete multi-view semi-supervised classification. In Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V. 1 . 995–1006. [30] Feiping Nie, Jingjing Xue, Weizhong Yu, and Xuelong Li. 2024. Fast clustering with anchor guidance. IEEE Transactions on Pattern Analysis and Machine Intel-ligence 46, 4 (2024), 1898–1912. [31] Xiang Pan, Andi Chen, Chenhui Zhang, Junxiong Wang, Jie Zhou, and Weize Xu. 2025. Wind turbine blade fault detection based on graph Fourier transform and deep learning. Digital Signal Processing 159 (2025), 105007. [32] Yazhou Ren, Junlong Ke, Zichen Wen, Tianyi Wu, Yang Yang, Xiaorong Pu, and Lifang He. 2025. Multi-view graph clustering via node-guided contrastive encod-ing. In Proceedings of the 42nd International Conference on Machine Learning .[33] Aliaksei Sandryhaila and José MF Moura. 2013. Discrete signal processing on graphs. IEEE Transactions on Signal Processing 61, 7 (2013), 1644–1656. [34] Wei Shen, Yang Yang, and Yinan Liu. 2022. Multi-view clustering for open knowl-edge base canonicalization. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . 1578–1588. [35] David I Shuman, Sunil K Narang, Pascal Frossard, Antonio Ortega, and Pierre Vandergheynst. 2013. The emerging field of signal processing on graphs: Extend-ing high-dimensional data analysis to networks and other irregular domains. 
+
+IEEE Signal Processing Magazine 30, 3 (2013), 83–98. [36] Xiaoli Sun, Rui Zhu, Ming Yang, Xiujun Zhang, and Yuanyan Tang. 2022. Sliced sparse gradient induced multi-view subspace clustering via tensorial arctan-gent rank minimization. IEEE Transactions on Knowledge and Data Engineering 
+
+(2022). [37] Chuan Tang, Miaomiao Li, Jun Wang, Chang Tang, Jiahe Jiang, Tianyi Wang, En Zhu, and Xinwang Liu. 2025. Multi-view clustering via high-order bipartite graph learning and tensor low-rank representation. IEEE Transactions on Knowl-edge and Data Engineering 37, 11 (2025), 6521–6534. [38] Hao Wang, Yan Yang, and Bing Liu. 2019. GMC: Graph-based multi-view clus-tering. IEEE Transactions on Knowledge and Data Engineering 32, 6 (2019), 1116– 1129. [39] Zhongwen Wang, Xingfeng Li, Yinghui Sun, Quansen Sun, Yuan Sun, Han Ling, Jian Dai, and Zhenwen Ren. 2025. TPCH: Tensor-interacted projection and coop-erative hashing for multi-view clustering. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 39. 21420–21428. [40] Wei Xia, Xiangdong Zhang, Quanxue Gao, Xiaochuang Shu, Jungong Han, and Xinbo Gao. 2022. Multiview subspace clustering by an enhanced tensor nuclear norm. IEEE Transactions on Cybernetics 52, 9 (2022), 8962–8975. [41] Yuan Xie, Dacheng Tao, Wensheng Zhang, Yan Liu, Lei Zhang, and Yanyun Qu. 2018. On unifying multi-view self-representations for clustering by tensor multi-rank minimization. International Journal of Computer Vision 126, 11 (2018), 1157– 1179. [42] Haonan Xin, Danyang Wu, Jitao Lu, Rong Wang, Feiping Nie, and Xuelong Li. 2025. Multiview clustering via block diagonal graph filtering. IEEE Transactions on Neural Networks and Learning Systems 36, 8 (2025), 14269–14282. [43] Yesong Xu, Shuo Chen, Jun Li, and Jian Yang. 2025. Asymptotics-aware multi-view subspace clustering. IEEE Transactions on Multimedia 27 (2025), 3650–3663. [44] Shengju Yu, Zhibing Dong, Siwei Wang, Xinhang Wan, Yue Liu, Weixuan Liang, Pei Zhang, Wenxuan Tu, and Xinwang Liu. 2024. Towards resource-friendly, extensible and stable incomplete multi-view clustering. In Proceedings of the 41st International Conference on Machine Learning . Article 2368, 26 pages. [45] Changqing Zhang, Huazhu Fu, Si Liu, Guangcan Liu, and Xiaochun Cao. 2015. Low-rank tensor constrained multiview subspace clustering. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR) . 1582–1590. [46] Changqing Zhang, Qinghua Hu, Huazhu Fu, Pengfei Zhu, and Xiaochun Cao. 2017. Latent multi-view subspace clustering. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR) . 4333–4341. [47] Zihua Zhao, Ting Wang, Haonan Xin, Rong Wang, and Feiping Nie. 2025. Multi-view clustering via high-order bipartite graph fusion. Information Fusion 113 (2025), 102630. 
+
+A Proof of Theorem 3.1 
+
+Theorem 3.1(Permutation Sensitivity of FFT-based Tensor Trans-form) Let 𝒯 fft (𝒳 , F, 3) denote the Fast Fourier Transform of a rep-resentation tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 along its third dimension. For a generic non-identity permutation matrix P ∈ {0, 1} 𝑛×𝑛 , let 𝒳 ′ =
+
+𝒳 ×3 P be the permuted version of 𝒳 . For generic 𝒳 , the following properties hold: 
+
+1. Spectral Non-Equivariance: 
+
+𝒯 fft (𝒳 ′, F, 3) ≠ 𝒯 fft (𝒳 , F, 3), 
+
+𝒯 fft (𝒳 ′, F, 3) ≠ 𝒯 fft (𝒳 , F, 3) × 3 P, (21) 
+
+2. Energy Redistribution Sensitivity: Define the non-direct-current (non-DC) energy vector as 𝑒( 𝒳 ) = [‖̄ 𝒳 (2) ‖2𝐹 , … , ‖̄ 𝒳 (𝑛) ‖2𝐹 ]⊤.The energy distribution is non-invariant under a generic permuta-tion: 
+
+𝑒( 𝒳 ×3 P) ≠ 𝑒( 𝒳 ). (22) This implies that there exists at least one frequency 𝑘 ∈ {2, … , 𝑛} 
+
+such that ‖̄ 𝒳 ′(𝑘) ‖2𝐹 ≠ ‖̄ 𝒳 (𝑘) ‖2𝐹 .PRoof. The Fast Fourier Transform (FFT) of a tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 
+
+along the third dimension, denoted as 𝒯 fft (𝒳 , F, 3) , is mathemati-cally equivalent to the mode-3 product of the tensor with the Dis-crete Fourier Transform (DFT) matrix F ∈ ℂ 𝑛×𝑛 , 𝒯 fft (𝒳 , F, 3) = 
+
+𝒳 ×3F, where the components of F are defined as: 𝐹 𝑎𝑏 = 𝜔 (𝑎−1)(𝑏−1) , with 𝜔 = 𝑒 −2𝜋𝑖/𝑛 , so the matrix F can be expressed as: 
+
+F =⎡⎢⎢⎢⎢⎣1 1 1 … 11 𝜔 𝜔 2 … 𝜔 𝑛−1 
+
+1 𝜔 2 𝜔 4 … 𝜔 2(𝑛−1) 
+
+⋮ ⋮ ⋮ ⋱ ⋮1 𝜔 𝑛−1 𝜔 2(𝑛−1) … 𝜔 (𝑛−1)(𝑛−1) 
+
+⎤⎥⎥⎥⎥⎦
+
+(23) 
+
+Proof of spectral non-equivariance. Let 𝒳 ′ = 𝒳 ×3 P be the tensor obtained by permuting the third mode. By the definition of the fast Fourier transform, we have: 
+
+𝒯 fft (𝒳 ′, F, 3) = 𝒳 ×3 P ×3 F = 𝒳 ×3 (FP ). (24) So if P is a non-trivial and generic permutation and P ≠ I, it is easy to derive the following property: 
+
+𝒯 fft (𝒳 ′, F, 3) = 𝒳 ×3 P ×3 F = 𝒳 ×3 (FP ) ≠ 𝒳 ×3 F = 𝒯 fft (𝒳 , F, 3). 
+
+(25) Then, for the transform to be equivariant in the spectral do-main (i.e., 𝒯 fft (𝒳 ′, F, 3) = 𝒯 fft (𝒳 , F, 3) × 3 P), it requires FP = PF .Note that F does not commute with P even when P is a circu-lar shift S; instead, by the DFT shift theorem, F diagonalizes S:
+
+FSF −1 = D = diag (1, 𝜔, … , 𝜔 𝑛−1 ). Since D is diagonal with unit-modulus entries, a circular shift only rescales each frequency slice by a unit-modulus phase, leaving its energy ‖̄ 𝒳 (𝑘) ‖𝐹 invariant. For a generic (non-cyclic) permutation P, however, FPF −1 is a dense unitary matrix rather than a diagonal one, so each permuted slice ̄
+
+𝒳 ′(𝑘) becomes a mixture of multiple original frequency slices, and 
+
+FP ≠ PF . Consequently: 
+
+𝒯 fft (𝒳 ′, F, 3) ≠ 𝒯 fft (𝒳 , F, 3) × 3 P. (26) 
+
+To prove energy redistribution sensitivity. Let ̄ 𝒳 = 𝒯 fft (𝒳 , F, 3) 
+
+be the spectral tensor. The 𝑘 -th frontal slice ̄ 𝒳 (𝑘) is the 𝑘 -th com-ponent of the DFT along the third dimension. For any fiber 𝑥 = 
+
+𝒳 𝑖,𝑗,∶ ∈ ℝ 𝑛 , its 𝑘 -th spectral coefficient is given by the inner prod-uct 𝑦 𝑘 = ⟨𝑥, 𝑓 𝑘 ⟩, where 𝑓 𝑘 is the 𝑘 -th column of the DFT matrix F.The squared Frobenius norm of the 𝑘 -th spectral slice is the sum of the magnitudes of these projections: 
+
+‖̄ 𝒳 (𝑘) ‖2𝐹 = ∑ 
+
+𝑖,𝑗 
+
+‖⟨ 𝒳 𝑖,𝑗,∶ , 𝑓 𝑘 ⟩‖ 2. (27) When 𝒳 is transformed by a generic permutation P, the new fiber becomes 𝑥 ′ = P𝑥 . The 𝑘 -th spectral component of the permuted fiber is: 
+
+𝑦 ′𝑘 = ⟨ P𝑥, 𝑓 𝑘 ⟩ = ⟨𝑥, P⊤𝑓 𝑘 ⟩. (28) Let 𝑦 = F𝑥 . After permutation, the Fourier coefficients become 
+
+𝑦 ′ = FP 𝑥 = ( FPF −1 ) 𝑦. 
+
+For a generic permutation matrix P, FPF −1 is not diagonal and gen-erally mixes multiple Fourier components. Therefore, for generic non-degenerate data, at least one component-wise energy changes. Summing over all fibers yields 
+
+𝑒( 𝒳 ×3 P) ≠ 𝑒( 𝒳 ). 
+
+□
+
+B Proof of Proposition 3.2 
+
+Proposition 3.2 (Frequency Energy Bound) Let ̄ 𝒳 = 𝒯 fft (𝒳 , F, 3) 
+
+be the Fourier-domain representation of the tensor 𝒳 ∈ ℝ 𝑑×𝑚×𝑛 .The Frobenius norm of the 𝑘 -th alternating-current (AC) frequency component is bounded by the Circular Total Variation (CTV) de-fined in Eq. (11): 
+
+‖̄ 𝒳 (𝑘) ‖𝐹 ≤ 𝐶𝑇 𝑉 ( 𝒳 )2 | sin (𝜋(𝑘 − 1)/𝑛)| , ∀𝑘 = 2, … , 𝑛. (29) PRoof. We establish the bound by analyzing the relationship between the first-order difference of the tensor and its representa-tion in the Fourier domain. Let 𝑥 = 𝒳 𝑖,𝑗,∶ ∈ ℝ 𝑛 denote an arbitrary fiber of 𝒳 along the sample mode. Define the circular difference vector Δ𝑥 ∈ ℝ 𝑛 such that (Δ𝑥) 𝑡 =𝑥 𝑡+1 − 𝑥 𝑡 for 𝑡 = 1, … , 𝑛 − 1 , and (Δ𝑥) 𝑛 = 𝑥 1 − 𝑥 𝑛 . Let 𝑦 = fft (𝑥) be the Discrete Fourier Transform (DFT) of 𝑥 . By the linearity and the time-shift property of the DFT, the 𝑘 -th component of the Fourier transform of Δ𝑥 is: 
+
+ℱ(Δ𝑥) 𝑘 = (𝑒 2𝜋𝑖(𝑘−1) 𝑛 − 1) 𝑦 𝑘 , (30) where 𝑦 𝑘 corresponds to the entry ̄ 𝒳 𝑖,𝑗,𝑘 . Taking the modulus of both sides and applying the identity |𝑒 𝑖𝜃 − 1| = 2| sin (𝜃/2)| , we obtain: 
+
+|ℱ(Δ𝑥) 𝑘 | = |𝑒 2𝜋𝑖(𝑘−1) 𝑛 − 1| ⋅ |𝑦 𝑘 | = 2 | sin ( 𝜋(𝑘 − 1) 𝑛 )| ⋅ |𝑦 𝑘 |. (31) By the definition of the DFT, the term ℱ(Δ𝑥) 𝑘 is a weighted sum of the differences: ℱ(Δ𝑥) 𝑘 = ∑ 𝑛 𝑡=1 (Δ𝑥) 𝑡 𝜔 (𝑡−1)(𝑘−1) . Applying the triangle inequality: 
+
+|ℱ(Δ𝑥) 𝑘 | = | 
+
+> 𝑛
+
+∑
+
+> 𝑡=1
+
+(𝑥 𝑡+1 − 𝑥 𝑡 )𝑒 −𝑗 2𝜋(𝑡−1)(𝑘−1) 𝑛 | ≤ 
+
+> 𝑛
+
+∑
+
+> 𝑡=1
+
+|𝑥 𝑡+1 − 𝑥 𝑡 |. (32) Note that ∑𝑛 𝑡=1 |𝑥 𝑡+1 −𝑥 𝑡 | represents the Circular Total Variation. Substituting this into Eq. (31) yields the fiber-wise bound: 
+
+|𝑦 𝑘 | = |ℱ(Δ𝑥) 𝑘 |2 | sin (𝜋(𝑘 − 1)/𝑛)| ≤ 𝐶𝑇 𝑉 (𝑥) 2 | sin (𝜋(𝑘 − 1)/𝑛)| . (33) The Frobenius norm of the 𝑘 -th spectral slice is defined as the square root of the sum of squared moduli of all fibers at frequency 
+
+𝑘 . Setting 𝒳 (𝑛+1) = 𝒳 (1) , we sum the fiber-wise bounds over all spatial indices (𝑖, 𝑗) :
+
+‖̄ 𝒳 (𝑘) ‖𝐹 =√∑
+
+> 𝑖,𝑗
+
+|𝑦 𝑖,𝑗,𝑘 |2
+
+≤ 12 | sin (𝜋(𝑘 − 1)/𝑛)| √∑
+
+> 𝑖,𝑗
+
+(
+
+> 𝑛
+
+∑
+
+> 𝑡=1
+
+|𝑥 𝑖,𝑗,𝑡+1 − 𝑥 𝑖,𝑗,𝑡 |) 
+
+> 2
+
+≤ 12 | sin (𝜋(𝑘 − 1)/𝑛)| 
+
+> 𝑛
+
+∑ 
+
+> 𝑡=1
+
+√∑
+
+> 𝑖,𝑗
+
+|𝑥 𝑖,𝑗,𝑡+1 − 𝑥 𝑖,𝑗,𝑡 |2
+
+= ∑𝑛 𝑡=1 ‖𝒳 (𝑡+1) − 𝒳 (𝑡) ‖𝐹 
+
+2 | sin (𝜋(𝑘 − 1)/𝑛)| = 𝐶𝑇 𝑉 ( 𝒳 )2 | sin (𝜋(𝑘 − 1)/𝑛)| .
+
+(34) Therefore, the bound holds for all 𝑘 ∈ {2, … , 𝑛} . □
+
+C Additional Empirical Evidence for Theorem 3.1 and Proposition 3.2 
+
+In this section, we provide extended empirical evaluations to val-idate the theoretical claims established in Theorem 3.1 (Permuta-tion Sensitivity) and Proposition 3.2 (Frequency Energy Bound). Our investigation focuses on how the clustering performance of FFT-based tensor models is affected by sample permutations along the third dimension. (1) Correlation between CTV and Clustering Performance .As illustrated in Figure 6 and Figure 7, there is a clear and consistent inverse correlation between clustering performance (NMI/ARI) and the Total Variation ( 𝐶𝑇 𝑉 ( 𝒳 )) of the repre-sentation tensor. In the baseline case (shuffle rate = 0 ), where samples are ordered by category, the tensor 𝒳 maintains high local continuity. This alignment minimizes 𝐶𝑇 𝑉 ( 𝒳 ),which, according to the Frequency Energy Bound (FEB), en-sures that spectral energy is compactly concentrated in a few low-frequency slices. Such spectral sparsity is the fun-damental prerequisite for FFT-based low-rank regularizers to succeed. (2) Impact of Stochastic Shuffling. As the shuffle rate in-creases, the random permutation of sample indices disrupts the spatial coherence of the tensor, leading to a sharp rise in 
+
+𝐶𝑇 𝑉 ( 𝒳 ). This disruption violates the low-rank prior essen-tial for FFT-based models. Specifically, the resulting spectral dispersion increases the effective spectral complexity and causes singular components to be distributed across more frequency slices. 
+
+Visualizing the Frequency Energy Distribution. To further investigate the mechanism behind performance degradation, we visualize the Frobenius norm of the spectral slices ‖̄ 𝒳 (𝑘) ‖𝐹 for AC frequency indices 1 < 𝑘 < 50 . The results across four benchmark datasets (MSRCv1, NGs, BBCSport, Caltech101-20) are presented in Figure 8. Specifically, for multi-view data {X(𝑣) }𝑚 𝑣=1 with X(𝑣) ∈ℝ𝑑 𝑣 ×𝑛 , we construct the self-representation tensor 𝒳 ∈ ℝ 𝑛×𝑚×𝑛 via 
+
+𝒳 = Φ( Z(1) , … , Z(𝑚) ), where Z(𝑣) = ( X(𝑣) )⊤X(𝑣) and Φ(⋅) denotes the merging and orienting operation [41]. From the visualization, several key insights can be drawn: (1) Spectral Energy Compaction: In the baseline case (shuf-fle rate = 0, ordered by category), the spectral energy is highly concentrated in the low-frequency bins. The mag-nitude ‖̄ 𝒳 (𝑘) ‖𝐹 exhibits a precipitous decay as 𝑘 increases, which is consistent with our Frequency Energy Bound (FEB) theorem. This energy compaction makes many high-frequency slices have relatively small singular values, allowing low-rank shrinkage to attenuate these components while pre-serving the dominant spectral structure. (2) Spectral Leakage and Dispersion: As the shuffle rate in-creases, a significant ”spectral leakage” phenomenon is ob-served. The energy previously concentrated in the funda-mental frequencies is redistributed across the high-frequency spectrum. When the shuffle rate equals 1.0, the spectrum be-comes remarkably flat, resembling white noise. 
+
+D Proof of Theorem 4.2 
+
+Theorem 4.2 (Permutation Equivariance of GFT-based Ten-sor Transform) Let 𝒳 ∈ ℝ𝑑×𝑚×𝑛 be a third-order tensor and 
+
+L = U￿U ⊤ ∈ ℝ 𝑛×𝑛 be the graph Laplacian characterizing the relationships along the third mode. For any permutation matrix 
+
+P ∈ {0, 1} 𝑛×𝑛 , let 𝒳 ′ = 𝒳 ×3 P and L′ = PLP ⊤ = U′￿U ′⊤ be the permuted tensor and Laplacian, respectively, where the eigenval-ues are ordered consistently. The following properties hold: 
+
+1. Spectral Subspace Equivariance: There exists a block-diagonal orthogonal matrix Q, whose blocks correspond to the eigenspaces associated with repeated eigenvalues, such that U′ = PUQ and 
+
+𝒯 gft (𝒳 ′, U′⊤ , 3) = 𝒯 gft (𝒳 , U⊤, 3) × 3 Q⊤. (35) 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+Dataset: MSRCv1 
+
+ACC 
+
+Purity 
+
+Norm. TV (a) MSRCv1 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+Dataset: NGs 
+
+ACC 
+
+Purity 
+
+Norm. TV (b) NGs 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+Dataset: BBCSport 
+
+ACC 
+
+Purity 
+
+Norm. TV (c) BBCSport 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+Dataset: Caltech101-20 
+
+ACC 
+
+Purity 
+
+Norm. TV (d) Caltech101-20 
+
+Figure 6: Evaluation of the TLSpNM method on four datasets with different shuffle rates. A ratio of 0 indicates the baseline, where samples are ordered by category. 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+ACC 
+
+Purity 
+
+Norm. TV 
+
+(a) MSRCv1 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+ACC 
+
+Purity 
+
+Norm. TV (b) NGs 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+ACC 
+
+Purity 
+
+Norm. TV (c) BBCSport 0 0.2 0.4 0.6 0.8 1
+
+Shuffle Rate (0 to 1) 
+
+00.2 0.4 0.6 0.8 1
+
+> Clustering Performance
+
+00.2 0.4 0.6 0.8 1
+
+> Normalized TV
+
+ACC 
+
+Purity 
+
+Norm. TV (d) Caltech101-20 
+
+Figure 7: Evaluation of the t-SVD-MVC method on four datasets with different shuffle rates. A ratio of 0 indicates the baseline, where samples are ordered by category. 5 10 15 20 25 30 35 40 45 
+
+AC Frequency Index 
+
+> 10 20 30 40 50 60 70 80 90 100
+> Spectral Energy
+
+Spectral Energy vs. Sample Permutation 
+
+> Shuffle Rate = 0.0
+> Shuffle Rate = 0.2
+> Shuffle Rate = 0.4
+> Shuffle Rate = 0.6
+> Shuffle Rate = 0.8
+> Shuffle Rate = 1.0
+
+(a) MSRCv1 5 10 15 20 25 30 35 40 45 
+
+AC Frequency Index 
+
+> 40 60 80 100 120 140 160 180 200
+> Spectral Energy
+
+Spectral Energy vs. Sample Permutation  
+
+> Shuffle Rate = 0.0
+> Shuffle Rate = 0.2
+> Shuffle Rate = 0.4
+> Shuffle Rate = 0.6
+> Shuffle Rate = 0.8
+> Shuffle Rate = 1.0
+
+(b) NGs 5 10 15 20 25 30 35 40 45 
+
+AC Frequency Index 
+
+> 40 60 80 100 120 140 160 180 200 220
+> Spectral Energy
+
+Spectral Energy vs. Sample Permutation  
+
+> Shuffle Rate = 0.0
+> Shuffle Rate = 0.2
+> Shuffle Rate = 0.4
+> Shuffle Rate = 0.6
+> Shuffle Rate = 0.8
+> Shuffle Rate = 1.0
+
+(c) BBCSport 5 10 15 20 25 30 35 40 45 
+
+AC Frequency Index 
+
+> 01000 2000 3000 4000 5000 6000 7000
+> Spectral Energy
+
+Spectral Energy vs. Sample Permutation  
+
+> Shuffle Rate = 0.0
+> Shuffle Rate = 0.2
+> Shuffle Rate = 0.4
+> Shuffle Rate = 0.6
+> Shuffle Rate = 0.8
+> Shuffle Rate = 1.0
+
+(d) Caltech101-20 
+
+Figure 8: Spectral magnitude ‖̄ 𝒳 (𝑘) ‖𝐹 for AC frequencies ( 𝑘 > 1 ) on four datasets. 2. GTR Rank Stability: If L has a simple spectrum, the follow-ing equality holds: 
+
+‖𝒳 ′‖gft-GTR = ‖ 𝒳 ‖gft-GTR . (36) PRoof. Proof of Property 1: According to Definition 4.1, the GFT-based transform is computed through the mode-3 product: 
+
+𝒯 gft (𝒳 , U⊤, 3) = 𝒳 ×3 U⊤, (37) where U ∈ ℝ 𝑛×𝑛 is an orthogonal eigenvector matrix of L = U￿U ⊤.For the permuted Laplacian, we have 
+
+L′ = PLP ⊤ = ( PU )￿(PU )⊤. (38) Thus, PU is an orthogonal eigenvector matrix of L′. When repeated eigenvalues are present, the orthonormal basis within each corre-sponding eigenspace is not unique. Since U′ and PU are orthonor-mal eigenvector matrices associated with the same consistently or-dered eigenvalues, there exists a block-diagonal orthogonal matrix 
+
+Q, with one block for each eigenspace, such that 
+
+U′ = PUQ . (39) Each block of Q acts only within an eigenspace associated with the same eigenvalue; hence, Q￿Q ⊤ = ￿.Using 𝒳 ′ = 𝒳 ×3 P and the mode-3 product identity 
+
+(𝒜 ×3 B) × 3 C = 𝒜 ×3 (CB ), (40) we obtain 
+
+𝒯 gft (𝒳 ′, U′⊤ , 3) = 𝒳 ′ ×3 U′⊤ (41) 
+
+= ( 𝒳 ×3 P) × 3 (PUQ )⊤ (42) 
+
+= 𝒳 ×3 (Q⊤U⊤P⊤P) . (43) Because P is orthogonal, P⊤P = I, and therefore 
+
+𝒯 gft (𝒳 ′, U′⊤ , 3) = 𝒳 ×3 (Q⊤U⊤) (44) 
+
+= ( 𝒳 ×3 U⊤) × 3 Q⊤ (45) 
+
+= 𝒯 gft (𝒳 , U⊤, 3) × 3 Q⊤. (46) Hence, a mode-3 permutation preserves the GFT representation up to an orthogonal change of basis within each repeated-eigenvalue eigenspace. By contrast, consider a fixed transform basis V that does not adapt to the sample permutation, with 
+
+𝒯 fix (𝒳 ) = 𝒳 ×3 V⊤. (47) After permuting the third mode, its transform becomes 
+
+𝒯 fix (𝒳 ×3 P) = 𝒳 ×3 (V⊤P) . (48) Since V does not adapt to P, this expression generally differs from 
+
+𝒳 ×3 V⊤. Therefore, a fixed basis such as the DFT basis gener-ally produces order-dependent spectral coefficients and spectral energy distributions. 
+
+Proof of Property 2: According to Definition 2.2, the General-ized Tensor Rank is defined as the average of the matrix ranks of the frontal slices in the GFT domain: 
+
+‖𝒳 ‖gft-GTR = 1𝑛 
+
+> 𝑛
+
+∑
+
+> 𝑘=1
+
+rank (𝒯 gft (𝒳 , U⊤, 3) (𝑘) ) . (49) If L has a simple spectrum, every eigenspace is one-dimensional. Consequently, the block-diagonal orthogonal matrix Q in Prop-erty 1 reduces to a diagonal sign matrix: 
+
+Q = diag (𝑠 1, … , 𝑠 𝑛 ), 𝑠 𝑘 ∈ {−1, 1}. (50) Let ̄
+
+𝒳 = 𝒯 gft (𝒳 , U⊤, 3),̄ 𝒳 ′ = 𝒯 gft (𝒳 ′, U′⊤ , 3). (51) From Property 1, ̄
+
+𝒳 ′ =̄ 𝒳 ×3 Q⊤. (52) Since Q⊤ = Q is diagonal, the 𝑘 -th frontal slice satisfies ̄
+
+𝒳 ′(𝑘) = 𝑠 𝑘 ̄ 𝒳 (𝑘) , 𝑘 = 1, … , 𝑛. (53) Because multiplication by a nonzero scalar does not change matrix rank, rank (̄ 𝒳 ′(𝑘) ) = rank (̄ 𝒳 (𝑘) ) , 𝑘 = 1, … , 𝑛. (54) Summing over all frontal slices and dividing by 𝑛 gives 
+
+1𝑛 
+
+> 𝑛
+
+∑
+
+> 𝑘=1
+
+rank (̄ 𝒳 ′(𝑘) ) = 1𝑛 
+
+> 𝑛
+
+∑
+
+> 𝑘=1
+
+rank (̄ 𝒳 (𝑘) ) . (55) Therefore, 
+
+‖𝒳 ′‖gft-GTR = ‖ 𝒳 ‖gft-GTR . (56) Thus, the GTR is invariant to mode-3 permutations under the sim-ple spectrum condition. The same argument applies to any slice-wise rank surrogate that depends only on the singular values of each spectral slice, since multiplying a slice by −1 does not change its singular values. □
+
+E Bounded Equivariance Error under a Non-simple Spectrum 
+
+We further analyze the permutation behavior of the GFT-based low-rank learning procedure in Algorithm 2 when the graph Lapla-cian has repeated eigenvalues. Let 𝒟 𝜆,𝜓 denote the matrix spectral shrinkage operator 
+
+𝒟 𝜆,𝜓 (A) = R Prox 𝜓 ,𝜆 (Σ) V⊤, (57) where A = RΣV⊤ is an SVD of A. Let 𝒟 𝜆,𝜓 denote its tensor exten-sion that applies 𝒟 𝜆,𝜓 independently to every frontal slice. Given a graph Fourier basis U, define the GFT-based low-rank mapping as 
+
+ℱU 
+
+> 𝜆,𝜓
+
+(𝒴 ) = 𝒟 𝜆,𝜓 (𝒴 ×3 U⊤) × 3 U. (58) Accordingly, Algorithm 2 can be written as 𝒵 = ℱU 
+
+> 𝜆,𝜓
+
+(𝒴 ).For a permutation matrix P, let 𝒴 ′ = 𝒴 ×3 P and U′ = PUQ ,where Q is the block-diagonal orthogonal matrix induced by the non-unique choice of orthonormal bases within repeated-eigenvalue eigenspaces. We define the permutation-equivariance error as 
+
+ℰequiv (𝒴 , P) = ‖ ℱU′ 
+
+> 𝜆,𝜓
+
+(𝒴 ×3 P) − ℱU 
+
+> 𝜆,𝜓
+
+(𝒴 ) × 3 P‖𝐹 . (59) 
+
+Theorem E.1. (Repeated-Eigenspace Energy Bound for the Equiv-ariance Error) 
+
+Let 𝒴 ∈ ℝ 𝑑×𝑚×𝑛 and let 𝒴 ′ = 𝒴 ×3 P. Suppose that the correspond-ing graph Fourier bases satisfy 
+
+U′ = PUQ , (60) 
+
+where 
+
+Q = blkdiag (Q1, … , Q𝑠 ) (61) 
+
+and each orthogonal block Qℓ ∈ ℝ 𝑟 ℓ×𝑟 ℓ acts within the eigenspace associated with the distinct eigenvalue 𝜆 ℓ. Let ℐℓ denote the corre-sponding spectral index set, with 𝑟 ℓ = | ℐℓ|, and define 
+
+ℛ = {ℓ ∶ 𝑟 ℓ > 1} (62) 
+
+as the set of repeated-eigenvalue eigenspaces. Let ̄
+
+𝒴 = 𝒴 ×3 U⊤ (63) 
+
+and define the spectral energy contained in the repeated-eigenvalue eigenspaces as 
+
+𝐸 ℛ(𝒴 ) = ∑ 
+
+> ℓ∈ ℛ
+
+‖̄ 𝒴 (∶, ∶, ℐℓ)‖ 2𝐹 = ∑ 
+
+> ℓ∈ ℛ
+
+∑
+
+> 𝑘∈ ℐℓ
+
+‖̄ 𝒴 (𝑘) ‖2𝐹 . (64) 
+
+Assume that 𝒟 𝜆,𝜓 (0) = 0, that 𝒟 𝜆,𝜓 is 𝐿 𝜓 -Lipschitz continuous with respect to the Frobenius norm, and that it is equivariant to sign changes: 
+
+𝒟 𝜆,𝜓 (𝑠 A) = 𝑠 𝒟 𝜆,𝜓 (A), 𝑠 ∈ {−1, 1}. (65) 
+
+Then the permutation-equivariance error defined in Eq. (59) satisfies 
+
+ℰequiv (𝒴 , P) ≤ 2𝐿 𝜓 [ ∑ 
+
+> ℓ∈ ℛ
+
+‖̄ 𝒴 (∶, ∶, ℐℓ)‖ 2𝐹 min {1, ‖ Qℓ − I𝑟 ℓ ‖22}] 
+
+> 1/2
+
+≤ 2𝐿 𝜓 √𝐸 ℛ(𝒴 ). 
+
+(66) For standard singular value soft-thresholding, 𝐿 𝜓 = 1 . In particular, if the graph Laplacian has a simple spectrum, then ℛ = ∅ and 
+
+ℰequiv (𝒴 , P) = 0. (67) PRoof. Let ̄
+
+𝒴 = 𝒴 ×3 U⊤ (68) and ̄
+
+𝒴 ′ = ( 𝒴 ×3 P) × 3 U′⊤ . (69) Using U′ = PUQ , P⊤P = I, and the mode-3 product identity, we obtain ̄
+
+𝒴 ′ = ( 𝒴 ×3 P) × 3 (PUQ )⊤ (70) 
+
+= 𝒴 ×3 (Q⊤U⊤P⊤P) (71) 
+
+=̄ 𝒴 ×3 Q⊤. (72) Using the definition in Eq. (59), together with ̄ 𝒴 ′ =̄ 𝒴 ×3 Q⊤ and the orthogonality of PU , the equivariance error can be written in the graph-spectral domain as 
+
+ℰequiv (𝒴 , P) = ‖𝒟 𝜆,𝜓 (̄ 𝒴 ×3 Q⊤) × 3 Q − 𝒟 𝜆,𝜓 (̄ 𝒴 )‖ 𝐹 . (73) For each distinct eigenvalue 𝜆 ℓ, define ̄
+
+𝒴 ℓ =̄ 𝒴 (∶, ∶, ℐℓ). (74) Because Q is block diagonal and 𝒟 𝜆,𝜓 acts independently on frontal slices, the error in Eq. (73) decomposes orthogonally across the eigenspaces: 
+
+ℰ2
+
+> equiv
+
+(𝒴 , P) = 
+
+> 𝑠
+
+∑
+
+> ℓ=1
+
+𝜀 2ℓ , (75) where 
+
+𝜀 ℓ = ‖𝒟 𝜆,𝜓 (̄ 𝒴 ℓ ×3 Q⊤ℓ ) × 3 Qℓ − 𝒟 𝜆,𝜓 (̄ 𝒴 ℓ)‖ 𝐹 . (76) If 𝑟 ℓ = 1 , then Qℓ = [𝑠 ℓ] with 𝑠 ℓ ∈ {−1, 1} . By sign equivariance, 
+
+𝒟 𝜆,𝜓 (𝑠 ℓ̄ 𝒴 ℓ) = 𝑠 ℓ𝒟 𝜆,𝜓 (̄ 𝒴 ℓ) . (77) Since 𝑠 2ℓ = 1 , it follows that 
+
+𝜀 ℓ = 0, 𝑟 ℓ = 1. (78) Therefore, only eigenspaces associated with repeated eigenvalues can contribute to the equivariance error. We next bound 𝜀 ℓ for ℓ ∈ ℛ. Adding and subtracting 𝒟 𝜆,𝜓 (̄ 𝒴 ℓ)× 3
+
+Qℓ in Eq. (76) and applying the triangle inequality give 
+
+𝜀 ℓ ≤ ‖[𝒟 𝜆,𝜓 (̄ 𝒴 ℓ ×3 Q⊤ℓ ) − 𝒟 𝜆,𝜓 (̄ 𝒴 ℓ)] × 3 Qℓ‖𝐹 (79) 
+
++ ‖𝒟 𝜆,𝜓 (̄ 𝒴 ℓ) × 3 (Qℓ − I𝑟 ℓ )‖ 𝐹 . (80) Since Qℓ is orthogonal and 𝒟 𝜆,𝜓 is 𝐿 𝜓 -Lipschitz, 
+
+‖[𝒟 𝜆,𝜓 (̄ 𝒴 ℓ ×3 Q⊤ℓ ) − 𝒟 𝜆,𝜓 (̄ 𝒴 ℓ)] × 3 Qℓ‖𝐹 (81) 
+
+= ‖𝒟 𝜆,𝜓 (̄ 𝒴 ℓ ×3 Q⊤ℓ ) − 𝒟 𝜆,𝜓 (̄ 𝒴 ℓ)‖ 𝐹 (82) 
+
+≤ 𝐿 𝜓 ‖̄ 𝒴 ℓ ×3 (Q⊤ℓ − I𝑟 ℓ )‖ 𝐹 (83) 
+
+≤ 𝐿 𝜓 ‖̄ 𝒴 ℓ‖𝐹 ‖Qℓ − I𝑟 ℓ ‖2 . (84) Moreover, because 𝒟 𝜆,𝜓 (0) = 0,
+
+‖𝒟 𝜆,𝜓 (̄ 𝒴 ℓ)‖ 𝐹 ≤ 𝐿 𝜓 ‖̄ 𝒴 ℓ‖𝐹 . (85) Hence, 
+
+‖𝒟 𝜆,𝜓 (̄ 𝒴 ℓ) × 3 (Qℓ − I𝑟 ℓ )‖ 𝐹 (86) 
+
+≤ 𝐿 𝜓 ‖̄ 𝒴 ℓ‖𝐹 ‖Qℓ − I𝑟 ℓ ‖2 . (87) Combining these inequalities yields 
+
+𝜀 ℓ ≤ 2𝐿 𝜓 ‖̄ 𝒴 ℓ‖𝐹 ‖Qℓ − I𝑟 ℓ ‖2 . (88) A uniform bound follows directly from Eq. (76): 
+
+𝜀 ℓ ≤ ‖𝒟 𝜆,𝜓 (̄ 𝒴 ℓ ×3 Q⊤ℓ )‖ 𝐹 + ‖𝒟 𝜆,𝜓 (̄ 𝒴 ℓ)‖ 𝐹 (89) 
+
+≤ 2𝐿 𝜓 ‖̄ 𝒴 ℓ‖𝐹 , (90) where the orthogonality of Qℓ has been used. Combining this uni-form bound with Eq. (88) gives 
+
+𝜀 ℓ ≤ 2𝐿 𝜓 ‖̄ 𝒴 ℓ‖𝐹 min {1, ‖ Qℓ − I𝑟 ℓ ‖2} . (91) Finally, substituting (78) and (91) into Eq. (75) yields 
+
+ℰequiv (𝒴 , P) ≤ 2𝐿 𝜓 [ ∑ 
+
+> ℓ∈ ℛ
+
+‖̄ 𝒴 ℓ‖2𝐹 min {1, ‖ Qℓ − I𝑟 ℓ ‖22}] 
+
+> 1/2
+
+(92) 
+
+≤ 2𝐿 𝜓 [ ∑ 
+
+> ℓ∈ ℛ
+
+‖̄ 𝒴 ℓ‖2𝐹 ]
+
+> 1/2
+
+(93) 
+
+= 2𝐿 𝜓 √𝐸 ℛ(𝒴 ). (94) This completes the proof. □
+
+F Detailed Description of Experimental Setup 
+
+To empirically validate the efficacy of our GFT-based low-rank tensor framework, we present a comparative analysis with state-of-the-art (SOTA) clustering methods across various benchmark datasets. All algorithms are implemented in MATLAB R2020b and executed on a workstation equipped with an Intel Core i7-11700 CPU (2.50GHz) and 64GB of RAM. The code is available at https://github.com/jijintian/GFT-TMVC. 
+
+Datasets: To verify the effectiveness of our proposed methods, eight challenging datasets with diverse properties are used and summarized in Table 4. More detailed information about these datasets is provided below. To construct each shuffled dataset, we gener-ate a random permutation of the sample indices and apply the same permutation consistently to all views and the corresponding ground-truth labels. In this way, the cross-view correspondence of each sample and its label information are strictly preserved, while only the global sample ordering is changed. 
+
+• MSRCv1 1. It consists of 210 scene recognition images and is divided into 7 categories. Each image is represented by five different feature sets. 
+
+• NGs 2. It is a subset of the 20 Newsgroups dataset, which consists of 500 newsgroup documents. Each raw document is pre-processed with three different methods (three views) and is assigned to one of five categories. 
+
+• BBCSport 3. It consists of 544 sports news articles in five topical areas (athletics, cricket, football, rugby, and tennis). 
+
+> 1http://research.microsoft.com/en us/projects/objectclassrecognition
+> 2https://lig-membres.imag.fr/grimal/data.html
+> 3http://mlg.ucd.ie/datasets/segment.html
+
+Table 4: Summary of the benchmark datasets. Dataset Sam./Clu. Dimensions MSRCv1 210 / 7 24/576/512/256/254 
+
+NGs 500 / 5 2000/2000/2000 
+
+BBCSport 544 / 5 3183/3203 
+
+Caltech101-20 2386 /20 48/40/254/1984/512/928 
+
+CCV 6773 / 20 20/20/20 
+
+Caltech101-all 9144 / 102 48/40/254/1984/512/928 
+
+Aloi-100 11025 / 100 77/13/64/125 
+
+Animal 11673 / 20 2689/2000/2001/2000 
+
+Each sample is described by two views, and their dimen-sions are 3183 and 3203, respectively. 
+
+• Caltech101-20 . It is a subset of the challenging object data-base Caltechall [21] and contains 2386 samples and 20 classes. Each sample has six types of features, i.e., 48-dim Gabor, 40-dim wavelet moments, 254-dim CENTRIST, 1984-dim HOG, 512-dim GIST, and 928-dim LBP. 
+
+• CCV 4. It consists of 6773 samples belonging to 20 semantic categories of YouTube videos. Each sample has three views, and the dimensions are all 20. 
+
+• Caltech101-all . It is a subset of the challenging object data-base Caltechall [21] and contains 9144 images belonging to 102 categories. Each sample has six types of features, i.e., 48-dim Gabor, 40-dim wavelet moments, 254-dim CENTRIST, 1984-dim HOG, 512-dim GIST, and 928-dim LBP. 
+
+• Aloi-100 5. It is a widely used small-object dataset, which consists of 11025 images of 100 small objects. Each sample is represented by four types of features: RGB, HSV, Color similarity, and Haralick features. 
+
+• Animal 6. It consists of 11673 animal images from 20 cate-gories, with each sample represented by four views. 
+
+Baselines: We select five representative state-of-the-art FFT-based low-rank tensor learning methods: 
+
+• t-SVD-MVC (IJCV 2018) [41] is the first to apply FFT-based low-rank tensor learning to multi-view clustering. Apply-ing FFT along the sample mode significantly improved clus-tering performance. 
+
+• TLSpNM (TPAMI 2023) [15] proposes a novel low-rank constraint for FFT-based low-rank tensor learning, demon-strating that nonconvex rank approximation functions out-perform traditional Tensor Nuclear Norm (TNN). 
+
+• ASR-ETR (ICCV 2023) [16] proposes a fast version of the t-SVD-based low-rank tensor learning framework, which greatly improves the efficiency of traditional FFT-based frame-works when handling large-scale data. 
+
+• ESTMC (TPAMI 2025) [19] integrates various non-convex rank approximations into a fast t-SVD-based low-rank ten-sor learning framework. 
+
+> 4http://www.ee.columbia.edu/ln/dvmm/CCV/
+> 5http://elki.dbs.ifi.lmu.de/wiki/DataSets/MultiView
+> 6https://github.com/wangsiwei2010/
+
+• TLRLF4MVC (TPAMI 2025) [26] introduces a novel ten-sor low-frequency component to smooth the representation across samples, which improves the performance of the t-SVD-based low-rank tensor learning framework. To ensure a rigorous and fair comparison, all experiments are con-ducted using the official implementations provided by the respec-tive authors. We strictly follow the parameter tuning protocols sug-gested in the original publications to report the best achievable re-sults for each baseline. 
+
+Implementation Details: To ensure a rigorous and fair com-parison, we seamlessly integrate the proposed GFT-based frame-work into the baseline architectures by substituting the standard sample-mode FFT components with our GFT-based spectral trans-forms. For the GFT-based variants, we evaluate three distinct graph construction methodologies: (1) our proposed SimG strategy (10 neighbors); (2) the GMC algorithm [38]; and (3) an ideal graph (us-ing ground-truth labels) to establish the performance upper bound. Additionally, we implement the proposed AGFT (Theorem 4.3) with Balanced 𝑘 -means-based Hierarchical 𝑘 -means (BKHK) [30] to se-lect anchors, and the graph construction method follows this work [26]. The number of anchors is set to 𝑘 𝑎 = 2 min (𝑐,10) on all test datasets, where 𝑐 denotes the number of clusters. Specifically, 𝑐 
+
+determines the depth of the recursive binary partition when 𝑐 < 10 , while the maximum partition depth is capped at 10 to control the computational cost. Consequently, the number of anchors in-creases with the complexity of the underlying clustering structure but is bounded above by 210 = 1024 . All datasets considered in our experiments satisfy 𝑛 ≥ 𝑘 𝑎 . To specifically benchmark against ex-isting methods that attempt to mitigate the permutation sensitivity of standard FFT, we include a variant denoted as FFT(view mode). Following the CVPR 2025 method in [24], this variant performs the FFT along the view mode instead of the sample mode to circumvent sample-ordering issues. All experiments are conducted over five in-dependent trials. We report the mean performance along with the standard deviation across all metrics. Hyperparameters for each method are optimized via grid search according to their respective original publications to ensure peak performance. 
+
+Parameter Setting of 𝑘 𝑛 : For SimG, we set the number of near-est neighbors to 𝑘 𝑛 = 10 by default, following common practice in graph-based methods. As shown in Table 5, the performance re-mains stable when 𝑘 𝑛 varies within {5, 10, 15, 20} , indicating that the proposed framework is not sensitive to this parameter. 
+
+Table 5: Clustering accuracy (ACC%) of ESTMC with GFT un-der different values of 𝑘 𝑛 .Dataset 𝑘 𝑛 = 5 𝑘 𝑛 = 10 𝑘 𝑛 = 15 𝑘 𝑛 = 20 
+
+MSRCv1 86.19 85.05 84.29 84.38 NGs 96.40 96.60 96.80 96.00 BBCSport 95.04 94.85 94.85 94.30 
+
+Parameter Setting of 𝑘 𝑎 : Since BKHK [30] recursively performs binary partitioning, the number of anchors is restricted to powers of two. We therefore set 𝑘 𝑎 = 2 min (𝑐,10) , where 𝑐 is the number of clusters, yielding 𝑘 𝑎 = 128 for MSRCv1 and 𝑘 𝑎 = 32 for BBCSport and NGs. For datasets with more than 10 clusters, 𝑘 𝑎 is capped at 210 = 1024 . As shown in Table 6, the default setting achieves com-petitive or superior performance across the three datasets. 
+
+Table 6: Clustering accuracy (ACC%) of ESTMC with AGFT under different values of 𝑘 𝑎 .Dataset 𝑘 𝑎 = 8 𝑘 𝑎 = 16 𝑘 𝑎 = 32 𝑘 𝑎 = 64 𝑘 𝑎 = 128 
+
+MSRCv1 74.95 75.33 83.81 81.43 87.81 BBCSport 71.51 88.42 88.05 87.87 86.40 NGs 69.40 70.60 87.80 86.80 86.80 
+
+G Additional Experimental Results 
+
+To further validate the generalization of the proposed frameworks, we provide extended experimental evaluations on the BBCSport and Caltech101-20 datasets. The extended results in Table 7 fur-ther demonstrate the broad effectiveness and robustness of the pro-posed GFT-based variants across different baseline architectures. 
+
+Efficiency and Scalability of AGFT. To evaluate the scalabil-ity of the proposed AGFT, we compare its main execution time + transform matrix construction time and clustering accuracy (ACC) against two fast TMC methods (ESTMC and TLRLF4MVC) across four large-scale datasets: CCV, Caltech101-all, Aloi-100, and Ani-mal. As shown in Table 2 and 8, AGFT significantly outperforms full-graph spectral methods such as GMC and GFT. This efficiency gain is theoretically grounded in the reduction in transform com-plexity from 𝒪 (𝑛 2) to 𝒪 (𝑛𝑘 𝑎 ), where 𝑘 𝑎 represents the number of anchors ( 𝑘 𝑎 ≪ 𝑛 ). While the Fast Fourier Transform (FFT) remains efficient at 𝒪 (𝑛 log 𝑛) by exploiting structural symmetry, AGFT provides a highly scalable alternative for non-structured graph sig-nals. Notably, AGFT may occasionally be slower than FFT. This is mainly due to two factors: (i) the additional overhead of transform matrix construction, and (ii) slower convergence of the iterative optimization after spectral truncation. For example, on the Ani-mal dataset, FFT converges within 30 iterations, whereas AGFT requires 45 iterations. Despite these cases, AGFT remains efficient overall and effectively narrows the efficiency gap, making it a scal-able solution for large-scale tasks. 
+
+H Additional Ablation Study 
+
+Influence of Different Transform Bases. To demonstrate the generalizability of our observations, we provide additional visual-izations of the transform bases for NGs, BBCSport, and Caltech101-20 in Figure 9. Across these diverse data types (ranging from text to images), the results consistently confirm that the GFT basis ma-trices exhibit clearer block-diagonal structures than the FFT basis matrix. This further validates that the manifold-adaptive nature of GFT is robust to varying data distributions, consistently ensuring class-discriminative energy concentration in the spectral domain. 
+
+Spectral Energy Compaction Analysis. To evaluate the energy-compaction capability of different spectral transforms, we orga-nize the multi-view representations into a third-order tensor 𝒵 =Φ( Z(1) , … , Z(𝑚) ) ∈ ℝ 𝑑×𝑚×𝑛 , where 𝑛 and 𝑚 denote the numbers of samples and views, respectively. Applying FFT or GFT along the third, i.e., the sample mode, yields ̄ 𝒵 = 𝒯 (𝒵 ). The energy of the 
+
+𝑖 -th spectral component is defined as: 
+
+𝐸 𝑖 = ‖̄ 𝒵 (∶, ∶, 𝑖)‖ 2𝐹 , 𝑖 ∈ {1, … , 𝑛}, (95) where ‖ ⋅ ‖ 𝐹 denotes the Frobenius norm. To focus on the structural encoding capability, we analyze the AC frequencies (excluding the DC component at 𝑖 = 1 ). The Cumulative Energy Ratio (CER) for the first 𝐾 non-DC components is defined as: CER (𝐾 ) = ∑𝐾 +1 𝑖=2 𝐸 𝑖 
+
+∑𝑛 𝑖=2 𝐸 𝑖 
+
+, 𝐾 ∈ {1, 2, … , 𝑛 − 1}. (96) A steeper CER curve indicates that the transform more effec-tively concentrates the structural information in a smaller number of spectral components. We provide the CER curves for all evalu-ated datasets in this section. The experiments are conducted under varying shuffle rates {0, 0.5, 1} , where 1 represents a fully random-ized sample order. The results in Figure 10 lead to the following observations: 1. The CER curves of the GFT-based methods remain nearly un-changed across the tested shuffle rates. In contrast, the FFT base-line shows significant energy dispersion as the shuffle rate increases. 2. On most datasets, SimG and GMC exhibit a higher CER in the low-frequency AC range compared to FFT (especially in disor-dered cases). This confirms that graph-adaptive bases successfully align the intrinsic multi-view correlations into a compact spectral subspace. 3. In some specific cases where the shuffle rate = 0 (perfectly or-dered by category), FFT may show high compaction due to the ar-tificial periodicity. However, our proposed GFT-based framework (SimG, GMC, and Ideal) provides a more robust and reliable rep-resentation for real-world scenarios where such an order is un-known. 
+
+Influence of Shuffle Rates on GFT-based Methods. To eval-uate the robustness of our framework against data disorder, we conduct experiments with shuffle rates ranging from 0 to 1. As illustrated in Figure 11, while the performance of the FFT-based framework deteriorates sharply as the sample order becomes ran-domized, our GFT(SimG), GFT(GMC), and AGFT variants exhibit remarkable stability. Their clustering metrics remain nearly invari-ant as the shuffle rate increases, maintaining a near-constant plateau. This empirically validates that the graph-adaptive basis effectively captures the intrinsic topology, making the spectral representation substantially more stable under sample permutations. Table 7: Clustering performance (mean(std)) of five baseline architectures across different low-rank tensor learning frame-works on the BBCSport and Caltech101-20 datasets. +FFT denotes the original framework; +FFT (view) refers to FFT per-formed along the view dimension; +GFT(SimG), +GFT(GMC), and +GFT(Ideal) represent our proposed GFT framework using SimG, GMC, and ground-truth graphs, respectively; +AGFT denotes the proposed AGFT framework. 
+
+Baselines Variants Shuffled BBCSport Shuffled Caltech101-20 
+
+ACC NMI Purity F-score ARI ACC NMI Purity F-score ARI +FFT 55.29(5.46) 35.95(5.42) 69.30(4.33) 46.25(4.56) 31.24(5.82) 57.28(1.39) 66.45(0.78) 79.72(1.12) 51.73(0.91) 46.99(1.01) +FFT(view mode) 86.21(0) 75.98(0) 86.21(0) 83.32(0) 77.97(0) 56.25(0.89) 67.11(0.49) 80.18(0.74) 50.59(0.85) 45.09(0.89) +GFT(SimG) 93.20(0) 81.05(0.19) 93.20(0) 86.67(0.18) 82.51(0.10) 53.33(0.49) 65.10(0.62) 80.17(0.79) 44.27(0.63) 38.50(0.65) +GFT(GMC) 88.60(0.68) 78.33(1.55) 88.60(0.69) 84.60(1.32) 79.82(1.61) 59.38(1.37) 68.86(0.35) 81.60(0.86) 53.60(0.86) 48.08(0.89) 
+
++AGFT 90.29(0.08) 73.90(0.43) 90.29(0.08) 82.20(0.01) 76.73(0.24) 56.00(0.32) 66.33(0.20) 79.59(0.17) 48.27(0.55) 43.14(0.61) t-SVD-MVC +GFT(Ideal) 100(0) 100(0) 100(0) 100(0) 100(0) 78.90(1.68) 88.98(1.31) 95.41(0.78) 69.50(1.84) 65.51(1.98) +FFT 71.86(3.21) 52.10(1.68) 77.00(1.11) 60.99(1.68) 49.95(2.11) 44.17(1.00) 51.13(0.90) 74.95(0.81) 35.80(1.22) 29.92(1.26) +FFT(view mode) 76.10(0) 61.94(0.05) 81.25(0.03) 67.23(0.04) 58.01(0.05) 37.31(1.18) 48.76(0.54) 72.51(0.70) 32.82(1.06) 27.01(1.10) +GFT(SimG) 83.31(0.08) 71.06(0.29) 84.96(0.08) 74.36(0.14) 67.02(0.18) 47.39(2.60) 55.47(1.08) 77.66(0.48) 41.01(2.11) 35.07(2.11) +GFT(GMC) 89.34(2.26) 76.33(1.40) 89.34(2.26) 84.22(1.74) 79.33(2.17) 47.60(1.07) 56.58(0.91) 78.07(0.99) 39.81(0.72) 33.96(0.71) +AGFT 78.97(0.10) 61.23(0.08) 80.15(0.02) 66.42(0.04) 56.72(0.04) 47.50(1.52) 56.89(0.77) 78.09(0.81) 42.02(1.12) 36.35(1.17) 
+
+TLSpNM +GFT(Ideal) 99.60(0.08) 98.55(0.23) 99.60(0.08) 99.21(0.16) 98.96(0.21) 65.52(4.36) 77.05(1.77) 92.36(0.99) 57.43(3.55) 52.76(3.46) +FFT 83.48(0.64) 67.29(1.41) 83.46(0.64) 73.58(3.16) 65.56(3.83) 51.89(0.43) 56.34(0.58) 76.34(1.00) 46.69(1.03) 40.76(1.11) +FFT(view mode) 85.11(0) 68.72(0) 85.11(0) 75.52(0) 68.25(0) 51.85(0.55) 56.74(0.80) 77.41(0.55) 45.05(1.45) 38.94(1.51) +GFT(SimG) 94.63(0.49) 84.15(1.40) 94.63(0.49) 89.19(0.99) 85.73(1.33) 54.12(2.18) 57.73(0.81) 75.14(0.91) 48.05(2.26) 41.26(2.70) +GFT(GMC) 94.85(0) 85.09(0.01) 94.85(0.04) 89.72(0.08) 86.50(0.05) 59.72(2.36) 63.28(1.63) 77.21(1.99) 54.78(2.39) 48.22(2.63) 
+
++AGFT 88.53(0.10) 70.64(0.35) 88.35(0.10) 77.64(0.16) 70.25(0.18) 56.89(0.91) 60.20(1.13) 77.66(0.98) 51.18(3.10) 45.14(3.47) ASR-ETR +GFT(Ideal) 100(0) 100(0) 100(0) 100(0) 100(0) 97.52(1.50) 98.37(0.65) 98.12(1.27) 99.22(0.54) 99.07(0.64) +FFT 83.42(0.85) 64.72(1.62) 83.42(0.85) 71.75(1.38) 63.59(1.75) 41.93(1.17) 51.72(0.74) 75.02(0.73) 35.85(1.39) 30.11(1.43) +FFT(view mode) 83.82(0) 64.08(0) 83.82(0) 71.72(0) 63.56(0) 42.08(1.94) 51.55(1.58) 75.24(1.45) 35.95(1.42) 30.24(1.49) +GFT(SimG) 94.85(0) 85.66(0) 94.85(0) 89.32(0) 86.01(0) 54.32(1.08) 54.95(0.52) 74.73(1.17) 49.85(1.09) 43.64(1.02) +GFT(GMC) 90.96(3.18) 80.34(3.21) 90.96(3.18) 87.13(1.73) 83.04(2.32) 58.30(2.59) 59.18(2.12) 75.05(2.96) 52.24(3.22) 45.76(3.22) +AGFT 88.05(0) 71.03(0) 88.05(0) 80.13(0) 74.16(0) 55.55(1.30) 58.33(0.55) 76.96(1.11) 52.83(1.29) 47.19(1.42) 
+
+ESTMC +GFT(Ideal) 100(0) 100(0) 100(0) 100(0) 100(0) 96.68(4.41) 98.57(1.81) 98.04(2.35) 99.27(1.11) 99.13(1.32) +FFT 75.55(0) 51.53(0) 75.55(0) 63.70(0) 52.87(0) 57.21(1.35) 60.54(2.46) 74.48(2.80) 54.05(2.30) 47.74(2.42) +FFT(view mode) 73.35(1.23) 52.35(0) 75.51(0.33) 60.37(0.53) 47.88(1.01) 56.50(0.66) 63.47(0.72) 77.75(0.47) 55.23(0.82) 49.54(0.92) +GFT(SimG) 81.88(2.71) 75.52(0.48) 84.04(0.49) 76.27(0.93) 67.74(1.24) 57.57(0.90) 59.88(2.37) 73.70(2.66) 54.80(1.23) 48.34(1.69) +GFT(GMC) 84.74(0) 76.24(0) 84.74(0) 78.28(0) 70.22(0) 61.94(0) 65.80(0) 74.10(0) 61.34(0) 54.72(0) 
+
++AGFT 80.33(0) 65.54(0) 80.88(0) 72.10(0) 61.98(0) 60.44(0) 64.51(0) 76.74(0) 57.84(0) 52.11(0) TLRLF4MVC +GFT(Ideal) 88.79(0) 94.54(0) 88.79(0) 94.91(0) 93.20(0) 88.60(0) 95.24(0) 90.61(0) 97.34(0) 96.82(0) 
+
+Table 8: Runtime (main execution + transform matrix construction) vs. Accuracy of ESTMC with different transforms. 
+
+Methods Shuffled CCV Shuffled Aloi-100 Shuffled Caltech101-all Shuffled Animal ACC Time (s) ACC Time (s) ACC Time (s) ACC Time (s) +FFT 19.23 7.13 + 0 62.72 50.96 + 0 26.82 100.93 + 0 14.82 166.85 + 0 
+
++SimG 19.75 14.61 + 10.77 65.13 149.89 + 25.83 24.14 183.03 + 17.92 18.33 218.05 + 37.23 +GMC 26.96 14.08 + 157.38 63.89 104.32 + 284.13 25.63 209.99 + 207.36 19.12 223.90 + 279.72 +Ideal 96.37 14.9 + 10.66 88.58 126.53 + 26.50 88.01 204.11 + 16.89 100 216.29 + 33.10 +AGFT 19.98 4.47 + 0.62 64.89 12.92 + 1.60 26.19 46.98 + 12.81 17.21 196.55 + 35.66 Real Part 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Frequency Index k 
+
+50 100 150 200 250 300 350 400 450 500 
+
+> Time Index t
+
+-1 -0.8 -0.6 -0.4 -0.2 00.2 0.4 0.6 0.8 1(a) FFT GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+0.05 0.1 0.15 0.2 0.25 (b) GFT(SimG) GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+00.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 (c) GFT(GMC) GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+00.1 0.2 0.3 0.4 0.5 0.6 0.7 (d) GFT(Ideal) Real Part 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Frequency Index k 
+
+50 100 150 200 250 300 350 400 450 500 
+
+> Time Index t
+
+-1 -0.8 -0.6 -0.4 -0.2 00.2 0.4 0.6 0.8 1
+
+(e) FFT GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+0.05 0.1 0.15 0.2 (f) GFT(SimG) GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+00.1 0.2 0.3 0.4 0.5 0.6 (g) GFT(GMC) GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+50 100 150 200 250 300 350 400 450 500 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 (h) GFT(Ideal) Real Part 
+
+200 400 600 800 1000 1200 1400 1600 1800 2000 2200 
+
+Frequency Index k 
+
+200 400 600 800 1000 1200 1400 1600 1800 2000 2200 
+
+> Time Index t
+
+-1 -0.8 -0.6 -0.4 -0.2 00.2 0.4 0.6 0.8 1
+
+(i) FFT GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+200 400 600 800 1000 1200 1400 1600 1800 2000 2200 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+0.02 0.04 0.06 0.08 0.1 0.12 0.14 0.16 0.18 0.2 (j) GFT(SimG) GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+200 400 600 800 1000 1200 1400 1600 1800 2000 2200 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+00.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 (k) GFT(GMC) GFT Basis Matrix Heatmap (Sorted by Labels) 
+
+200 400 600 800 1000 1200 1400 1600 1800 2000 2200 
+
+Sample Index (Grouped by Clusters) 
+
+510 15 20 25 
+
+> Frequency Index (0<k<30)
+
+00.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 (l) GFT(Ideal) 
+
+Figure 9: Visualization of the transform basis matrices on the NGs (a–d), BBCSport (e–h) and Caltech101-20 (i–l) datasets. 10 20 30 40 50 60 
+
+AC Frequency Index 
+
+00.2 0.4 0.6 0.8 1
+
+> Cumulative Energy Ratio (CER)
+
+FFT 
+
+SimG 
+
+GMC 
+
+Ideal 
+
+(a) MSRCv1 10 20 30 40 50 60 
+
+AC Frequency Index 
+
+00.2 0.4 0.6 0.8 1
+
+> Cumulative Energy Ratio (CER)
+
+FFT 
+
+SimG 
+
+GMC 
+
+Ideal (b) NGs 10 20 30 40 50 60 
+
+AC Frequency Index 
+
+00.2 0.4 0.6 0.8 1
+
+> Cumulative Energy Ratio (CER)
+
+FFT 
+
+SimG 
+
+GMC 
+
+Ideal (c) BBCSport 10 20 30 40 50 60 
+
+AC Frequency Index 
+
+00.2 0.4 0.6 0.8 1
+
+> Cumulative Energy Ratio (CER)
+
+FFT 
+
+SimG 
+
+GMC 
+
+Ideal (d) Caltech101-20 
+
+Figure 10: Comparison of Cumulative Energy Ratio (CER) across different shuffle rates ( {0, 0.5, 1} , where darker colors indicate higher shuffle rates) on the four datasets. 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (a) MSRCv1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (b) NGs 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (c) BBCSport 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.4 0.5 0.6 0.7 0.8 0.9 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT 
+
+(d) MSRCv1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (e) NGs 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (f) BBCSport 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT 
+
+(g) MSRCv1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.8 0.82 0.84 0.86 0.88 0.9 0.92 0.94 0.96 0.98 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (h) NGs 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.8 0.82 0.84 0.86 0.88 0.9 0.92 0.94 0.96 0.98 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (i) BBCSport 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT 
+
+(j) MSRCv1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (k) NGs 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+Shuffle Rate 
+
+0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> Clustering Accuracy (ACC)
+
+SimG 
+
+GMC 
+
+AGFT 
+
+Ideal 
+
+FFT (l) BBCSport 
+
+Figure 11: Influence of shuffle rates on different GFT methods. Baselines: t-SVD-MVC (a-c), TLSpNM (d-f), ESTMC (g-i), TL-RLF4MVC (j-l).

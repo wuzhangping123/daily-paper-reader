@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-30",
+  "date": "2026-07-30",
+  "generated_at": "2026-07-30T21:38:37",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/30/2607.25338v1-dual-domain-manifold-modeling-for-hyperspectral-image-fusion",
+      "section": "deep",
+      "title_en": "Dual-Domain Manifold Modeling for Hyperspectral Image Fusion",
+      "authors": "Chengxin Xie, Qiya Song, Yangbangyan Jiang, Renwei Dian, Xudong Kang",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25338v1",
+      "score": "8.0",
+      "evidence": "双域流形建模用于高光谱图像融合，与张量数据恢复相关",
+      "tldr": "高光谱图像融合面临空间域结构退化与光谱域局部流形利用不足的问题。本文提出双域流形建模（DDMM）框架，通过拓扑感知Transformer联合建模空间拓扑与像素特征流形，并设计频率解耦空间光谱协同融合模块，在频率域解耦高低频并增强几何感知高频特征。在多个基准数据集上，DDMM在空间结构保持与光谱重建上均优于现有方法。该工作有效缓解了低频偏置与结构退化，提升了融合图像的几何感知能力。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Achieving a coherent integration of spectral richness and spatial fidelity remains a central objective in hyperspectral image fusion. However, existing hyperspectral image fusion methods struggle to effectively model geometric constraints. In the spatial domain, weak spatial-spectral interaction limits geometry-aware feature learning and suppresses high-frequency structural information, resulting in low-frequency bias and structural degradation. In the spectral domain, local manifold structures induced by spectral similarity are insufficiently exploited, limiting intrinsic pixel relationship modeling and fine-grained spectral reconstruction. To address these challenges, we propose a dual-domain manifold modeling (DDMM) framework. Specifically, we introduce a Topology-Aware Transformer (TPFormer) that combines global attention with neighborhood propagation, jointly modeling spatial topology and pixel-level feature manifold relationships to capture intrinsic spatial-spectral structures and improve topology-aware representation learning. Furthermore, a Frequency-Decoupled Spatial-Spectral Collaborative Fusion (FDSCF) module is devised, in which features are projected into the frequency domain via the discrete cosine transform and explicitly decoupled into low- and high-frequency components. Guided by a low-rank structural prior and spectral-driven spatial enhancement, FDSCF selectively enhances geometry-aware high-frequency features, strengthening spatia-spectral coupling and recovering sharper edges and finer textures. Extensive experiments on multiple benchmark datasets demonstrate that DDMM achieves superior overall performance over SoTA methods in terms of spatial structure preservation and spectral reconstruction.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/30/2607.25275v1-scaleresfusion-residual-rectified-flow-based-on-residual-vector-field",
+      "section": "quick",
+      "title_en": "ScaleResfusion: Residual Rectified Flow based on Residual Vector Field",
+      "authors": "Zhenning Shi, Chen Xu, Junhao Zhang, Kefei Zhang, Linjie Liu, Zhedong Zheng, Tao Li",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25275v1",
+      "score": "6.0",
+      "evidence": "基于深度神经网络的图像去噪与恢复",
+      "tldr": "真实图像恢复任务中，现有扩散方法存在速度慢或难以利用预训练生成先验的问题。本文提出ScaleResfusion，基于预训练的文本到图像整流流模型，引入残差整流流，从带噪低质量图像开始学习残差向量场，保持输出分布与预训练模型一致。该方法支持参数高效微调，并通过知识蒸馏减少采样成本。在多项真实恢复任务上达到最先进性能，效率显著提升。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Real-world Image Restoration (Real-IR) aims to recover high-quality (HQ) images from complex and unknown degradations. Although recent diffusion-based methods have substantially improved perceptual quality, their current designs leave two key challenges unresolved. Methods that start from Gaussian noise are slow and often less faithful to the degraded input. Residual-based methods usually train from scratch, which makes it hard to exploit modern pre-trained generative priors. In this paper, we present ScaleResfusion, a scalable diffusion framework for real-world image restoration built on pre-trained text-to-image rectified-flow models. The core of our method is Residual Rectified Flow, which introduces the residual term R into Standard Rectified Flow. Instead of starting from pure noise, it uses a residual transport path that starts from noisy low-quality (LQ) images and admits an exact acceleration point. By learning the residual vector field, Residual Rectified Flow keeps the output distribution and linear diffusion process consistent with the pre-trained rectified-flow models. This makes parameter-efficient fine-tuning possible at scale. We further introduce a knowledge-distillation pipeline to reduce sampling cost while maintaining restoration quality. Extensive experiments on multiple real-world restoration tasks show that ScaleResfusion achieves state-of-the-art performance with much higher efficiency. These results suggest a practical and scalable way to adapt large pre-trained diffusion models to real-world image restoration. Our code and models are available at https://github.com/YukinoshitaLove/ScaleResfusion.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/30/2607.25295v1-breaking-the-periodicity-assumption-robust-tensorial-multi-view-clustering-via-graph-spectral-low-rank-learning",
+      "section": "quick",
+      "title_en": "Breaking the Periodicity Assumption: Robust Tensorial Multi-View Clustering via Graph-Spectral Low-Rank Learning",
+      "authors": "Jintian Ji, Xingsu Li, Songhe Feng",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25295v1",
+      "score": "6.0",
+      "evidence": "张量低秩学习方法用于多视图聚类，可迁移至张量数据恢复",
+      "tldr": "现有张量多视图聚类（TMC）广泛使用快速傅里叶变换（FFT）施加频域低秩约束，但FFT隐含的周期性假设要求样本按类别顺序排列才能生效。随机打乱顺序后性能大幅下降，这表明以往成功部分源于人工顺序而非真实结构。本文提出基于图傅里叶变换（GFT）的图光谱低秩张量学习框架，用数据驱动的图谱基替代固定傅里叶基，自适应捕获流形结构，消除排列敏感性。同时设计锚点变体处理大规模数据。实验证明该方法克服了顺序依赖性，在多个基准上表现竞争或更优。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Tensorial multi-view clustering (TMC) has achieved strong performance due to its ability to capture high-order correlations across multiple views. Most existing t-SVD-based TMC frameworks apply the Fast Fourier Transform (FFT) along the sample mode to impose frequency-domain low-rank constraints. However, we reveal that this widely adopted design critically relies on an implicit ``periodicity assumption'' induced by the sample arrangement. When samples are ordered by class, neighboring indices tend to be semantically similar, creating artificial local continuity along the sample mode and a favorable spectral structure for FFT-based low-rank regularization. Once this ordering is removed by random permutation, existing t-SVD-based TMC methods suffer severe performance degradation. This strong sensitivity to class ordering conflicts with the permutation-invariant nature of clustering and indicates that part of the reported performance may be attributed to a privileged sample arrangement rather than genuine high-order structure modeling. In this paper, we systematically investigate this phenomenon and its underlying algebraic and spectral mechanisms. To address this fundamental flaw, we further propose a graph-spectral low-rank tensor learning framework based on the Graph Fourier Transform (GFT), which replaces the fixed Fourier basis along the sample mode with a data-driven graph spectral basis, thereby capturing the intrinsic manifold structure without relying on a particular sample ordering. Moreover, we develop an anchor-based variant to address large-scale datasets efficiently. Extensive experiments on various benchmarks validate our findings and demonstrate the competitive or superior performance of the proposed methods compared with state-of-the-art TMC approaches.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/30/2607.26951v1-a-spectral-domain-pseudo-inverse-construction-method-for-unitary-diagonalizable-linear-inverse-problems",
+      "section": "quick",
+      "title_en": "A Spectral-Domain Pseudo-Inverse Construction Method for Unitary Diagonalizable Linear Inverse Problems",
+      "authors": "Shengchang Chen",
+      "date": "2026-07-29",
+      "pdf": "https://arxiv.org/pdf/2607.26951v1",
+      "score": "6.0",
+      "evidence": "谱域伪逆方法适用于图像恢复，可迁移至去噪",
+      "tldr": "线性逆问题在多个领域广泛存在，当矩阵G病态或奇异时需正则化或广义逆方法，但大规模问题计算困难。本文针对可被酉矩阵对角化的一类线性逆问题，提出一种谱域伪逆构造方法。核心是在变换域直接构造稳定的伪逆算子，先给出该类矩阵的解析SVD，定义谱域正则化滤波因子，构建稳定算子并证明其有界稳定性及收敛于Moore-Penrose广义逆。该方法数值等价于零阶Tikhonov正则化，但方法论路径不同，为大规模结构化逆问题提供高效解法。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Linear inverse problems are prevalent in geophysics, signal processing, image restoration, and medical imaging. Mathematically, they can be formulated as $Gm = d$. When $G$ is ill-conditioned or singular, the problem becomes ill-posed and requires regularization methods or generalized inverse methods for a stable solution. However, both types of methods encounter significant computational difficulties for large-scale linear inverse problems. In this paper, we establish a spectral-domain pseudo-inverse construction method for a class of linear inverse problems that can be diagonalized by unitary matrices. The core idea is to construct a stable pseudo-inverse operator directly in the transform domain, starting from the unitary diagonalization structure of the matrix. We first provide the analytic Singular Value Decomposition (SVD) of this class of matrices, clarifying the correspondence between spectral decomposition and SVD. On this basis, we define spectral-domain regularization filtering factors, construct a stable spectral-domain pseudo-inverse operator, and prove its bounded stability as well as its consistency in converging to the Moore--Penrose generalized inverse. This construction is numerically equivalent to zeroth-order Tikhonov regularization and converges to the Moore--Penrose generalized inverse as $α\\to 0^+$, but its methodological path differs from both. This paper reveals that the stable generalized inverse of a class of structured matrices can be directly constructed from their spectral decomposition, providing an efficient solution method for large-scale structured inverse problems. The Fourier transform case is a special instance of this method when the unitary matrix is taken as the discrete Fourier transform matrix.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

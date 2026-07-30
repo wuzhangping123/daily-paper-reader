@@ -6,29 +6,32 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-29
-- 运行时间：2026-07-29 20:50:26 UTC
+- 最新运行日期：2026-07-30
+- 运行时间：2026-07-30 21:38:30 UTC
 - 运行状态：成功
-- 本次总论文数：3
+- 本次总论文数：4
 - 精读区：1
-- 速读区：2
+- 速读区：3
 
 ### 今日简报（AI）
-今日共处理3篇论文，其中1篇精读、2篇速读，聚焦图像重建与恢复领域。最值得关注的是精读论文《Trainable Nonexpansive Denoisers for Contractive Image Reconstruction》（8.0分），其可训练非膨胀去噪器为图像重建提供了新思路。建议优先阅读该论文，同时可结合速读中的《Noise-Free One-Step LoRA for Task-Driven Image Restoration》了解扩散先验在图像恢复中的应用。
-- 详情：[/202607/29/README](/202607/29/README)
+今日共读4篇论文，精读1篇《Dual-Domain Manifold Modeling for Hyperspectral Image Fusion》（8.0分）聚焦高光谱图像融合的双流形建模。最值得关注的方向是高光谱图像融合的流形方法，以及残差流和鲁棒张量多视图聚类的新思路。下一步可深入精读高光谱融合的双域模型，并关注线性逆问题求解的谱域伪逆方法。
+- 详情：[/202607/30/README](/202607/30/README)
 
 ### 精读区论文标签
-1. [Trainable Nonexpansive Denoisers for Contractive Image Reconstruction](/202607/29/2607.23347v1-trainable-nonexpansive-denoisers-for-contractive-image-reconstruction)  
+1. [Dual-Domain Manifold Modeling for Hyperspectral Image Fusion](/202607/30/2607.25338v1-dual-domain-manifold-modeling-for-hyperspectral-image-fusion)  
    标签：评分：8.0/10、query:hsi-denoise
-   evidence：可训练的非扩张去噪器，具有Lipschitz控制，用于收缩图像重建
+   evidence：双域流形建模用于高光谱图像融合，与张量数据恢复相关
 
 ### 速读区论文标签
-1. [Randomized Krylov-Projected Iterated Tikhonov Regularization for Large-Scale Ill-posed Problems Under A Posteriori Stopping Rule](/202607/29/2607.24138v1-randomized-krylov-projected-iterated-tikhonov-regularization-for-large-scale-ill-posed-problems-under-a-posteriori-stopping-rule)  
+1. [ScaleResfusion: Residual Rectified Flow based on Residual Vector Field](/202607/30/2607.25275v1-scaleresfusion-residual-rectified-flow-based-on-residual-vector-field)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：结合Tikhonov与Krylov投影的随机迭代正则化用于不适定反问题
-2. [Noise-Free One-Step LoRA for Task-Driven Image Restoration with Diffusion Priors](/202607/29/2607.25390v1-noise-free-one-step-lora-for-task-driven-image-restoration-with-diffusion-priors)  
+   evidence：基于深度神经网络的图像去噪与恢复
+2. [Breaking the Periodicity Assumption: Robust Tensorial Multi-View Clustering via Graph-Spectral Low-Rank Learning](/202607/30/2607.25295v1-breaking-the-periodicity-assumption-robust-tensorial-multi-view-clustering-via-graph-spectral-low-rank-learning)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：无噪声一步LoRA用于任务驱动图像恢复，使用扩散先验
+   evidence：张量低秩学习方法用于多视图聚类，可迁移至张量数据恢复
+3. [A Spectral-Domain Pseudo-Inverse Construction Method for Unitary Diagonalizable Linear Inverse Problems](/202607/30/2607.26951v1-a-spectral-domain-pseudo-inverse-construction-method-for-unitary-diagonalizable-linear-inverse-problems)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：谱域伪逆方法适用于图像恢复，可迁移至去噪
 
 
 <div class="dpr-home-promo-card">
