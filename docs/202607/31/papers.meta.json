@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-31",
+  "date": "2026-07-31",
+  "generated_at": "2026-07-31T20:52:08",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/31/2607.23341v2-stabilizing-deep-reconstruction-operators-with-contractive-anchoring",
+      "section": "quick",
+      "title_en": "Stabilizing Deep Reconstruction Operators with Contractive Anchoring",
+      "authors": "Arghya Sinha, Trishit Mukherjee, Kunal N. Chaudhury",
+      "date": "2026-07-25",
+      "pdf": "https://arxiv.org/pdf/2607.23341v2",
+      "score": "7.0",
+      "evidence": "利用预训练深度去噪器稳定迭代重建，可应用于高光谱图像深度学习去噪",
+      "tldr": "预训练深度去噪器通过PnP和RED算法可用于多种图像重建任务，但作为正则器在迭代中可能不稳定，出现峰值后崩溃现象。本文提出数据驱动的稳定化框架，通过局部量形式化不稳定性并自适应正则化，无需重训或修改网络。核心是利用可收缩算子作为锚点控制不稳定算子，并设计高效的训练型可收缩算子。实验证明该方法在多种算法、架构和任务上实现无崩溃的稳定重建。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Pretrained deep denoisers can be used to solve a wide range of model-based image reconstruction tasks via Plug-and-Play (PnP) and Regularization-by-Denoising (RED) algorithms, without retraining per task. These denoisers are trained only for single-step denoising. Using them as Image Reconstruction (IR) regularizers in an iterative process can destabilize reconstruction. A common failure mode is the peak-and-collapse behaviour: metrics such as PSNR improve for early iterations and then abruptly degrade, making these algorithms unreliable in practice. We propose a data-driven stabilization framework that (i) formalizes this instability of any IR operator through a local quantity and (ii) prevents collapse by regularizing this quantity adaptively, requiring no retraining or modification of the given pretrained network. Our key idea is to control the potentially unstable IR operator with a contractive operator whose stable iterates act as an anchor and prevent collapse. We further introduce an efficient family of trainable contractive operators that serve as strong anchors while remaining lightweight. Extensive experiments across proximal algorithms, denoiser architectures, noise levels, and imaging tasks show consistent, collapse-free performance and improved reliability of PnP and RED reconstruction.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/31/2607.26864v1-a-relaxed-gradient-step-denoiser-for-splitting-methods-in-poisson-inverse-problems",
+      "section": "quick",
+      "title_en": "A Relaxed Gradient Step Denoiser for Splitting Methods in Poisson Inverse Problems",
+      "authors": "Alessandro Benfenati",
+      "date": "2026-07-29",
+      "pdf": "https://arxiv.org/pdf/2607.26864v1",
+      "score": "7.0",
+      "evidence": "将学习式梯度步去噪器用于泊松逆问题分裂方法，与非高斯高光谱去噪相关",
+      "tldr": "泊松逆问题的分裂算法中，通用去噪模块被替换为松弛梯度步去噪器，基于输入凸神经网络学习的凸势能定义，满足非扩张性条件并选择松弛参数。实验表明该去噪器在验证数据上处于FNE兼容区间，重构稳定且对ADMM参数敏感性低，适用于不同模糊算子和噪声水平。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Plug\\&Play methods combine classical variational models with learned denoisers and have achieved strong results in imaging inverse problems. Their convergence has been widely studied for Gaussian data, whereas Poisson models require additional care because of the nonquadratic Kullback--Leibler fidelity. This work introduces \\gsdsplit, a splitting method built upon \\pnpsplit, in which the generic denoising block is replaced by a relaxed Gradient Step Denoiser. The resulting method retains explicit Poisson fidelity updates. The denoiser is defined through the gradient of a learned convex potential parameterized by an Input Convex Neural Network. Its architecture and training promote both blind denoising capability and a smoothness condition sufficient for firm nonexpansiveness. Empirical smoothness estimates are used to select a relaxation parameter compatible with the convergence assumptions of \\pnpsplit. Numerical experiments provide evidence that the trained denoiser operates in an FNE-compatible regime on the considered validation data. \\gsdsplit also yields stable reconstructions outside the empirically supported range and shows substantially lower sensitivity to the ADMM parameter, while remaining effective for different blur operators and Poisson noise levels.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/31/2607.27898v1-core-uir-prior-guided-common-and-residual-experts-for-efficient-all-in-one-remote-sensing-image-restoration",
+      "section": "quick",
+      "title_en": "CoRE-UIR: Prior-guided common and residual experts for efficient all-in-one remote sensing image restoration",
+      "authors": "Zaiyan Zhang, Qiangqiang Yuan, Jie Li, Ziyang Lihe, Yu Wan, Yuzeng Chen, Xin Su, Liangpei Zhang",
+      "date": "2026-07-30",
+      "pdf": "https://arxiv.org/pdf/2607.27898v1",
+      "score": "7.0",
+      "evidence": "全合一遥感图像复原方法，针对多种退化，可迁移至高光谱去噪/复原。",
+      "tldr": "遥感图像常受多重退化影响，现有全一体化修复方法存在退化线索弱、专家冗余的问题。提出CoRE-UIR框架，用公共与残差专家分解恢复能力，结合退化先验嵌入和全局特征调制。在MDVD-108K等数据集上PSNR提升1.05dB，速度提升11.83倍，显存降低85.3%，并验证了泛化性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Remote sensing images acquired by unmanned aerial vehicles (UAVs) and satellites are often degraded by adverse weather, illumination variation, and imaging artifacts, which may co-occur and jointly induce global distribution shifts and local structural corruption. Although All-in-One image restoration offers an appealing unified alternative to task-specific pipelines, existing methods still suffer from weak or implicit degradation cues and parameter redundancy caused by full-rank multi-expert designs with overlapping restoration behaviors. We propose CoRE-UIR (Common and Residual Experts for Universal Image Restoration), a prior-guided global-local framework centered on the Common-and-Residual Expert Block (CoRE). CoRE explicitly decomposes restoration capacity into a common dense expert for degradation-invariant restoration and low-rank residual experts for degradation-specific compensation, enabling adaptive specialization without redundant expert replication. Built on this design, Degradation Prior Embedding (DPE) adapts frozen CLIP features into an explicit restoration-oriented prior, while Global Feature Modulation (GFM) aligns global feature statistics before local residual compensation. We also construct MDVD-108K (Multi-Degradation VisDrone), a large-scale UAV restoration dataset covering both single and compound degradations, together with a real-world test set. Extensive experiments on multiple datasets show that CoRE-UIR improves the overall average PSNR by 1.05 dB while running 11.83$\\times$ faster and reducing peak memory by 85.3% relative to the strongest baseline, BaryIR, thereby maintaining a favorable quality-efficiency trade-off. Evaluations on downstream tasks and unseen degradation also validate the generalizability of CoRE-UIR. The code and dataset will be released at https://github.com/zzaiyan/CoRE-UIR.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/31/2607.22793v1-small-bias-free-blind-and-convolutional-denoiser-a-compact-convnext-u-net-for-blind-gaussian-color-image-denoising",
+      "section": "quick",
+      "title_en": "Small, Bias-Free, Blind and Convolutional Denoiser: A compact ConvNeXt U-Net for blind Gaussian color-image denoising",
+      "authors": "Nikolas Markou",
+      "date": "2026-07-24",
+      "pdf": "https://arxiv.org/pdf/2607.22793v1",
+      "score": "6.0",
+      "evidence": "具有齐次性的紧凑卷积盲高斯去噪器，可迁移至高光谱去噪",
+      "tldr": "盲高斯彩色图像去噪需应对未知噪声水平，常用模型笨重或泛化不足。提出BF-ConvUNeXt，0.82M参数的紧凑无偏ConvNeXt U-Net，用Gabor茎、拉普拉斯金字塔和全程无偏构造实现degree-1齐次。在sigma 6.4-64训练，外推至200不崩溃；标准集上平均超DnCNN约0.7dB，参数仅为SOTA的1/15。齐次性支持Tweedie分数读取，可驱动逆问题。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We describe and evaluate BF-ConvUNeXt, a compact bias-free ConvNeXt U-Net for blind additive-white-Gaussian-noise color image denoising, combining four existing ingredients so a single property survives end to end: a frozen depthwise Gabor stem (oriented band-pass, zero trainable parameters), a Laplacian-pyramid encoder routing the high-frequency residual into each skip connection, a ConvNeXt-V1 U-Net body, and bias-free construction throughout (no additive bias, linear head, LeakyReLU, variance-only batch norm). Together these make the 0.82M-parameter network exactly degree-1 homogeneous at inference, D(alpha y) = alpha D(y), licensing a Miyasawa/Tweedie score reading of the residual and blind generalization across noise levels from one model. We train a single blind model on a noise-sigma curriculum (sigma approximately 6.4 to 64, 0-255 scale); it extrapolates past that ceiling without a cliff, degrading smoothly to 22.8 dB at sigma=150 and 20.0 dB at sigma=200. Evaluated unchanged on four standard color sets (CBSD68, Kodak24, McMaster, Urban100) at sigma in {15,25,50}, it matches or beats DnCNN and FFDNet on every set and level, averaging about +0.7 dB over DnCNN. Against heavyweight CNN/transformer state of the art it trails by a small margin (roughly 0.3-1.7 dB depending on set) at 1/15 to 1/39 of their parameters. The homogeneity is inference-only and checkpoint-specific, and the learned residual is a local, not global, score (non-conservative Jacobian), so plug-and-play/RED guarantees do not transfer; it still drives stochastic sampling and linear inverse problems (inpainting, super-resolution, deblurring, compressive sensing).",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
