@@ -6,35 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-31
-- 运行时间：2026-07-31 20:51:55 UTC
+- 最新运行日期：2026-08-01
+- 运行时间：2026-08-01 21:09:21 UTC
 - 运行状态：成功
-- 本次总论文数：4
+- 本次总论文数：2
 - 精读区：0
-- 速读区：4
+- 速读区：2
 
 ### 今日简报（AI）
-今日速读4篇论文，聚焦图像复原与深度重建算子的稳定性优化，均获7.0分。
-最值得关注的方向：遥感图像全场景复原（CoRE-UIR）与泊松逆问题中的松弛梯度步去噪器，均以先验/锚定提升稳健性。
-建议下一步从这4篇中挑1篇与自身任务最相关的进行精读，验证方法在真实数据上的效果。
-- 详情：[/202607/31/README](/202607/31/README)
+今日速读2篇论文，均获6.0分，暂无精读。
+
+值得关注：矩阵三因子分解的稀疏可识别性，以及全能图像恢复中的双歧义校正。
+
+建议先从图像恢复方向入手，兼顾理论与应用，后续可精读这两篇原文。
+- 详情：[/202608/01/README](/202608/01/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Stabilizing Deep Reconstruction Operators with Contractive Anchoring](/202607/31/2607.23341v2-stabilizing-deep-reconstruction-operators-with-contractive-anchoring)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：利用预训练深度去噪器稳定迭代重建，可应用于高光谱图像深度学习去噪
-2. [A Relaxed Gradient Step Denoiser for Splitting Methods in Poisson Inverse Problems](/202607/31/2607.26864v1-a-relaxed-gradient-step-denoiser-for-splitting-methods-in-poisson-inverse-problems)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：将学习式梯度步去噪器用于泊松逆问题分裂方法，与非高斯高光谱去噪相关
-3. [CoRE-UIR: Prior-guided common and residual experts for efficient all-in-one remote sensing image restoration](/202607/31/2607.27898v1-core-uir-prior-guided-common-and-residual-experts-for-efficient-all-in-one-remote-sensing-image-restoration)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：全合一遥感图像复原方法，针对多种退化，可迁移至高光谱去噪/复原。
-4. [Small, Bias-Free, Blind and Convolutional Denoiser: A compact ConvNeXt U-Net for blind Gaussian color-image denoising](/202607/31/2607.22793v1-small-bias-free-blind-and-convolutional-denoiser-a-compact-convnext-u-net-for-blind-gaussian-color-image-denoising)  
+1. [Sparsity Induced Identifiability in Matrix Tri-Factorisation](/202608/01/2607.27507v1-sparsity-induced-identifiability-in-matrix-tri-factorisation)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：具有齐次性的紧凑卷积盲高斯去噪器，可迁移至高光谱去噪
+   evidence：基于稀疏性的矩阵分解去噪及其可辨识性理论
+2. [What to Remove, What to Preserve: Dual-Ambiguity Rectification for All-in-One Image Restoration](/202608/01/2607.28526v1-what-to-remove-what-to-preserve-dual-ambiguity-rectification-for-all-in-one-image-restoration)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：面向多种退化的全合一图像恢复方法，可迁移至高光谱恢复
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,96 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-01T21:06:05.350077+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.27507v1",
+      "source": "arxiv",
+      "title": "Sparsity Induced Identifiability in Matrix Tri-Factorisation",
+      "abstract": "Matrix factorisation is a fundamental tool for exploiting low-dimensional structure in high-dimensional data, with applications such as data compression, denoising, structure discovery, interpretable representation learning, and dimensionality reduction. Compared to conventional two-factor models, matrix tri-factorisation provides greater modelling flexibility, while sparsity constraints often improve both interpretability and recovery performance. Although the role of sparsity has been extensively studied for two-factor matrix factorisation, rigorous theoretical guarantees for general real-valued matrix tri-factorisation remain largely unexplored. To address this gap, we establish, to the best of our knowledge, the first rigorous theoretical study for sparsity-induced identifiability in general real-valued matrix tri-factorisation. Our analysis is enabled by a novel decomposition strategy that transforms the original problem into two coupled auxiliary factorisation problems, while preserving the structural information necessary to the recovery of the original factor matrices from the observations. Building upon this decomposition, we derive recovery guarantees and structural consistency results that characterise how coefficient sparsity influences the sufficient recovery conditions, convergence behaviour, spectral approximation error, high-probability bounds, and structure preservation. Comprehensive Monte Carlo experiments validate the proposed theory and demonstrate close agreement between the theoretical results and empirical observations.",
+      "authors": [
+        "Tingting Mu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-29T22:47:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.27507v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "matrix factorization for denoising with sparsity guarantees",
+      "llm_evidence_cn": "基于稀疏性的矩阵分解去噪及其可辨识性理论",
+      "llm_evidence": "基于稀疏性的矩阵分解去噪及其可辨识性理论",
+      "canonical_evidence": "基于稀疏性的矩阵分解去噪及其可辨识性理论",
+      "llm_tldr_en": "This paper provides the first rigorous identifiability analysis for sparse matrix tri-factorisation, establishing uniqueness conditions that support denoising and structure discovery, bridging low-rank representation theory with practical recovery.",
+      "llm_tldr_cn": "现有矩阵因子分解理论多限于两因子模型，而三因子分解在去噪等应用中更具灵活性，但其稀疏性理论保障尚属空白。本文首次系统研究了实值矩阵三因子分解中稀疏性诱导的可辨识性，给出了稀疏约束下解唯一性的理论条件。实验和分析表明稀疏性可显著提升分解的可解释性与恢复性能。该结果为低秩表示用于图像去噪和结构发现提供了坚实的理论基础。",
+      "llm_tldr": "现有矩阵因子分解理论多限于两因子模型，而三因子分解在去噪等应用中更具灵活性，但其稀疏性理论保障尚属空白。本文首次系统研究了实值矩阵三因子分解中稀疏性诱导的可辨识性，给出了稀疏约束下解唯一性的理论条件。实验和分析表明稀疏性可显著提升分解的可解释性与恢复性能。该结果为低秩表示用于图像去噪和结构发现提供了坚实的理论基础。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "low-rank representation for denoising",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.28526v1",
+      "source": "arxiv",
+      "title": "What to Remove, What to Preserve: Dual-Ambiguity Rectification for All-in-One Image Restoration",
+      "abstract": "All-in-one image restoration aims to handle diverse degradations within a unified framework. Existing methods commonly encode heterogeneous degradation conditions in a shared latent space, where degradation-related cues and scene content can remain entangled. We characterize the resulting challenge as dual ambiguity: semantic ambiguity in channel-wise modulation and spatial ambiguity in restoration responses, which can lead to content corruption and residual artifacts. To mitigate this issue, we propose DAR-Net, a Dual-Ambiguity Rectification Network for all-in-one image restoration. DAR-Net first introduces a Degradation Archetype Representation (DAR) module to construct a structured degradation state through simplex-constrained archetype mixture modeling. Based on this state, a Semantic Ambiguity Rectification (SeAR) module generates degradation-aware prompts to improve channel-wise conditioning in the decoder. A Spatial Ambiguity Rectification (SpAR) module further regularizes degradation-aware and complementary features toward orthogonal response subspaces, reducing spatial interference between removal and preservation cues. Extensive experiments on standard all-in-one restoration benchmarks show that DAR-Net achieves the best overall performance under both three-degradation and five-degradation settings, improving the average PSNR over the strongest competitor by 0.14 dB and 0.34 dB, respectively; it additionally shows superior performance on CDD-11 and WeatherBench.",
+      "authors": [
+        "Cencen Liu",
+        "Wen Yin",
+        "Dongyang Zhang",
+        "Dongmin Li",
+        "Shan Zhao",
+        "Bing Su",
+        "Tao He",
+        "Jielei Wang",
+        "Guoming Lu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-30T17:01:24+00:00",
+      "link": "https://arxiv.org/pdf/2607.28526v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "All-in-one image restoration method addressing diverse degradations, transferable to HSI restoration",
+      "llm_evidence_cn": "面向多种退化的全合一图像恢复方法，可迁移至高光谱恢复",
+      "llm_evidence": "面向多种退化的全合一图像恢复方法，可迁移至高光谱恢复",
+      "canonical_evidence": "面向多种退化的全合一图像恢复方法，可迁移至高光谱恢复",
+      "llm_tldr_en": "Proposes DAR-Net, a dual-ambiguity rectification network for all-in-one image restoration, disentangling degradation-related cues from scene content; relevant as a modern restoration framework for hyperspectral restoration and denoising.",
+      "llm_tldr_cn": "全合一图像恢复需要在统一框架中处理多种退化，但现有方法常将退化线索与场景内容纠缠，导致恢复时内容损坏或伪影。本文提出DAR-Net，通过退化原型表示（DAR）模块构造结构化的退化状态，并采用双重歧义校正消除语义和空间歧义。该方法在多种退化恢复任务上表现出优越性。作为通用的图像恢复框架，它对高光谱图像恢复与去噪具有迁移应用的潜力。",
+      "llm_tldr": "全合一图像恢复需要在统一框架中处理多种退化，但现有方法常将退化线索与场景内容纠缠，导致恢复时内容损坏或伪影。本文提出DAR-Net，通过退化原型表示（DAR）模块构造结构化的退化状态，并采用双重歧义校正消除语义和空间歧义。该方法在多种退化恢复任务上表现出优越性。作为通用的图像恢复框架，它对高光谱图像恢复与去噪具有迁移应用的潜力。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-01",
+  "date": "2026-08-01",
+  "generated_at": "2026-08-01T21:09:26",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/01/2607.27507v1-sparsity-induced-identifiability-in-matrix-tri-factorisation",
+      "section": "quick",
+      "title_en": "Sparsity Induced Identifiability in Matrix Tri-Factorisation",
+      "authors": "Tingting Mu",
+      "date": "2026-07-29",
+      "pdf": "https://arxiv.org/pdf/2607.27507v1",
+      "score": "6.0",
+      "evidence": "基于稀疏性的矩阵分解去噪及其可辨识性理论",
+      "tldr": "矩阵三因子分解能够更灵活地挖掘高维数据中的低维结构，但其稀疏性诱导的可识别性长期缺乏严格理论分析。本文提出一种新颖的分解策略，将原问题转化为两个耦合的辅助因子分解问题，同时保留原始因子矩阵的结构信息。基于该分解，首次获得恢复保证与结构一致性结果，并刻画稀疏性对收敛性、谱近似误差和高概率界的影响。大量蒙特卡洛实验验证了理论与经验的高度一致。这项工作填补理论空白，为三因子分解的可识别性提供首个严格依据。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Matrix factorisation is a fundamental tool for exploiting low-dimensional structure in high-dimensional data, with applications such as data compression, denoising, structure discovery, interpretable representation learning, and dimensionality reduction. Compared to conventional two-factor models, matrix tri-factorisation provides greater modelling flexibility, while sparsity constraints often improve both interpretability and recovery performance. Although the role of sparsity has been extensively studied for two-factor matrix factorisation, rigorous theoretical guarantees for general real-valued matrix tri-factorisation remain largely unexplored. To address this gap, we establish, to the best of our knowledge, the first rigorous theoretical study for sparsity-induced identifiability in general real-valued matrix tri-factorisation. Our analysis is enabled by a novel decomposition strategy that transforms the original problem into two coupled auxiliary factorisation problems, while preserving the structural information necessary to the recovery of the original factor matrices from the observations. Building upon this decomposition, we derive recovery guarantees and structural consistency results that characterise how coefficient sparsity influences the sufficient recovery conditions, convergence behaviour, spectral approximation error, high-probability bounds, and structure preservation. Comprehensive Monte Carlo experiments validate the proposed theory and demonstrate close agreement between the theoretical results and empirical observations.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/01/2607.28526v1-what-to-remove-what-to-preserve-dual-ambiguity-rectification-for-all-in-one-image-restoration",
+      "section": "quick",
+      "title_en": "What to Remove, What to Preserve: Dual-Ambiguity Rectification for All-in-One Image Restoration",
+      "authors": "Cencen Liu, Wen Yin, Dongyang Zhang, Dongmin Li, Shan Zhao, Bing Su, Tao He, Jielei Wang, Guoming Lu",
+      "date": "2026-07-30",
+      "pdf": "https://arxiv.org/pdf/2607.28526v1",
+      "score": "6.0",
+      "evidence": "面向多种退化的全合一图像恢复方法，可迁移至高光谱恢复",
+      "tldr": "针对全图像复原中退化线索与场景内容纠缠导致的双重歧义（通道调制的语义歧义和空间响应的空间歧义），提出DAR-Net，通过退化原型表示构建结构化退化状态，用语义歧义纠正模块和空间歧义纠正模块分别改善通道条件化和正交化响应子空间。在多种退化基准上取得最优，平均PSNR提升0.14/0.34dB。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "All-in-one image restoration aims to handle diverse degradations within a unified framework. Existing methods commonly encode heterogeneous degradation conditions in a shared latent space, where degradation-related cues and scene content can remain entangled. We characterize the resulting challenge as dual ambiguity: semantic ambiguity in channel-wise modulation and spatial ambiguity in restoration responses, which can lead to content corruption and residual artifacts. To mitigate this issue, we propose DAR-Net, a Dual-Ambiguity Rectification Network for all-in-one image restoration. DAR-Net first introduces a Degradation Archetype Representation (DAR) module to construct a structured degradation state through simplex-constrained archetype mixture modeling. Based on this state, a Semantic Ambiguity Rectification (SeAR) module generates degradation-aware prompts to improve channel-wise conditioning in the decoder. A Spatial Ambiguity Rectification (SpAR) module further regularizes degradation-aware and complementary features toward orthogonal response subspaces, reducing spatial interference between removal and preservation cues. Extensive experiments on standard all-in-one restoration benchmarks show that DAR-Net achieves the best overall performance under both three-degradation and five-degradation settings, improving the average PSNR over the strongest competitor by 0.14 dB and 0.34 dB, respectively; it additionally shows superior performance on CDD-11 and WeatherBench.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
