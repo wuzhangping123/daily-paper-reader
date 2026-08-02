@@ -6,31 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-01
-- 运行时间：2026-08-01 21:09:21 UTC
+- 最新运行日期：2026-08-02
+- 运行时间：2026-08-02 20:27:32 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：0
 - 精读区：0
-- 速读区：2
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读2篇论文，均获6.0分，暂无精读。
-
-值得关注：矩阵三因子分解的稀疏可识别性，以及全能图像恢复中的双歧义校正。
-
-建议先从图像恢复方向入手，兼顾理论与应用，后续可精读这两篇原文。
-- 详情：[/202608/01/README](/202608/01/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202608/02/README](/202608/02/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Sparsity Induced Identifiability in Matrix Tri-Factorisation](/202608/01/2607.27507v1-sparsity-induced-identifiability-in-matrix-tri-factorisation)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：基于稀疏性的矩阵分解去噪及其可辨识性理论
-2. [What to Remove, What to Preserve: Dual-Ambiguity Rectification for All-in-One Image Restoration](/202608/01/2607.28526v1-what-to-remove-what-to-preserve-dual-ambiguity-rectification-for-all-in-one-image-restoration)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：面向多种退化的全合一图像恢复方法，可迁移至高光谱恢复
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
