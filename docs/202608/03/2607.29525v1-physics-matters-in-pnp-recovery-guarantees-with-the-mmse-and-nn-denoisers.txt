@@ -1,0 +1,4612 @@
+Title: Physics Matters in PnP: Recovery Guarantees with the MMSE and NN Denoisers
+
+URL Source: https://arxiv.org/pdf/2607.29525v1
+
+Published Time: Mon, 03 Aug 2026 01:03:28 GMT
+
+Number of Pages: 46
+
+Markdown Content:
+# Physics Matters in PnP: Recovery Guarantees with the MMSE and NN Denoisers 
+
+Tobias Wolf ∗ Jalal Fadili † Jin Guo ‡ Roy Y. He §
+
+August 3, 2026 
+
+Abstract 
+
+We investigate the forward-backward-splitting version of the Plug and Play (PnP) method for linear ill-posed problems with MMSE estimators as denoisers. In contrast to existing literature, we consider estimators which are specialized for (degenerate) Gaussian noise with possibly non-diagonal covariance matrices. We further deviate from the classical iteration by replacing parts of the descent step with a linear operator that relates the observation noise to that of the MMSE estimator. Under mild assumptions, we derive several properties of the denoiser and prove recovery guarantees of the iteration both pointwise and in the Wasserstein distance of the underlying probability distributions. Crucially, our analysis shows that the denoiser cannot be chosen in a physics-agnostic way, that is, independently of the forward model. We extend our results to the case where the MMSE denoiser is parametrized by a neural network and derive the corresponding recovery bounds. 
+
+# Contents 
+
+1 Introduction 2
+
+1.1 Problem statement and literature overview . . . . . . . . . . . . . . . . . . . . . . . . . . . 21.1.1 Model-based approach . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31.1.2 Data-driven approach . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31.1.3 Hybrid approach . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3Learning the regularization functional . . . . . . . . . . . . . . . . . . . . . . . . . 3Plug-and-Play . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4Unrolling/Unfolding . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4Generative models . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4Deep Inverse Prior . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41.2 Contributions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51.3 Relation to prior work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+
+2 The MMSE denoiser 7
+
+> ∗
+
+UNICAEN, CNRS, GREYC, Caen, France (tobias.wolf@unicaen.fr) 
+
+> †
+
+ENSICAEN, CNRS, GREYC, Caen, France (Jalal.Fadili@ensicaen.fr) 
+
+> ‡
+
+Department of Mathematics, City University of Hong Kong, Hong Kong(jin.guo@my.cityu.edu.hk) 
+
+> §
+
+Department of Mathematics, City University of Hong Kong, Hong Kong (royhe2@cityu.edu.hk) 
+
+1arXiv:2607.29525v1 [math.OC] 31 Jul 2026 3 Main results 9
+
+3.1 Main assumptions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10 3.2 Recovery guarantees for PnP with the MMSE . . . . . . . . . . . . . . . . . . . . . . . . . 11 3.2.1 Pointwise recovery error bound . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11 3.2.2 Wasserstein recovery error bound . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 3.3 Recovery guarantees for PnP with neural network denoiser . . . . . . . . . . . . . . . . . . 16 
+
+4 Properties of the MMSE denoiser 19 
+
+4.1 Lipschitz continuity . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 4.2 Stability with respect to the prior measure . . . . . . . . . . . . . . . . . . . . . . . . . . . 21 4.3 Monotonicity properties . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23 4.4 Asymptotic behavior of the MMSE denoiser . . . . . . . . . . . . . . . . . . . . . . . . . . 25 
+
+5 Proofs of the main results 28 
+
+5.1 Proof of Theorem 3.2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 5.2 Proof of Theorem 3.6 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31 5.3 Proof of Proposition 3.9 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 5.4 Proof of Lemma 3.10 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33 5.5 Proof of Theorem 3.11 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34 
+
+6 Conclusions and future work 35 A General case of Lemma 3.4 35 B General case of Lemma 4.11 36 
+
+# 1 Introduction 
+
+1.1 Problem statement and literature overview 
+
+Let X ⊂ Rn and A : X → Rm be a linear forward operator. For random vectors X and E distributed according to, respectively, the probability measures μX ∈ P (X ) and μE ∈ P (Rm), we make an observation 
+
+y according to the forward model 
+
+y = Ax + e. (1) Here x and e are realizations of X and E, respectively. Throughout this work, we assume that the noise e
+
+is Gaussian i.e. 
+
+A-1. μE is the zero-mean Gaussian distribution with positive definite covariance matrix ΣE .
+
+Solving (1) is, in general, an ill-conditioned problem and suffers additionally from non-uniqueness if 
+
+A is not injective. In order to overcome these issues, it is necessary to restrict the inversion process to a well-chosen subset of X containing the plausible solutions, as well as to stabilize the inversion process via so called regularization methods. 21.1.1 Model-based approach 
+
+Many classical solutions address the problem of selecting appropriate solutions by using regularization func-tionals that encode some prior on the sought-after vectors. The general principle is to promote vectors with some notion of low-complexity, or equivalently, to penalize, even with a hard constraint, vectors with unde-sired structures as given by the model knowledge. A multitude of regularizers have been designed, among which the most popular are total variation and its extensions [88, 19, 14], as well as low-rank, sparsity and group sparsity promoting penalties. See [65, 91, 99, 108] for comprehensive overviews in finite and infinite dimensions. In order to approximate solutions of (1), these regularizers are often employed as parts of an energy functional that is minimized [19, 24, 4], within iterative methods in which a sequence of variational problems is solved [76, 34, 72], or implicitly within iterative methods that aim to approximate a specific minimizer of a discrepancy functional [10, 98, 53]. Model-based regularization has produced a wealth of theoretical recovery guarantees for a large variety of regularizers; see [29, 91, 8, 108]. They are explainable, and the failure cases are well-known. However, the choice of the prior and thus of the regularization is nontrivial, and it might not fully capture the diversity and complexity of the objects to recover. This has led to a tremendous shift toward data-driven methods where the prior is either partly or completely learned from some training data. 
+
+1.1.2 Data-driven approach 
+
+In order to circumvent some of the issues discussed above when using model-based priors, it was proposed to learn this prior information from data, rather than by handcrafting models. This can be done either partly or completely, explicitly or implicitly. This trend has started even before the advent of “deep learning”. Our review here is by no means exhaustive in a literature that has been constantly and rapidly evolving in recent years. Observe that completely separating existing literature into model-based versus data-driven is debatable. We invite the reader to refer to the excellent and comprehensive reviews to [3, 75] as well as to more recent surveys on specific themes [94, 67, 69, 55]. See also the volume [44]. A natural, yet naive, way is to learn a neural network (NN) that approximates an analytic inverse to the forward operator A; see [51, 121, 80] and others. This approach is fully supervised but suffers from a few shortcomings. First, it does not explicitly take into account the physics of the problem (the forward model). Attempts to overcome this issue include the work [93]. Second, finding an appropriate NN architecture to approximate an inverse operator well is not an easy task. Moreover, this has to be done robustly to stay immune to perturbation by the noise, so that one may possibly derive stability and recovery guarantees. In fact, a continuous inverse of A rarely exists which may jeopardize the whole approach. Generally, directly learning an inversion map lacks a deep understanding of its recovery guarantees, with a notable exception of the recent work of [80]. 
+
+1.1.3 Hybrid approach 
+
+To overcome some of the shortcomings discussed for the previous learning procedure, a variety of hybrid approaches that mix model- and data-driven methods were devised with the aim of combining the best of both worlds. In the following, we review some of these. 
+
+Learning the regularization functional This approach consists of parametrizing the regularizing func-tional, typically involving a neural network, which is then learned either partly or completely; see e.g. [64, 357, 83, 70]. The training is typically cast as a bilevel programming problem, which, generally, is very chal-lenging to solve. Regularization guarantees were obtained in this setting in [61, 68, 93, 95]. However, this does not give guarantees about the real sought-after vector. 
+
+Plug-and-Play A now widely used approach is Plug-and-Play (PnP for short) [109, 87, 55, 47, 102]. It is inspired by operator splitting schemes when applied to solve variational model-based problems. These splitting schemes typically involve the so-called (explicit) proximal mapping associated to the regularizer. The idea is now to replace the proximal operator with any denoising operator, hence the name ‘Plug-and-Play’. Observe that this means that the regularization functional is now implicitly defined. By parameterizing it with a neural network, the denoiser is learned from pairs of noisy-noiseless data once and for all. In this case, the forward model is well captured by the data fidelity in the splitting algorithm. Recalling that the denoiser induces an implicit prior and adopting a Bayesian perspective, several authors have combined PnP with Monte-Carlo simulation, for instance discretization of Langevin diffusion, to solve inverse problems [58, 38, 54, 96, 46, 28]. 
+
+Unrolling/Unfolding The starting point of unfolding, also referred to as unrolling, is to convert an iterative optimization algorithm into a neural network such that each step (implicit or explicit) of the optimization algorithm resembles a layer of a neural network, and then replace some steps with learned ones. In a nutshell, unrolling amounts to learning parts of optimization algorithms. Its time-continuous version can be seen as an optimal control problem. The idea goes back to [35] for the ISTA algorithm in sparse recovery. Since then, it has received a tremendous interest; see [35, 69, 1, 101, 9] and the reviews in [67, 94]. Despite its success and popularity, unrolling has a few shortcomings nevertheless. Its computational feasibility is directly tied to the number of iterations, where one can then have as many neural networks as iterations. Training is also done for one particular optimization/reconstruction algorithm and for each forward operator. This approach lacks an understanding of its recovery guarantees, which is actually a very challenging problem. 
+
+Generative models Instead of using a neural network to learn a penalty functional, it can be used to restrict a prior distribution through a generative model (GAN, variational auto-encoder, diffusion model, etc.) that learns to generate samples similar to some training dataset [97, 23, 25, 21, 104, 41]. The advantage is that for many problems, the class of vectors to recover lies on a low-dimensional manifold (or rather a union of finitely many of them) and the training of a generative model amounts to learning a map from a low-dimensional space (the latent space) to the original signal space. However, generative models can suffer from memorization and hallucination, and recovery guarantees have to be properly rethought for such models. 
+
+Deep Inverse Prior In the case where no training data is available, a self-supervised method, yet based on a neural network, can be considered. The Deep Inverse Prior (DIP), or Deep Image Prior, was introduced in [107] for simple image processing tasks (denoising, super-resolution, and inpainting). The central idea in the DIP is to train a neural network that acts as a generator with a randomly generated input. It can be thought of as a latent random variable in a lower dimension. The hope is that the architecture of this neural network will induce some “implicit regularization” such that more and more detailed content is added during training before eventually overfitting the noisy image. Its theoretical recovery guarantees have been studied extensively in a series of recent papers [16, 18, 17, 15]. 41.2 Contributions 
+
+Our goal is to recover x given y in (1) with provable guarantees using the Plug-and-Play (PnP) paradigm [109, 87, 55, 47, 102]. This approach is inspired by operator splitting schemes, which one often employs to solve variational, model-based problems. In this work, we investigate the forward-backward-splitting (FBS), which in its proximal form is given by the iteration 
+
+xk+1 = prox γJ (xk − γ∇xF (Axk, y)) , (2) for some step size γ > 0, a fidelity term F that is chosen according to the forward model (1), and a regularizer 
+
+J, whose proximal mapping is defined by 
+
+prox γJ (x) def 
+
+= Argmin 
+
+> z∈Rn
+
+ 12γ ∥x − z∥2 + J(z)
+
+
+
+.
+
+Choosing F (Ax, y) = 12 ∥Ax − y∥2 in (2) yields 
+
+xk+1 = prox γJ 
+
+
+
+xk − γA ⊤(Axk − y)
+
+
+
+. (3) The idea of PnP is to replace the proximal operator with a suitably chosen operator bD : Rn → Rn, hence the name ‘Plug-and-Play’. Using the data model (1), one can then write (3) as 
+
+xk+1 = bD
+
+
+
+x + ( In − γA ⊤A)( xk − x) + γA ⊤e
+
+
+
+. (4) Therefore, one can intuitively interpret the argument of bD as a noisy version of x, which is the reason why 
+
+bD is often called a "denoiser" in the literature. This intuition is rigorous and exact for the special instance where A = In, and by setting γ = 1 , in which case (4) simplifies to 
+
+xk = bD (x + e) , ∀k ∈ N. (5) In particular, the iteration then reduces to a denoising step with noise e.Note that the iteration (4) does not require an explicit regularization functional. While (3) is tied to the computation of minimizers of the functional J(x) + F (Ax, y) (see e.g. [7]), the PnP iteration (4) might not necessarily solve an optimization problem. After all, why should it? In fact, a fixed-point perspective is more appropriate in this setting as we will argue later. Consequently, the argument of the denoiser does not need to be chosen as a gradient-descent step for the fidelity. We therefore consider the more general form 
+
+xk+1 = bD (xk + γB (y − Axk)) with γ > 0, (6) where B ∈ Rn×m and its choice gives an additional degree of freedom to the user. For instance, typical choices are B = A⊤, B = A+ or A⊤(A⊤A + δI n)−1, δ > 0 (Tikhonov regularization). Such choices were used in e.g., [56, 52, 120, 113, 73]. Motivated by making the training phase independent of the observation noise covariance matrix ΣE , [60] proposed and studied the very interesting choice B = A⊤Σ−1/2 
+
+> E
+
+.Though general choices of B do not necessarily entail that (4) is tied to an optimization problem, this property still holds for some specific choices mentioned above. The case B = A⊤C, for C symmetric and positive semidefinite corresponds to gradient descent on 12 C1/2(y − A ·) 2. B = A+ corresponds to gradient descent on 12 dist( ·, C)2 where C = {z ∈ Rn : y = Az}.5Since the iterates of (6) should approximate a solution x of (1), we eventually want to have y −Axk ≈ e,meaning that B ideally acts as a transformation from the observation noise e to the type of noise that can be optimally removed by the denoiser bD.Our analysis focuses on the class of MMSE denoisers of X given a random vector Z. These are defined as bD ∈ Argmin 
+
+> D∈D(Rn,Rn)
+
+{R (D)} , (7) with 
+
+R(D) def 
+
+= E
+
+h
+
+∥D(Z) − X∥2i
+
+, (8) where the expectation in (8) is taken with respect to the joint distribution of X and Z, and D(Rn, Rn) is some subspace of measurable functions 1.The main contributions of this work is to derive pointwise and distributional recovery error bounds of the iteration (6), where the latter one is measured with respect to the Wasserstein distance. To this end, 
+
+• We establish several regularity and stability properties of the MMSE denoisers. In particular, we show cocoercivity, which gives a rigorous justification for the firm nonexpansiveness that is enforced in many PnP methods. 
+
+• We derive error estimates for the PnP iteration with MMSE denoisers from a pointwise perspective and with respect to the Wasserstein distance of the involved probability measures. The latter of those results shows that the transformation B should be chosen such that the transformed noise BE is dis-tributed similarly to the noise that is applied to the data when constructing the denoiser, i.e. to Z − X.Moreover, for optimal performance, the denoiser should be chosen based on the conditioning of BA .These results strongly contrast the conventional choice B = A⊤, which implicitly assumes that the denoiser in PnP algorithms is agnostic to the forward problem. 
+
+• We further extend our results to the case where the MMSE denoiser is approximated by a neural network and derive quantitative bounds for the necessary width and depth of the network. Notably, all of our recovery guarantees do not necessarily require non-expansiveness of the denoiser, but rather impose a constraint on the conditioning of the matrix BA .
+
+1.3 Relation to prior work 
+
+Recovery guarantees for PnP remain relatively scarce. While the work [27] develops a first regularization theory, it makes strong assumptions on the denoiser which in practical applications may not be satisfied in a computationally feasible way. In particular, the denoiser is assumed to be contractive, and limiting solutions are characterized only for denoisers that essentially behave like proximal mappings. Similarly, in [48, 49] the denoiser is designed to be a proximal map for a potentially nonconvex functional. For denoisers in an L∞-neighborhood of the identity and forward operators satisfying the restricted eigenvalue conditions, convergence results of the PnP-iteration to a fixed point of the denoiser were established. However, this work does not assess whether these fixed points constitute useful approximations of the sought-for solution. The PnP algorithm with MMSE denoisers was considered in [59, 117] from an optimization perspective. In particular, the authors of [59] showed that the PnP iteration using approximations of the MMSE denoiser 
+
+> 1Borel measurability is not superfluous here; see the counterexample in [115].
+
+6eventually remains in a neighborhood of the maximum a posteriori (MAP) solution for bounded trajectories. The matrix B in (6), which replaces A⊤ in classical forward-backward splitting has been used for a PnP method in [60]. In this work, the authors choose B such that it has a whitening effect on the noise used for training denoiser. That way, the denoiser becomes independent of the training noise. For MMSE denoisers, it was pointed out in [73] that by incorporating such B into the denoiser, one can construct a physics-aware estimator in which the noise is projected onto the image of the forward operator A. For certain imaging tasks, such as inpainting, such denoisers are more stable than physics-agnostic ones. Moreover, the use of transformation operators is a popular tool to match the data representation with the implicit prior given by the proximal operator. This interpretation has inspired the authors of [52] to propose a neural network architecture which is based on an unrolling of ISTA. 
+
+Notation 
+
+Throughout this paper, for d ∈ N, we equip Rd with the inner product ⟨x, z⟩ = x⊤z and associated norm 
+
+∥x∥ = p⟨x, x⟩. The open ball with radius r and center x is denoted by Br(x), where we use the shorthand notation B(x) if r = 1 . If U is a positive (semi)definite matrix, we denote the associated (semi)norm by 
+
+∥x∥U = p⟨x, U x ⟩. For a matrix A we denote the Moore-Penrose pseudo-inverse by A+. If A is quadratic and rank-degenerate, we write its pseudo-determinant (the product of all non-zero eigenvalues of A) as 
+
+det( A)∗. We further denote the largest and smallest eigenvalues of A by λmax (A) and λmin (A), respec-tively. For a subset C ⊂ Rd, let BC be the Borel σ-algebra on C. We define P(C) as the space of Borel probability measures on (C, BC ) and δx as the Dirac measure at x. The pushforward measure of a measurable function 
+
+f with respect to a measure μ is denoted by f#μ. Random vectors are denoted with bold capital letters and their realizations in bold lowercase letters. We further denote the distribution of a random vector X by μX .The support of a Borel measure μ is denoted by supp( μ) and defined as the set of all points for which all open neighborhoods have positive measure. For n ∈ N we set [n] = {1, . . . , n }. The convex hull of a set C is denoted by co ( C).The Jacobian matrix of a differentiable map H at a point z is denoted by JH (z).
+
+# 2 The MMSE denoiser 
+
+We make the assumption 
+
+A-2. X is a compact, 
+
+and for the remainder of this work fix M > 0 with 
+
+max  
+
+> x∈X
+
+∥x∥ ≤ M. 
+
+We consider (7), where D(Rn, Rn) is the space of measurable functions from (X , BX ) to (Rn, BRn ). In this case, it is well known that the MMSE estimator coincides μZ -almost everywhere with the posterior conditional mean (PCM) in Bayesian estimation, 
+
+bDμX (z) def 
+
+= E[X|Z = z] = 
+
+R 
+
+> X
+
+xdμ Z|x(z, x)dμ X (x)
+
+R 
+
+> X
+
+dμ Z|x(z, x)dμ X (x) . (9) 7Remark 2.1. If the moments of bD(Z) in (7) are constrained (typically bD(Z) is in L1(μZ )), then with a density argument of [42, Lemma A.1], one could optimize over the space of Lipschitz functions. This is important as in practice, bD is computationally intractable (as is the case of the MMSE denoiser [73]), and is parametrized with a neural network whose parameters are pre-trained from clean-noisy pairs with a Lipschitz constraint or other structural properties. Nevertheless, we will first stick with the ideal MMSE estimator before moving to NN training that will be the subject of the dedicated Section 3.3. 
+
+Note that the random variable Z can be freely chosen to design an optimal MMSE denoiser. In view of (5), it is natural to consider 
+
+Z = X + Υ, (10) where Υ is a zero-mean random vector independent of X. Using (1) to expand (6) as in (4), we have 
+
+xk+1 = bDμX (x + ( In − γBA )( xk − x) + γB e) . (11) Hence, the distribution of Υ should be equal, or at least close, to that of γB E ∼ N (0 , γ 2BΣE B⊤). Since 
+
+B is not necessarily full column rank, this Gaussian distribution can be degenerate. With this discussion in mind, we will make the following assumption: 
+
+A-3. Υ ∼ N (0 , ΣΥ), where ΣΥ is symmetric and positive semidefinite. 
+
+Remark 2.2. This assumption is in stark contrast with most approaches in the literature, where ΣΥ is taken as σ2
+
+> Υ
+
+In, and σΥ > 0 is drawn randomly away from 0 [109, 119, 45]. As we will quantify in Section 3.2, the recovery bound depends precisely on how the distribution of the noise Υ deviates from γB E. This can be large if (γB )#μE and μΥ have very different supports as is the case if B is not full column rank. 
+
+Condition (A-3) implies that μΥ is the Gaussian measure that has a density with respect to the Lebesgue measure on the r-dimensional subspace V def 
+
+= Im(Σ Υ) ⊂ Rn, with r = rank(Σ Υ). This density reads 
+
+ϕ(υ; Σ Υ) = 1(2 π)r/ 2 det(Σ Υ)1/2
+
+> ∗
+
+φ(υ; Σ Υ) where φ(υ; Σ Υ) def 
+
+= exp 
+
+
+
+− υ⊤Σ+
+
+> Υ
+
+υ
+
+2
+
+
+
+1V (υ),
+
+In particular this means that supp( ϕ) ⊂ Im(Σ Υ).We derive more convenient forms of ϕ and φ. Let Π be a n × r matrix whose columns form an orthonormal basis for V . Then the matrix eΣΥ = Π ⊤ΣΥΠ has full rank r (implying symmetry and positive definiteness), and we get the following equivalent forms of ϕ and φϕ(υ; eΣΥ) = 1(2 π)r/ 2 det( eΣΥ)1/2 φ(υ; eΣΥ) with φ(υ; eΣΥ) = exp − υ⊤ΠeΣ−1 
+
+> Υ
+
+Π⊤υ
+
+2
+
+!
+
+1V (υ). (12) In this setting, (9) reads 
+
+bDμX (z) = 
+
+R 
+
+> X
+
+xφ(z − x; eΣΥ)dμ X (x)
+
+R 
+
+> X
+
+φ(z − x; eΣΥ)dμ X (x) . (13) 
+
+Remark 2.3. Under suitable conditions, the MMSE denoiser can be linked to the maximum a posteriori (MAP) estimator. In particular, it has been shown in [36, 37] that when the noise Υ is Gaussian with non-degenerate covariance, then bDμX can be written as the proximal mapping of some penalty. In [78], the authors show that under strong regularity assumptions on the prior distribution μX , the iteration xk+1 =(1 − αk) bDμX (xk) + αkz approximates the MAP estimator. 
+
+8For ΣΥ = σ2In, the MMSE estimator satisfies Tweedie’s Identity 
+
+bDμX = In + σ2∇ log( pZ ). (14) Its scalar version has been derived by Robbins in [84] with general kernels φ beyond the Gaussian case. He credits Tweedie [105] who was the first to derive it with a Laplacian-type kernel (see also [106] for the exponential family). Tweedie’s formula was also independently discovered by Miyasawa [66]. The vector version with V = Rn and the Gaussian kernel was obtained in [30]. Tweedie’s formula was also used in [39, 77, 26] to get derivative formulas in their special non-degenerate cases. As it stands in the intersection of core concepts, including MMSE estimation, score function, and the optimal Gaussian denoiser, this formula has a strong connection to learning-based methods. In generative diffusion models, it links optimal denoising directions with the objectives of Hyvärinen’s score matching (SM) [50, 33] and denoising score matching (DSM) [112]. It can also be used to bridge Bayes estimators for naturally corrupted samples and generated images, thus addressing the ambient diffusion problem [22]. For solving inverse problems via the diffusion-based posterior sampling approach [20, 12, 74], Tweedie’s posterior mean is used for approximating the likelihood. The application of PnP for Gaussian noise MMSE estimation was explored in [117], and its link to Tweedie’s formula was made explicit in [82, 102]. Recently, Tweedie’s formula was extended to infinite dimensional Banach spaces and applied for PDE-based inverse problems [118]. The estimator (13) is, in general, difficult to compute, especially in high dimensions. Moreover, in prac-tice, one does not know the distribution μX but may only be able to sample from it. In other words, one has access to i.i.d. realizations DX
+
+> N
+> def
+
+= xi : i ∈ [N ] of X, or, equivalently, to an empirical distribution 
+
+μN 
+
+> X
+
+= 1
+
+> N
+
+PNi=1 δxi . In this case, (13) becomes 
+
+bDμN 
+
+> X
+
+(z) = 
+
+R 
+
+> X
+
+xφ(z − x; eΣΥ)dμ N 
+
+> X
+
+(x)
+
+R 
+
+> X
+
+φ(z − x; eΣΥ)dμ N 
+
+> X
+
+(x) =
+
+PNi=1 xiφ(z − xi; eΣΥ)
+
+PNi=1 φ(z − xi; eΣΥ) . (15) Note that (15) is exactly the Nadaraya-Watson estimator with kernel ϕ. It is also closely related to the mean-shift, the soft k-means, and kernel estimation. Further, it corresponds to the solution of the variational prob-lem (7) when μX is replaced by μN 
+
+> X
+
+. When eΣΥ is small, it can additionally be seen as an approximation to the nearest neighbour denoiser. This assertion will be made rigorous in Section 4.4. 
+
+Remark 2.4. A key observation is that for z ∈ supp( μX ) + V , bDμX (z) is the barycenter of a probability measure μX|z whose support is contained in supp( μX ). It then follows from a standard separation argument that bDμX (z) ∈ co (supp( μX ))) . Similarly, bDμN 
+
+> X
+
+(z) ∈ co  DX
+
+> N
+
+ ⊂ co (supp( μX ))) . This implies that the MMSE estimator has a memorization effect. 
+
+# 3 Main results 
+
+For notational convenience, we denote the PnP iteration (11) via 
+
+xk+1 = TμN  
+
+> X,γ
+
+(xk; y), (16) where 
+
+TμN  
+
+> X,γ
+
+(·; y) : Rn ∋ z 7 → bDμN 
+
+> X
+
+◦ (( In − γBA )z + γB y)
+
+for γ > 0 and y ∈ Rm. Note that bDμN 
+
+> X
+
+depends on μN 
+
+> X
+
+, the empirical measure obtained from the N i.i.d. samples DX 
+
+> N
+
+from μX , and thus is random. In turn, so are the iterates even for fixed noise. We will, however, avoid using capital letters in (16) at this stage. 93.1 Main assumptions 
+
+For the remainder of this work, we make the following assumptions. 
+
+A-4. X is fully supported within V , more precisely it holds co (supp( μX )) ⊂ V , where we recall that 
+
+V = Im(Σ Υ).
+
+A-5. The operator B maps into V , i.e. Im( B) ⊂ V ,
+
+A-6. The matrix BA is symmetric and positive semidefinite. 
+
+A-7. For x ∈ X satisfying (1) , it holds that 
+
+ker( BA ) ∩ Tco(supp( μX )) (x) = {0},
+
+where TC (x) = R+ (C − x) is the tangent cone of the convex set C at x ∈ C .
+
+A discussion of these assumptions is in order. Assumption (A-4) and Remark 2.4 imply that 
+
+bDμ : z ∈ V 7 → V ∋ bDμ(z) = 
+
+R 
+
+> X
+
+xφ(z − x; eΣΥ)dμ (x)
+
+pμ(z) with φ(υ; eΣΥ) = exp − υ⊤ΠeΣ−1 
+
+> Υ
+
+Π⊤υ
+
+2
+
+!
+
+,
+
+(17) where we have used the shorthand definition 
+
+pμ(z) def 
+
+=
+
+Z
+
+> X
+
+φ(z − x; eΣΥ)dμ (x).
+
+In the context of the MMSE estimator (13), assuming (A-4) on μX essentially amounts to imposing that the random variable Z = X + Υ is contained in the support of the noise distribution, which is a reasonable assumption. In other words, the latent noise Υ should be chosen such that it can realize any possible ground truth. In particular, this assumption is crucial for establishing Lipschitz continuity of the MMSE denoiser with respect to the prior measure. Assumption (A-5) ensures consistency between the (generalized) ’descent’ step uk = xk −γB (Axk −y) and the denoising step xk+1 = bDμN 
+
+> X
+
+(uk) by forcing the ’descent direction’ to be in the range of the signal noise 
+
+Υ. In view of assumption (A-4), this ensures that for x0 ∈ V the argument of the denoiser is well-defined throughout the iteration (16). In particular, this assumption is satisfied if B is chosen such that Im( B) = V ,which in turn means Im( B) = Im(Σ Υ).Assumption (A-6) entails that the forward operator part in TμN  
+
+> X,γ
+
+(·; y) is a gradient descent corresponding to the convex function z ∈ Rn 7 → 12 ⟨BA z, z⟩ − ⟨ By, z⟩, and assumption (A-7) ensures invertibility of BA 
+
+on Tco(supp( μX )) (x). Moreover assumptions (A-6)-(A-7) are used to ensure contractiveness of the operator 
+
+TμN  
+
+> X,γ
+
+(·; y).Consider the case B = A⊤C or B = A+, where C is a symmetric positive definite matrix, e.g., Tikhonov regularization or C = Σ −1/2 
+
+> E
+
+as in [60]. If the inclusion in (A-5) becomes an equality, then (A-4) implies that (A-7) is superfluous. Indeed, in this case V = Im( B) = Im( A⊤) = ker( BA )⊥, and thus (xk − x)k∈N ⊂
+
+ker( BA )⊥ thanks to (A-4). We recover the setting considered in [60]. Additionally, if the inclusion in (A-5) is strict, then (A-7) is needed. 10 3.2 Recovery guarantees for PnP with the MMSE 
+
+In this section, we present recovery bounds for the iteration (11), for which we provide self-contained proofs in the dedicated Section 5. The starting point of our analysis is the following existence result. 
+
+Lemma 3.1. Assume that (A-2) –(A-3) and (A-5) hold, and that μX fulfills (A-4) . Then the set of fixed points of TμN  
+
+> X,γ
+
+is non-empty and compact. Proof. Under our assumptions, TμN  
+
+> X,γ
+
+(·; y) is Lipschitz continuous thanks to Corollary 4.3. Moreover, from (A-4), (A-5) and Remark 2.4, it maps co (supp( μX )) onto co (supp( μX )) . Since supp( μX ) is compact (it is closed by definition and hence compact by (A-2)), it follows from [89, Theorem 3.20] that co (supp( μX )) 
+
+is a compact convex set. The claim is then ensured by Brouwer’s fixed point theorem. 
+
+3.2.1 Pointwise recovery error bound 
+
+As can be seen in Lemma 4.3 below, the empirical MMSE denoiser is Lipschitz continuous. We denote its Lipschitz constant by L bDμN
+
+> X
+
+and derive the following error bound for the iteration (16): 
+
+∥xk+1 − x∥ = bDμN 
+
+> X
+
+(xk + γB (y − Axk)) − x
+
+=
+
+ bDμN 
+
+> X
+
+(x + ( In − γBA ) ( xk − x) + γB e) − bDμN 
+
+> X
+
+(x)
+
+
+
++
+
+ bDμN 
+
+> X
+
+(x) − x
+
+
+
+≤ L bDμN
+
+> X
+
+∥(In − γBA )( xk − x) + γB e∥ + bDμN 
+
+> X
+
+(x) − x
+
+≤ L bDμN
+
+> X
+
+∥(In − γBA )( xk − x)∥ + γL bDμN
+
+> X
+
+∥B∥ ∥ e∥ + bDμN 
+
+> X
+
+(x) − x . (18) Note that (18) consists of three terms: the first one pertains to the iteration error, the second one originates from the noise in the observations, and the third one captures the performance of the denoiser. Theorem 3.2 below bounds these terms individually to obtain a recovery bound for the PnP iteration. Before stating it, we recall that the minimal conical singular value of a matrix M with respect to a closed cone K is defined as 
+
+λmin (M ; K) = inf  
+
+> z∈K\{ 0}
+
+∥M z∥ / ∥z∥ = min  
+
+> z∈K∩ Sn−1
+
+∥M z∥ .
+
+The last equality follows from positive homogeneity, and is indeed a minimum as the norm is continuous and the constraint set is compact. The condition number of BA on the cone Tco(supp( μX )) (x) is 
+
+κ(BA ) def 
+
+= λmax (BA )
+
+λmin 
+
+ BA ; Tco(supp( μX )) (x) ≥ 1, (19) Note that κ(BA ) is well-defined due to assumption (A-7). 
+
+Theorem 3.2. Assume that (A-2) –(A-3) and (A-5) –(A-7) hold and that μX fulfills (A-4) . Suppose also that either 
+
+M 2
+
+λmin (eΣΥ) ≤ 1, (20) 11 or otherwise, that 
+
+κ(BA ) < 1 − λmin (eΣΥ)2
+
+M 4
+
+!−1/2
+
+(21) 
+
+holds. Then, there exists ϵ > 0 such that the PnP-FBS iterates with 
+
+γ = ( κ(BA )λmax (BA )) −1 (22) 
+
+obey 
+
+∥xk − x∥ ≤ qk+1 ∥x0 − x∥ + 1 − qk
+
+1 − q
+
+M 2
+
+λmin (eΣΥ) γ ∥B∥ ∥ e∥ + 2 M (N − 1) e− ϵ 
+
+> 2λmax( eΣΥ)
+
++
+
+s
+
+λmax (eΣΥ)
+
+λmin (eΣΥ) dist( x, DX 
+
+> N
+
+)
+
+!
+
+, (23) 
+
+where q = M 2
+
+> λmin (eΣΥ)
+
+q
+
+1 − κ (BA )−2 ∈ [0 , 1[ .Moreover, if μX has a density with respect to the volume measure on V which is bounded away from zero, then for N large enough, it holds with probability at least 1 − K2N −2 over the sampling of DX 
+
+> N
+
+that 
+
+∥xk − x∥ ≲ qk+1 ∥x0 − x∥ + 1 − qk
+
+1 − q
+
+M 2
+
+λmin (eΣΥ) γ ∥B∥ ∥ e∥ + 2 M (N − 1) e− ϵ 
+
+> 2λmax( eΣΥ)
+
++ K131/r 
+
+s
+
+λmax (eΣΥ)
+
+λmin (eΣΥ)
+
+ log( N )
+
+N
+
+1/r !
+
+, (24) 
+
+where r = dim V , and K1, K 2 > 0 are constants that depend only on r and M .
+
+Estimate (23) implies 
+
+(1 −q) lim sup 
+
+> k→+∞
+
+∥xk − x∥ ≤ M 2
+
+λmin (eΣΥ) γ ∥B∥ ∥ e∥+2 M (N − 1) e− ϵ  
+
+> 2λmax( eΣΥ)
+
++K131/r 
+
+s
+
+λmax (eΣΥ)
+
+λmin (eΣΥ) dist( x, DX 
+
+> N
+
+).
+
+The right-hand side consists of three terms. The first one can be interpreted as a noise amplification and depends linearly on the norm of the noise, as it is often the case in regularization theory [29, 91, 92]. The second and third term capture both the MMSE denoiser performance and sampling error. The last term reflects the fact that as the noise decreases, the PnP-FBS behaves similarly to a nearest neighbor denoiser, hence provably showing the memorization effect that limits PnP. 
+
+Remark 3.3. (i) As opposed to the classical results for forward-backward splitting and many analyses of its PnP version (see e.g. [60, 27, 48, 49]) we do not assume that the denoiser is contractive or firmly non-expansive. If bDμN 
+
+> X
+
+is not contractive, Theorem 3.2 still gives a recovery bound, provided that (20) 
+
+holds. This condition imposes that BA cannot be too ill-conditioned. Note, however, that the left-hand side in (20) refers to the condition number of BA on the cone Tco(supp( μX )) (x), which may differ sig-nificantly from the classical condition number. In other words, BA only needs to be well-conditioned (up to some shifting) on the set of reasonable solutions. Moreover, interpreting the Lipschitz bound of the denoiser as an upper bound on the SNR, condition (20) relates this to the conditioning of the 
+
+12 operator BA : the higher the SNR, the better the conditioning should be. Equivalently, for fixed con-ditioning, the denoiser is allowed to be only mildly expansive. As discussed after Lemma 4.3 below, the Lipschitz constant bound degrades as the noise decreases, which, in turn, means less stability of the denoiser. Thus, the noise should not be amplified too much by B to maintain overall stability of the PnP-FBS iteration. (ii) In [62] the authors also derive recovery bounds for the PnP iteration with B = A⊤ and for potentially non-contractive denoisers. In particular, they derive a stepsize ensuring convergence of the iterates under the condition 
+
+κ(A⊤A) ≤ 1 + 2
+
+LD
+
+,
+
+where LD is the Lipschitz constant of the denoiser. Compared to (21) , their estimate allows for a slightly worse conditioning of the forward problem if the denoiser is fixed. However, in our setting, this limitation may be alleviated by choosing the matrix B appropriately, thus yielding a preconditioning of the problem. Further, the results in [62] assume a uniform bound of the residual operator I − D. This is true in the setting of this work due to (A-2) , but in general, it may be hard to verify. Similarly, in [60] the authors consider the choice B = A⊤
+
+eΣE
+
+ 12
+
+and derive a stepsize based on the conditioning of the operator BA . However, the analysis of the PnP iteration is carried out for nonexpansive denoisers. (iii) The quantity ϵ in Theorem 3.2 depends in particular on the sample DX 
+
+> N
+
+, hence on N . This dependence can be removed; see Remark 5.2. 
+
+3.2.2 Wasserstein recovery error bound 
+
+Formally, we would expect bDμN 
+
+> X
+
+to converge pointwise almost surely to bDμX as N → ∞ . Furthermore, for sufficiently well-behaved distributions μX , the MMSE denoiser becomes an approximation of identity, as can be seen by (9). Thus, one has convergence to the identity almost everywhere. If this behavior was quantifiable, it could simplify the estimate (18) and the subsequent analysis of the PnP iteration. However, this kind of convergence is not topologizable, and we therefore cannot obtain quantitative convergence results. This can also be seen in the bound (24), which blows up as N → ∞ . Thus, in order to improve the result, we change the perspective and focus on distributional error bounds rather than pointwise ones. This means instead of pointwise bounds for the iterates of the PnP given a realization y of Y , we now turn to establishing bounds on the expected Wasserstein distance between the distribution bμNk of the PnP iterates and the empirical MMSE denoiser and the distribution μX of X.Recall that for p ∈ [1 , ∞[, the p-Wasserstein distance is a metric on P(X ), defined for μ, ν ∈ P (X ) as 
+
+Wp(μ, ν ) def 
+
+= inf {E[∥U − V ∥p]1/p : U ∼ μ, V ∼ ν},
+
+where the infimum is over all joint distributions of (U , V ) (i.e., couplings of μ and ν). It is known that Wp
+
+is a metric on probability measures P(X ) with finite p-th moment and that it metrizes weak convergence [111]. It follows immediately from Hölder’s inequality that 
+
+Wp ≤ W q for p ≤ q. (25) As for the pointwise recovery bounds, the starting points of our analysis will be an error bound similar to (18). However, since we aim to state a recovery result with respect to Wasserstein distances, we consider iteration (11) with random vectors. Thus, for a fixed realization of the sampling DX 
+
+> N
+
+, let X ∼ μX , Υ ∼ N (0 , ΣΥ),13 E ∼ μE and XN ∼ μN 
+
+> X
+
+. Further denote by Xk the iterates of (16) with Y = AX + E instead of y. It holds 
+
+∥Xk+1 − X∥ = bDμN 
+
+> x
+
+(Xk + γB (Y − AXk)) − X
+
+≤ bDμN 
+
+> x
+
+(X + ( In − γBA )( Xk − X) + γB E) − bDμN 
+
+> x
+
+(X + Υ)
+
++ bDμN 
+
+> x
+
+(X + Υ) − bDμN 
+
+> x
+
+(XN + Υ) + bDμN
+
+> X
+
+ XN + Υ − XN + XN − X
+
+≤ L bDμN
+
+> X
+
+∥(In − γBA )( Xk − X)∥ + L bDμN
+
+> X
+
+∥γB E − Υ∥ + bDμN
+
+> X
+
+ XN + Υ − XN
+
++
+
+
+
+1 + L bDμN
+
+> X
+
+
+
+XN − X . (26) This error bound entails four terms. As in (18), the first one pertains the iteration error. The second term describes the difference between γB E and Υ, see also the discussion in Section 2. If one chooses B = A⊤,i.e. the argument in (11) is of gradient descent type, it establishes a direct link between the forward operator 
+
+A and Υ (which determines the denoiser). This observation is crucial since it shows that the PnP framework is not agnostic to the ill-posed problem. Rather, the denoiser needs to be chosen such that it is compatible with the forward operator. The third term in (26) captures the performance of the denoiser, and the fourth term corresponds to the sampling error when constructing the denoiser. We further need to uniformize (A-7). For this, let 
+
+eλmin (BA ) def 
+
+= inf   
+
+> z∈supp( μX)
+
+λmin 
+
+ BA ; Tco(supp( μX )) (z) .
+
+To ensure eλmin (BA ) > 0, we need a stronger assumption than (A-7). 
+
+A-7’. 
+
+supp( μX ) ∩ ri(co (supp( μX ))) ̸ = ∅
+
+and 
+
+ker( BA ) ∩ par(co (supp( μX ))) = {0},
+
+where for a non-empty convex set C, par( C) is the subspace parallel to C, i.e., for any point x ∈ C , we have 
+
+par( C) = aff( C) − { x} = R(C − C ) = R+(C − C ).
+
+Lemma 3.4. Under assumptions (A-2) and (A-7’) it holds eλmin (BA ) > 0.
+
+Remark 3.5. Assumption (A-7’) can be weakened if one assumes that the restricted injectivity property holds for all x ∈ supp( μX ) and that the core outer limit (see [63]) of the tangent cones is contained in their union. A detailed statement and proof can be found in appendix A. 
+
+Define eκ(BA ) and eγ accordingly by replacing λmin 
+
+ BA ; Tco(supp( μX )) (z) by eλmin (BA ) in (19), and (22) respectively. Lastly, we recall that the Minkowski dimension of a measure μ is given as 
+
+dM(μ) def 
+
+= inf {dim M(C) : μ(C) = 1 },
+
+where dim M(C) is the Minkowski-Bouligand or box-counting dimension [31]. The latter is defined as 
+
+dim M(C) := lim sup 
+
+> ϵ→0+
+
+log Nϵ(C)
+
+− log ϵ , (27) 14 and Nϵ(C) is the ϵ-covering number of the set C given by the smallest m such that there exist m closed balls 
+
+B1, . . . , Bm of diameter ϵ covering C, i.e., C ⊆ Smi=1 Bi.We are now ready to state our main recovery theorem. For this, we emphasize the dependence of the iterates 
+
+Xk on the random variables from which it is built, i.e., 
+
+Xk(X0, Y ) = T kμN  
+
+> X,γ
+
+(X0; Y ) = T kμN  
+
+> X,γ
+
+(X0; AX + E), (28) where X ∼ μX and E satisfies (A-1), and we suppose without loss of generality that X0 is drawn randomly from μN 
+
+> X
+
+but is independent from all other variables. The iterate Xk also depends on the denoiser bDμN 
+
+> X
+
+,hence on the empirical measure μN 
+
+> X
+
+constructed from the (random) samples DX 
+
+> N
+
+. We let bμNk be the law of 
+
+Xk conditionally on DX 
+
+> N
+
+.
+
+Theorem 3.6. Assume that (A-1) –(A-3) ,(A-5) –(A-6) , and (A-7’) hold, and that μX fulfills (A-4) . Suppose also that either M 2
+
+λmin (eΣΥ) ≤ 1, (29) 
+
+or otherwise, that 
+
+eκ(BA ) < 1 − λmin (eΣΥ)2
+
+M 4
+
+!−1/2
+
+.
+
+Additionally assume dM(μX ) ≥ 4 and let s > d M(μX ). Then it holds for the PnP-iteration with stepsize 
+
+eγ = ( eκ(BA )λmax (BA )) −1 that 
+
+EDX
+
+> N
+
+W2(bμNk , μ X ) ≲ eqk+1 
+
+r
+
+E
+
+h
+
+∥X0 − X∥2i
+
++ 1 − eqk
+
+1 − eq
+
+"
+
+M 2
+
+λmin (eΣΥ)
+
+eγ2tr 
+
+
+
+BΣE B⊤
+
++ tr 
+
+eΣΥ
+
+
+
+− 2eγtr 
+
+eΣ1/2 
+
+> Υ
+
+Π⊤BΣE B⊤ΠeΣ1/2
+
+> Υ
+
+1/21/2
+
++
+
+q
+
+λmax (eΣΥ)r + 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+diam( X )N −1/s 
+
+#
+
+, (30) 
+
+where eq = M 2
+
+> λmin (eΣΥ)
+
+q
+
+1 − eκ (BA )−2 ∈ [0 , 1[ , and EDX 
+
+> N
+
+[·] denotes the expectation with respect to the sampling. 
+
+Remark 3.7. Estimate (30) implies 
+
+lim sup  
+
+> k→+∞,N →+∞
+
+(1 − eq)EDX
+
+> N
+
+W2(bμNk , μ X ) ≲ M 2
+
+λmin (eΣΥ) eγ2tr 
+
+
+
+BΣE B⊤
+
++ tr 
+
+eΣΥ
+
+
+
+− 2eγtr 
+
+eΣ1/2 
+
+> Υ
+
+Π⊤BΣE B⊤ΠeΣ1/2
+
+> Υ
+
+1/2
+
+!1/2
+
++
+
+q
+
+λmax (eΣΥ)r. 
+
+The term encoding the discrepancy between the two Gaussian noises eγB E and Υ is known as the Bures met-ric, see e.g., [32]. Notably, it depends on the step size eγ. This suggests that the covariance eΣΥ should depend on eγ as well to make this term small or even vanish. Intuitively, this reflects the fact that the denoiser has to 
+
+15 account somehow for the step-size in a similar vein as for the proximal mapping with which the analogy is usually made, though this analogy is questionable as we argued before. As our analysis shows (compare also to the definition of eγ), the optimal step size depends on the conditioning of the inverse problem. This means that eΣΥ, hence the denoiser, should also depend on this conditioning. Again, this stands in contrast with the widespread idea that the denoiser used in PnP methods can be designed independently of the underlying inverse problem. In particular, the choice ΣΥ = eγ2BΣE B⊤ yields 
+
+lim sup  
+
+> k→+∞,N →+∞
+
+EDX
+
+> N
+
+W2(bμNk , μ X ) ≲ (1 − eq)−1eγ ∥B∥ pλmax (Σ E )r, (31) 
+
+where now r = rank( B). Moreover, with the choice ΣΥ = eγ2BΣE B⊤ for B = A⊤C or B = A+C and 
+
+C = Σ − 12 
+
+> E
+
+or C = ( I +A⊤A−1) (see [60]), assumption (A-7) is not needed as mentioned above. In this case, one could also replace the conical minimal singular value eλ(BA ) by the smallest singular value of BA over its whole domain. This, however yields a smaller step size eγ. On the other hand, if one chooses ΣΥ = σ2Ir
+
+for some σ > 0, the noise discrepancy in the bound (30) will not vanish. In fact, as in the pointwise analysis, one cannot afford adjusting freely the variance of the noise Υ when designing the MMSE denoiser to make it arbitrarily contractive as this will harm the the error term in the Bures metric between eγB E and Υ.
+
+Remark 3.8. The scaling in N in (30) can be sharpened with a finer notion of dimension. See the discussion in Remark 4.7. 
+
+In addition to proving the bound on the expected value of the quantity W2(bμNk , μ X ), we also show a high-probability error bound. 
+
+Proposition 3.9. Suppose that the assumptions of Theorem 3.6 hold and that dM(μX ) ≥ 2. Let s > 
+
+2dM(μX ). It holds with probability 1 − exp( −2N 1−4/s ) over the sampling of DX 
+
+> N
+
+, that 
+
+W2(bμNk , μ X ) ≲ eqk+1 
+
+r
+
+E
+
+h
+
+∥X0 − X∥2i
+
++ 1 − eqk
+
+1 − eq
+
+"
+
+M 2
+
+λmin (eΣΥ)
+
+eγ2tr 
+
+
+
+BΣE B⊤
+
++ tr 
+
+eΣΥ
+
+
+
+− 2eγtr 
+
+eΣ1/2 
+
+> Υ
+
+Π⊤BΣE B⊤ΠeΣ1/2
+
+> Υ
+
+1/21/2
+
++
+
+q
+
+λmax (eΣΥ)r + 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+diam( X )N −1/s 
+
+#! 
+
+.
+
+3.3 Recovery guarantees for PnP with neural network denoiser 
+
+While the empirical MMSE denoiser enjoys the recovery guarantees from the previous section, its evaluation is computationally not feasible for large sample sizes and in high dimension. We therefore extend our analysis where the MMSE is replaced by a denoiser parametrized by a trained neural network. In view of assumption (A-4), we identify V with Rr and consider the class of ReLU neural networks D : V → V with L =depth( D) ∈ N layers. These are recursively defined via 
+
+D0(x) = x
+
+Dl(x) = max(0 , A lDl−1(x) + bl) for l = 1 , . . . , L − 1
+
+D(x) = ALDL−1(x) + bL,
+
+16 where Al ∈ Rnl×nl−1 with n0 = nL = r, and bl ∈ Rnl and the maximum is taken component-wise. We denote the weights of D, i.e. the total number of non-zero entries in A1, . . . , A L, b1, . . . , bL, by W (D).As for the empirical MMSE denoiser, we assume that we have access to an i.i.d. sample DX 
+
+> N
+
+= xi : i ∈ [N ]
+
+from μX . We further sample i.i.d. noise vectors DΥ 
+
+> N
+
+= υi : i ∈ [N ] from N (0 , ΣΥ). Following (7), we now parametrize the class D(Rn, Rn) by neural networks. We therefore consider the denoiser bDN defined as 
+
+bDN ∈ Argmin  
+
+> D∈N N (W,L,β )
+> N
+
+X
+
+> i=1
+
+D(xi + υi) − xi 2 , (32) where the class of feasible denoisers is 
+
+N N (W, L, β ) def 
+
+= D : V → V is a ReLU neural network with 
+
+W (D) ≤ W, depth( D) ≤ L, whose weights are bounded by β, and D(Q) ⊂ Q .
+
+(33) Here Q is a closed cube with supp( μX ) ⊂ Q . In particular, we may assume that the sidelengths of Q are bounded by diam( X ) ≤ 2M . Note that any D ∈ N N (W, L, β ) is Lipschitz continuous, but the exact computation of its Lipschitz constant is NP-hard [90]. In order to make use of quantitative approximation estimates for Lipschitz functions on manifolds with neural networks, we make the following assumption. 
+
+A-8. S def 
+
+= supp( μX ) is a dS -dimensional manifold. 
+
+Note that by compactness of supp( μX ), for any δ > 0, the manifold S is (R, δ )-covered, i.e. there exist 
+
+R open balls B1, . . . , BR of radius δ 
+
+> 4
+
+, centered in S with 
+
+S ⊆ 
+
+> R
+
+[
+
+> i=1
+
+Bi.
+
+In view of (32), a good denoiser should be a stable approximation of the identity on S. This is the ratio-nale behind the following approximation lemma which motivates the choice of hyperparameters in the class 
+
+N N (W, L, β ) in (33). 
+
+Lemma 3.10. Assume that (A-8) holds. Let δ > 0 and R ∈ N such that S is (R, δ )-covered. For any 
+
+ϵ ∈]0 , 1[ , there exists a neural network bDϵ ∈ N N (W ∗ 
+
+> ϵ
+
+, L ∗, β ∗ 
+
+> ϵ
+
+) with 
+
+W ∗ 
+
+> ϵ
+
+≲ rR dS +1 
+
+ ϵ
+
+diam( S)
+
+−dS
+
+,L∗ = ⌈log 2(dS )⌉ + ⌈log 2(r)⌉ + c, β∗ 
+
+> ϵ
+
+≲ √r
+
+ ϵM
+
+−p
+
+such that 
+
+bDϵ(x) − x ≤ ϵ (34) 
+
+for all x ∈ S , where c ∈ N is a universal constant and p > 0 only depends on S.
+
+17 Let ϵ ∈]0 , 1[ . Consider the PnP-iteration with a neural network denoiser 
+
+xk+1 = bDNϵ (xk + γB (y − Axk)) , (35) where bDNϵ is a solution of (32) over N N (W ∗ 
+
+> ϵ
+
+, L ∗, β ∗ 
+
+> ϵ
+
+) with W ∗ 
+
+> ϵ
+
+, L ∗, β ∗ 
+
+> ϵ
+
+as in Lemma 3.10. We can then derive a pointwise recovery bound for the PnP-iteration (35). 
+
+Theorem 3.11. Assume that (A-2) –(A-3) and (A-5) –(A-8) hold and that μX fulfills (A-4) . Consider the PnP iteration (35) . If L bDNϵ
+
+≤ 1 or otherwise κ(BA ) ≤
+
+
+
+1 − L−2
+
+> bDNϵ
+
+− 12
+
+, then the iterates of (35) with 
+
+γ = ( κ(BA )λmax (BA )) −1 obey 
+
+∥xk − x∥ ≲ qk+1 ∥x0 − x∥
+
++ 1 − qk
+
+1 − q L bDNϵ
+
+γ ∥B∥ ∥ e∥ +
+
+
+
+L bDNϵ
+
++ L bDϵ
+
+
+
+1 + 
+
+r 4 log( N )
+
+N r 
+
+! q
+
+λmax (eΣΥ)N r 
+
++
+
+
+
+1 + L bDNϵ
+
+
+
+dist( x, DX 
+
+> N
+
+) + √N ϵ 
+
+!
+
+, (36) 
+
+with probability at least 1 − N −2 over the sampling of DΥ 
+
+> N
+
+, where q = L bDNϵ
+
+p1 − κ(BA )−2 ∈ [0 , 1[ , and 
+
+r = dim V .Moreover, if μX has a density with respect to the volume measure on V which is bounded away from zero, then for N large enough, it holds with probability at least 1 − (K2 + 1) N −2 over the sampling of DX
+
+> N
+
+and DΥ 
+
+> N
+
+that 
+
+∥xk − x∥ ≲ qk+1 ∥x0 − x∥
+
++ 1 − qk
+
+1 − q L bDNϵ
+
+γ ∥B∥ ∥ e∥ +
+
+
+
+L bDNϵ
+
++ L bDϵ
+
+
+
+1 + 
+
+r 4 log( N )
+
+N r 
+
+! q
+
+λmax (eΣΥ)N r 
+
++
+
+
+
+1 + L bDNϵ
+
+
+
+K131/r 
+
+ log( N )
+
+N
+
+1/r 
+
++ √N ϵ 
+
+!
+
+, (37) 
+
+where K1, K 2 > 0 are constants that depend only on r and M .
+
+Remark 3.12. One can sharpen the recovery bounds in Theorem 3.11 by estimating the Lipschitz constants of bDϵ and bDNϵ . We therefore use a coarse estimate for ReLU networks. Let sl be the number of nonzero entries of Al. Since the entries of Al are bounded by β, we have ∥Al∥ ≤ βs 1/2 
+
+> l
+
+. Hence, we can use the standard bound 
+
+LD ≤
+
+> L
+
+Y
+
+> l=1
+
+∥Al∥ ≤ 
+
+> L
+
+Y
+
+> l=1
+
+βs 1/2 
+
+> l
+
+≤ βL
+
+ WL
+
+ L
+
+> 2
+
+. (38) 
+
+Particularizing to the networks considered in Theorem 3.11, one obtains 
+
+max 
+
+n
+
+L bDϵ , L bDNϵ
+
+o
+
+≲
+
+ ϵM
+
+−ρ1
+
+rρ2 , (39) 
+
+with 
+
+ρ1 =
+
+
+
+p + dS
+
+2
+
+
+
+(⌈log 2(dS )⌉ + ⌈log 2(r)⌉ + c) ,
+
+18 ρ2 = ⌈log 2(dS )⌉ + ⌈log 2(r)⌉ + c, 
+
+from the asymptotic bounds of the network’s hyperparameters. However, for practical application, this bound could be drastically improved. In view of the Lipschitz continuity and cocoercivity - see Proposition 4.10 -of the MMSE denoiser, one could include such constraints in the training of the network. 
+
+# 4 Properties of the MMSE denoiser 
+
+We show several properties of the MMSE denoiser (9) which are the essential tools for proving the main results in Section 5. 
+
+4.1 Lipschitz continuity 
+
+Lipschitz stability of the MMSE denoiser is a consequence of the following proposition and the mean value theorem. 
+
+Proposition 4.1. Assume that (A-2) and (A-3) hold. Let μ ∈ P (X ) satisfy (A-4) then for every z ∈ V , the Jacobian is given by 
+
+J bDμ (z) = Σ X|z ΠeΣ−1 
+
+> Υ
+
+Π⊤ (40) 
+
+where ΣX|z is the conditional variance-covariance matrix, i.e., 
+
+ΣX|z =
+
+R 
+
+> X
+
+xx ⊤φ(z − x; eΣΥ)dμ (x)
+
+pμ(z) − bDμ(z) bDμ(z)⊤.
+
+Moreover, J bDμ (z) is diagonalizable, has nonnegative eigenvalues, and 
+
+sup 
+
+> z∈V
+
+J bDμ (z) ≤ M 2
+
+λmin (eΣΥ) ,
+
+where M > 0 is an upper bound of ∥x∥ for all x ∈ X .Proof. By (A-2) and standard arguments (differentiability of the integrand and Lebesgue’s dominated con-vergence theorem), one can interchange the differentiation and integration. Therefore, it holds 
+
+J bDμ (z) = 
+
+Z
+
+> X
+
+x∇z
+
+φ(z − x; eΣΥ)
+
+pμ(z)
+
+!⊤
+
+dμ (x)=
+
+R 
+
+> X
+
+x∇z φ(z − x; eΣΥ)⊤dμ (x)
+
+pμ(z) −
+
+R 
+
+> X
+
+xφ(z − x; eΣΥ)dμ (x)
+
+pμ(z)
+
+∇z pμ(z)
+
+pμ(z)
+
+> ⊤
+
+=
+
+R 
+
+> X
+
+x(x − z)⊤ΠeΣ−1 
+
+> Υ
+
+Π⊤φ(z − x; eΣΥ)dμ (x)
+
+pμ(z) − bDμ(z)∇z log( pμ(z)) ⊤
+
+=
+
+R 
+
+> X
+
+xx ⊤φ(z − x; eΣΥ)dμ (x)
+
+pμ(z) ΠeΣ−1 
+
+> Υ
+
+Π⊤ − bDμ(z)z⊤ΠeΣ−1 
+
+> Υ
+
+Π⊤ − bDμ(z)∇z log( pμ(z)) ⊤
+
+=
+
+R 
+
+> X
+
+xx ⊤φ(z − x; eΣΥ)dμ (x)
+
+pμ(z) ΠeΣ−1 
+
+> Υ
+
+Π⊤ − bDμ(z)
+
+
+
+ΠeΣ−1 
+
+> Υ
+
+Π⊤z + ∇z log( pμ(z)) 
+
+⊤
+
+. (41) 19 With a similar derivation as above, one shows that 
+
+∇z log( pμ(z)) = Π eΣ−1 
+
+> Υ
+
+Π⊤  bDμ(z) − z
+
+
+
+. (42) Inserting this into (41), we get (40). The fact that J bDμ (z) is diagonalizable with nonnegative eigenvalues follows from [86, Corollary 7.6.2]. In addition, for any z ∈ V , it holds 
+
+J bDμ (z) ≤ ΠeΣ−1 
+
+> Υ
+
+Π⊤ ΣX|z = λmin (eΣΥ)−1 ΣX|z .
+
+Let s as an arbitrary vector on the unit sphere Sr−1 of V . We have 
+
+0 ≤ ⟨ ΣX|z s, s⟩ ≤ 
+
+R 
+
+> X
+
+|⟨ x, s⟩| 2φ(z − x; eΣΥ)dμ (x)
+
+pμ(z) ≤
+
+R 
+
+> X
+
+∥x∥2 φ(z − x; eΣΥ)dμ (x)
+
+pμ(z) ≤ M 2.
+
+Taking the supremum over s and z concludes the proof. 
+
+Remark 4.2. 
+
+(i) The identity (40) has a long history and has had several applications in information and estimation theory. When ΣΥ is positive definite, i.e., V = Rn, this identity was proved in [39, 77]; see also the general version that appeared recently in [26]. It was used in [40] to study certain regularity, monotonicity, and convexity properties of the MMSE risk as a function of the SNR. The special case 
+
+ΣΥ = In is due to [43], while the scalar case was considered in [116] to establish some regularity properties of the MMSE risk and mutual information. (ii) Since Π⊤Π = Ir, ΠΠ ⊤ is the orthogonal projector on V , the identity (42) is equivalent to 
+
+bDμ(z) = z + Π eΣΥΠ⊤∇ log( pμ(z)) , (43) 
+
+due to z, bDμ(z), ∇z log( pμ)( z) ∈ V . Note that the term ∇ log( pμ(z)) is commonly known as the score function. Further, the identity (43) is reminiscent of Tweedie’s formula (14) .
+
+As an immediate consequence of Proposition 4.1, we obtain the following Lemma. 
+
+Lemma 4.3. Assume that (A-2) and (A-3) hold and denote M > 0 an upper bound of ∥x∥ for x ∈ X . For any measure μ ∈ P (X ) satisfying (A-4) , bDμ is L bDμ -Lipschitz continuous on V with L bDμ ≤ M 2 
+
+> λmin (eΣΥ)
+
+.
+
+The bound for the Lipschitz constant in Lemma 4.3 may be improved on a case by case basis. Further assumption (A-2) and thus the existence of an upper bound M is sufficient but not necessary for the Lip-schitz continuity of bDμ. For example, if X is a Gaussian random vector with covariance matrix ΣX , it holds bDμX (z) = Σ X (Σ X + Σ Υ)+z. Consequently bDμX is Lipschitz continuous with Lipschitz constant 
+
+∥ΣX (Σ X + Σ Υ)+∥. For the empirical MMSE denoiser bDμN 
+
+> X
+
+the Lipschitz constant can be bounded using concetration inequalities. We leave the details to a future work. The main advantage of the above Lipschitz bound, however, is its independence of the measure μ. More-over, this bound can be interpreted as an upper-bound on the signal-to-noise ratio (SNR). It also reflects that this constant degrades as the noise decreases. An explanation for this behavior can be seen in Proposi-tion 4.11, which shows that bDμ can become set-valued as ΣΥ → 0.20 4.2 Stability with respect to the prior measure 
+
+Theorem 4.4. Assume that (A-2) and (A-3) hold and that the measures μ, ν ∈ P (X ) satisfy (A-4) . Let Υ
+
+as in (A-3) , and U ∼ μ, V ∼ ν independent of Υ . Denote bμmmse (resp. bνmmse ) the law of bDμ(U + Υ)
+
+(resp. bDν (V + Υ)). Then the following estimates hold. (i) E
+
+h bDμ(U + Υ)
+
+i
+
+− E
+
+h bDν (V + Υ)
+
+i
+
+≤ W 1(μ, ν ).
+
+(ii) R( bDμ) − R ( bDν ) ≤ 2
+
+q
+
+λmax (eΣΥ)r
+
+
+
+1 + M 2
+
+> λmin (eΣΥ)
+
+
+
+W2(μ, ν ), where R is as in (8) and r = rank (Σ Υ).(iii) For p ∈ [1 , 2] it holds 
+
+Wp(bμmmse , bνmmse ) ≤ 2
+
+q
+
+λmax (eΣΥ)r + Wp(μ, ν ).
+
+Proof. 
+
+(i) By assumption (A-3), the densities of U + Υ and V + Υ with respect to the r-dimensional Hausdorff measure are given by Z
+
+> X
+
+ϕ(z − u)dμ (u) and 
+
+Z
+
+> X
+
+ϕ(z − v)dν (v),
+
+respectively. Thus, we have 
+
+E
+
+h bDμ(U + Υ)
+
+i
+
+− E
+
+h bDν (V + Υ)
+
+i
+
+= (2 π)−r/ 2 det( eΣΥ)−1/2
+
+Z 
+
+> V
+
+Z
+
+> X
+
+uφ(z − u; eΣΥ)dμ (u)dHr(z) −
+
+Z
+
+> V
+
+Z
+
+> X
+
+vφ(z′ − v; eΣΥ)dν (v)dHr(z)
+
+
+
+= (2 π)−r/ 2 det( eΣΥ)−1/2
+
+Z 
+
+> X
+
+Z
+
+> V
+
+uφ(z − u; eΣΥ)dHr(z)dμ (u) −
+
+Z
+
+> X
+
+Z
+
+> V
+
+vφ(z′ − v; eΣΥ)dHr(z′)dν (v)
+
+
+
+=
+
+Z
+
+> X
+
+udμ (u) −
+
+Z
+
+> X
+
+vdν (v), (44) where, in the second equality, we used (A-2) and Fubini’s theorem, (A-4) and standard integration results for Gaussian distributions. Fix s as an arbitrary vector on the unit sphere Sr−1 of V . We then have for all u, v ∈ X |⟨ s, u⟩ − ⟨ s, v⟩| ≤ ∥ u − v∥ .
+
+Consequently, taking the inner product with s ∈ Sr−1 in (44), we get for any coupling π of U and V
+
+that 
+
+E
+
+h bDμ(U + Υ)
+
+i
+
+− E
+
+h bDν (V + Υ)
+
+i
+
+= sup 
+
+> s∈Sr−1
+
+⟨s, E
+
+h bDμ(U + Υ)
+
+i
+
+− E
+
+h bDν (V + Υ)
+
+i
+
+⟩
+
+= sup 
+
+> s∈Sr−1
+
+Z
+
+> X
+
+⟨s, u⟩dμ (u) −
+
+Z
+
+> X
+
+⟨s, v⟩dν (v)
+
+= sup 
+
+> s∈Sr−1
+
+Z
+
+> X
+
+⟨s, u − v⟩dπ (u, v)
+
+≤
+
+Z
+
+> X
+
+∥u − v∥ dπ (u, v).
+
+Taking the infimum with respect to the coupling yields the claim. 21 (ii) Let U and V be jointly distributed according to their optimal coupling so that 
+
+W2(μ, ν ) = E
+
+h
+
+∥U − V ∥2i1/2
+
+.
+
+We have from the optimality of the MMSE estimator (see (7)) that 
+
+q
+
+R( bDμ) ≤ E
+
+bDν (U + Υ) − U 21/2
+
+≤ E
+
+bDν (V + Υ) − V 21/2
+
++ E
+
+bDν (U + Υ) − bDν (V + Υ) 21/2
+
++ E
+
+h
+
+∥U − V ∥2i1/2
+
+=
+
+q
+
+R( bDν ) + E
+
+bDν (U + Υ) − bDν (V + Υ) 21/2
+
++ W2(μ, ν ).
+
+For the second term, we use the mean value theorem and Lemma 4.3 to get that 
+
+E
+
+bDν (U + Υ) − bDν (V + Υ) 21/2
+
+≤ M 2
+
+λmin (eΣΥ) E
+
+h
+
+∥U − V ∥2i1/2
+
+= M 2
+
+λmin (eΣΥ) W2(μ, ν ).
+
+Reverting the role of μ and ν, we have the same bound. We therefore get 
+
+q
+
+R( bDμ) −
+
+q
+
+R( bDν ) ≤ 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+W2(μ, ν ).
+
+Observe now that from the optimality of the MMSE estimator again, we have 
+
+R( bDμ) ≤ E
+
+h
+
+∥(U + Υ) − U ∥2i
+
+= E
+
+h
+
+∥Υ∥2i
+
+= E
+
+
+
+Π⊤Υ 2
+
+= tr 
+
+eΣΥ
+
+
+
+≤ λmax (eΣΥ)r, (45) and similarly for R( bDν ). It then follows that 
+
+R( bDμ) − R ( bDν ) =
+
+q 
+
+R( bDμ) + 
+
+q
+
+R( bDν )
+
+ q 
+
+R( bDμ) −
+
+q
+
+R( bDν )
+
+≤ 2
+
+q
+
+λmax (eΣΥ)r 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+W2(μ, ν )
+
+as claimed. (iii) The triangle inequality yields 
+
+Wp(bμmmse , bνmmse ) ≤ W p(bμmmse , μ ) + Wp(bνmmse , ν ) + Wp(μ, ν ). (46) We have the bound 
+
+Wp(bμmmse , μ )2 ≤ W 2(bμmmse , μ )2 ≤ E
+
+bDμ(U + Υ) − U 2
+
+= R( bDμ) ≤ E
+
+h
+
+∥Υ∥2i
+
+≤ λmax (eΣΥ)r. 
+
+In the first inequality, we used (25), in the second one we used optimality in the definition of the Wasser-stein distance, and the third inequality follows from (45). The same bound holds for Wp(bνmmse , ν ).Inserting this into (46) proves the result. 22 Remark 4.5. The special scalar case of Theorem 4.4(ii) was considered in [116, Theorem 5]. Moreover, the constant M 2/λ min (eΣΥ) in Theorem 4.4(ii) can be replaced by max( L bDμ , L bDν ).
+
+A useful application of this result is when ν is the empirical version of μ as discussed in Section 2; see (13) and (15). Let μN be the empirical measure obtained from N independent samples from μ. Let bμN 
+
+> mmse
+
+be the law of bDμN (V + Υ), where V ∼ μN . We have the following corollary. 
+
+Corollary 4.6. Assume that (A-2) and (A-3) hold and that μ ∈ P (X ) satisfies (A-4) .(i) If s > d M(μ) ≥ 2, then 
+
+E
+
+h
+
+E
+
+h bDμ(U + Υ)
+
+i
+
+− E
+
+h bDμN (V + Υ)
+
+i i 
+
+≲ diam( X )N −1/s .
+
+(ii) If s > d M(μ) ≥ 4, then 
+
+E
+
+h
+
+R( bDμ) − R ( bDμN )
+
+i
+
+≲
+
+q
+
+λmax (eΣΥ)r 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+diam( X )N −1/s .
+
+(iii) For p ∈ [1 , 2] , if s > d M(μ) ≥ 2p, then 
+
+E Wp(bμmmse , bμN
+
+> mmse
+
+) ≲
+
+q
+
+λmax (eΣΥ)r + diam( X )N −1/s .
+
+The (outer) expectation is with respect to the sampling of the atoms in μN .
+
+Remark 4.7. The scaling in N in the above bounds can be sharpened with a finer notion of dimension; see [114, Theorem 1] where the authors also provide lower-bounds showing that the scaling is essentially tight in general. This can only improved if additional regularity assumptions are imposed. If μ is supported on a compact d-dimensional differentiable manifold and is absolutely continuous wrt the d-dimensional Hausdorff measure on it, then dM(μX ) = d and s in the above bounds can be replaced by d; see [114, Proposition 8 and 9]. Proof. It is sufficient to bound E Wp(μ, μ N ) and then invoke Theorem 4.4. This bound follows from [11, Corollary 1.2] for s as devised. 
+
+4.3 Monotonicity properties 
+
+Monotonicity properties of the MMSE denoiser can be derived using Proposition 4.1. 
+
+Proposition 4.8. Assume that (A-2) and (A-3) hold. Let μ ∈ P (X ) satisfy (A-4) , and set U := Π eΣ−1Υ Π⊤.Then bDμ is monotone and M 2 
+
+> λmin (eΣΥ)
+
+-Lipschitz continuous on the Hilbert space (V, ∥ · ∥ U ). Moreover, log pμ
+
+is λmin (eΣΥ)−1-weakly convex on (V, ∥·∥ ).
+
+23 Proof. For any u, v ∈ V , we have 
+
+⟨ bDμ(u) − bDμ(v), u − v⟩U =
+
+Z 10
+
+⟨J bDμ (v + t(u − v))( u − v), u − v⟩U dt 
+
+=
+
+Z 10
+
+⟨ΣX|v+t(u−v)U (u − v), u − v⟩U dt 
+
+=
+
+Z 10
+
+⟨U ΣX|v+t(u−v)U (u − v), u − v⟩dt 
+
+=
+
+Z 10
+
+⟨ΣX|v+t(u−v)U (u − v), U (u − v)⟩dt ≥ 0.
+
+In the second equality, we used the derivative identity of Proposition 4.1, and in the last inequality that the covariance matrix ΣX|z is symmetric, semidefinite positive and that U is symmetric and positive definite on 
+
+V .Now, with similar arguments, we also have 
+
+bDμ(u) − bDμ(v) U ≤
+
+Z 10
+
+U 1/2J bDμ (v + t(u − v))( u − v) dt 
+
+=
+
+Z 10
+
+U 1/2ΣX|v+t(u−v)U (u − v) dt 
+
+≤
+
+Z 10
+
+U 1/2ΣX|v+t(u−v)U 1/2 dt ∥u − v∥U
+
+≤ M 2
+
+λmin (eΣΥ) ∥u − v∥U .
+
+Weak convexity is equivalent to hypomonotoncity of the score ∇ log pμ on V . The latter holds by mono-tonicity of bDμ on VU and Tweedie’s formula (43), 
+
+λmin (eΣΥ)−1 ∥u − v∥2 + ⟨∇ log pμ(u) − ∇ log pμ(v), u − v⟩≥ ∥ u − v∥2 
+
+> U
+
++ ⟨U −1∇ log pμ(u) − U −1∇ log pμ(v), u − v⟩U = ⟨ bDμ(u) − bDμ(v), u − v⟩U ≥ 0.
+
+Remark 4.9. If ΣX|z is uniformly positive definite in z on V, i.e. there exists α > 0 such that 
+
+⟨ΣX|z w, w ⟩ ≥ α
+
+for all w ∈ V with ∥w∥ = 1 , then the MMSE estimsator is αλ max (eΣΥ)−1-strongly monotone with respect to 
+
+∥·∥ U . Consequently, log pμ is 
+
+
+
+λmin (eΣΥ)−1 − αλ max (eΣΥ)−1
+
+
+
+-weakly convex with respect to the standard euclidean norm. In particular, this implies strong convexity for α < λmax (eΣΥ) 
+
+> λmin (eΣΥ)
+
+= κ
+
+eΣΥ
+
+
+
+.
+
+In the special case where eΣΥ = σ2
+
+> Υ
+
+Ir, even more can be said due to symmetry. We recall that an operator 
+
+T : V → V is β-cocoercive, β > 0, if 
+
+⟨T (x) − T (z), x − z⟩ ≥ β ∥T (x) − T (z)∥2 , for all x, z ∈ V. β-cocoercivity implies 1/β -Lipschitz continuity. The converse is not true in general, unless T is the gradient of a differentiable convex function, a fact known as the Baillon-Haddad theorem. 24 Proposition 4.10. Assume that (A-2) holds, that eΣΥ = σ2
+
+> Υ
+
+Ir, σΥ > 0, and that μ ∈ P (X ) satisfies (A-4) .Then, the operator bDμ is L−1
+
+> bDμ
+
+-cocoercive on V with L bDμ ≤ M 2
+
+> σ2
+> Υ
+
+.Proof. In this case, U = σ−2 
+
+> Υ
+
+ΠΠ ⊤ and thus ⟨x, z⟩U = σ−2 
+
+> Υ
+
+⟨x, z⟩ for all x, z ∈ V . Monotonicity on V then follows from Proposition 4.8 since 
+
+⟨ bDμ(u) − bDμ(v), u − v⟩ = σ−2
+
+> Υ
+
+Z 10
+
+⟨ΣX|v+t(u−v)(u − v), u − v⟩dt ≥ 0, for all u, v ∈ V. 
+
+From Lemma 4.3, bDμ is also L bDμ -Lipschitz continuous on V with L bDμ ≤ M 2
+
+> σ2
+> Υ
+
+. Moreover, Tweedie’s formula (42) now reads, 
+
+bDμ(z) = z + σ2
+
+> Υ
+
+∇ log( pμ(z)) , for all z ∈ V, 
+
+that is, bDμ is the gradient of the function z ∈ V 7 → h(z) def 
+
+= 12 ∥z∥2 + σ2 
+
+> Υ
+
+log( pμ(z)) . Thus monotonicity of bDμ is equivalent to convexity of h; see [6, Proposition 17.7]. It follows from the Baillon-Haddad theorem that bDμ is L−1
+
+> bDμ
+
+-cocoercive; see [6, Corollary 18.17]. To the best of our knowledge, the cocoercivity of the MMSE estimator has not been shown before. If 
+
+L bDμ ≤ 1, then bDμ is firmly nonexpansive. This property has recently been of interest in a number of studies, on the one side as a constraint for training a learned denoiser [103, 13][71], but also as a tool in the conver-gence analysis of PnP methods [100, 117]. While the focus of these works is to ensure firm nonexpansiveness to obtain theoretical convergence guarantees, Proposition 4.10 gives an additional justification for enforcing it, being a property of the MMSE denoiser. 
+
+4.4 Asymptotic behavior of the MMSE denoiser 
+
+We conclude with an investigation of the asymptotic behavior of the MMSE denoiser as the noise Υ vanishes. For simplicity, we focus on the case eΣ = σ2
+
+> Υ
+
+Ir. The general result can be found in appendix B. For z ∈ V ,let 
+
+d(z) def 
+
+= dist( z, supp( μ)) = inf  
+
+> x∈supp( μ)
+
+∥x − z∥
+
+and 
+
+Psupp( μ)(z) def 
+
+= {x ∈ supp( μ) : ∥x − z∥ = d(z)} .
+
+Psupp( μ) : V → 2supp( μ) is the set-valued orthogonal projector onto supp( μ). To emphasize the dependence of the MMSE estimator on σΥ, we will use the notation bDσΥ 
+
+> μ
+
+instead of bDμX .
+
+Proposition 4.11. Assume that (A-2) holds, the covariance of Υ is given by eΣΥ = σ2
+
+> Υ
+
+Ir with σΥ > 0, and that μ ∈ P (X ) satisfies (A-4) . For z ∈ V and a μ-measurable set A, define 
+
+μσΥ 
+
+> z
+
+(A) = 
+
+R 
+
+> A
+
+e− ∥x−z∥22σ2 
+
+> Υ
+
+dμ (x)
+
+R 
+
+> X
+
+e− ∥x−z∥22σ2 
+
+> Υ
+
+dμ (x)
+
+.
+
+Then the following hold: 
+
+25 (i) (μσΥ 
+
+> z
+
+)σΥ>0 subsequentially converges with respect to the Wasserstein distance Wp as σΥ → 0 and each cluster point ¯μz satisfies 
+
+supp(¯ μz ) ⊂ Psupp( μ)(z).
+
+(ii) For all z ∈ V ,
+
+dist( bDσΥ 
+
+> μ
+
+(z), bD0(z)) → 0 as σΥ → 0,
+
+where bD0 : V → 2co(supp( μ)) is the maximal monotone operator defined by 
+
+bD0(z) = co  Psupp( μ)(z) ⊂ co (supp( μ)) .
+
+Proof. 
+
+(i) Let hz (x) = ∥x − z∥. Since X is compact by (A-2), and supp( μ) is closed by definition, it is compact. Thus, hz attains its minimum on it, with value d(z), and Psupp( μ)(z) is nonempty and compact. Moreover, as hz is continuous on supp( μ), it is uniformly continuous there and so is h2 
+
+> z
+
+.Given ϵ > 0, let 
+
+Uϵ 
+
+> z
+
+= x ∈ supp( μ) : h2 
+
+> z
+
+(x) ≤ d2(z) + ϵ .
+
+By uniform continuity, there exists δϵ > 0 such that for all x⋆ ∈ Psupp( μ)(z),
+
+supp( μ) ∩ B(x⋆, δ ϵ) ⊂ U ϵ 
+
+> z
+
+.
+
+Let 
+
+Kϵ 
+
+> z
+
+= supp( μ) ∩
+
+ [
+
+> x⋆∈Psupp( μ)(z)
+
+B(x⋆, δ ϵ)
+
+ .
+
+This is a relatively open neighborhood of Psupp( μ)(z) in supp( μ), and uniform continuity implies that 
+
+Kϵ 
+
+> z
+
+⊂ U ϵ 
+
+> z
+
+.
+
+Note that due to the separability of X , it holds for any open set O that μ(O ∩ supp( μ)c) = 0 . Thus, by definition of the support, we have μ(Kϵ 
+
+> z
+
+) > 0. Therefore, 
+
+μσΥ 
+
+> z
+
+(supp( μ) \ U ϵ 
+
+> z
+
+) = 
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e− h2  
+
+> z(x)−d2(z)2σ2
+> Υ
+
+dμ (x)
+
+R 
+
+> X
+
+e− h2  
+
+> z(x)−d2(z)2σ2
+> Υ
+
+dμ (x)
+
+≤
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e− h2  
+
+> z(x)−d2(z)2σ2
+> Υ
+
+dμ (x)
+
+R
+
+> Kϵ/ 2
+> z
+
+e− h2  
+
+> z(x)−d2(z)2σ2
+> Υ
+
+dμ (x)
+
+≤ e 
+
+> −ϵ
+> 2σ2
+> Υ
+
+μ(supp( μ) \ U ϵ 
+
+> z
+
+)
+
+e 
+
+> −ϵ
+> 4σ2
+> Υ
+
+μ(Kϵ/ 2 
+
+> z
+
+)
+
+≤ e 
+
+> −ϵ
+> 4σ2
+> Υ
+
+μ(X )
+
+μ(Kϵ/ 2 
+
+> z
+
+) .
+
+Passing to the limit as σΥ → 0 we get 
+
+μσΥ 
+
+> z
+
+(supp( μ) \ U ϵ 
+
+> z
+
+) → 0.
+
+26 Compactness of X implies that P(X ) is weak-∗ compact by [2, Theorem 15.11]. Then, the family (μσΥ 
+
+> z
+
+)σΥ>0
+
+is relatively compact by Prokhorov’s theorem. Thus, every weak-∗ cluster point ¯μz is such that ¯μz (supp( μ)\Uϵ 
+
+> z
+
+) = 0 . Because ϵ > 0 is arbitrary and Psupp( μ)(z) = T 
+
+> ϵ> 0
+
+Uϵ 
+
+> z
+
+, we get that supp(¯ μz ) ⊂ Psupp( μ)(z).Indeed, for x /∈ Psupp( μ), there must be ϵ > 0 with x ∈ (Uϵ 
+
+> z
+
+)c. But since (Uϵ 
+
+> z
+
+)c is open and weak-*-convergence implies 
+
+¯μz (( Uϵ 
+
+> z
+
+)c) = ¯ μz (supp( μ) ∩ (Uϵ 
+
+> z
+
+)c) + ¯ μz (supp( μ)c ∩ (Uϵ 
+
+> z
+
+)c) = ¯ μz (supp( μ)c ∩ (Uϵ 
+
+> z
+
+)c)
+
+≤ lim inf  
+
+> σΥ→0
+
+μσΥ 
+
+> z
+
+(supp( μ)c ∩ (Uϵ 
+
+> z
+
+)c) = 0 ,
+
+it must be x /∈ supp(¯ μz ). As X is compact, Wp metrizes weak-∗ convergence on P(X ) [111, Theorem 6.9]. Therefore, subsequential weak-∗ convergence is equivalent to that in Wp.(ii) For any subsequence (μσΥ,k  
+
+> z
+
+)k∈N (that we do not relabel) with weak-∗ cluster point ¯μz , we have from (i), 
+
+bDσΥ,k  
+
+> μ
+
+(z) = 
+
+Z
+
+> X
+
+xdμ σΥ,k  
+
+> z
+
+(x) −→ 
+
+> k→∞
+
+Z
+
+> X
+
+xd¯μz (x) ∈ co  Psupp( μ)(z) = bD0(z).
+
+As this is true for any subsequence (μσΥ,k  
+
+> z
+
+)k∈N, we get the limit claim. Let us now prove that bD0 is maximal monotone. Let (z, η) ∈ gph( bD0) and (z′, η′) ∈ gph( bD0). By Carathéodory’s theorem, η can be expressed as the convex combination 
+
+η =
+
+> r+1
+
+X
+
+> i=1
+
+αiηi where ηi ∈ Psupp( μ)(z) and 
+
+> r+1
+
+X
+
+> i=1
+
+αi = 1 , α i ≥ 0 ∀i ∈ [r + 1] .
+
+Similarly, 
+
+η′ =
+
+> r+1
+
+X
+
+> i=1
+
+βiη′ 
+
+> i
+
+where η′ 
+
+> i
+
+∈ Psupp( μ)(z′) and 
+
+> r+1
+
+X
+
+> i=1
+
+βi = 1 , β i ≥ 0 ∀i ∈ [r + 1] .
+
+We then have 
+
+⟨η′ − η, z′ − z⟩ = ⟨
+
+
+
+> r+1
+
+X
+
+> j=1
+
+βj
+
+
+
+> r+1
+
+X
+
+> i=1
+
+αiηi −
+
+> r+1
+
+X
+
+> i=1
+
+αi
+
+! r+1 X
+
+> j=1
+
+βj η′ 
+
+> j
+
+, z′ − z⟩ =
+
+> r+1
+
+X
+
+> i,j =1
+
+αiβj ⟨η′ 
+
+> j
+
+− ηi, z′ − z⟩.
+
+We know that Psupp( μ) is a monotone operator; see e.g., [6, Example 20.12], whence monotonicity of bD0
+
+follows. We now turn to maximality. By Minty’s theorem [6, Theorem 21.1], bD0 is maximal monotone if and only if Ir + bD0 is surjective. That is, for every η ∈ V , there exists (z, b) ∈ gph( bD0) such that η = z + b, or equivalently, for every η ∈ V ,
+
+∃b such that b ∈ bD0(η − b).
+
+The latter statement amounts to proving the existence of a fixed point of the set-valued operator 
+
+T def 
+
+= bD0(η − · ) : co (supp( μ)) → 2co(supp( μ)) .
+
+This holds true thanks to Kakutani’s fixed point theorem; see e.g., [5, Corollary 1.12.1]. Indeed, T has non-empty convex compact images. In view of [5, Corollary 1.1.1], it remains to show that gph( T ) is closed, 27 that is, for any sequence (zk, ηk) ∈ gph( T ) such that (zk, ηk) → (¯ z, ¯η), then (¯ z, ¯η) ∈ gph( T ). By Carathéodory’s theorem, for each ηk, we can write 
+
+ηk =
+
+> r+1
+
+X
+
+> i=1
+
+αi,k ηk,i where ηk,i ∈ Psupp( μ)(η − zk) and 
+
+> r+1
+
+X
+
+> i=1
+
+αi,k = 1 , α i,k ≥ 0 ∀i ∈ [r + 1] .
+
+By compactness of the standard simplex and the values of Psupp( μ), we can pass to a subsequence so that 
+
+αi,k → ¯αi and ηk,i → ¯ηi, where ¯α belongs to the standard simplex. Since Psupp( μ) has a closed graph by [85, Example 1.20], we have ¯ηi ∈ Psupp( μ)(η − ¯z). In turn, 
+
+¯η = lim  
+
+> k→∞
+
+ηk =
+
+> r+1
+
+X
+
+> i=1
+
+¯αi ¯ηi ∈ co  Psupp( μ)(η − ¯z) = T (¯ z).
+
+This concludes the proof. 
+
+# 5 Proofs of the main results 
+
+5.1 Proof of Theorem 3.2 
+
+In order to show (23), we need the following lemma. 
+
+Lemma 5.1. Assume that (A-2) –(A-3) hold, and that μX fulfills (A-4) . Then there exists ϵ > 0 such that 
+
+bDμN 
+
+> X
+
+(x) − x ≤
+
+s
+
+λmax (eΣΥ)
+
+λmin (eΣΥ) dist( x, DX 
+
+> N
+
+) + 2 M (N − 1) e− ϵ 
+
+> 2λmax (eΣΥ)
+
+. (47) 
+
+Proof. Let Ix def 
+
+= Argmin i∈[N ] x − xi eΣ+
+
+> Υ
+
+and d⋆ def 
+
+= min i∈[N ] x − xi eΣ+
+
+> Υ
+
+. For all i ∈ I x, it holds 
+
+x − xi eΣ+
+
+> Υ
+
+= d⋆. From (15) and (17), and since x ∈ V and DX 
+
+> N
+
+⊂ V by (A-4), we have 
+
+bDμN 
+
+> X
+
+(x) − x =
+
+PNi=1 xie−
+
+∥x−xi∥2
+
+> eΣ+
+> Υ
+> 2
+
+PNi=1 e−∥x−xi∥2
+
+> eΣ+
+> Υ
+> 2
+
+− x ≤
+
+PNi=1 x − xi e−
+
+∥x−xi∥2
+
+> eΣ+
+> Υ
+> 2
+
+PNi=1 e−∥x−xi∥2
+
+> eΣ+
+> Υ
+> 2
+
+≤
+
+P 
+
+> i∈I x
+
+x − xi + P 
+
+> i̸∈I x
+
+x − xi e−
+
+∥x−xi∥2
+
+> eΣ+
+> Υ
+> −d2
+> ⋆
+> !
+> 2
+
+|I x| + P 
+
+> i̸∈I x
+
+e−
+
+> ∥x−xi∥2
+> eΣ+
+> Υ
+> −d2
+> ⋆
+> !
+> 2
+
+≤ 1
+
+|I x|
+
+X
+
+> i∈I x
+
+x − xi + 1
+
+|I x|
+
+X
+
+> i̸∈I x
+
+x − xi e−
+
+∥x−xi∥2 
+
+> eΣ+
+> Υ
+> −d2
+> ⋆
+> !
+> 2
+
+.
+
+Let i⋆ ∈ Argmin i∈[N ] x − xi , i.e. x − xi⋆ = dist( x, DX 
+
+> N
+
+). Since for all i ∈ I x, x − xi eΣ+
+
+> Υ
+
+= d⋆ ≤
+
+x − xi⋆ eΣ+
+
+> Υ
+
+, we have 
+
+x − xi ≤
+
+q
+
+λmax ( ˜ΣΥ) x − xi eΣ+
+
+> Υ
+
+≤
+
+q
+
+λmax ( ˜ΣΥ) x − xi⋆ eΣ+
+
+> Υ
+
+≤
+
+s
+
+λmax ( ˜ΣΥ)
+
+λmin ( ˜ΣΥ) dist( x, DX 
+
+> N
+
+).
+
+28 In turn, 
+
+bDμN 
+
+> X
+
+(x) − x ≤
+
+s
+
+λmax ( ˜ΣΥ)
+
+λmin ( ˜ΣΥ) dist( x, DX 
+
+> N
+
+) + 1
+
+|I x|
+
+X
+
+> i̸∈I x
+
+x − xi e−
+
+∥x−xi∥2 
+
+> eΣ+
+> Υ
+> −d2
+> ⋆
+> !
+> 2
+
+.
+
+If |I x| = N , the claim follows. Otherwise, there exists ϵ > 0 such that x − xi 2
+
+> eΣ+
+> Υ
+
+− d2 
+
+> ⋆
+
+≥ ϵ for all i̸ ∈ I x,and therefore, using also (A-2), 
+
+bDμN 
+
+> X
+
+(x) − x ≤
+
+s
+
+λmax ( ˜ΣΥ)
+
+λmin ( ˜ΣΥ) dist( x, DX 
+
+> N
+
+) + diam( X ) ( N/ |I x| − 1) e− ϵ
+
+> 2λmax (eΣΥ)
+
+≤
+
+s
+
+λmax ( ˜ΣΥ)
+
+λmin ( ˜ΣΥ) dist( x, DX 
+
+> N
+
+) + 2 M (N − 1) e− ϵ 
+
+> 2λmax (eΣΥ)
+
+.
+
+Remark 5.2. Note that ϵ in Lemma 5.1 depends on N . This dependence can be removed by choosing ϵ > 0
+
+and repeating the arguments of the proof with 
+
+Ix,ϵ =
+
+n
+
+i ∈ [N ] : x − xi 2
+
+> eΣ+
+> Υ
+
+≤ d2 
+
+> ⋆
+
++ ϵ
+
+o
+
+.
+
+instead of Ix, to obtain the estimate 
+
+bDμN 
+
+> X
+
+(x) − x ≤
+
+s
+
+λmax ( ˜ΣΥ)
+
+λmin ( ˜ΣΥ) dist( x, DX 
+
+> N
+
+) + 2 M (N − 1) e− ϵ 
+
+> 2λmax (eΣΥ)
+
++
+
+q
+
+λmax ( ˜ΣΥ)ϵ. 
+
+We are now in the position to prove Theorem 3.2. 
+
+Proof of (23) . Note that due to (A-6), conditon (A-7) is equivalent to 
+
+λmin 
+
+ BA ; Tco(supp( μX )) (x) > 0.
+
+Therefore, using xk ∈ co (supp( μ)) , we obtain for γ > 0 that 
+
+∥(In − γBA )( xk − x)∥2 = ∥xk − x∥2 − 2γ⟨BA (xk − x), xk − x⟩ + γ2 ∥BA (xk − x)∥2
+
+≤ ρ(γ)2 ∥xk − x∥2 ,
+
+where ρ(γ)2 = 1 − 2γλ min 
+
+ BA ; Tco(supp( μX )) (x) + γ2λmax (BA )2. By (19) it holds ρ(γ) ≥ 0. In particular, ρ(γ) is minimal with value ρ(γ) = 
+
+q
+
+1 − κ (BA )−2 < 1 for γ chosen according to (22). Since 
+
+q = M 2
+
+> λmin
+
+(eΣΥ)
+
+q
+
+1 − κ (BA )−2 < 1 by (20) or (21), we obtain from (18) that 
+
+∥xk − x∥ ≤ q ∥xk−1 − x∥ + L bDμN
+
+> X
+
+γ ∥B∥ ∥ e∥ + bDμN 
+
+> X
+
+(x) − x
+
+≤ qk+1 ∥x0 − x∥ + 1 − qk
+
+1 − q
+
+
+
+L bDμN
+
+> X
+
+γ ∥B∥ ∥ e∥ + bDμN 
+
+> X
+
+(x) − x
+
+
+
+. (48) Estimate (23) now follows from Lemma 5.1. 29 Estimate (24) is a consequence of (23) and the following lemma applied with τ = 2 .
+
+Lemma 5.3. Assume that (A-2) holds and that μX satisfies (A-4) and has a density g with respect to the volume measure on Rr such that g is bounded away from zero. Then, for any τ > 0 there exists N (τ ) ∈ N
+
+such that for all N ≥ N (τ ),
+
+max   
+
+> z∈supp( μX)
+
+dist( z, DX 
+
+> N
+
+) ≤ K1(1 + τ )1/r 
+
+ log( N )
+
+N
+
+1/r 
+
+,
+
+holds with probability at least 1 − K2N −τ on the sampling of DX 
+
+> N
+
+, where K1 > 0 and K2 > 0 are two constants that depend only on r and M .Proof. Denote for short S def 
+
+= supp( μX ) ⊂ V and identify V with Rr.Let Sδ = z1, z2, . . . , zN (S,δ ) be a δ-net of S in the Euclidean distance on Rr, i.e., S ⊆ S 
+
+> z∈Sδ
+
+Bδ(z).We then have 
+
+max  
+
+> z∈S
+
+dist( z, DX 
+
+> N
+
+) ≤ max   
+
+> j∈[N(S,δ )]
+
+max   
+
+> z∈Bδ(zj)
+
+dist( z, DX 
+
+> N
+
+).
+
+For each j ∈ [N (S, δ )] , let Qj be the number of random variables in DX 
+
+> N
+
+falling into Bδ(zj ). Qj is a Bi-nomial random variable with parameters (N, p j ), where pj = μX (Bδ(zj )) ≥ cvol( Bδ(0)) = cδ rvol( B(0)) ,where c = inf S g > 0 by assumption, and we used the shorthand notation B(0) for the unit ball centered at zero. Thus, using the union bound, we get 
+
+Pr 
+
+
+
+max  
+
+> z∈S
+
+dist( z, DX 
+
+> N
+
+) > 2δ
+
+
+
+≤ Pr max   
+
+> j∈[N(S,δ )]
+
+max   
+
+> z∈Bδ(xj)
+
+dist( z, DX 
+
+> N
+
+) > 2δ
+
+!
+
+≤ X 
+
+> j∈[N(S,δ )]
+
+Pr max   
+
+> z∈Bδ(xj)
+
+dist( z, DX 
+
+> N
+
+) > 2δ
+
+!
+
+≤ X 
+
+> j∈[N(S,δ )]
+
+Pr  Qj = 0  = X 
+
+> j∈[N(S,δ )]
+
+(1 − pj )N ≤ N (S, δ ) (1 − cδ rvol( B(0))) N .
+
+Since S is compact, we know that S ⊆ BM (0) . It then follows from [81, Lemma 4.10] that 
+
+N (S, δ ) = N (S/M, δ/M ) ≤
+
+
+
+1 + 2Mδ
+
+r
+
+.
+
+We therefore arrive at the bound 
+
+Pr 
+
+
+
+max  
+
+> x∈S
+
+dist( z, DX 
+
+> N
+
+) > 2δ
+
+
+
+≤
+
+
+
+1 + 2Mδ
+
+r
+
+(1 − cδ rvol( B(0))) N ≤ (δ + 2 M )r
+
+δr e−N cδ r vol( B(0) .
+
+Take δr = (1+ τ )  
+
+> cvol( B(0)) log( N)
+> N
+
+, for any τ > 0. Thus, for N large enough, one has δ ≤ M , and in turn the above bound becomes 
+
+Pr 
+
+
+
+max  
+
+> x∈S
+
+dist( z, DX 
+
+> N
+
+) > 2δ
+
+
+
+≤ c(3 M )rvol( B(0))(1 + τ )−1 N −τ
+
+log( N )
+
+≤ c(3 M )rvol( B(0)) N −τ .
+
+30 By the Stirling formula, we have 
+
+vol( B(0)) = 2πr/ 2
+
+rΓ( r/ 2) = 1
+
+√πr 
+
+ 2πe r
+
+r/ 2
+
+eθ(r/ 2) /(6 r)
+
+with θ(r/ 2) ∈ [0 , 1] . Plugging this into the expression of δ concludes the proof. 
+
+5.2 Proof of Theorem 3.6 
+
+Proof of Lemma 3.4. Denote for short Ux def 
+
+= Tco( S)(x) ∩ Sn−1 for any x ∈ S def 
+
+= supp( μX ), and note that it holds [
+
+> x∈S
+
+Ux = [
+
+> x∈S
+
+Tco( S)(x)
+
+!
+
+∩ Sn−1.
+
+By definition, we have for any x ∈ S ,
+
+Tco( S)(x) ⊂ par(co ( S)) ,
+
+and in turn [
+
+> x∈S
+
+Tco( S)(x) ⊂ par(co ( S)) .
+
+Moreover, for any x ∈ ri(co ( S)) , we know that (see e.g., [6, Theorem 6.45]) 
+
+Tco( S)(x) = par(co ( S)) .
+
+Altogether, since by (A-7’) it holds that ri(co ( S)) ∩ S is non-empty we deduce that 
+
+[
+
+> x∈S
+
+Tco( S)(x) = par(co ( S)) .
+
+We conclude that S
+
+> x∈S
+
+Ux = par(co ( S)) ∩Sn−1 is compact since it is the unit sphere of the finite-dimensional vector space par(co ( S)) . We thus obtain 
+
+eλmin (BA ) = inf  
+
+> z∈S
+> x∈S
+> Ux
+
+∥BA z∥ = min  
+
+> z∈par(co( S)) ∩Sn−1
+
+∥BA z∥ > 0,
+
+where the last inequality follows from assumption (A-7’). 
+
+Proof of Theorem 3.6. Let E and Υ be such that eγB E and Υ are jointly distributed according to their optimal coupling, and similarly for X and XN . Let Y = AX + E. We then have, conditioned on the samples DX 
+
+> N
+
+, that 
+
+W2(bμNk , μ X ) ≤
+
+r
+
+E
+
+h
+
+∥Xk − X∥2 | D X
+
+> N
+
+i
+
+,
+
+where Xk is the iterate defined as in (28) with X0 and Y as above. Using (26) and Minkowski’s inequality, we obtain 
+
+r
+
+E
+
+h
+
+∥Xk − X∥2 | D X
+
+> N
+
+i
+
+≤ eq
+
+r
+
+E
+
+h
+
+∥Xk−1 − X∥2 | D X
+
+> N
+
+i
+
++ M 2
+
+λmin (eΣΥ)
+
+r
+
+E
+
+h
+
+∥eγB E − Υ∥2i
+
+31 +
+
+s
+
+E
+
+bDμN
+
+> X
+
+ XN + Υ − XN 2
+
+| D X
+
+> N
+
+
+
++ 1 + M 2
+
+λmin (eΣΥ)
+
+! r 
+
+E
+
+h
+
+XN − X 2 | D X
+
+> N
+
+i
+
+= eq
+
+r
+
+E
+
+h
+
+∥Xk−1 − X∥2 | D X
+
+> N
+
+i
+
++ M 2
+
+λmin (eΣΥ) W2(μeγB E , μ Υ)+
+
+s
+
+E
+
+bDμN
+
+> X
+
+ XN + Υ − XN 2
+
+| D X
+
+> N
+
+
+
++ 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+W2(μX , μ N 
+
+> X
+
+).
+
+Iterating, we obtain 
+
+W2(bμNk , μ X ) ≤ eqk+1 
+
+r
+
+E
+
+h
+
+∥X0 − X∥2 | D X
+
+> N
+
+i
+
++ 1 − eqk
+
+1 − eq
+
+"
+
+M 2
+
+λmin (eΣΥ) W2 (( eγB )#μE , μ Υ)+
+
+s
+
+E
+
+bDμN
+
+> X
+
+ XN + Υ − XN 2
+
+| D X
+
+> N
+
+
+
++ 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+W2(μX , μ N 
+
+> X
+
+)
+
+#
+
+. (49) Now taking the expectation over the sampling of DX 
+
+> N
+
+and using Jensen’s inequality, we obtain 
+
+EDX
+
+> N
+
+W2(bμNk , μ X ) ≤ eqk+1 
+
+r
+
+E
+
+h
+
+∥X0 − X∥2i
+
++ 1 − eqk
+
+1 − eq
+
+"
+
+M 2
+
+λmin (eΣΥ) W2(( eγB )#μE , μ Υ)+
+
+s
+
+E
+
+bDμN
+
+> X
+
+ XN + Υ − XN 2
+
++ 1 + M 2
+
+λmin (eΣΥ)
+
+!
+
+EDX
+
+> N
+
+W2(μX , μ N 
+
+> X
+
+) #
+
+.
+
+(50) We bound the last three summands in (50) individually. Since E and Υ are zero-mean Gaussian, the first term is given by the Bures metric valid even in the degenerate case thanks to [32, Theorom 2.1 and Theorom 2.4], 
+
+W2(( eγB )#μE , μ Υ) = 
+
+eγ2
+
+tr 
+
+
+
+BΣE B⊤
+
++ tr 
+
+eΣΥ
+
+
+
+− 2eγtr 
+
+eΣ1/2 
+
+> Υ
+
+Π⊤BΣE B⊤ΠeΣ1/2
+
+> Υ
+
+1/21/2
+
+.
+
+For the second term, we argue as in the proof of Theorem 4.4(ii), using optimality of the MMSE denoiser 
+
+bDμN 
+
+> X
+
+(see (45)) to get that 
+
+E
+
+bDμN
+
+> X
+
+ XN + Υ − XN 2
+
+= EDX
+
+> N
+
+bDμN
+
+> X
+
+ XN + Υ − XN 2
+
+| D X
+
+> N
+
+
+
+= EDX
+
+> N
+
+h
+
+R( bDμN 
+
+> X
+
+)
+
+i
+
+≤ EDX
+
+> N
+
+h
+
+∥Υ∥2i
+
+= tr 
+
+eΣΥ
+
+
+
+≤ λmax (eΣΥ)r. 
+
+For the sampling error term EDX
+
+> N
+
+W2(μX , μ N 
+
+> X
+
+), we argue as in Corollary 4.6 to get that it scales as 
+
+O(diam( X )N −1/s ). Plugging these estimates into (50), we get the claimed bound. 
+
+5.3 Proof of Proposition 3.9 
+
+From the proof of Theorem 3.6, we only need to show that W2(μX , μ N 
+
+> X
+
+) concentrates well around its expec-tation. For this, we apply [114, Proposition 20] to get that with probability larger than 1 − exp( −2N t 2),
+
+W22 (μX , μ N 
+
+> X
+
+) ≤ EDX
+
+> N
+
+W22 (μX , μ N 
+
+> X
+
+) + diam( X )2t. 
+
+32 The term EDX
+
+> N
+
+W22 (μX , μ N 
+
+> X
+
+) needs some care because of the square inside the expectation (Jensen’s in-equality is in the opposite direction). For this, we use the reverse inequality of (25) which holds thanks to boundedness of X (see A-2). 
+
+Lemma 5.4. Let μ, ν be probability measures supported on X which satisfies (A-2) . Then, for 1 ≤ p ≤ q < 
+
++∞,
+
+Wq(μ, ν ) ≤ diam( X )1−p/q Wp(μ, ν )p/q .
+
+The proof uses basic properties of the Wasserstein distance and we include it for self-containedness. 
+
+Proof. Let πp ∈ Π( μ, ν ) (resp. πq ∈ Π( μ, ν )) the optimal coupling for Wp(μ, ν ) (resp. Wq(μ, ν )). Both exist thanks to compactness. Since μ and ν are supported on X , we have 
+
+∥x − z∥q = ∥x − z∥q−p ∥x − z∥p ≤ diam( X )q−p ∥x − z∥p .
+
+Therefore 
+
+W qq (μ, ν ) = 
+
+Z
+
+> X ×X
+
+∥x − z∥q dπ q(x, z)
+
+≤
+
+Z
+
+> X ×X
+
+∥x − z∥q dπ p(x, z)
+
+≤ diam( X )q−p
+
+Z
+
+> X ×X
+
+∥x − z∥p dπ p(x, z) = diam( X )q−pWpp (μ, ν ).
+
+It then follows that with the same probability as above, 
+
+W22 (μX , μ N 
+
+> X
+
+) ≤ diam( X )EDX
+
+> N
+
+W1(μX , μ N 
+
+> X
+
+) + diam( X )2t. 
+
+We now use [11, Corollary 1.2] to see that 
+
+EDX
+
+> N
+
+W1(μX , μ N 
+
+> X
+
+) ≲ diam( X )N −1/s ′
+
+for s′ > d M(μX ) ≥ 2. Therefore, with the same probability as above, 
+
+W2(μX , μ N 
+
+> X
+
+) ≲ diam( X )N −1/(2 s′) + diam( X )√t. 
+
+Setting s = 2 s′ and t = N −1/s ′
+
+, and plugging this into (49), we conclude. 
+
+5.4 Proof of Lemma 3.10 
+
+Since the identity is 1-Lipschitz, the claim follows from [80, Theorem 3.9] and a scaling argument. Let eS def 
+
+= diam( S)−1S and choose b ∈ Rr such that eS − { b} ⊂ [0 , 1] r holds. Since the iden-tity is 1-Lipschitz, it follows from [80, Theorem 3.9] that there exists a neural network D with W (D) ≲
+
+rR dS +1 
+
+ ϵ
+
+> diam( S)
+
+−dS
+
+, and L(D) = ⌈log 2(dS )⌉ + ⌈log 2(r)⌉ + c for some universal constant c ∈ N such that 
+
+∥D(x) − x∥ ≤ diam( S)−1ϵ
+
+33 for all x ∈ eS − { b}. Moreover, according to [80, Remark 3.12], there exists ep ∈ N, which only depends on S, such that the weights of D are bounded proportionally to  ϵdiam( S)−1−ep. To be precise, the upper bound of the weights can be chosen as the maximum of the optimal scaling order in [79, Lemma A.3], and the inverse grid size that is necessary to approximate the identity with precision diam( S)−1ϵ using linear finite element functions. Since both of these quantitities are polynomial with respect to the inverse approximation error diam( S)ϵ−1 and only dependent on S, such ep must exist. We therefore obtain that the neural network 
+
+bDϵ = diam( S)D approximates the identity on S with precision ϵ. In particular, bDϵ has the same number of weights and layers as D. Since ∥b∥ ≤ √r M 
+
+> diam( S)
+
+and diam( S) ≤ 2M , the weights of bDϵ are bounded proportionally to √r   ϵM
+
+−p with p = ep + 1 .
+
+5.5 Proof of Theorem 3.11 
+
+Analogously to the proof of Theorem 3.2, we obtain 
+
+∥xk − x∥ ≤ qk+1 ∥x0 − x∥ + 1 − qk
+
+1 − q
+
+
+
+L bDNϵ
+
+γ ∥B∥ ∥ e∥ + bDNϵ (x) − x
+
+
+
+.
+
+To bound the last summand, we let i ∈ Argmin  
+
+> j∈[N]
+
+xj − x and make the estimate 
+
+bDNϵ (x) − x ≤ bDNϵ (x) − bDNϵ (xi + υi) + bDNϵ (xi + υi) − xi + dist( x, DX 
+
+> N
+
+)
+
+≤ L bDNϵ
+
+x − (xi + υi) + bDNϵ (xi + υi) − xi + dist( x, DX 
+
+> N
+
+)
+
+≤ L bDNϵ
+
+υi +
+
+vuut NX
+
+> j=1
+
+bDNϵ (xj + υj ) − xj 2
+
++
+
+
+
+1 + L bDNϵ
+
+
+
+dist( x, DX 
+
+> N
+
+). (51) By the optimality of bDNϵ in (32) and Lemma 3.10 it holds 
+
+> N
+
+X
+
+> j=1
+
+bDNϵ (xj + υj ) − xj 2
+
+≤
+
+> N
+
+X
+
+> j=1
+
+bDϵ(xj + υj ) − xj 2
+
+≤ 2
+
+> N
+
+X
+
+> j=1
+
+bDϵ(xj + υj ) − bDϵ(xj ) 2
+
++ bDϵ(xj ) − xj 2
+
+≤ 2
+
+L2
+
+> bDϵ
+> N
+
+X
+
+> j=1
+
+υj 2 + N ϵ 2
+
+ .
+
+Hence, estimate (51) implies 
+
+bDNϵ (x) − x ≤
+
+
+
+L bDNϵ
+
++ √2L bDϵ
+
+ 
+
+> N
+
+X
+
+> j=1
+
+υj 2
+
+
+
+> 12
+
++ √2N ϵ +
+
+
+
+1 + L bDNϵ
+
+
+
+dist( x, DX 
+
+> N
+
+).
+
+34 It remains to bound f (υ1, . . . , υN ), where (υ1, . . . , υN ) 7 → f (υ1, . . . , υN ) = NP
+
+> j=1
+
+υj 2
+
+! 12
+
+. Since 
+
+Υ = eΣ1/2 
+
+> Υ
+
+Z, for Z ∼ N (0 , I r), we have 
+
+f (υ1, . . . , υN ) ≤
+
+q
+
+λmax (eΣΥ)f (z1, . . . , zN ).
+
+Observe that f is 1-Lipschitz, and since the zi’s are independent zero-mean standard Gaussian vectors, we can use the concentration in Gauss space, see e.g., [110], to get that 
+
+f (υ1, . . . , υN ) ≤ E f (υ1, . . . , υN ) + t ≤ √N r + t
+
+with probability at least 1 − exp( −t2/2) . Taking t = p4 log( N ), we get (36). Applying Lemma 5.3 with 
+
+t = N −2 and using a union bound implies (37). 
+
+# 6 Conclusions and future work 
+
+We analyzed the forward-backward version of the PnP method using an empirical version of the optimal MMSE denoiser. In particular, we proved error bounds that loosen typical contractiveness assumptions on the denoiser for sufficiently well-conditioned problems. The crucial observation within our analysis, however, is that the denoiser should not be chosen independently of the forward model. Instead, it needs to be constructed such that it removes the transformed version of the observation noise, which occurs within the ’descent step’ of the algorithm. We additionally show cocoercivity of the MMSE estimator, which implies firm nonexpansiveness up to scaling. In future work, we would like to study how this constraint can be rigorously and efficiently incorporated in the training of denoisers. Tightness of our bounds is also another interesting avenue for a future work. 
+
+Acknowledgments 
+
+TW and JF were supported by the CAESAR AI4Science project from the University of Caen. All authors received support from the PHC HONG KONG-PROCORE Programme under number 52663RH. 
+
+# Appendix A General case of Lemma 3.4 
+
+Recall, see [63], that the core outer limit of a sequence of sets (Cn)n∈N is defined via 
+
+lim sup  
+
+> n→∞ ◦
+
+Cn =
+
+n
+
+x = lim  
+
+> n→∞
+
+λnxn : xn ∈ C n, λ n ↑ ∞ 
+
+o
+
+. (52) We show a generalized version of Lemma 3.4. 
+
+Lemma A.1. Assume that (A-2) holds and that ker( BA ) ∩ Tco(supp( μX )) (x) = {0} for all x ∈ supp( μX ).Further assume that for each sequence (xn)n∈N it holds that 
+
+lim sup  
+
+> n→∞ ◦
+
+Tco(supp( μX )) (xn) ⊂ [
+
+> x∈S
+
+Tco(supp( μX )) (x). (53) 
+
+Then eλmin (BA ) > 0.
+
+35 Proof. We first show that S
+
+> x∈S
+
+Tco(supp( μX )) (x) is closed. Thus, let (zn)n∈N be a sequence in Tco(supp( μX )) (xn)
+
+with limit z. Hence, there exist λn > 0 and yn ∈ co (supp( μX )) such that zn = λn(yn − xn). We con-sider two cases. First, if λn is unbounded, we can pass to a subsequence such that λn increases to ∞. Hence 
+
+z ∈ lim sup  
+
+> n→∞ ◦
+
+Tco(supp( μX )) (xn), and thus z ∈ S
+
+> x∈S (x)
+
+Tco(supp( μX )) (x). Otherwise, if λn is bounded, we can pass to a subsequence and assume that xn converges to some x ∈ supp( μX ) by compactness. Consequently, 
+
+λn(yn − x) converges to z, since 
+
+λn(yn − xn) − λn(yn − x) = λn(x − xn) n→∞ 
+
+→ 0.
+
+Thus, z ∈ Tco(supp( μX )) (x). Therefore S
+
+> x∈S
+
+Tco(supp( μX )) (x) is closed and consequently 
+
+[
+
+> x∈S
+
+Tco(supp( μX )) (x)
+
+!
+
+∩ Sn−1 = [
+
+> x∈S
+
+ Tco(supp( μX )) (x) ∩ Sn−1
+
+is compact. We conclude 
+
+eλmin (BA ) = inf    
+
+> z∈S
+> x∈S
+> 
+> Tco (supp( μX))(x)∩Sn−1
+> 
+
+∥BAz ∥ = min    
+
+> z∈S
+> x∈S
+> 
+> Tco (supp( μX))(x)∩Sn−1
+> 
+
+∥BAz ∥ > 0.
+
+# Appendix B General case of Lemma 4.11 
+
+Let 
+
+eΣn
+
+> Υ
+
+ 
+
+> n∈N
+
+be a sequence of non-zero, symmetric, positive semidefinite matrices whose image is con-tained in V , such that lim 
+
+> n→∞
+
+eΣn 
+
+> Υ
+
+= 0 holds and set 
+
+Λn def 
+
+=
+
+eΣn
+
+> Υ
+
++ −1 eΣn
+
+> Υ
+
++
+
+.
+
+Recall that for any symmetric positive-semidefinte matrix Λ, we set 
+
+∥w∥Λdef 
+
+= p⟨Λw, w⟩.
+
+Further, fix z ∈ V and let 
+
+dΛ(z)def 
+
+= inf  
+
+> x∈supp( μ)
+
+∥x − z∥Λ ,
+
+and 
+
+PΛsupp( μ)(z) def 
+
+= {x ∈ supp( μ) : ∥x − z∥Λ = dΛ(z)} .
+
+As in Proposition 4.11 define 
+
+μn 
+
+> z
+
+(A) = 
+
+R 
+
+> A
+
+e− 12 (x−z)⊤(eΣn
+
+> Υ
+
+)+(x−z)dμ (x)
+
+R 
+
+> X
+
+e− 12 (x−z)⊤(eΣn
+
+> Υ
+
+)+(x−z)dμ (x)
+
+for z ∈ V .36 Proposition B.1. Assume that (A-2) holds and that μ satisfies (A-4) .(i) (μn 
+
+> z
+
+)n∈N subsequentially converges with respect to the Wasserstein distance Wp and each cluster point 
+
+¯μz satisfies 
+
+supp(¯ μz ) ⊂ PΛsupp( μ)(z).
+
+(ii) For all z ∈ V ,
+
+dist( bDμn 
+
+> z
+
+(z), bD0(z)) → 0 as σΥ → 0,
+
+where bD0 : V → 2co(supp( μ)) is the maximal monotone operator defined by 
+
+bD0(z) = co 
+
+
+
+PΛsupp( μ)(z)
+
+
+
+⊂ co (supp( μ)) .
+
+Proof. Upon passing to a subsequence, assume that lim  
+
+> n→∞
+
+Λn = Λ for a symmetric, positive-semidefinite matrix Λ with ∥Λ∥ = 1 . Let hz (x) = ∥x − z∥Λ. By the compactness of supp( μ), hz , h2 are uniformly continuous and h(x) attains its minimium dΛ(z). Consequently, PΛsupp( μ)(z) is non-empty and compact. For ϵ > 0 let 
+
+Uϵ 
+
+> z
+
+= x ∈ supp( μ) : h2 
+
+> z
+
+(x) ≤ d2Λ(z) + ϵ .
+
+By uniform continuity, there exists δϵ > 0 such that 
+
+supp( μ) ∩ B(x⋆, δ ϵ) ⊂ U ϵ
+
+> z
+
+for all x⋆ ∈ PΛsupp( μ)(z). Let 
+
+Kϵ
+
+> z
+> def
+
+= supp( μ) ∩ [
+
+> x⋆∈PΛsupp( μ)(z)
+
+B(x⋆, δ ϵ) ⊂ U ϵ 
+
+> z
+
+.
+
+Thus, by definition of the support and the separability of X , we have μ(Kϵ 
+
+> z
+
+) > 0. Further, the compactness of X implies that (x − z)⊤(Λ n − Λ)( x − z) converges uniformly to 0. Hence, for n large enough it holds 
+
+(x − z)⊤(Λ n − Λ)( x − z) ≤ ϵ 
+
+> 4
+
+for all x ∈ X . We can therefore estimate 
+
+μn 
+
+> z
+
+(supp( μ) \ U ϵ 
+
+> z
+
+) = 
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e− 12 (x−z)⊤(eΣn
+
+> Υ
+
+)+(x−z)dμ (x)
+
+R 
+
+> X
+
+e− 12 (x−z)⊤(eΣn
+
+> Υ
+
+)+(x−z)dμ (x)=
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤Λn(x−z)dμ (x)
+
+R 
+
+> X
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤Λn(x−z)dμ (x)=
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤(Λ n−Λ)( x−z)e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤Λ( x−z)dμ (x)
+
+R 
+
+> X
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤(Λ n−Λ)( x−z)e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤Λ( x−z)dμ (x)
+
+≤
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e ϵ 
+
+> 8
+
+(eΣn
+
+> Υ
+
+)+
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤Λ( x−z)dμ (x)
+
+R 
+
+> X
+
+e− ϵ 
+
+> 8
+
+(eΣn
+
+> Υ
+
+)+
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (x−z)⊤Λ( x−z)dμ (x)
+
+37 = e ϵ 
+
+> 4
+
+(eΣn
+
+> Υ
+
+)+
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (h2 
+
+> z(x)−d2Λ(z))
+
+dμ (x)
+
+R 
+
+> X
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (h2 
+
+> z(x)−d2Λ(z))
+
+dμ (x)
+
+
+
+≤ e ϵ 
+
+> 4
+
+(eΣn
+
+> Υ
+
+)+
+
+R 
+
+> supp( μ)\U ϵ
+> z
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (h2 
+
+> z(x)−d2Λ(z))
+
+dμ (x)
+
+R
+
+> Kϵ/ 4
+> z
+
+e− 12 (eΣn
+
+> Υ
+
+)+ (h2 
+
+> z(x)−d2Λ(z))
+
+dμ (x)
+
+
+
+≤ e ϵ 
+
+> 4
+
+(eΣn
+
+> Υ
+
+)+ e− 3ϵ 
+
+> 8
+
+(eΣn
+
+> Υ
+
+)+
+
+μ(supp( μ) \ U ϵ 
+
+> z
+
+)
+
+μ(Kϵ/ 4 
+
+> z
+
+) = e− ϵ 
+
+> 8
+
+(eΣn
+
+> Υ
+
+)+
+
+μ(X )
+
+μ(Kϵ/ 4 
+
+> z
+
+) .
+
+Since lim 
+
+> n→∞
+
+eΣn 
+
+> Υ
+
+= 0 , we have lim 
+
+> n→∞
+
+eΣn
+
+> Υ
+
++
+
+= ∞ and thus lim  
+
+> n→∞
+
+μn 
+
+> z
+
+(supp( μ) \ U ϵ 
+
+> z
+
+) = 0 . From here we continue as in the proof of Proposition 4.11. 
+
+Remark B.2. Note that even if PΛn
+
+> supp( μ)
+
+(z) converges as a sequence of set, its limit man not coincide with 
+
+PΛsupp( μ)(z), e.g. if rankΛ < lim inf  
+
+> n→∞
+
+rankΛ n.
+
+# References 
+
+[1] Jonas Adler and Ozan Öktem. Solving ill-posed inverse problems using iterative deep neural networks. Inverse Problems, 33(12):124007, 2017. [2] Charalambos D. Aliprantis and Kim C. Border. Infinite Dimensional Analysis. SpringerLink. Springer-Verlag, Berlin, Heidelberg, third edition edition, 2006. Literaturverz. S. 667 - 680. [3] Simon Arridge, Peter Maass, Öktem Ozan, and Carola-Bibiane Schönlieb. Solving inverse problems using data-driven models. Acta Numerica, 28:1–174, May 2019. [4] Gilles Aubert and Jean-FranÃ§ois Aujol. A variational approach to removing multiplicative noise. SIAM Journal on Applied Mathematics, 68(4):925–946, January 2008. [5] Jean-Pierre Aubin and Arrigo Cellina. Differential Inclusions: Set-Valued Maps and Viability Theory. Springer Berlin Heidelberg, 1984. [6] H. Bauschke and P. L. Combettes. Convex Analysis and Monotone Operator Theory in Hilbert Spaces. Springer, 2nd edition, 2017. [7] Amir Beck. First-Order Methods in Optimization. Society for Industrial and Applied Mathematics, October 2017. [8] Martin Benning and Martin Burger. Modern regularization methods for inverse problems. Acta numerica, 27:1–111, 2018. [9] Carla Bertocchi, Emilie Chouzenoux, Marie-Caroline Corbineau, Jean-Christophe Pesquet, and Marco Prato. Deep unfolding of a proximal interior point method for image restoration. Inverse Problems, 36(3):034005, 2020. 38 [10] Ismael Bleyer and Antonio Leitao. On tikhonov functionals penalized by bregman distances. CUBO, 11:099–115, 12 2009. [11] Emmanuel Boissard and Thibaut Le Gouic. On the mean speed of convergence of empirical and oc-cupation measures in Wasserstein distance. Annales de l’I.H.P. Probabilités et statistiques, 50(2):539– 563, 2014. [12] Benjamin Boys, Mark Girolami, Jakiw Pidstrigach, Sebastian Reich, Alan Mosca, and O Deniz Aky-ildiz. Tweedie moment projected diffusions for inverse problems. arXiv preprint arXiv:2310.06721, 2023. [13] Kristian Bredies, Jonathan Chirinos-Rodriguez, and Emanuele Naldi. Learning firmly nonexpansive operators. arXiv, 2024. [14] Kristian Bredies, Karl Kunisch, and Thomas Pock. Total generalized variation. SIAM Journal on Imaging Sciences, 3(3):492–526, January 2010. [15] N. Buskulic, M. J. Fadili, and Y. Quéau. Implicit regularization of the deep inverse prior trained with inertia. In Andreas Hauptmann, Bangti Jin, and Carola-Bibiane Schönlieb, editors, Machine Learning Solutions for Inverse Problems: Part A, volume 26 of Handbook of Numerical Analysis, chapter 6. Elsevier, 2025. [16] Nathan Buskulic, Jalal Fadili, and Yvain Quéau. Convergence and recovery guarantees of unsuper-vised neural networks for inverse problems. Journal of Mathematical Imaging and Vision, pages 1–22, 2024. [17] Nathan Buskulic, Jalal Fadili, and Yvain Quéau. Recovery guarantees of unsupervised neural networks for inverse problems trained with gradient descent. EUSIPCO, 2024. [18] Nathan Buskulic, Yvain Quéau, and Jalal Fadili. Convergence guarantees of overparametrized wide deep inverse prior. In International Conference on Scale Space and Variational Methods in Computer Vision, pages 406–417, 2023. [19] Antonin Chambolle and Pierre-Louis Lions. Image recovery via total variation minimization and related problems. Numerische Mathematik, 76:167–188, 1997. [20] Hyungjin Chung, Jeongsol Kim, Michael T Mccann, Marc L Klasky, and Jong Chul Ye. Diffusion posterior sampling for general noisy inverse problems. arXiv preprint arXiv:2209.14687, 2022. [21] Hyungjin Chung, Byeongsu Sim, Dohoon Ryu, and Jong Chul Ye. Improving diffusion models for inverse problems using manifold constraints. Advances in Neural Information Processing Systems, 35:25683–25696, 2022. [22] Giannis Daras, Alexandros G Dimakis, and Constantinos Daskalakis. Consistent diffusion meets tweedie: Training exact ambient diffusion models with noisy data. arXiv preprint arXiv:2404.10177, 2024. [23] Alexandros G Dimakis. Deep generative models and inverse problems. Mathematical Aspects of Deep Learning, 400, 2022. 39 [24] D.L. Donoho. Compressed sensing. IEEE Transactions on Information Theory, 52(4):1289–1306, April 2006. [25] Mag Duff, Neill Campbell, and Matthias J Ehrhardt. Regularising inverse problems with generative machine learning models. Journal of Mathematical Imaging and Vision, 66(1):37–56, 2024. [26] Alex Dytso, H. Vincent Poor, and Shlomo Shamai Shitz. A general derivative identity for the condi-tional mean estimator in gaussian noise and some applications. In 2020 IEEE International Symposium on Information Theory (ISIT), pages 1183–1188, 2020. [27] Andrea Ebner and Markus Haltmeier. Plug-and-play image reconstruction is a convergent regulariza-tion method. IEEE Transactions on Image Processing, 33:1476–1486, 2024. [28] Matthias J Ehrhardt, Lorenz Kuger, and Carola-Bibiane Schönlieb. Proximal Langevin sampling with inexact proximal mapping. SIAM Journal on Imaging Sciences, 17(3):1729–1760, 2024. [29] HW Engl. Regularization of inverse problems. Mathematics and its Applications, 375, 1996. [30] R. Esposito. On a relation between detection and estimation in decision theory. Information and Control, 12(2):116–120, 1968. [31] K. Falconer. Fractal Geometry: Mathematical Foundations and Applications. John Wiley & Sons, 2nd edition, 2003. [32] Matthias Gelbrich. On a formula for the l2 wasserstein metric between measures on euclidean and hilbert spaces. Mathematische Nachrichten, 147:185–203, 1990. [33] Sulagna Ghosh, Nikolaos Ignatiadis, Frederic Koehler, and Amber Lee. Stein’s unbiased risk estimate and hyv \" arinen’s score matching. arXiv preprint arXiv:2502.20123, 2025. [34] Tom Goldstein and Stanley Osher. The split bregman method for l1-regularized problems. SIAM Journal on Imaging Sciences, 2(2):323–343, January 2009. [35] Karol Gregor and Yann LeCun. Learning fast approximations of sparse coding. In Proceedings of the 27th international conference on international conference on machine learning, pages 399–406, 2010. [36] RÃ ©mi Gribonval. Should penalized least squares regression be interpreted as maximum a posteriori estimation? IEEE Transactions on Signal Processing, 59(5):2405–2410, May 2011. [37] RÃ ©mi Gribonval and Pierre Machart. Reconciling "priors" and "priors" without prejudice? EURASIP Journal on Advances in Signal Processing, 2013(1), 12 2013. [38] Bichuan Guo, Yuxing Han, and Jiangtao Wen. Agem: Solving linear inverse problems via deep priors and sampling. Advances in Neural Information Processing Systems, 32, 2019. [39] Dongning Guo, S. Shamai, and S. Verdu. Mutual information and minimum mean-square error in gaussian channels. IEEE Transactions on Information Theory, 51(4):1261–1282, 2005. [40] Dongning Guo, Yihong Wu, Shlomo S. Shitz, and Sergio Verdú. Estimation in gaussian noise: Proper-ties of the minimum mean-square error. IEEE Transactions on Information Theory, 57(4):2371–2385, 2011. 40 [41] Andreas Habring and Martin Holler. A generative variational model for inverse problems in imaging. SIAM Journal on Mathematics of Data Science, 4(1):306–335, 2022. [42] Steve Hanneke, Aryeh Kontorovich, Sivan Sabato, and Roi Weiss. Universal bayes consistency in metric spaces. Ann. Statist., 49(4):2129–2150, August 2021. [43] C. Hatsell and L. Nolte. Some geometric properties of the likelihood ratio (corresp.). IEEE Transactions on Information Theory, 17(5):616–618, 1971. [44] Andreas Hauptmann, Bangti Jin, and Carola-Bibiane Schönlieb, editors. Machine Learning Solutions for Inverse Problems: Part A, volume 26 of Handbook of Numerical Analysis. Elsevier, 2025. [45] Andreas Hauptmann, Subhadip Mukherjee, Carola-Bibiane Schönlieb, and Ferdia Sherry. Convergent regularization in inverse problems and linear plug-and-play denoisers. Foundations of Computational Mathematics, 25(4):1087–1120, June 2025. [46] Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. Advances in neural information processing systems, 33:6840–6851, 2020. [47] Samuel Hurault. Convergent plug-and-play methods for image inverse problems with explicit and nonconvex deep regularization. PhD thesis, Institut de MathÃ ©matiques de Bordeaux, 2023. [48] Samuel Hurault, Arthur Leclaire, and Nicolas Papadakis. Gradient Step Denoiser for convergent Plug-and-Play. arXiv:2110.03220 [cs, eess, math], October 2021. arXiv: 2110.03220. [49] Samuel Hurault, Arthur Leclaire, and Nicolas Papadakis. Proximal denoiser for convergent plug-and-play optimization with nonconvex regularization. arXiv preprint, 2022. [50] Aapo Hyvärinen and Peter Dayan. Estimation of non-normalized statistical models by score matching. Journal of Machine Learning Research, 6(4), 2005. [51] Kyong Hwan Jin, Michael T McCann, Emmanuel Froustey, and Michael Unser. Deep convolutional neural network for inverse problems in imaging. IEEE transactions on image processing, 26(9):4509– 4522, 2017. [52] Kyong Hwan Jin, Michael T. McCann, Emmanuel Froustey, and Michael Unser. Deep convolutional neural network for inverse problems in imaging. IEEE Transactions on Image Processing, 26(9):4509– 4522, 2017. [53] Qinian Jin, Xiliang Lu, and Liuying Zhang. Stochastic mirror descent method for linear ill-posed problems in banach spaces. Inverse Problems, 39(6):065010, May 2023. [54] Zahra Kadkhodaie and Eero Simoncelli. Stochastic solutions for linear inverse problems using the prior implicit in a denoiser. Advances in Neural Information Processing Systems, 34:13242–13254, 2021. [55] Ulugbek S Kamilov, Charles A Bouman, Gregery T Buzzard, and Brendt Wohlberg. Plug-and-play methods for integrating physical and learned models in computational imaging: Theory, algorithms, and applications. IEEE Signal Processing Magazine, 40(1):85–97, 2023. 41 [56] Jiwon Kim, Jung Kwon Lee, and Kyoung Mu Lee. Accurate image superresolution using very deep convolutional networks. 2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 1646–1654, 2016. [57] Erich Kobler, Alexander Effland, Karl Kunisch, and Thomas Pock. Total deep variation for linear inverse problems. In Proceedings of the IEEE/CVF Conference on computer vision and pattern recognition, pages 7549–7558, 2020. [58] Rémi Laumont, Valentin De Bortoli, Andrés Almansa, Julie Delon, Alain Durmus, and Marcelo Pereyra. Bayesian imaging using plug & play priors: when Langevin meets tweedie. SIAM Journal on Imaging Sciences, 15(2):701–737, 2022. [59] Rémi Laumont, Valentin De Bortoli, Andrés Almansa, Julie Delon, Alain Durmus, and Marcelo Pereyra. On maximum a posteriori estimation with plug & play priors and stochastic gradient de-scent. Journal of Mathematical Imaging and Vision, 65(1):140–163, 2023. [60] H. Leterme, A. Tersenov, J. Fadili, and J.-L. Starck. A plug-and-play approach with fast uncertainty quantification for weak-lensing mass mapping. Astronomy & Astrophysics, 2025. [61] Housen Li, Johannes Schwab, Stephan Antholzer, and Markus Haltmeier. NETT: solving inverse problems with deep neural networks. Inverse Problems, 36(6):065005, June 2020. [62] Jiaming Liu, Salman Asif, Brendt Wohlberg, and Ulugbek Kamilov. Recovery analysis for plug-and-play priors using the restricted eigenvalue condition. Advances in Neural Information Processing Systems, 34:5921–5933, 2021. [63] Dinh The Luc and Roger J.-B. Wets. Outer semicontinuity of positive hull mappings with application to semi-infinite and stochastic programming. SIAM Journal on Optimization, 19(2):700–713, January 2008. [64] Sebastian Lunz, Ozan Öktem, and Carola-Bibiane Schönlieb. Adversarial regularizers in inverse prob-lems. Advances in neural information processing systems, 31, 2018. [65] Stéphane Mallat. A wavelet tour of signal processing. Elsevier, 1999. [66] Koichi Miyasawa et al. An empirical bayes estimator of the mean of a normal population. Bull. Inst. Internat. Statist, 38(181-188):1–2, 1961. [67] Vishal Monga, Yuelong Li, and Yonina C Eldar. Algorithm unrolling: Interpretable, efficient deep learning for signal and image processing. IEEE Signal Processing Magazine, 38(2):18–44, 2021. [68] S Mukherjee, S Dittmer, Z Shumaylov, S Lunz, O Öktem, and C-B Schönlieb. Data-driven convex regularizers for inverse problems. In ICASSP 2024-2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), pages 13386–13390. IEEE, 2024. [69] Subhadip Mukherjee, Marcello Carioni, Ozan Öktem, and Carola-Bibiane Schönlieb. End-to-end reconstruction meets data-driven regularization for inverse problems. Advances in Neural Information Processing Systems, 34:21413–21425, 2021. 42 [70] Subhadip Mukherjee, Andreas Hauptmann, Ozan Öktem, Marcelo Pereyra, and Carola-Bibiane Schönlieb. Learned reconstruction methods with convergence guarantees: a survey of concepts and applications. IEEE Signal Processing Magazine, 40(1):164–182, 2023. [71] Pravin Nair and Kunal N. Chaudhury. Averaged deep denoisers for image regularization. Journal of Mathematical Imaging and Vision, 66(3):362–379, March 2024. [72] Suzanne Nezzar, Eitan Tadmor, and Luminita Vese. Multiscale hierarchical decomposition of im-ages with applications to deblurring, denoising, and segmentation. Communications in Mathematical Sciences, 6(2):281–307, 01 2008. [73] Minh Hai Nguyen, Quoc Bao Do, Edouard Pauwels, and Pierre Weiss. An analytic theory of convo-lutional neural network inverse problems solvers. arXiv preprint, 2026. [74] Van Khoa Nguyen, Lionel Blondé, and Alexandros Kalousis. Training-free stein diffusion guidance: Posterior correction for sampling beyond high-density regions. arXiv preprint arXiv:2507.05482, 2025. [75] Gregory Ongie, Ajil Jalal, Christopher A. Metzler, Richard G. Baraniuk, Alexandros G. Dimakis, and Rebecca Willett. Deep Learning Techniques for Inverse Problems in Imaging. IEEE Journal on Selected Areas in Information Theory, pages 39–56, May 2020. [76] Stanley Osher, Martin Burger, Donald Goldfarb, Jinjun Xu, and Wotao Yin. An iterative regularization method for total variation-based image restoration. Multiscale Modeling & Simulation, 4(2):460–489, January 2005. [77] D.P. Palomar and S. Verdu. Gradient of mutual information in linear vector gaussian channels. IEEE Transactions on Information Theory, 52(1):141–154, 2006. [78] Scott Pesme, Giacomo Meanti, Michael Arbel, and Julien Mairal. MAP estimation with denoisers: Convergence rates and guarantees. In The Thirty-ninth Annual Conference on Neural Information Processing Systems, 2026. [79] Philipp Petersen and Felix Voigtlaender. Optimal approximation of piecewise smooth functions using deep relu neural networks. Neural Networks, 108:296–330, December 2018. [80] Andrés Felipe Lerma Pineda and Philipp Christian Petersen. Deep neural networks can stably solve high-dimensional, noisy, non-linear inverse problems. Analysis and Applications, 21(01):49–91, 2023. [81] Gilles Pisier. The Volume of Convex Bodies and Banach Space Geometry. Number 94 in Cambridge tracts in mathematics. Cambridge Univ. Press, Cambridge [u.a.], 1989. [82] Henry Pritchard and Rahul Parhi. Nonasymptotic convergence rates for plug-and-play methods with mmse denoisers. arXiv preprint arXiv:2510.27211, 2025. [83] Jean Prost, Antoine Houdard, Andrés Almansa, and Nicolas Papadakis. Learning local regularization for variational image restoration. In International Conference on Scale Space and Variational Methods in Computer Vision, pages 358–370, 2021. 43 [84] Herbert E. Robbins. An empirical bayes approach to statistics. In An Empirical Bayes Approach to Statistics Chapter Author(s) Herbert Robbins Editor(s) Jerzy Neyman Berkeley Symp. on Math. Statist. and Prob., volume 3, pages 157–163, 1956. [85] R. Tyrrell Rockafellar and Roger J. B. Wets. Variational Analysis. Springer Berlin Heidelberg, 1998. [86] Charles R. Johnson Roger A. Horn. Matrix Analysis. Cambridge University Press, 2nd edition, 2013. [87] Yaniv Romano, Michael Elad, and Peyman Milanfar. The little engine that could: Regularization by denoising (red). SIAM Journal on Imaging Sciences, 10(4):1804–1844, 2017. [88] Leonid I Rudin, Stanley Osher, and Emad Fatemi. Nonlinear total variation based noise removal algorithms. Physica D: nonlinear phenomena, 60(1-4):259–268, 1992. [89] Walter Rudin. Functional Analysis. Mc-Graw-Hill, Boston, 2nd edition, 1991. [90] Kevin Scaman and Aladin Virmaux. Lipschitz regularity of deep neural networks: analysis and efficient estimation. In Proceedings of the 32nd International Conference on Neural Information Processing Systems, NIPS’18, pages 3839–3848, Red Hook, NY, USA, 2018. Curran Associates Inc. [91] Otmar Scherzer, Markus Grasmair, Harald Grossauer, Markus Haltmeier, and Frank Lenzen. Variational methods in imaging, volume 167. Springer, 2009. [92] Thomas Schuster, Barbara Kaltenbacher, Bernd Hofmann, and Kamil Kazimierski. Regularization methods in banach spaces. Regularization Methods in Banach Spaces, 07 2012. [93] Johannes Schwab, Stephan Antholzer, and Markus Haltmeier. Deep null space learning for inverse problems: convergence analysis and rates. Inverse Problems, 35(2):025008, 2019. [94] Nir Shlezinger, Jay Whang, Yonina C. Eldar, and Alexandros G. Dimakis. Model-based deep learning: Key approaches and design guidelines. In 2021 IEEE Data Science and Learning Workshop (DSLW), pages 1–6, 2021. [95] Zakhar Shumaylov, Jeremy Budd, Subhadip Mukherjee, and Carola-Bibiane Schönlieb. Weakly con-vex regularisers for inverse problems: convergence of critical points and primal-dual optimisation. arXiv preprint, 2024. [96] Yang Song and Stefano Ermon. Generative modeling by estimating gradients of the data distribution. Advances in neural information processing systems, 32, 2019. [97] Yang Song, Liyue Shen, Lei Xing, and Stefano Ermon. Solving inverse problems in medical imaging with score-based generative models. arXiv preprint arXiv:2111.08005, 2021. [98] Benjamin Sprung and Thorsten Hohage. Higher order convergence rates for bregman iterated varia-tional regularization of inverse problems. Numerische Mathematik, 141(1):215–252, July 2018. [99] Jean-Luc Starck, Fionn Murtagh, and Jalal M Fadili. Sparse image and signal processing: wavelets, curvelets, morphological diversity. Cambridge university press, 2010. [100] Yu Sun, Zihui Wu, Xiaojian Xu, Brendt Wohlberg, and Ulugbek Kamilov. Scalable plug-and-play admmwith convergence guarantees. IEEE Transactions on Computational Imaging, 7:849–863, 2021. 44 [101] Jonathan I Tamir, Stella X Yu, and Michael Lustig. Unsupervised deep basis pursuit: Learning inverse problems without ground-truth data. arXiv preprint arXiv:1910.13110, 2019. [102] H.Y.e Tan, J. Tang, and S. Mukherjee. Solving imaging inverse problems using plug-and-play denois-ers: regularization and optimization perspectives: Using image denoisers as regularizers for ill-posed inverse problems. In Andreas Hauptmann, Bangti Jin, and Carola-Bibiane Schönlieb, editors, Machine Learning Solutions for Inverse Problems: Part B, Handbook of Numerical Analysis. Elsevier, 2026. [103] Matthieu Terris, Audrey Repetti, Jean-Christophe Pesquet, and Yves Wiaux. Building firmly non-expansive convolutional neural networks. ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), pages 8658–8662, May 2020. [104] Ayush Tewari, Tianwei Yin, George Cazenavette, Semon Rezchikov, Josh Tenenbaum, Frédo Durand, Bill Freeman, and Vincent Sitzmann. Diffusion with forward models: Solving stochastic inverse problems without direct supervision. Advances in Neural Information Processing Systems, 36:12349– 12362, 2023. [105] M. C. K. Tweedie. Functions of a statistical variate with given means, with special reference to lapla-cian distributions. Mathematical Proceedings of the Cambridge Philosophical Society, 43(1):41–49, 1947. [106] M. C. K. Tweedie. An index which distinguishes between some important exponential families. In J. K. Ghosh and J. Roy, editors, Statistics: Applications and New Directions, pages 579–604. Indian Statistical Institute, Calcutta, 1984. [107] Dmitry Ulyanov, Andrea Vedaldi, and Victor Lempitsky. Deep image prior. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 9446–9454, 2018. [108] S. Vaiter, G. Peyré, and J. Fadili. Low Complexity Regularization of Linear Inverse Problems. In Götz E. Pfander, editor, Sampling Theory, a Renaissance: Compressive Sensing and Other Developments, Applied and Numerical Harmonic Analysis, pages 103–153. Springer International Publishing, 2015. [109] Singanallur V Venkatakrishnan, Charles A Bouman, and Brendt Wohlberg. Plug-and-play priors for model based reconstruction. In 2013 IEEE global conference on signal and information processing, pages 945–948, 2013. [110] Roman Vershynin. High-Dimensional Probability: An Introduction with Applications in Data Science. Cambridge Series in Statistical and Probabilistic Mathematics. Cambridge University Press, Cambridge, 2018. [111] CÃ ©dric Villani. Optimal Transport. Springer Berlin Heidelberg, 2009. [112] Pascal Vincent. A connection between score matching and denoising autoencoders. Neural computation, 23(7):1661–1674, 2011. [113] Ge Wang, Jong Chul Ye, and Bruno De Man. Deep learning for tomographic image reconstruction. Nature Machine Intelligence, 2(12):737–748, December 2020. [114] Jonathan Weed and Francis Bach. Sharp asymptotic and finite-sample rates of convergence of empir-ical measures in Wasserstein distance. Bernoulli, 25(4A):2620 – 2648, 2019. 45 [115] G. L. Wise. A note on a common misconception in estimation. Systems and Control Letters, 5:355– 356, Apr. 1985. [116] Yihong Wu and Sergio Verdu. Functional properties of minimum mean-square error and mutual information. IEEE Transactions on Information Theory, 58(3):1289–1301, 2012. [117] Xiaojian Xu, Yu Sun, Jiaming Liu, Brendt Wohlberg, and Ulugbek S Kamilov. Provable convergence of plug-and-play priors with mmse denoisers. IEEE Signal Processing Letters, 27:1280–1284, 2020. [118] Jiachen Yao, Abbas Mammadov, Julius Berner, Gavin Kerrigan, Jong Chul Ye, Kamyar Azizzade-nesheli, and Anima Anandkumar. Guided diffusion sampling on function spaces with applications to pdes. arXiv preprint arXiv:2505.17004, 2025. [119] Kai Zhang, Yawei Li, Wangmeng Zuo, Lei Zhang, Luc Van Gool, and Radu Timofte. Plug-and-play image restoration with deep denoiser prior. IEEE Transactions on Pattern Analysis and Machine Intelligence, 44(10):6360–6376, October 2021. [120] Bo Zhou, Xiongchao Chen, S. Kevin Zhou, James S. Duncan, and Chi Liu. Dudodr-net: Dual-domain data consistent recurrent network for simultaneous sparse view and metal artifact reduction in com-puted tomography. Medical Image Analysis, 75:102289, 2022. [121] Bo Zhu, Jeremiah Z Liu, Stephen F Cauley, Bruce R Rosen, and Matthew S Rosen. Image reconstruc-tion by domain-transform manifold learning. Nature, 555(7697):487–492, 2018. 46

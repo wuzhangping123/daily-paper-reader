@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-03T20:17:26.447728+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.29525v1",
+      "source": "arxiv",
+      "title": "Physics Matters in PnP: Recovery Guarantees with the MMSE and NN Denoisers",
+      "abstract": "We investigate the forward-backward-splitting version of the Plug and Play (PnP) method for linear ill-posed problems with MMSE estimators as denoisers. In contrast to existing literature, we consider estimators which are specialized for (degenerate) Gaussian noise with possibly non-diagonal covariance matrices. We further deviate from the classical iteration by replacing parts of the descent step with a linear operator that relates the observation noise to that of the MMSE estimator. Under mild assumptions, we derive several properties of the denoiser and prove recovery guarantees of the iteration both pointwise and in the Wasserstein distance of the underlying probability distributions. Crucially, our analysis shows that the denoiser cannot be chosen in a physics-agnostic way, that is, independently of the forward model. We extend our results to the case where the MMSE denoiser is parametrized by a neural network and derive the corresponding recovery bounds.",
+      "authors": [
+        "Tobias Wolf",
+        "Jalal Fadili",
+        "Jin Guo",
+        "Roy Y. He"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.IT"
+      ],
+      "published": "2026-07-31T15:25:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.29525v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "PnP recovery guarantees with MMSE and NN denoisers; directly relevant to denoising methods",
+      "llm_evidence_cn": "PnP方法结合MMSE与神经网络去噪器的恢复保证，直接关联去噪方法",
+      "llm_evidence": "PnP方法结合MMSE与神经网络去噪器的恢复保证，直接关联去噪方法",
+      "canonical_evidence": "PnP方法结合MMSE与神经网络去噪器的恢复保证，直接关联去噪方法",
+      "llm_tldr_en": "This paper analyzes Plug-and-Play (PnP) methods with MMSE and neural network denoisers for linear ill-posed problems, proving recovery guarantees pointwise and in Wasserstein distance under degenerate Gaussian noise with non-diagonal covariance.",
+      "llm_tldr_cn": "针对线性病态问题，研究基于前后向分裂的即插即用（PnP）方法，其中去噪器采用MMSE估计器并考虑退化高斯噪声（含非对角协方差）。在温和假设下证明迭代逐点及Wasserstein距离下的恢复保证，并说明去噪器选择受物理模型约束。该分析为PnP去噪在图像恢复中的可靠应用提供理论基础，但对高光谱图像无直接实验。",
+      "llm_tldr": "针对线性病态问题，研究基于前后向分裂的即插即用（PnP）方法，其中去噪器采用MMSE估计器并考虑退化高斯噪声（含非对角协方差）。在温和假设下证明迭代逐点及Wasserstein距离下的恢复保证，并说明去噪器选择受物理模型约束。该分析为PnP去噪在图像恢复中的可靠应用提供理论基础，但对高光谱图像无直接实验。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

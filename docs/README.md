@@ -6,22 +6,24 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-02
-- 运行时间：2026-08-02 20:27:32 UTC
+- 最新运行日期：2026-08-03
+- 运行时间：2026-08-03 20:19:55 UTC
 - 运行状态：成功
-- 本次总论文数：0
+- 本次总论文数：1
 - 精读区：0
-- 速读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-> 今日无新推荐，系统未产出可展示论文。
-- 详情：[/202608/02/README](/202608/02/README)
+今日共速读1篇论文，暂无精读；重点论文为《Physics Matters in PnP: Recovery Guarantees with the MMSE and NN Denoisers》（6.0/10）。该文探讨即插即用成像中物理模型对恢复保证的影响，比较了MMSE与神经网络去噪器的理论性能。建议普通读者优先关注去噪器选择与物理先验匹配这一核心结论。
+- 详情：[/202608/03/README](/202608/03/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Physics Matters in PnP: Recovery Guarantees with the MMSE and NN Denoisers](/202608/03/2607.29525v1-physics-matters-in-pnp-recovery-guarantees-with-the-mmse-and-nn-denoisers)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：PnP方法结合MMSE与神经网络去噪器的恢复保证，直接关联去噪方法
 
 
 <div class="dpr-home-promo-card">

@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-08-03 <!--dpr-date:20260803-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/03/2607.29525v1-physics-matters-in-pnp-recovery-guarantees-with-the-mmse-and-nn-denoisers" data-sidebar-item="{&quot;title&quot;: &quot;Physics Matters in PnP: Recovery Guarantees with the MMSE and NN Denoisers&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.29525v1-physics-matters-in-pnp-recovery-guarantees-with-the-mmse-and-nn-denoisers&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;PnP方法结合MMSE与神经网络去噪器的恢复保证，直接关联去噪方法&quot;}">Physics Matters in PnP: Recovery Guarantees with the MMSE and NN Denoisers</a>
   * 2026-08-01 <!--dpr-date:20260801-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/01/2607.27507v1-sparsity-induced-identifiability-in-matrix-tri-factorisation" data-sidebar-item="{&quot;title&quot;: &quot;Sparsity Induced Identifiability in Matrix Tri-Factorisation&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.27507v1-sparsity-induced-identifiability-in-matrix-tri-factorisation&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;基于稀疏性的矩阵分解去噪及其可辨识性理论&quot;}">Sparsity Induced Identifiability in Matrix Tri-Factorisation</a>
