@@ -1,0 +1,3219 @@
+Title: Universal Denoising without Channel Knowledge
+
+URL Source: https://arxiv.org/pdf/2607.28948v1
+
+Published Time: Mon, 03 Aug 2026 00:20:12 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+> 1
+
+# Universal Denoising without Channel Knowledge 
+
+Matthias Frey, Jonathan H. Manton, and Jingge Zhu Department of Electrical and Electronic Engineering, The University of Melbourne 
+
+Abstract 
+
+Inspired by a classical algorithm for online prediction, we propose a novel denoising scheme which is universal for families of probability distributions both in terms of the source that generates the noiseless signal and in terms of the channel that generates the noisy signal. The new denoising scheme does not rely on assumptions of exact channel knowledge or finite signal alphabets. Our analysis provides an upper bound for the performance gap compared with the Bayes envelope. For the special case in which the signal is an i.i.d. sequence and the family is countable, we characterize the consistency condition under which our scheme approaches the Bayes envelope as the length of the sequence tends to infinity. We also show that in general, approaching the Bayes envelope is not possible for a universal denoising scheme when this consistency condition is not satisfied. Furthermore, we show that, as in the online prediction case, the so-called plug-in approach (which relies on a maximum likelihood estimation of the underlying distribution parameter) does not approach the Bayes envelope in general. We also include numerical evaluations of our scheme for denoising of a Poisson signal. 
+
+I. I NTRODUCTION 
+
+Denoising is a ubiquitous problem in signal processing. One of the most famous examples is the Kalman filter [13] which has so many applications (cf., e.g., [26], [2]) that it is a staple in signal processing textbooks. Although it is a computationally very efficient and in many applications highly effective denoising method, one of its central limitations is the need for the denoiser to know the statistics of the signal and noise. For the case in which knowledge about these statistics is limited, universal denoising schemes such as the Discrete Universal Denoiser (DUDE) [29] have been proposed. Applications of universal denoisers include image denoising [20], [18], DNA sequence denoising [14], and denoising of medical measurements [12]. Most existing universal denoisers focus on the case of time-series signals (i.e., there is a correlation between the successive outputs of the source which is exploited for denoising), and typical limitations include that they are only applicable to the case of finite signal alphabets, that they require full knowledge of the noise channel, or that their performance does not approach the Bayes envelope. In this work, we consider the following denoising problem: given a noisy signal ˜X, estimate the noiseless signal X without full knowledge of the underlying joint distribution PX, ˜X . Specifically, we aim to find denoising strategies (i.e., functions that map ˜X to estimates of X) that are universal for a family of distributions (PX, ˜X|θ)θ∈Θ. That is, there is a denoising strategy which has, as long as PX, ˜X = PX, ˜X|θ0 for some θ0 ∈ Θ, similar 1 performance as a hypothetical optimal denoiser 2 that operates with full knowledge of PX, ˜X . To this end, we propose a novel universal denoising algorithm for i.i.d. signals which is inspired by a classical algorithm for online prediction problems [16]. This algorithm is universal in the joint distribution of the noiseless and noisy signals, which means that it relies neither on knowledge of the noise channel nor the statistics of the source of the noiseless signal. Furthermore, we prove performance guarantees that do not require assumptions of finite alphabet size. 
+
+A. Prior Work a) Unknown source, known channel, finite alphabets: To the best of our knowledge, the seminal work in the area of universal denoising is [29] (with its earliest version published in [28]). It introduces the sliding-window DUDE algorithm for denoising of finite-alphabet signals where the noisy signal is obtained by passing the noiseless signal through a discrete memoryless channel (DMC) with transition probabilities known to the denoiser. Performance guarantees are given both for the semi-stochastic case where the noiseless signal is an individual sequence (i.e., it does not follow a probability distribution and could be adversarial with knowledge of the denoising strategy), and also for the stochastic case where the noiseless signal follows a probability distribution unknown to the denoiser. It is shown that in the stochastic case DUDE asymptotically achieves the Bayes envelope and in the semi-stochastic case it has at least as good worst-case performance as any alternative sliding-window denoiser of the same window size. There have been many extensions and follow-up works: for instance, [21] proposes a way of estimating the loss incurred by the denoiser, [25] proposes a similar non-sliding window denoiser, and [17] proposes a variation that incorporates the use of a deep neural network (DNN). The authors of [27] propose converse performance bounds for the DUDE setting. DUDE applications to denoising of biomedical data are explored in [15], [7]. Notably, the papers [30], [31] make an explicit connection to the universal prediction problem. 
+
+> 1See Definition 2 for a rigorous definition.
+> 2The performance of the optimal denoiser is also called the Bayes envelope. arXiv:2607.28948v1 [cs.IT] 31 Jul 2026 2
+
+b) Unknown channel and general alphabets: While most of the literature on universal denoising is universal in the source only (i.e., there is an assumption that the noise comes from a DMC with transition probabilities known to the denoiser) and are restricted to the case of finite alphabets, there are a few works that relax these assumptions. The work [6] assumes knowledge of the noise DMC but allows the alphabet of the noisy signal to be infinite while keeping the assumption that the alphabet of the noiseless signal is finite. The series of works [11], [10], [9] proposes an algorithm for denoising of finite-alphabet signals under channel uncertainty. The assumption made for the scheme to work is that the possible channels are invertible which differs from the consistency condition we use in its place. The authors also show with an example that their assumptions are not sufficient to guarantee that the denoiser asymptotically achieves the Bayes envelope. In [8], both assumptions are relaxed, but the paper is focused on the case of additive white Gaussian noise (AWGN) with unknown variance. The more recent paper [19] also does not assume knowledge of the noise statistics, but requires finite alphabets and focuses on a specific scenario of image denoising where multiple noisy versions of the same image are available. 
+
+c) i.i.d. signals: Most existing literature is about denoising of time-series signals, i.e., there is usually some correlation between subsequent outputs of the source that produces the noiseless signal and these correlations are exploited for denoising. There are, however, a few works that focus on denoising of i.i.d. signals such as [8] which assumes AWGN, [22] which is not a universal algorithm as it assumes knowledge of both the source and noise statistics, and [12] which assumes that the source distribution is approximately known. Notably, [12] also gives a concrete application example for denoising of i.i.d. signals: medical measurements (e.g., blood pressure or white blood cell count) which are taken from different patients (i.e., there is no reason to believe that two measurements taken subsequently from different patients might be correlated). 
+
+B. Contributions and Outline 
+
+The contribution of our paper can be summarized as follows:  
+
+> •
+
+For the general form of the denoising problem, which we call the one-shot denoising problem , we establish an information-theoretic performance guarantee for a denoising strategy that is mismatched to the true underlying distribution.  
+
+> •
+
+For the special case of denoising of i.i.d. sequences, we propose a novel denoising strategy which is inspired by classical works on online prediction. Building on the results for one-shot denoising, we establish a sufficient condition for our strategy to approach the Bayes envelope.  
+
+> •
+
+We show that in the case of countable parameter sets Θ, this condition is also necessary.  
+
+> •
+
+We show that there is a denoising problem in which the plug-in approach, a simpler alternative approach that uses a maximum likelihood estimate of the underlying distribution, does not approach the Bayes envelope while our proposed approach does.  
+
+> •
+
+We conduct numerical evaluations of our proposed approach for the problem of denoising a Poisson signal. The remainder of the paper is organized as follows: in Section II, we formally introduce the one-shot denoising problem and establish the associated performance guarantees. In Section III, we formally introduce the problem of denoising of i.i.d. sequences and the notion of universality. Performance guarantees for sufficient conditions are established in Section III-A for countable parameter sets and Section III-B for uncountable parameter sets, respectively. The necessity of the sufficient condition in the countable case is shown in Section III-C. In Section IV, we study the plug-in approach, and in Section V, we numerically evaluate our approach for the problem of denoising a Poisson signal. 
+
+C. Notation 
+
+We use capital letters such as A and B to denote random variables and small letters such as a and b to denote values that they can take. Given probability measures μ and ν, we use Eμ to denote the expectation with respect to μ and when 
+
+μ is absolutely continuous with respect to ν, we use dμ/dν to denote the Radon-Nikodym derivative. The Kullback-Leibler divergence is denoted D (μ|| ν) := Eμdμ/dν with the usual convention that Kullback-Leibler divergence is infinite whenever the Radon-Nikodym derivative does not exist. If A is a random variable with probability distribution described by μA, we use 
+
+H(μA) to denote the Shannon entropy of A when it is distributed according to μA (note that we do not use the more common notation H(A) because it is ambiguous when the distribution of A is not clear from context). If μ is any signed measure on the measurable space A, we use ∥μ∥TV := max {μ(S) : S ⊆ A is measurable }. If a ∈ A where A is a measurable space, we use δa to denote the Dirac measure with probability mass at a, i.e., sets have measure 1 if they contain a and they have measure 0 otherwise. If S is a subset of some set A which is clear from context, we use Sc := A \ S to denote the complement of S. We also use 
+
+1S : A → { 0, 1}, a 7 →
+
+(
+
+1, a ∈ S, 
+
+0, otherwise, to denote the indicator function. Elements of the product space An are denoted an and their n′-th component is denoted an′ .For a set A and n ∈ N (which will be clear from context), we define # : An × A → N, (an, a ) 7 → |{ t : at = a}| (where |S|
+
+is the number of elements in a finite set S) to denote a function that counts the numbers of entries of a tuple. 3
+
+II. O NE -S HOT DENOISING 
+
+In this section, we introduce the problem of removing noise from a single observation ˜X to obtain an estimate of the noiseless signal X. Since ˜X and X can be vector-valued random variables, this is a more general problem than denoising of sequences of observations. We also present performance results for this general scenario. While the generality of the problem statement inherently means that the strength of the results is somewhat limited, they nonetheless form the basis for the main results of our paper on denoising of i.i.d. sequences which we present in Section III. 
+
+Problem 1. (One-shot denoising). A one-shot denoising problem P =  (X, G), ( ˜X, ˜G), ( ˆX, ˆG), P X, ˜X , L  is characterized by measurable spaces (X, G), the noiseless signal alphabet , ( ˜X, ˜G), the noisy signal alphabet , and ( ˆX, ˆG) , the estimated signal alphabet , as well as a probability distribution PX, ˜X on (X × ˜X, G ⊗ ˜G) and a measurable loss function L : ˆX × X → R.It consists of the following steps:  
+
+> •
+
+Nature draws the random variables X, ˜X from PX, ˜X . 
+
+> •
+
+The denoiser observes only ˜X and computes an estimate ˆX ∈ ˆX of the unknown noiseless signal X. 
+
+> •
+
+The denoiser incurs the loss L( ˆX, X ).
+
+In this paper, we consider two cases for what the loss function can be, each yielding slightly different results. 
+
+Definition 1. (Loss functions). 1) We say that L is bounded by Lmax if it only takes values in [0 , L max ].
+
+2) We say that L is the self-information loss if X is countable, ˆX is the set of p.m.f.s on X, and 
+
+L(ˆ x, x ) = − log ˆ x(x).
+
+Throughout this paper, we use PX , respectively P ˜X to denote the corresponding marginals of PX, ˜X . Furthermore, we assume that regular conditional probabilities P ˜X|X and PX| ˜X exist. A denoising strategy is a function that maps the noisy signal ˜X to an estimate ˆX. We compare the denoiser’s performance with that of a strategy which can utilize full knowledge of PX| ˜X and optimizes for the lowest possible expected loss. That is, we define an optimal estimate (see Remark 1 for sufficient conditions for existence) 
+
+X∗ ∈ arg min 
+
+> ˆx∈ˆX
+
+EPX| ˜X L(ˆ x, X ). (1) The quantity 
+
+EPX| ˜X L(X∗, X ) = min 
+
+> ˆx∈ˆX
+
+EPX| ˜X L(ˆ x, X ),
+
+which is a function of ˜X, is called the Bayes envelope . We will evaluate the performance of the denoisers considered in this paper in terms of how closely their performance approaches the Bayes envelope. Specifically, we consider a denoising strategy that is induced by a probability distribution QX, ˜X . Under this strategy, the denoiser chooses an estimate that minimizes the loss in the case that PX, ˜X = QX, ˜X , i.e., the estimate ˆX satisfies 
+
+ˆX ∈ arg min 
+
+> ˆx∈ˆX
+
+EQX| ˜X L(ˆ x, X ). (2) 
+
+Remark 1. (Existence and measurability of estimates). In order for the expectations involving X∗ and ˆX (which will appear throughout the remainder of the paper) to be well-defined, it is important to ensure that they exist and are random variables. Since ˜X is a random variable, it is sufficient to make sure that they are measurable functions of ˜X. In general, we believe that this is only possible by imposing some additional conditions on the measurable space ( ˆX, ˆG). The measurable maximum theorem [1, Theorem 18.19] tells us that it is for instance sufficient to assume that ( ˆX, ˆG) is metrizable such that all of the following hold:  
+
+> •
+
+( ˆX, ˆG) is separable and compact.  
+
+> •
+
+For every ˆx ∈ ˆX, the function L(ˆ x, ·) is measurable.  
+
+> •
+
+For every x ∈ X, the function L(·, x ) is continuous. An important special case is when ˆX is finite and ˆG is the discrete σ-algebra. For the remainder of this paper, we assume tacitly that measurable X∗ and ˆX exist which almost surely satisfy (1) and (2) .
+
+Since in general, we have PX, ˜X̸ = QX, ˜X , we can also expect that usually EPX| ˜X L( ˆX, X ) > EPX| ˜X L(X∗, X ), i.e., the loss incurred by the predictor is greater than the Bayes envelope. Following the terminology of the online learning literature, we define the mean difference of these two quantities as the expected regret R of the denoiser: 
+
+R := EPX, ˜X
+
+ L( ˆX, X ) − L(X∗, X ). (3) For the one-shot denoising problem and denoising strategies induced by a probability distribution QX, ˜X , we have the following result on expected regret. The proof of Theorem 1 is relegated to Appendix A. 4
+
+Theorem 1. (Sufficient conditions for one-shot denoising). Consider the setting of Problem 1. If L is bounded by Lmax for some Lmax ∈ [0 , ∞), we have 
+
+R ≤ Lmax 
+
+r 12
+
+
+
+D
+
+
+
+PX, ˜X || QX, ˜X
+
+
+
+− D (P ˜X || Q ˜X )
+
+
+
+. (4) 
+
+If L is the self-information loss, we have 
+
+R = D
+
+
+
+PX, ˜X || QX, ˜X
+
+
+
+− D (P ˜X || Q ˜X ) . (5) As we might expect intuitively, Theorem 1 states that if QX, ˜X is not much more dissimilar from PX, ˜X than Q ˜X is from P ˜X ,the regret will be small. The theorem quantifies this exactly in terms of well-known information-theoretic quantities. Another way to look at this is via the identity 
+
+D
+
+
+
+PX, ˜X || QX, ˜X
+
+
+
+− D (P ˜X || Q ˜X ) = EP ˜X D
+
+
+
+PX| ˜X || QX| ˜X
+
+
+
+which holds by Lemma 6 in Appendix A. From this point of view, Theorem 1 quantifies the average regret in terms of how different the conditional distributions of the noiseless signal are on average. As can be seen in the proof of Theorem 1 in Appendix A, it is a relatively straightforward result, and it also leaves the question open how the denoiser should choose a QX, ˜X that leads to a small expected regret. Answering these questions may not be possible without considering special characteristics of the denoising problem at hand. In this paper we will answer these questions for a class of denoising problems involving i.i.d. sequences. III. D ENOISING OF I .I.D. S EQUENCES 
+
+In this section, we specialize the one-shot denoising problem to the case of i.i.d. sequences. The idea behind this is that the i.i.d. nature of the sequence allows us to draw conclusions about the distribution of one component from observing the other components and thereby enables us to realize smaller regrets as the sequence length grows. In this case, we can construct a denoising strategy that works well as long as the true distribution of signals is contained in a family of distributions known a priori to the denoiser. One important (but intuitively obvious) caveat is that this family cannot contain two distributions that are very different in terms of noiseless signals but indistinguishable in terms of noisy signals. This consistency condition is formally stated in (7) and its necessity is illustrated with an example in Section III-C. We consider a bounded additive loss per component as well as the self-information loss. 
+
+Problem 2. (i.i.d. denoising problem). An i.i.d. denoising problem P =  (X , F), ( ˜X , ˜F), ( ˆX , ˆF), P X, ˜X , L  is characterized by measurable spaces (X , F), the noiseless signal alphabet , ( ˜X , ˜F), the noisy signal alphabet , and ( ˆX , ˆF), the estimated signal alphabet , as well as a probability distribution PX, ˜X on (X × ˜X , F ⊗ ˜F) and a measurable loss function L : ˆX T × X T → R.Its instantiation for sequence length T consists of the following steps:  
+
+> •
+
+Nature draws a sequence (X1, ˜X1), . . . , (XT , ˜XT ) i.i.d. from PX, ˜X . 
+
+> •
+
+The denoiser observes only ˜XT and computes an estimate ˆXT ∈ ˆX T of the unknown noiseless signal XT . 
+
+> •
+
+The denoiser incurs the loss L( ˆXT , X T ).
+
+Given an i.i.d. denoising problem P =  (X , F), ( ˜X , ˜F), ( ˆX , ˆF), P X, ˜X , L , each sequence length T ∈ N induces a one-shot denoising problem PT :=  (X T , F⊗T ), ( ˜X T , ˜F⊗T ), ( ˆX T , ˆF⊗T ), P TX, ˜X , L , where P TX, ˜X is the T -fold product of PX, ˜X .Clearly, P at sequence length T and PT describe the same random experiment. We define the average expected per-component regret as 
+
+¯R := RT ,
+
+where R is the expected regret incurred by the denoiser in the induced one-shot denoising problem. We say that the loss is additive if there is a per-component loss function ℓ : ˆX × X → [0 , ∞) such that L(ˆ xT , x T ) = PTt=1 ℓ(ˆ xt, x t) for all 
+
+ˆxT ∈ ˆX T , x T ∈ X T . Analogously to Definition 1, we say that ℓ is bounded by ℓmax if it only takes values in [0 , ℓ max ]. Clearly, in the case of an additive loss, ℓ is bounded by ℓmax if and only if L is bounded by T ℓ max .We next construct a denoising strategy which is universal for a (possibly very large) family 
+
+
+
+PX, ˜X|θ
+
+
+
+> θ∈Θ
+
+of probability distributions on X × ˜X where Θ is a measurable space. 
+
+Definition 2. (Universal denoising). A denoising strategy is called universal if it works well as long as PX, ˜X = PX, ˜X|θ0 for some θ0 ∈ Θ. The definition of “works well” in this context can differ, but in this work we will consider two possibilities: 
+
+1) R → 0 as T → ∞ ,
+
+2) ¯R → 0 as T → ∞ .
+
+Obviously 1 yields a stronger version of Definition 2 in the sense that it implies 2 (but not necessarily vice versa). 5
+
+We construct the universal denoising strategy in a way similar as is done for universal prediction [16]. Namely, we define some probability measure w on Θ (as can be seen in the results, it does not usually matter too much what w is chosen as long as it is supported on all of Θ) and use 
+
+QXT , ˜XT (A) := 
+
+Z
+
+> Θ
+
+P TX, ˜X|θ(A)w(dθ ) (6) with the denoising strategy (2). 
+
+A. Sufficient conditions and performance guarantees for countable Θ
+
+In this subsection, we establish our main result on denoising of i.i.d. sequences for the case in which the parametric family of possible distributions is countable. 
+
+Theorem 2. (Sufficient conditions for i.i.d. denoising with countable parameter space). Let (PX, ˜X|θ)θ∈Θ be a parametric family of probability distributions on X × ˜X where Θ is countable, and assume that it satisfies 
+
+∀θ1̸ = θ2 ∈ Θ : P ˜X|θ1 = P ˜X|θ2 ⇒ PX, ˜X|θ1 = PX, ˜X|θ2 . (7) 
+
+Assume further that PXT , ˜XT = P TX, ˜X = P TX, ˜X|θ0
+
+for some θ0 in the support of a p.m.f. w on Θ, and let QXT , ˜XT (A) be defined as in (6) .
+
+1) If ˜X and Θ are finite, then for large enough T , we have 
+
+¯R ≤ ℓmax exp 
+
+
+
+− 12
+
+√T
+
+
+
+if the loss is additive with ℓ bounded by ℓmax ,
+
+R ≤ exp 
+
+
+
+−√T
+
+
+
+if ℓ is the self-information loss. 
+
+2) If ˜X is a general measurable space and Θ is finite or countably infinite, we have 
+
+lim  
+
+> T→∞
+
+¯R = 0 if the loss is additive with ℓ bounded by ℓmax ,
+
+lim   
+
+> T→∞
+
+R = 0 if ℓ is the self-information loss. 
+
+This theorem follows directly from Theorem 1 and the following lemma. 
+
+Lemma 1. Let (PX, ˜X|θ)θ∈Θ be a parametric family of probability distributions on X × ˜X and assume that Θ is countable, 
+
+PXT , ˜XT = P TX, ˜X = P Tθ0,X, ˜X for some θ0 ∈ Θ with w(θ0) > 0, condition (7) is satisfied, and QXT , ˜XT is given by (6) .
+
+1) If ˜X and Θ are finite, then for large enough T , we have 
+
+D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ ≤ exp 
+
+
+
+−√T
+
+
+
+.
+
+2) If ˜X is a general measurable space and Θ is countable, we have 
+
+lim  
+
+> T→∞
+
+
+
+D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+= 0 .
+
+The proof of Lemma 1 is relegated to Appendix B, but we provide a sketch here. In order to establish Item 1, we use the upper bound 
+
+D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+≤ log 1
+
+w(θ0)
+
+which trivially follows from (6) and split the expectation that appears in the definition of −D
+
+
+
+P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+into a typical and an atypical part. We use letter typicality, which is based on the relative frequency of letters from ˜X appearing in ˜XT and is also the reason that we need ˜X to be finite. The atypical part of the expectation can be bounded with standard techniques (essentially, this part of the expectation is small because the probability of drawing an atypical sequence is small). In order to bound the typical part of the expectation, we upper bound the probability of the typical set under P ˜X|θ for θ̸ = θ0. While this approach is standard in principle as well, a slight departure from usual methods is required to establish this bound for the probability of the typical set. In the process, we make use of the fact that the finiteness of Θ implies that the variational distance between P ˜X|θ and P ˜X|θ0 is uniformly bounded away from 0 for all θ̸ = θ0.In order to establish Item 2, we apply a successively finer quantization of ˜X which depends on θ0 and the parametric family 
+
+(PX, ˜X|θ)θ∈Θ. It is important to note that this does not mean that the denoising strategy requires knowledge of θ0 since the quantization is only used in the proof that the regret is small but not in the description of the denoising strategy. The advantage of this parameter-dependent quantization strategy is that we do not require any regularity conditions on ˜X other than that it is a measurable space. 6
+
+Remark 2. The requirement in Theorem 2 that the loss is additive with ℓ bounded by ℓmax can be relaxed to only require that 
+
+L is bounded by T ℓ max . However, additive losses are in our opinion the most relevant case in which we have a bound of this form. We will also see in Lemma 3 that it is significantly easier to compute (2) if the loss is additive. B. Sufficient conditions and performance guarantees for uncountable Θ
+
+For the case of uncountable parametric families of distributions, we focus on the case in which both the parameter set and the signal alphabets are continuous or finite and the parametric family satisfies smoothness and regularity conditions which are common in parametric statistics. 
+
+Theorem 3. (Sufficient conditions for i.i.d. denoising with continuous parameter space). Let ˜X and X be Euclidean or finite spaces, let (PX, ˜X|θ)θ∈Θ be a parametric family of probability distributions on X × ˜X described by densities or p.m.f.s 3 where 
+
+Θ ⊆ Rd, and assume that it satisfies the following regularity conditions: 
+
+1) PX, ˜X|θ(x, ˜x) and P ˜X|θ(˜ x) are twice continuously differentiable at θ0 as functions of θ for almost all x, ˜x, and there exists δ > 0 such that for all j, k ∈ { 1, . . . , d }
+
+EPX, ˜X|θ0
+
+sup 
+
+> θ:∥θ−θ0∥<δ
+
+∂2
+
+∂θ (j)∂θ (k)
+
+log PX, ˜X|θ(X, ˜X)
+
+> 2
+
+< ∞
+
+EPX, ˜X|θ0
+
+∂∂θ (j)
+
+log PX, ˜X|θ0 (X, ˜X)
+
+> 2
+
+< ∞
+
+EP ˜X|θ0
+
+sup 
+
+> θ:∥θ−θ0∥<δ
+
+∂2
+
+∂θ (j)∂θ (k)
+
+log P ˜X|θ( ˜X)
+
+> 2
+
+< ∞
+
+EP ˜X|θ0
+
+∂∂θ (j)
+
+log P ˜X|θ0 ( ˜X)
+
+> 2
+
+< ∞,
+
+where θ(j) and θ(k) denote the j-th, respectively k-th component of θ.
+
+2) D
+
+
+
+PX, ˜X|θ0 || PX, ˜X|θ
+
+
+
+and D
+
+
+
+P ˜X|θ0 || P ˜X|θ
+
+
+
+are twice continuously differentiable at θ0 as functions of θ, and they have a positive definite Hessian at θ0.
+
+3) For all j, k ∈ { 1, . . . , d }, we have 
+
+∂2
+
+∂θ (j)∂θ (k)
+
+Z 
+
+> X × ˜X
+
+PX, ˜X|θ0 (x, ˜x)dxd ˜x =
+
+Z 
+
+> X × ˜X
+
+∂2
+
+∂θ (j)∂θ (k)
+
+PX, ˜X|θ0 (x, ˜x)dxd ˜x∂2
+
+∂θ (j)∂θ (k)
+
+Z
+
+> ˜X
+
+P ˜X|θ0 (˜ x)d˜x =
+
+Z
+
+> ˜X
+
+∂2
+
+∂θ (j)∂θ (k)
+
+P ˜X|θ0 (˜ x)d˜x. 
+
+4) w is described by a continuous density and w(θ0) > 0.
+
+5) For every sequence (θn)n∈N of elements of Θ, we have 
+
+PX, ˜X|θn −−−−→ 
+
+> n→∞
+
+PX, ˜X|θ0 ⇔ θn −−−−→ 
+
+> n→∞
+
+θ0 ⇔ P ˜X|θn −−−−→ 
+
+> n→∞
+
+P ˜X|θ0 ,
+
+where the convergence of probability measures is in the weak sense. Then, we have 
+
+lim  
+
+> T→∞
+
+¯R ≤ ℓmax 
+
+2
+
+s
+
+log det IX, ˜X (θ0)det I ˜X (θ0) if the loss is additive with ℓ bounded by ℓmax ,
+
+¯R = 12T log det IX, ˜X (θ0)det I ˜X (θ0) + o
+
+ 1
+
+T
+
+
+
+if ℓ is the self-information loss, where IX, ˜X (θ0) and I ˜X (θ0) denote the Fisher information matrix of the families (PX, ˜X|θ)θ∈Θ and (P ˜X|θ)θ∈Θ, respectively, at θ0, and o is the Landau symbol denoting asymptotic behavior of terms as T → ∞ .
+
+The proof is a straightforward application of Theorem 1 and the results in [4] and is given in Appendix C. Conditions 1 and 2 are smoothness assumptions for the parametric families and their Kullback-Leibler divergences. Condition 3 is a regularity condition for the Fisher information which assures that the Fisher information can be written in terms of the Hessian of the log likelihood function. Conditions 4 and 5, on the other hand, can be seen as continuous analogs of the conditions that w
+
+is supported on θ0 and that (7) holds. One important example given in [4] (after Theorem 2.2) is that these assumptions are satisfied for the case of finite-dimensional exponential families. The regret bounds of Theorem 3 assure universality of the    
+
+> 3We will use symbols such as PX, ˜X|θinterchangeably for the probability measure and the density or p.m.f. it is described by. 7
+
+denoising strategy only for the case of self-information loss in the sense of Definition 2-2. For the case of bounded loss, while the theorem does not assure a vanishing regret, it does give an upper bound for the asymptotic average regret per component which can still be useful in case the Fisher information can be uniformly bounded for the entire parametric family of distributions. One remarkable property of Theorem 3 is that the result on self-information loss is given exactly (up to higher-order terms) rather than just as an upper bound. Multiplying both sides of the equation with T , we get 
+
+R = 12 log det IX, ˜X (θ0)det I ˜X (θ0) + o (1) ,
+
+which shows that the total regret does not vanish as T → ∞ . This is in contrast with the result of Theorem 2 for the case of countable Θ and means that (at least as long as the fairly standard regularity conditions of Theorem 3 are satisfied), there seems to be a fundamental difference between the cases of countable and continuous Θ when it comes to the behavior of the denoising strategy defined in (2) and (6). 
+
+C. Necessity of condition (7) In this subsection, we give an example of a parametric family which does not satisfy (7) and for which it is not possible to find a universal denoising strategy. This shows that condition (7) is necessary for universal denoising regardless of the denoising strategy employed. 
+
+Example 1. Let X = ˜X := {0, 1} be binary alphabets, and let Θ := {1, 2}. Furthermore, let PX, ˜X|θ := P ˜X|θPX| ˜X,θ where 
+
+P ˜X|1 = P ˜X|2 := Bernoulli 
+
+ 12
+
+
+
+PX| ˜X, 1 := δ ˜X
+
+PX| ˜X, 2 := δ1− ˜X .
+
+As a loss function, we consider both the classification loss, i.e., ˆX = {0, 1} and ℓ(ˆ x, x ) = 1ˆx̸=x (which is an additive loss bounded by 1), and the self-information loss. 
+
+Clearly, with knowledge of θ, it is possible to achieve zero loss in both cases. Specifically, consider 
+
+X∗ 
+
+> t
+
+:= 
+
+
+
+˜Xt, ℓ is classification loss, θ = 1 1 − ˜Xt, ℓ is classification loss, θ = 2 
+
+δ ˜Xt , ℓ is self-information loss, θ = 1 
+
+δ1− ˜Xt , ℓ is self-information loss, θ = 2 .This means that the Bayes envelope is 0 and the denoiser’s regret is equal to its loss. Assume that the denoising strategy that yields ˆXT as a function of ˜XT is universal in the weaker sense of Definition 2-2. It clearly must satisfy 
+
+EPXT , ˜XT |θ
+
+> ∞
+
+X
+
+> t=1
+
+ℓ( ˆXt, X t) < ∞
+
+for both values of θ, which implies in particular lim t→∞ EPXT , ˜XT |θ ℓ( ˆXt, X t) = 0 . Note also that the definition of PX| ˜X,θ in Example 1 implies that PX, ˜X|1 = P1−X, ˜X|2. Consequently, we have 
+
+lim  
+
+> t→∞
+
+EPXT , ˜XT |2 ℓ( ˆXt, X t) = 0 = lim  
+
+> t→∞
+
+EPXT , ˜XT |1 ℓ( ˆXt, X t) = lim  
+
+> t→∞
+
+EPXT , ˜XT |2 ℓ( ˆXt, 1 − Xt) (8) 
+
+a) Classification loss: In this case we can write 
+
+EPXT , ˜XT |θ ℓ( ˆXt, X t) = PXT , ˜XT |θ
+
+ ˆXt̸ = Xt
+
+
+
+.
+
+Substituting this in (8), we obtain 
+
+lim  
+
+> t→∞
+
+PXT , ˜XT |2
+
+ ˆXt̸ = Xt
+
+
+
+= 0 = lim  
+
+> t→∞
+
+PXT , ˜XT |2
+
+ ˆXt = Xt
+
+
+
+.
+
+However, lim t→∞ PXT , ˜XT |2
+
+ ˆXt̸ = Xt
+
+
+
+= 0 implies 
+
+lim  
+
+> t→∞
+
+PXT , ˜XT |2
+
+ ˆXt = Xt
+
+
+
+= lim 
+
+> t→∞
+
+
+
+1 − PXT , ˜XT |2
+
+ ˆXt̸ = Xt
+
+ 
+
+= 1 ,
+
+which contradicts the original assumption that the denoising strategy is universal. 8
+
+b) Self-information loss: In this case we can write 
+
+EPXT , ˜XT |θ ℓ( ˆXt, X t) = −EPXT , ˜XT |θ log ˆXt(Xt).
+
+Substituting this in (8), we obtain 
+
+lim  
+
+> t→∞
+
+EPXT , ˜XT |2 log ˆXt(Xt) = 0 = lim  
+
+> t→∞
+
+EPXT , ˜XT |2 log ˆXt(1 − Xt).
+
+Since 0 is the maximum possible value of log ˆXt(1 − Xt), this implies that we PXT , ˜XT |2-almost surely have 
+
+lim  
+
+> t→∞
+
+log ˆXt(Xt) = 0 = lim  
+
+> t→∞
+
+log ˆXt(1 − Xt).
+
+Due to the continuity of the logarithm, we can equivalently write 
+
+lim 
+
+> t→∞
+
+ˆXt(Xt) = 1 = lim 
+
+> t→∞
+
+ˆXt(1 − Xt).
+
+But since ˆXt(1 − Xt) = 1 − ˆXt(Xt), we have again arrived at a contradiction of the original assumption that the denoising strategy is universal. IV. T HE PLUG -IN APPROACH 
+
+It is not necessarily intuitively clear why the denoising strategy given by (2) and (6) is required. A simpler and more straightforward strategy could be to determine a maximum likelihood estimate θML of θ0 from the observation ˜XT and then estimate the ˆXT which has the lowest expected loss under P TX| ˜X,θ ML 
+
+. This so-called plug-in approach is known to be in general suboptimal in the context of universal prediction [16], and in this section we show that this is indeed also the case for universal denoising. Intuitively, there might be θ ∈ Θ for which P ˜X|θ and P ˜X|θ0 are very similar while PX| ˜X,θ and PX| ˜X,θ 0
+
+differ dramatically. While the plug-in approach always has to commit to one hypothesis on what θ0 is, the mixture approach given by (2) and (6) is more flexible in that it always at least partially considers the true PX| ˜X,θ 0 . We make this intuition more rigorous in the following example. 
+
+Example 2. Let X := ˜X := ˆX := {0, 1}, consider the classification loss function ℓ : (ˆ x, x ) 7 → 1ˆx̸=x, let Θ := {0, 1, 2, . . . }
+
+with θ0 := 0 , and define PX, ˜X|θ via 
+
+PX|0 := 12 δ0 + 12 δ1, P ˜X|X, 0 := δX
+
+for θ ∈ Θ \ { 0} : PX|θ := 
+
+ 12 + 12 + θ (−1) θ
+
+
+
+δ0 +
+
+ 12 − 12 + θ (−1) θ
+
+
+
+δ1, P ˜X|X,θ := δ1−X
+
+a) Plug-in approach: The learner’s strategy we analyze is as follows: based on the noisy observations ˜X1, . . . , ˜XT ,choose the maximum likelihood parameter 
+
+θML := arg max 
+
+> θ∈Θ
+
+P ˜X|θ( ˜X1) · · · P ˜X|θ( ˜XT )
+
+and use denoising strategy (2) with QXT , ˜XT := P TX, ˜X|θML 
+
+. Clearly, the total regret will be 0 if θML = 0 and T otherwise. 
+
+Lemma 2. θML = 0 iff #( ˜XT , 0) = T 
+
+> 2
+
+.Proof. Let 
+
+L(p; N, n ) := log 
+
+ Nn
+
+
+
+pn(1 − p)N −n
+
+
+
+= log 
+
+Nn
+
+
+
++ n log p + ( N − n) log(1 − p)
+
+denote the binomial log-likelihood of parameter p given N trials and n successes. We compute its derivative as 
+
+L′(p; N, n ) := ∂∂p L(p; N, n ) = np − N − n
+
+1 − p .
+
+Clearly, L(p; N, n ) is a continuous function of p, and it can be checked that 
+
+L′(p; N, n ) > 0 (i.e., L is increasing) for p < n/N 
+
+L′(p; N, n ) = 0 (i.e., L takes its maximum value) for p = n/N 
+
+L′(p; N, n ) < 0 (i.e., L is decreasing) for p > n/N. 
+
+From this, it is immediately clear that if #( ˜XT , 0) = T 
+
+> 2
+
+, L(p; T, T / 2) takes its maximum value at p = 1 /2 and therefore θML =0. If, on the other hand, #( ˜XT , 0) ̸ = T 
+
+> 2
+
+, then L(p; T, #( ˜XT , 0)) takes its maximum value at p = pmax := #( ˜XT , 0) /T ̸ = 1 /2.Clearly, there is θ ∈ Θ \ { 0} such that 
+
+12 + 12 + θ (−1) θ ∈
+
+ 12 , p max 
+
+
+
+or 12 + 12 + θ (−1) θ ∈
+
+
+
+pmax , 12
+
+9
+
+(only one of these intervals will be nonempty). From the established monotonicity behavior of L, it is clear that L(1 /2; T, #( ˜XT , 0)) <
+
+L(1 /2; T, #( ˜XT , θ )) and hence θML ̸ = 0 .Lemma 2 establishes that R = T whenever T is odd. For even T , we can compute 
+
+R = PX, ˜X|θ0 (θML ̸ = 0) · T
+
+> (a)
+
+= PX, ˜X|θ0
+
+
+
+#( ˜XT , 0) ̸ = 12
+
+
+
+· T
+
+> (b)
+
+=
+
+
+
+1 −
+
+T
+
+> T
+> 2
+
+
+
+2−T
+
+
+
+· T
+
+= 1 − T !
+
+  T
+
+> 2
+
+!2 2−T
+
+!
+
+· T
+
+> (c)
+
+>
+
+1 −√2πT T + 12 exp( −T + 1) 
+
+√2π   T
+
+> 2
+
+ T   
+
+> 2+12
+
+exp  − T
+
+> 2
+
+2 2−T
+
+ · T
+
+=
+
+1 − e
+
+√π ·
+
+ T
+
+> T
+> 2
+
+T + 12
+
+√T 2−T
+
+ · T
+
+= T − e
+
+r 2Tπ , (9) where in step (a) we have used Lemma 2, in step (b) we have substituted the binomial p.m.f., and in step (c) we have used 
+
+√2πn n+ 12 exp( −n) < n ! < √2πn n+ 12 exp( −n + 1) 
+
+which is a slightly weaker form of the first two equations in [24]. Hence, in both cases the total regret will grow linearly with 
+
+T .
+
+b) Mixture approach: We analyze the learner’s strategy given by (2) and (6). Defining the function 
+
+f (θ, ˜xT ) := 
+
+ 12 + 12 + θ (−1) θ
+
+#(˜ xT ,0)  12 − 12 + θ (−1) θ
+
+#(˜ xT ,1) 
+
+,
+
+we have 
+
+QXT , ˜XT (xT , ˜xT ) = w(θ0)2 −T 1xT =˜ xT +
+
+> ∞
+
+X
+
+> θ=1
+
+w(θ)f (θ, ˜xT )1xT =(1 −˜x1,..., 1−˜xT ),Q ˜XT (˜ xT ) = X 
+
+> xT∈{ 0,1}T
+
+QXT , ˜XT (xT , ˜xT )= w(θ0)2 −T +
+
+> ∞
+
+X
+
+> θ=1
+
+w(θ)f (θ, ˜xT )
+
+QXT | ˜XT (xT |˜xT ) = QXT , ˜XT (xT , ˜xT )
+
+Q ˜XT (˜ xT )= 1xT =˜ xT 1 + 2 T
+
+> ∞
+
+X
+
+> θ=1
+
+w(θ)
+
+w(θ0) f (θ, ˜xT )
+
+!−1
+
++ 1xT =(1 −˜x1,..., 1−˜xT )
+
+1 + 2T
+
+> ∞
+
+X
+
+> θ=1
+
+w(θ)
+
+w(θ0) f (θ, ˜xT )
+
+!−1
+
+> −1
+
+.
+
+This means that the channel from XT to ˜XT under QXT , ˜XT (xT , ˜xT ) returns its input with probability 
+
+1 + 2 T
+
+> ∞
+
+X
+
+> θ=1
+
+w(θ)
+
+w(θ0) f (θ, ˜xT )
+
+!−1
+
+(10) and otherwise flips all of its input bits. Under the classification loss, the learner will return the estimate ˆXT that is most likely to equal XT given the observation ˜XT under QXT , ˜XT (xT , ˜xT ). This means that the regret is 0 whenever the quantity (10) is greater than 1/2 and the regret is T whenever (10) is less than 1/2.10 
+
+w(θ0) = 10 −1 w(θ0) = 10 −2 w(θ0) = 10 −3 w(θ0) = 10 −4 w(θ0) = 10 −5 w(θ0) = 10 −6
+
+w(θ0) = 10 −7 w(θ0) = 10 −8 w(θ0) = 10 −9 w(θ0) = 10 −10 w(θ0) = 10 −11 plug-in (even T )
+
+0 0.2 0.4 0.6 0.8 1
+
+·10 4
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+T    
+
+> expectation of (10)
+> (a) Expected non-flipping probability of QXT|˜XTin the mixture approach.
+
+0 0.2 0.4 0.6 0.8 1
+
+·10 4
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+T
+
+> ¯R
+> (b) Expected regret of the learner per component.
+
+Fig. 1: Numerical comparison of the performance of the plug-in approach with the mixture approach. It is clear from Theorem 2 that the regret incurred with the mixture approach vanishes as T → ∞ . In order to get a better idea of what this looks like numerically and what the conditional mixture distribution QXT | ˜XT looks like on average, we show the expectation of the probability (10) along with the expected regret the denoiser incurs with the mixture approach compared to the plug-in lower bound (9) in Fig. 1. Since countably infinite Θ do not admit uniform w, the convergence speed crucially depends on w(θ0). We show plots for various values of w(θ0) (which for realistic scenarios can be expected to be very small), where the probability masses of the other parameters are chosen as 
+
+w(θ) := 2 −θ (1 − w(θ0)) .
+
+We can see that even for very small values of w(θ0), the expected regret vanishes in the mixture approach for reasonable sequence lengths whereas it converges to its maximum value 1 quite quickly with the plug-in approach. V. N UMERICAL EXAMPLE : D ENOISING OF POISSON SIGNALS 
+
+Although this work is primarily focused on the theoretical results of Theorems 1, 2, and 3, we show in this section that it is in principle possible to implement the denoising strategy we have analyzed. The main practical difficulty that arises is solving the optimization problem (2) with the probability distribution defined in (6). Whether or not this is tractable and how difficult and computationally expensive it is depends heavily on the underlying parametric family (PX, ˜X|θ)θ∈Θ. Here, we show how it can be done in the case of an example of a denoising problem in which the signals follow a Poisson distribution. 
+
+A. Preliminaries 
+
+In this subsection, we establish a lemma that holds with some generality but will later help us in implementing our denoising strategy for the numerical example given in Section V-B. The lemma shows that the loss can be estimated with respect to the per-component marginals which makes the computation of (2) computationally more tractable. 
+
+Lemma 3. (Simplified optimization for additive losses) In the case of denoising of (not necessarily i.i.d.) sequences, if the loss is additive, that is 
+
+L(ˆ xT , x T ) = 
+
+> T
+
+X
+
+> t=1
+
+ℓ(ˆ xt, x t),
+
+and X is countable, then ˆXT solves the optimization (2) if and only if 
+
+∀t ∈ { 1, . . . , T } : ˆxt ∈ arg max EQXt| ˜XT ℓ(ˆ xt, X t).11 
+
+Proof. We calculate 
+
+EQXT | ˜XT L(ˆ xT , X T ) = X  
+
+> xT∈X T
+
+QXT | ˜XT (xT |˜xT )
+
+> T
+
+X
+
+> t=1
+
+ℓ(ˆ xt, x t)
+
+!
+
+=
+
+> T
+
+X
+
+> t=1
+
+X
+
+> x1∈X
+
+· · · X 
+
+> xT∈X
+
+QXT | ˜XT (xT |˜xT )ℓ(ˆ xt, x t)
+
+!
+
+=
+
+> T
+
+X
+
+> t=1
+
+ X
+
+> xt∈X
+
+ℓ(ˆ xt, x t) X
+
+> x1∈X
+
+· · · X
+
+> xt−1∈X
+
+X
+
+> xt+1 ∈X
+
+· · · X 
+
+> xT∈X
+
+QXT | ˜XT (xT |˜xT )
+
+
+
+=
+
+> T
+
+X
+
+> t=1
+
+X
+
+> xt∈X
+
+
+
+ℓ(ˆ xt, x t)QXt| ˜XT (xt|˜xT )
+
+!
+
+=
+
+> T
+
+X
+
+> t=1
+
+EQXt| ˜XT ℓ(ˆ xt, x t).
+
+Since every summand depends on a different entry of ˆXT , optimizing the entire sum is equivalent to optimizing every summand. 
+
+B. Denoising of Poisson Signals 
+
+We consider a denoising problem where the noiseless signal is the number of events generated by an unknown number 
+
+nZ of Poisson sources of known mean λX . The noisy signal is corrupted by additive noise which is the number of events generated by an unknown number nZ of Poisson sources of known mean λZ .
+
+Example 3. (Denoising of Poisson Signals). Consider an instance of Problem 2 where X = ˜X = N ∪ { 0}, and PX, ˜X|nX ,n Z
+
+is described as follows:  
+
+> •
+
+X follows a Poisson distribution with mean nX λX , 
+
+> •
+
+Z follows a Poisson distribution with mean nZ λZ , 
+
+> •
+
+˜X = X + Z.We assume that λX , λ Z ∈ (0 , ∞) are known to the denoiser while nX and nZ are unknown. That is, Θ = N2, and the parametric family is (PX, ˜X|nX ,n Z )nX ,n Z ∈N. The true distribution is PX, ˜X = PX, ˜X|nX, 0,n Z, 0 .
+
+Note that if n i.i.d. random variables follow a Poisson distribution with mean λ, their sum is Poisson distributed with mean 
+
+nλ . Hence both the noiseless signal and the noise in Example 3 can be seen as signals generated by an unknown number of sources with known mean. 
+
+Lemma 4. The parametric family in Example 3 satisfies (7) iff λX /λ Z is irrational. Proof. Two Poisson distributions are identical iff they have the same mean, so clearly PX, ˜X|θ1̸ = PX, ˜X|θ2 for all θ1̸ = θ2 ∈ Θ.
+
+˜X is the sum of two independent Poisson variables, so it follows a Poisson distribution with mean nZ λZ +nX λX . Assume first that there are nX, 1, n X, 2, n Z, 1, n Z, 2 ∈ N such that (nX, 1, n Z, 1)̸ = ( nX, 2, n Z, 2) and nZ, 1λZ + nX, 1λX = nZ, 2λZ + nX, 2λX .
+
+If nX, 1 = nX, 2, we can divide both sides by λZ and obtain nZ, 1 = nZ, 2, which is a contradiction. Otherwise, we have 
+
+nZ, 1λZ + nX, 1λX = nZ, 2λZ + nX, 2λX ⇔ λX
+
+λZ
+
+= nZ, 1 − nZ, 2
+
+nX, 2 − nX, 1
+
+,
+
+so clearly λX /λ Z is rational. On the other hand, if λX /λ Z is rational, write λX /λ Z = n1/n 2. So for instance choosing 
+
+nZ, 1 := n1 + 1 , n Z, 2 := 1 , n X, 1 = 1 , n X, 2 = n2 + 1 yields nZ, 1λZ + nX, 1λX = nZ, 2λZ + nX, 2λX , hence (7) is not satisfied. 
+
+Remark 3. In practice, for every irrational number r and every T there will be a rational number ˆr that approximates r so closely that for T observations of X and ˜X, it does not matter if λX /λ Z is r or ˆr. Nonetheless, if the floating point accuracy is increased as T grows and λX /λ Z remains irrational and fixed (but evaluated more and more accurately), we can still expect that the limit statements of Theorem 2-2 hold. For numerical evaluations up to a fixed T and with fixed floating point precision, however, it is important that we do not have λX /λ Z ≈ n1/n 2 where n1 and n2 are too small numbers. That is, some irrational choices of λX /λ Z could be “almost rational” in the sense that there is some θ̸ = θ0 with non-negligible w(θ0) which satisfies 
+
+PX, ˜X|θ0 ≈ PX, ˜X|θ . As can be seen in the numerical results reported in this section, our choice of λX /λ Z = p3/2 is not “almost rational” in this sense. 
+
+In order to compute (2), we need to be able to compute QXT | ˜XT =˜ xT for any given ˜xT . Due to Lemma 3, in the case of additive losses, it is sufficient to compute QXt| ˜XT =˜ xT . In order to be able to evaluate the denoiser’s regret, we also need to 12 
+
+compute (1). Since XT and ˜XT are i.i.d. for instances of Problem 2 (which Example 3 satisfies), we only need to be able to compute PX| ˜X,θ 0 regardless of additivity of the loss. 
+
+Lemma 5. (Likelihoods in the Poisson example). For Example 3, we have 
+
+PX| ˜X,n X ,n Z (x|˜x) = 1˜x≥x
+
+Pois( x; nX λX )Pois(˜ x − x; nZ λZ )Pois(˜ x; nX λX + nZ λZ ) (11) 
+
+QXT | ˜XT (xT |˜xT ) = 1∀t∈{ 1,...,T }: ˜ xt≥xt
+
+P∞ 
+
+> nX=1
+
+P∞  
+
+> nZ=1
+
+w(nX , n Z ) QTt=1 Pois( xt; nX λX )Pois(˜ xt − xt; nZ λZ )
+
+P∞ 
+
+> nX=1
+
+P∞  
+
+> nZ=1
+
+w(nX , n Z ) QTt=1 Pois(˜ xt; nX λX + nZ λZ ) (12) 
+
+QXt| ˜XT (xt|˜xT ) = 1˜xt≥xt
+
+P∞ 
+
+> nX=1
+
+P∞  
+
+> nZ=1
+
+w(nX , n Z )Pois( xt; nX λX )Pois(˜ xt − xt; nZ λZ ) QTt′=1  
+
+> t′̸=t
+
+Pois(˜ xt′ ; nX λX + nZ λZ )
+
+P∞ 
+
+> nX=1
+
+P∞  
+
+> nZ=1
+
+w(nX , n Z ) QTt=1 Pois(˜ xt; nX λX + nZ λZ ) ,
+
+(13) 
+
+where Pois( n; λ) denotes the Poisson p.m.f., i.e., the probability that a Poisson distributed random variable with mean λ equals 
+
+n.Proof. From the description of Example 3, it is clear that 
+
+PX|nX ,n Z (x) = Pois( x; nX λX )
+
+PZ|nX ,n Z (z) = Pois( z; nZ λZ ).
+
+We can infer from this 
+
+P ˜X|X,n X ,n Z (˜ x|x) = 1˜x≥xPois(˜ x − x; nZ λZ )
+
+PX, ˜X|nX ,n Z (x, ˜x) = PX|nX ,n Z (x)P ˜X|X,n X ,n Z (˜ x|x) = 1˜x≥xPois( x; nX λX )Pois(˜ x − x; nZ λZ ). (14) Due to the known additivity property of Poisson random variables, we also have 
+
+P ˜X|nX ,n Z (˜ x) = Pois(˜ x; nX λX + nZ λZ ). (15) (11) then follows directly from (14) and (15). For the mixture distribution, we use (14) to compute 
+
+QXT , ˜XT (xT , ˜xT ) = 
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )
+
+> T
+
+Y
+
+> t=1
+
+PX, ˜X|nX ,n Z (xt, ˜xt)=
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )
+
+> T
+
+Y
+
+> t=1
+
+Pois( xt; nX λX )Pois(˜ xt − xt; nZ λZ )1˜xt≥xt
+
+= 1∀t∈{ 1,...,T }: ˜ xt≥xt
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )
+
+> T
+
+Y
+
+> t=1
+
+Pois( xt; nX λX )Pois(˜ xt − xt; nZ λZ ), (16) and similarly we use (15) to compute 
+
+Q ˜XT (˜ xT ) = 
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )
+
+> T
+
+Y
+
+> t=1
+
+P ˜X|nX ,n Z (˜ xt)=
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )
+
+> T
+
+Y
+
+> t=1
+
+Pois(˜ xt; nX λX + nZ λZ ). (17) (12) then follows directly from (16) and (17). Finally, we use (11) and (15) to obtain 
+
+QXt, ˜XT (xt, ˜xT ) = X
+
+> x1∈X
+
+· · · X
+
+> xt−1∈X
+
+X
+
+> xt+1 ∈X
+
+· · · X 
+
+> xT∈X
+
+QXT , ˜XT (xT , ˜xT )= X
+
+> x1∈X
+
+· · · X
+
+> xt−1∈X
+
+X
+
+> xt+1 ∈X
+
+· · · X 
+
+> xT∈X ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )P TX, ˜X|nX ,n Z (xT , ˜xT )=
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z ) X
+
+> x1∈X
+
+· · · X
+
+> xt−1∈X
+
+X
+
+> xt+1 ∈X
+
+· · · X 
+
+> xT∈X
+
+P TX, ˜X|nX ,n Z (xT , ˜xT )=
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )PXt, ˜XT |nX ,n Z (xt, ˜xT )13 
+
+200 400 600 800 1,000 
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+T
+
+> per-component regret
+
+nX = 4 , n Z = 1 
+
+nX = 1 , n Z = 4 
+
+nX = 2 , n Z = 5 
+
+nX = 5 , n Z = 2 
+
+truncated 
+
+not truncated 
+
+(a) Per-component regret for truncated and untruncated distance loss. 
+
+200 400 600 800 1,000 
+
+0
+
+0.5
+
+1
+
+1.5
+
+2
+
+T
+
+> total regret
+
+nX = 4 , n Z = 1 
+
+nX = 1 , n Z = 4 
+
+nX = 2 , n Z = 5 
+
+nX = 5 , n Z = 2 
+
+(b) Total regret for self-information loss. 
+
+Fig. 2: Regrets incurred by the denoiser in Example 3 for various values of nX and nZ , each data point averaged over 3,000 runs. 
+
+=
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )P T   
+
+> ˜XT|nX,n Z
+
+(˜ xT )PXt| ˜Xt,n X ,n Z (xt, ˜xt)= 1˜xt≥xt
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )
+
+> T
+
+Y
+
+> t′=1
+
+Pois(˜ xt′ ; nX λX + nZ λZ )
+
+!
+
+Pois( xt; nX λX )Pois(˜ xt − xt; nZ λZ )Pois(˜ xt; nX λX + nZ λZ )= 1˜xt≥xt
+
+> ∞
+
+X 
+
+> nX=1
+> ∞
+
+X 
+
+> nZ=1
+
+w(nX , n Z )Pois( xt; nX λX )Pois(˜ xt − xt; nZ λZ )
+
+> T
+
+Y 
+
+> t′=1
+> t′̸=t
+
+Pois(˜ xt′ ; nX λX + nZ λZ ),
+
+which together with (17) yields (13). We have implemented the denoising strategy given by (2) and (6) with 
+
+w(nX , n Z ) := 2 −nX −nZ ,
+
+as well as the optimal denoiser (1). For the intensities, we use λX = 1 and λZ = p2/3. We have used (16) along with Lemma 7 to compute the denoising estimate for the case of self-information loss and (11) along with Lemma 7 to compute the corresponding optimal denoising estimate. It should be noted that while computing ˆX(xt) is feasible for any given value of xt, due to the number of possibilities for xt, it is not tractable to compute the entirety of ˆX even in the case of moderate 
+
+T . However, the loss for a concrete realization of Xt can be computed in a simulation. For the case of additive losses, we use (16) along with Lemma 3 to compute the denoising estimate (note that it is guaranteed in Example 3 that we have Xt ≤ ˜Xt
+
+so it is tractable to iterate over all the possible choices in (2)) for the distance loss 
+
+ℓdist (ˆ x, x ) := |ˆx − x|
+
+as well as for the truncated distance loss 
+
+ℓdist ,5(ˆ x, x ) := min 
+
+
+
+ℓdist (ˆ x, x ), 5
+
+
+
+.
+
+Note that we have a theoretical guarantee on the regret only for the case of the truncated distance loss. Similarly, we use (11) and Lemma 3 to compute the optimal denoising estimate and the regret. The documented Python code used to generate the plots shown in this section is available as an electronic supplement with this paper. In Fig. 2, we show the per-component regret for the distance loss and the total regret for the self-information loss case. As Theorem 2 predicts, in the case of truncated distance loss, the per-component regret becomes small as T increases and in the case of self-information loss, the total regret becomes small as T increases. We can additionally see that the (untruncated) distance loss effectively behaves quite similar to its truncated version although we do not have a theoretical guarantee for this case. As can be expected from the w we use, there is a rough trend that higher values of nX and nZ result in slower convergence of the regret. 14 
+
+VI. A CKNOWLEDGMENTS 
+
+This research was supported in part by the Australian Research Council under Project DP230101493, and by The University of Melbourne’s Research Computing Services and the Petascale Campus. The authors would also like to thank Samuel H. Wilks for many useful discussions on the topic. Artificial intelligence (AI) has been used to generate code related to the command line user interface of the numerical simulations discussed in Section V and to brainstorm ideas for which probability distributions could be used in Example 3. No technical results and no text that appears in the paper have been generated with the involvement of AI. APPENDIX 
+
+A. Proof of Theorem 1 
+
+For the sake of completeness, we first prove the following elementary lemma which we will use in our proof of the theorem. 
+
+Lemma 6. Let A and B be two random variables, let μB and νB be two probability measures for B, let μA|B and νA|B be two stochastic kernels describing transitions from B to A, let μA,B be the joint probability measure for A and B induced by 
+
+μB and μA|B , and let and νA,B be the joint probability measure induced by νB and νA|B . Then 
+
+EμB D  μA|B (·| B)|| νA|B (·| B) = D (μA,B || νA,B ) − D (μB || νB ) .
+
+Proof. We have 
+
+EμB D  μA|B (·| B)|| νA|B (·| B) (a)
+
+= EμB EμA|B log dμ A|B (·| B)
+
+dν A|B (·| B) (A)
+
+> (b)
+
+= EμA,B log 
+
+ dμ A|B (·| B)
+
+dν A|B (·| B) (A) dμ B
+
+dν B
+
+(B)
+
+
+
+− EμB log dμ B
+
+dν B
+
+(B)
+
+> (c)
+
+= EμA,B log dμ A,B 
+
+dν A,B 
+
+(A, B ) − EμB log dμ B
+
+dν B
+
+(B)
+
+> (a)
+
+= D (μA,B || νA,B ) − D (μB || νB ) ,
+
+where in both steps labeled (a) we have used the definition of Kullback-Leibler divergence, in step (b) we have added zero, and in step (c) we have used [23, Section 6.3, Proposition 1]. 
+
+Proof of Theorem 1. To show (4), we first bound 
+
+EPX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
+
+
+= EPX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
++
+
+− EPX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
+−
+
+> (a)
+
+=
+
+Z Lmax 
+
+> 0
+
+PX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X ) ≥ r
+
+
+
+dr −
+
+Z Lmax 
+
+> 0
+
+PX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X ) ≤ − r
+
+
+
+dr 
+
+> (b)
+
+≤
+
+Z Lmax 
+
+> 0
+
+
+
+QX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X ) ≥ r
+
+
+
++ ∥P − Q∥TV 
+
+
+
+dr 
+
+−
+
+Z Lmax 
+
+> 0
+
+
+
+QX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X ) ≤ − r
+
+
+
+− ∥ P − Q∥TV 
+
+
+
+dr 
+
+= EQX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
++
+
+− EQX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
+−
+
++ 2 ∥P − Q∥TV 
+
+= EQX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
+
+
++ 2 ∥P − Q∥TV , (18) where (a) is due to the assumption that L only takes values in [0 , L max ] and (b) holds due to the definition of variational distance. Using this, we can bound 
+
+R = EP ˜X EPX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
+
+
+> (18)
+
+≤ EP ˜X
+
+
+
+EQX| ˜X
+
+
+
+L( ˆX, X ) − L(X∗, X )
+
+
+
++ 2 Lmax PX| ˜X − QX| ˜X TV 
+
+
+
+> (2)
+
+≤ 2Lmax EP ˜X PX| ˜X − QX| ˜X TV (a)
+
+≤ 2Lmax EP ˜X
+
+r 12 D
+
+
+
+PX| ˜X || QX| ˜X
+
+15 
+
+> (b)
+
+≤ 2Lmax 
+
+r 12 EP ˜X D
+
+
+
+PX| ˜X || QX| ˜X
+
+
+
+> (c)
+
+= 2 Lmax 
+
+r 12
+
+
+
+D
+
+
+
+PX, ˜X || QX, ˜X
+
+
+
+− D (P ˜X || Q ˜X )
+
+
+
+where step (a) follows by Pinsker’s inequality, in step (b) we have used Jensen’s inequality and the concavity of the square root function, and step (c) follows by Lemma 6. This concludes the proof of (4). To show (5), we first need to determine a X∗ which satisfies (1) and a ˆX that satisfies (2). To this end, we prove the following lemma. 
+
+Lemma 7. (Optimal estimate for the self-information loss). If L is the self-information loss, then ˆx = QX| ˜X=˜ x is the unique minimum of 
+
+EQX| ˜X=˜ x L(ˆ x, X ) = −EQX| ˜X=˜ x log ˆ x(X).
+
+Proof. The proof proceeds similarly as in the online prediction case [16]. We have 
+
+−EQX| ˜X=˜ x log ˆ x(X) (a)
+
+= −EQX| ˜X=˜ x log QX| ˜X=˜ x(X) + EQX| ˜X=˜ x log QX| ˜X=˜ x(X)ˆx(X)= H(QX| ˜X=˜ x) + D
+
+
+
+QX| ˜X=˜ x|| ˆx
+
+
+
+,
+
+where step (a) is an addition of zero and H(·) is Shannon entropy (note that in matching the notation of Kullback-Leibler divergence but different from common notation we indicate the probability distribution instead of the random variable in the argument). The entropy term is independent of ˆx and the Kullback-Leibler divergence takes its minimum value 0 if and only if ˆx = QX| ˜X=˜ x.So clearly, we have that ˆX = QX| ˜X (·| ˜X) satisfies (2). Since P can be substituted for Q in Lemma 7, we can also conclude that X∗ = PX| ˜X (·| ˜X) satisfies (1). Substituting both of these into definition (3), we obtain 
+
+R = EPX, ˜X
+
+
+
+− log QX| ˜X (X| ˜X) + log PX| ˜X (X| ˜X)
+
+
+
+= EP ˜X EPX| ˜X log PX| ˜X (X| ˜X)
+
+QX| ˜X (X| ˜X)
+
+> (a)
+
+= EP ˜X D
+
+
+
+PX| ˜X || QX| ˜X
+
+
+
+> (b)
+
+= D
+
+
+
+PX, ˜X || QX, ˜X
+
+
+
+− D (P ˜X || Q ˜X ) ,
+
+where (a) follows by the definition of Kullback-Leibler divergence and (b) by Lemma 6. This concludes the proof of (5). 
+
+B. Proof of Lemma 1 
+
+First, we argue that condition (7) allows us without loss of generality to assume that the slightly stronger condition 
+
+∀θ1̸ = θ2 ∈ Θ : P ˜X|θ1̸ = P ˜X|θ2 (19) holds. If (7) holds but (19) does not, we define an equivalence relation ≈ via 
+
+θ1 ≈ θ2 :⇔ P ˜X|θ1 = P ˜X|θ2
+
+and let 
+
+Θ′ := Θ / ≈=
+
+nn 
+
+θ2 : P ˜X|θ1 = P ˜X|θ2
+
+o
+
+: θ1 ∈ Θ
+
+o
+
+be the quotient of Θ with respect to ≈. For θ′, let 
+
+PX, ˜X|θ′ := PX, ˜X|θ,
+
+where θ is an element of the equivalence class θ′ (it does not matter which element we choose from each class due to condition (7)). We define a p.m.f. w′ on Θ′ as 
+
+w′(θ′) := X
+
+> θ∈θ′
+
+w(θ).
+
+Clearly, Θ′ satisfies condition (19) and 
+
+X
+
+> θ∈Θ
+
+P TX, ˜X|θw(θ) = X
+
+> θ′∈Θ′
+
+X
+
+> θ∈θ′
+
+P TX, ˜X|θw(θ) = X
+
+> θ′∈Θ
+
+P TX, ˜X|θ′ w′(θ′).16 
+
+Consequently, defining QXT , ˜XT as in (6) based on (PX, ˜X|θ)θ∈Θ is equivalent to using the family (PX, ˜X|θ′ )θ′∈Θ′ instead. Therefore, in the following we assume without loss of generality that (19) holds. The following lemma contains the typicality argument used to establish Theorem 2. 
+
+Lemma 8. If ˜X < ∞, then for every φ ∈ (0 , ∞), we have 
+
+log 1
+
+w(θ0) − D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ ≤ 1
+
+w(θ0)
+
+
+
+exp 
+
+
+
+−2T 12
+
+
+
++ w(Θ cT \ { θ0})
+
+
+
++ 2 ˜X
+
+
+
+log 1
+
+w(θ0) + T log 1
+
+pmin ,θ 0
+
+
+
+exp( −2T φ 2),
+
+where 
+
+ΘT := 
+
+n
+
+θ ∈ Θ : P ˜X − P ˜X|θ TV 
+
+− ˜X φ ≥ T − 14
+
+o
+
+(20) 
+
+and 
+
+pmin ,θ := min    
+
+> ˜x∈˜X
+> P˜X|θ(˜ x)>0
+
+P ˜X|θ(˜ x). (21) 
+
+Proof. We define a typical set 
+
+T := 
+
+
+
+˜xT ∈ X T : ∀˜x ∈ ˜X 1
+
+T #(˜ xT , ˜x) − P ˜X (˜ x) < φ 
+
+
+
+(22) and bound 
+
+log 1
+
+w(θ0) − D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ = EP T
+
+> ˜X
+
+log Q ˜XT ( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+!
+
+(23) 
+
+= EP T
+
+> ˜X
+
+1 ˜XT ∈T log Q ˜XT ( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+!
+
++ EP T
+
+> ˜X
+
+1 ˜XT ∈T c log Q ˜XT ( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+!
+
+. (24) We next bound the summands that appear in (24) separately. For the second summand in (24), we have 
+
+EP T
+
+> ˜X
+
+1 ˜XT ∈T c log Q ˜XT ( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+! (a)
+
+≤ EP T
+
+> ˜X
+
+1 ˜XT ∈T c log 1
+
+w(θ0)pT
+
+> min ,θ 0
+
+!
+
+= P T 
+
+> ˜X
+
+(T c) log 1
+
+w(θ0)pT
+
+> min ,θ 0
+> (b)
+
+≤ 2 ˜X
+
+
+
+log 1
+
+w(θ0) + T log 1
+
+pmin ,θ 0
+
+
+
+exp( −2T φ 2) (25) where in step (a) we have used Q ˜XT ( ˜XT ) ≤ 1 and (21), and in step (b) we have used [5, Lemma 2.12] along with the refinement pointed out in the unnumbered remark following the lemma. For the first summand in (24), we have 
+
+EP T
+
+> ˜X
+
+1 ˜XT ∈T log Q ˜XT ( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+!
+
+> (6)
+
+= EP T
+
+> ˜X
+
+1 ˜XT ∈T log 
+
+P 
+
+> θ∈Θ
+
+w(θ)P T
+
+> ˜X|θ
+
+( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+
+
+= EP T
+
+> ˜X
+
+1 ˜XT ∈T log 
+
+1 + 
+
+P θ∈Θ 
+
+> θ̸=θ0
+
+w(θ)P T
+
+> ˜X|θ
+
+( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+
+
+> (a)
+
+≤ EP T
+
+> ˜X
+
+1 ˜XT ∈T 
+
+P θ∈Θ 
+
+> θ̸=θ0
+
+w(θ)P T
+
+> ˜X|θ
+
+( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+
+
+> (b)
+
+= X 
+
+> θ∈Θ
+> θ̸=θ0
+
+EP T
+
+> ˜X
+
+1 ˜XT ∈T 
+
+w(θ)P T
+
+> ˜X|θ
+
+( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+
+
+> (c)
+
+= X 
+
+> θ∈Θ
+> θ̸=θ0
+
+EP T
+
+> ˜X|θ
+
+
+
+1 ˜XT ∈T 
+
+w(θ)
+
+w(θ0)
+
+17 
+
+= 1
+
+w(θ0)
+
+X 
+
+> θ∈Θ
+> θ̸=θ0
+
+w(θ)P T
+
+> ˜X|θ
+
+(T )
+
+≤ 1
+
+w(θ0)
+
+X
+
+> θ∈ΘT
+
+w(θ)P T
+
+> ˜X|θ
+
+(T ) + w (Θ cT \ { θ0})
+
+!
+
+(26) where in step (a) we have used the inequality log(1 + r) ≤ r for all r ∈ (−1, ∞), in (b) we have used linearity of expectation, and in (c) we have used change of measure. For θ ∈ ΘT , we have 
+
+P T
+
+> ˜X|θ
+
+(T )
+
+> (22)
+
+= P T
+
+> ˜X|θ
+
+ 
+
+˜xT ∈ ˜X T : ∀˜x ∈ ˜X 1
+
+T #(˜ xT , ˜x) − P ˜X (˜ x) < φ T
+
+ 
+
+> (a)
+
+≤ P T
+
+> ˜X|θ
+
+ 
+
+˜xT ∈ ˜X T : ∀˜x ∈ A 1
+
+T #(˜ xT , ˜x) − P ˜X (˜ x) < φ T
+
+ 
+
+≤ P T
+
+> ˜X|θ
+
+(
+
+˜xT ∈ ˜X T : X
+
+> ˜x∈A
+
+1
+
+T #(˜ xT , ˜x) − P ˜X (˜ x) < |A| φT
+
+)! 
+
+≤ P T
+
+> ˜X|θ
+
+(
+
+˜xT ∈ ˜X T : X
+
+> ˜x∈A
+
+ 1
+
+T #(˜ xT , ˜x) − P ˜X (˜ x)
+
+
+
+< |A| φT
+
+)! 
+
+= P T
+
+> ˜X|θ
+
+(
+
+˜xT ∈ ˜X T : X
+
+> ˜x∈A
+
+ 1
+
+T #(˜ xT , ˜x) − P ˜X|θ(˜ x)
+
+
+
+− X
+
+> ˜x∈A
+
+
+
+P ˜X (˜ x) − P ˜X|θ(˜ x)
+
+
+
+< |A| φT
+
+)! 
+
+= P T
+
+> ˜X|θ
+
+(
+
+˜xT ∈ ˜X T : X
+
+> ˜x∈A
+
+ 1
+
+T #(˜ xT , ˜x) − P ˜X|θ(˜ x)
+
+
+
+− P ˜X − P ˜X|θ TV 
+
+< |A| φT
+
+)! 
+
+≤ P T
+
+> ˜X|θ
+
+(
+
+˜xT ∈ ˜X T : − X
+
+> ˜x∈A
+
+ 1
+
+T #(˜ xT , ˜x) − P ˜X|θ(˜ x)
+
+
+
++ P ˜X − P ˜X|θ TV < |A| φT
+
+)! 
+
+= P T
+
+> ˜X|θ
+
+(
+
+˜xT ∈ ˜X T : 1
+
+T
+
+X
+
+> ˜x∈A
+
+#(˜ xT , ˜x) − P ˜X|θ(A) > P ˜X − P ˜X|θ TV − | A| φT
+
+)! 
+
+> (b)
+
+≤ exp 
+
+
+
+−2T
+
+
+
+P ˜X − P ˜X|θ TV 
+
+− | A| φT
+
+2
+
+≤ exp 
+
+
+
+−2T
+
+
+
+P ˜X − P ˜X|θ TV 
+
+− ˜X φT
+
+2
+
+, (27) where in step (a) we introduce A ⊂ ˜X with the property P ˜X (A) − P ˜X|θ(A) = P ˜X − P ˜X|θ TV 
+
+(the existence of such a set is ensured by the definition of variational distance), and step (b) holds due to Hoeffding’s inequality (e.g., [3, Theorem 2.8]) because P 
+
+> ˜x∈A
+
+#(˜ xT , ˜x) is a binomial random variable with T trials and success probability P ˜X|θ(A).We substitute (27) into (26) and obtain 
+
+EP T
+
+> ˜X
+
+1 ˜XT ∈T log Q ˜XT ( ˜XT )
+
+w(θ0)P T 
+
+> ˜X
+
+( ˜XT )
+
+!
+
+≤ 1
+
+w(θ0)
+
+X
+
+> θ∈ΘT
+
+w(θ) exp 
+
+
+
+−2T
+
+
+
+P ˜X − P ˜X|θ TV 
+
+− ˜X φT
+
+2
+
++ w(Θ cT \ { θ0})
+
+!
+
+≤ 1
+
+w(θ0)
+
+X
+
+> θ∈ΘT
+
+w(θ) exp 
+
+
+
+−2T 12
+
+
+
++ w(Θ cT \ { θ0})
+
+!
+
+≤ 1
+
+w(θ0)
+
+
+
+exp 
+
+
+
+−2T 12
+
+
+
++ w(Θ cT \ { θ0})
+
+
+
+(28) The lemma follows by substituting (25) and (28) into (24). If Θ and ˜X are finite, we bound 
+
+D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ (a)
+
+= EP TX, ˜X
+
+log P TX, ˜X (XT , ˜XT )
+
+QXT , ˜XT (XT , ˜XT ) − D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+18 
+
+> (b)
+
+≤ log 1
+
+w(θ0) − D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ (29) where in step (a) we have substituted the definition of Kullback-Leibler divergence, for (b) we have used that due to (6), it holds that 
+
+QXT , ˜XT (XT , ˜XT ) ≥ w(θ0)P TX, ˜X (xT , ˜xT )
+
+pointwise. We bound this term further by invoking Lemma 8 with φ := T − 14 . Substituting this choice into the condition in (20) and rearranging terms, we get 
+
+T 14 ≥
+
+1 + ˜X
+
+P ˜X − P ˜X|θ TV 
+
+.
+
+Hence ΘT = Θ \ { θ0} for all 
+
+T ≥
+
+ 1 + ˜X
+
+min θ∈Θ\{ θ0} P ˜X − P ˜X|θ TV 
+
+
+
+> 4
+
+(30) So for all T that satisfy (30), we have 
+
+D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ ≤ exp 
+
+
+
+−2T 12
+
+  1
+
+w(θ0) + 2 ˜X
+
+
+
+log 1
+
+w(θ0) + T log 1
+
+pmin ,θ 0
+
+ 
+
+.
+
+For large enough T , this is upper bounded by exp( −√T ), proving the theorem for this case. Next, we consider the case that Θ is countably infinite and ( ˜X , ˜F) is a general measurable space. We will first construct a sequence of finite alphabets ( ˜XT )T ∈N and a corresponding sequence of quantization maps qT : ˜X → ˜XT . For every 
+
+θ ∈ Θ \ { θ0}, due to (19), we can choose some set Sθ ∈ F with PX|θ(Sθ )̸ = PX (Sθ ). Then let Aθ := Sθ if PX (Sθ ) > 0 and let Aθ := ˜X \ Sθ otherwise. We have thus constructed a family (Aθ )θ∈Θ\{ θ0} of measurable subsets of ˜X with the property 
+
+∀θ ∈ Θ \ { θ0} : P ˜X (Aθ ) > 0, P ˜X (Aθ )̸ = P ˜X|θ(Aθ ). (31) We next define a sequence (ℓT )T ∈N via 
+
+ℓT := max 
+
+
+
+ℓ ∈
+
+
+
+1, . . . , 
+
+ 18 log 2 T
+
+ 
+
+: min 
+
+> (s1,...,s ℓ)∈Bℓ
+
+P ˜X (Aθ1 [s1] ∩ · · · ∩ Aθℓ [sℓ]) ≥ exp( −T )
+
+
+
+, (32) where (θn)n∈N is an enumeration of Θ \ { θ0},
+
+Aθ [s] := 
+
+(
+
+Aθ , s = 1 
+
+Acθ , otherwise, and 
+
+Bℓ := (s1, . . . , s ℓ) ∈ { 0, 1}ℓ : P ˜X (Aθ1 [s1] ∩ · · · ∩ Aθℓ [sℓ]) > 0 .
+
+Lemma 9. For every ℓ ∈ N, we have Bℓ̸ = ∅.Proof. We prove the lemma by induction. If ℓ = 1 , then 1 ∈ Bℓ by property (31). If ℓ > 1, we invoke the induction hypothesis to obtain (s1, . . . , s ℓ−1) ∈ Bℓ−1, i.e., P ˜X
+
+ Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] > 0. If P ˜X
+
+ Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] ∩ Aθℓ
+
+ > 0,then we have (s1, . . . , s ℓ−1, 1) ∈ Bℓ. If, on the other hand, P ˜X
+
+ Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] ∩ Aθℓ
+
+ = 0 , we have 
+
+P ˜X
+
+ Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] ∩ Acθℓ
+
+
+
+= P ˜X
+
+   Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] \  Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] ∩ Aθℓ
+
+ 
+
+= P ˜X
+
+ Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] − P ˜X
+
+ Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1] ∩ Aθℓ
+
+
+
+= P ˜X
+
+ Aθ1 [s1] ∩ · · · ∩ Aθℓ−1 [sℓ−1]
+
+> 0
+
+and hence (s1, . . . , s ℓ−1, 0) ∈ Bℓ.
+
+Lemma 10. (ℓT )T ∈N is a nondecreasing sequence with lim T →∞ ℓT = ∞.Proof. It is clear from definition (32) that the set of which ℓT +1 is the maximum is a superset of the set of which ℓT is the maximum and therefore ℓT +1 ≥ ℓT . Assume, towards a contradiction, that lim T →∞ ℓT̸ = ∞. Since we have already shown 19 
+
+that the sequence is nondecreasing, this implies that there is some ℓmax ∈ N such that ℓT = ℓmax for all sufficiently large 
+
+T ∈ N. Examining definition (32) once more, we can see that it implies 
+
+min 
+
+> (s1,...,s ℓmax+1 )∈Bℓmax+1
+
+P ˜X (Aθ1 [s1]) ∩ · · · ∩ Aθℓ [sℓmax +1 ]) < exp( −T ) (33) for all sufficiently large T . Since the left hand side is independent of T and due to Lemma 9 Bℓmax +1 ̸ = ∅, this means that there is (s1, . . . , s ℓmax +1 ) ∈ { 0, 1}ℓmax +1 with P ˜X (Aθ1 [s1] ∩ · · · ∩ Aθℓ [sℓmax +1 ]) > 0 but P ˜X (Aθ1 [s1] ∩ · · · ∩ P ˜X (Aθℓ [sℓmax +1 ]) <
+
+exp( −T ) for all sufficiently large T ∈ N. This is the contradiction that was needed to prove the lemma. For every T ∈ N, define ˜XT := {0, 1}ℓT and 
+
+qT : ˜X → ˜XT , ˜x 7 →
+
+
+
+1˜x∈Aθ1 , . . . , 1˜x∈AθℓT
+
+
+
+. (34) We also define 
+
+pmin (T ) := min     
+
+> ˜xquant ∈˜XT
+> P˜X(qT( ˜X)=˜ xquant )>0
+
+P ˜X (qT ( ˜X) = ˜ xquant )
+
+and note that (32) ensures 
+
+pmin (T ) ≥ exp( −T ) and ˜XT ≤ 2 18 log 2 T = T 18 . (35) 
+
+Lemma 11. Defining 
+
+ΘT := 
+
+n
+
+θ ∈ Θ : PqT ( ˜X) − PqT ( ˜X)|θ TV 
+
+− ˜XT T − 14 ≥ T − 14
+
+o
+
+(36) 
+
+Θ′ 
+
+> T
+
+:= 
+
+n
+
+θ ∈ Θ : PqT ( ˜X) − PqT ( ˜X)|θ TV 
+
+− T − 18 ≥ T − 14
+
+o
+
+,
+
+we have Θ′ 
+
+> T
+
+⊆ ΘT and [ 
+
+> T∈N
+
+Θ′ 
+
+> T
+
+= Θ \ { θ0}. (37) 
+
+Proof. Θ′ 
+
+> T
+
+⊆ ΘT follows directly from ˜XT ≤ T 18 . For (37), we assume, towards a contradiction, that there is ℓ ∈ N such that θℓ /∈ Θ′ 
+
+> T
+
+for all T ∈ N. Defining the auxiliary sequence (aT )T ∈N via 
+
+aT := PqT ( ˜X) − PqT ( ˜X)|θℓ TV 
+
+,
+
+this means that aT < T − 18 + T − 14 for all T ∈ N and in particular implies lim T →∞ aT = 0 . It can be seen in (34) that qT ( ˜X)
+
+is a function of qT +1 ( ˜X) (simply discard the last coordinate), so by the data processing principle, (aT )T ∈N is a nondecreasing sequence. However, it clearly also is a nonnegative sequence, so the limit statement actually implies aT = 0 for all T ∈ N.Lemma 10 allows us to fix T with ℓT ≥ ℓ. aT = 0 and (34) then imply 
+
+P ˜X (Aθℓ ) = PqT ( ˜X)
+
+ {0, 1}ℓ−1 × { 1} × { 0, 1}ℓT −ℓ = PqT ( ˜X)|θℓ
+
+ {0, 1}ℓ−1 × { 1} × { 0, 1}ℓT −ℓ = P ˜X|θℓ (Aθℓ ),
+
+contradicting (31). We now have all the technical ingredient necessary to finish the proof of Lemma 1. Specifically, we can bound 
+
+D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+> (a)
+
+= EP TX, ˜X
+
+log dP TX, ˜X
+
+dQ XT , ˜XT
+
+(XT , ˜XT ) − D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+> (6)
+
+= −EP TX, ˜X
+
+log X
+
+> θ∈Θ
+
+w(θ)
+
+dP TX, ˜X|θ
+
+dP TX, ˜X
+
+(XT , ˜XT )
+
+!
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+≤ − EP TX, ˜X
+
+log w(θ0)
+
+dP TX, ˜X|θ0
+
+dP TX, ˜X
+
+(XT , ˜XT )
+
+!
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+> (b)
+
+≤ log 1
+
+w(θ0) − D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+> (c)
+
+≤ log 1
+
+w(θ0) − D
+
+
+
+P TqT ( ˜X)|| QqT ( ˜XT )
+
+
+
+> (d)
+
+≤ 1
+
+w(θ0)
+
+
+
+exp 
+
+
+
+−2T 12
+
+
+
++ w(Θ cT \ { θ0})
+
+
+
++ 2 ˜XT
+
+
+
+log 1
+
+w(θ0) + T log 1
+
+pmin (T )
+
+
+
+exp( −2T 12 )20 
+
+> (e)
+
+≤ 1
+
+w(θ0)
+
+
+
+exp 
+
+
+
+−2T 12
+
+
+
++ w(Θ ′cT \ { θ0})
+
+
+
++ 2 T 18
+
+
+
+log 1
+
+w(θ0) + T 2
+
+
+
+exp( −2T 12 ) (38) where step (a) uses the definition of Kullabck-Leibler divergence, step (b) uses PX, ˜X|θ0 = PX, ˜X , (c) follows by the data processing principle (the notation qT ( ˜XT ) is to be understood as a component-wise application of the map qT ), in (d) we have invoked Lemma 8 with φ := T − 14 (note that the definitions (20) and (36) match in this case), and in (e) we have used Lemma 11 and (35). It follows from Lemma 11 that 
+
+lim   
+
+> T→∞
+
+w(Θ ′cT \ { θ0}) = 0 ,
+
+so (38) vanishes as T → ∞ , concluding the proof of Lemma 1. 
+
+C. Proof of Theorem 3 
+
+We use the main result of [4] to bound the Kullback-Leibler divergences D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+and D
+
+
+
+P T 
+
+> ˜X
+
+|| Q ˜XT
+
+
+
+so we can substitute them into Theorem 1. First, we note that condition 1 in Theorem 3 ensures that [4, Condition 1] is satisfied for both families (PX, ˜X|θ)θ∈Θ and (P ˜X|θ)θ∈Θ while conditions 2 and 4 ensure that [4, Condition 2] is also satisfied. Condition 5 corresponds to the soundness condition in [4] which via [4, Theorem 2.2] ensures that also [4, Condition 3] is satisfied. This allows us to invoke [4, Theorem 2.1] and via the remark after the theorem and condition 3 of Theorem 3, we get the expression of [4, eq. (1.4)] 
+
+D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+= d
+
+2 log T
+
+2πe + 12 log det IX, ˜X (θ0) + o(1) 
+
+D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ = d
+
+2 log T
+
+2πe + 12 log det I ˜X (θ0) + o(1) .
+
+Putting this together and substituting into Theorem 1, we obtain 
+
+R = D
+
+
+
+P TX, ˜X || QXT , ˜XT
+
+
+
+− D  P T 
+
+> ˜X
+
+|| Q ˜XT
+
+ = 12 log det IX, ˜X (θ0)det I ˜X (θ0) + o(1) ,
+
+and the theorem follows by dividing both sides by T .REFERENCES [1] Charalambos D. Aliprantis and Kim C. Border. Infinite Dimensional Analysis. A Hitchhiker’s Guide . Springer-Verlag, Berlin Heidelberg New York, 3 edition, 2006. [2] Franc ¸ois Auger, Mickael Hilairet, Josep M Guerrero, Eric Monmasson, Teresa Orlowska-Kowalska, and Seiichiro Katsura. Industrial applications of the kalman filter: A review. IEEE Transactions on Industrial Electronics , 60(12):5458–5471, 2013. [3] St´ ephane Boucheron, G´ abor Lugosi, and Pascal Massart. Concentration Inequalities. A Nonasymptotic Theory of Independence . Oxford University Press, Oxford, 1 edition, 2013. [4] Bertrand S Clarke and Andrew R Barron. Information-theoretic asymptotics of Bayes methods. IEEE Transactions on Information Theory , 36(3):453–471, 2002. [5] Imre Csisz´ ar and J´ anos K¨ orner. Information Theory: Coding Theorems for Discrete Memoryless Systems . Cambridge University Press, Cambridge, second edition, 2011. [6] Amir Dembo and Tsachy Weissman. Universal denoising for the finite-input general-output channel. IEEE Transactions on Information Theory ,51(4):1507–1517, 2005. [7] Irena Fischer-Hwang, Idoia Ochoa, Tsachy Weissman, and Mikel Hernaez. Denoising of aligned genomic data. Scientific Reports , 9(1):15067, 2019. [8] Majid Fozunbal. On regret of parametric mismatch in minimum mean square error estimation. In 2010 IEEE International Symposium on Information Theory , pages 1408–1412. IEEE, 2010. [9] George M Gemelos. Universal discrete denoising under channel uncertainty . PhD thesis, 2006. [10] George M Gemelos, Styrmir Sigurjonsson, and Tsachy Weissman. Algorithms for discrete denoising under channel uncertainty. IEEE Transactions on Signal Processing , 54(6):2263–2276, 2006. [11] George M Gemelos, Styrmir Sigurj´ onsson, and Tsachy Weissman. Universal minimax discrete denoising under channel uncertainty. IEEE Transactions on Information Theory , 52(8):3476–3497, 2006. [12] Shao-Lun Huang, Anuran Makur, Fabian Kozynski, and Lizhong Zheng. Efficient statistics: Extracting information from iid observations. In 2014 52nd Annual Allerton Conference on Communication, Control, and Computing (Allerton) , pages 699–706. IEEE, 2014. [13] Rudolph Emil Kalman. A new approach to linear filtering and prediction problems. Journal of Basic Engineering , 82(1):35–45, 1960. [14] David Laehnemann, Arndt Borkhardt, and Alice Carolyn McHardy. Denoising DNA deep sequencing data—high-throughput sequencing errors and their correction. Briefings in bioinformatics , 17(1):154–179, 2016. [15] Byunghan Lee, Taesup Moon, Sungroh Yoon, and Tsachy Weissman. DUDE-seq: fast, flexible, and robust denoising for targeted amplicon sequencing. 
+
+PLOS One , 12(7):e0181463, 2017. [16] Neri Merhav and Meir Feder. Universal prediction. IEEE Transactions on Information Theory , 44(6):2124–2147, 1998. [17] Taesup Moon, Seonwoo Min, Byunghan Lee, and Sungroh Yoon. Neural universal discrete denoiser. In 30th Conference on Neural Information Processing Systems (NIPS 2016), Barcelona, Spain , volume 29, 2016. [18] Giovanni Motta, Erik Ordentlich, Ignacio Ramirez, Gadiel Seroussi, and Marcelo J Weinberger. The iDUDE framework for grayscale image denoising. 
+
+IEEE Transactions on Image Processing , 20(1):1–21, 2010. [19] Janis N¨ otzel and Andreas Winter. Information theoretic principles of universal discrete denoising. In 2017 International Symposium on Wireless Communication Systems (ISWCS) , pages 205–210. IEEE, 2017. [20] Erik Ordentlich, Gadiel Seroussi, Sergio Verdu, Marcelo Weinberger, and Tsachy Weissman. A discrete universal denoiser and its application to binary images. In 2003 International Conference on Image Processing , volume 1, pages I–117 – I–120. IEEE, 2003. 21 
+
+[21] Erik Ordentlich, Krishnamurthy Viswanathan, and Marcelo J Weinberger. On concentration for denoiser-loss estimators. In 2009 IEEE International Symposium on Information Theory , pages 824–828. IEEE, 2009. [22] Stephanie Pereira and Tsachy Weissman. Denoising and filtering under the probability of excess loss criterion. IEEE Transactions on Information Theory , 53(4):1265–1281, 2007. [23] Malempati Madhusudana Rao. Measure Theory and Integration . Pure and Applied Mathematics. Marcel Dekker, New York Basel, 2 edition, 2004. [24] Herbert Robbins. A remark on Stirling’s formula. The American Mathematical Monthly , 62(1):26–29, 1955. [25] Han-I Su and Tsachy Weissman. Universal lossless compression-based denoising. In 2010 IEEE International Symposium on Information Theory , pages 1648–1652. IEEE, 2010. [26] Claudio Urrea and Rayko Agramonte. Kalman filter: historical overview and review of its use in robotics 60 years after its creation. Journal of Sensors ,2021(1):9674015, 2021. [27] Krishnamurthy Viswanathan and Erik Ordentlich. Lower limits of discrete universal denoising. IEEE Transactions on Information Theory , 55(3):1374– 1386, 2009. [28] Tsachy Weissman, Erik Ordentlich, Gadiel Seroussi, Sergio Verdu, and Marcelo Weinberger. Universal discrete denoising. In Proceedings of the IEEE Information Theory Workshop , pages 11–14. IEEE, 2002. [29] Tsachy Weissman, Erik Ordentlich, Gadiel Seroussi, Sergio Verd´ u, and Marcelo J Weinberger. Universal discrete denoising: Known channel. IEEE Transactions on Information Theory , 51(1):5–28, 2005. [30] Tsachy Weissman, Erik Ordentlich, Marcelo J Weinberger, Anelia Somekh-Baruch, and Neri Merhav. Universal filtering via prediction. IEEE Transactions on Information Theory , 53(4):1253–1264, 2007. [31] Pumiao Yan, Jiwon Jeong, Naomi Sagan, and Tsachy Weissman. Universal discrete filtering with lookahead or delay. IEEE Transactions on Information Theory , 72(1):791–809, 2026.

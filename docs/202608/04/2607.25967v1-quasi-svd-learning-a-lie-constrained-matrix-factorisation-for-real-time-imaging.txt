@@ -1,0 +1,948 @@
+Title: Quasi-SVD: Learning a Lie-constrained matrix factorisation for real-time imaging
+
+URL Source: https://arxiv.org/pdf/2607.25967v1
+
+Published Time: Wed, 29 Jul 2026 01:22:39 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# QUASI -SVD: L EARNING A LIE -CONSTRAINED MATRIX FACTORISATION FOR REAL -TIME IMAGING 
+
+A P REPRINT 
+
+Christopher Hahne *
+
+University of Bern 3008 Bern, Switzerland 
+
+christopher.hahne@unibe.ch 
+
+July 29, 2026 
+
+# ABSTRACT 
+
+Singular Value Decomposition (SVD) underlies matrix factorisation tasks across computational imag-ing, with medical applications increasingly demanding real-time processing. Yet SVD algorithms are inherently sequential, constraining real-time GPU throughput and limit online deployment in clinical pipelines. This study introduces Quasi-SVD, a differentiable, fully parallelized matrix factorization framework for GPUs. Rather than enforcing orthogonality on both factors, it guarantees exact orthog-onality for a single Lie-parameterized factor while recovering the remaining components through soft constraints, enabling efficient parallel decomposition without iterative singular-vector optimization. This asymmetric design, provably sufficient for valid factorisation, achieves reconstruction fidelity of SSIM = 0.89–0.94 and accelerates computation by 3–20× relative to cuSOLVER and randomised SVD, enabling throughput above 25 FPS. Performance is evaluated on two medical imaging tasks spanning complementary computational regimes: (1) spatio-temporal background subtraction for ultrasound localisation microscopy, requiring high-dimensional matrix separation, and (2) Mueller matrix polarimetry for neurosurgical tissue characterisation, requiring massive batch processing of small matrices. Across both regimes and multiple imaging instruments, the proposed framework demonstrates robust domain transfer and throughput exceeding 25 FPS at clinical matrix scales, a rate sufficient for live image-guided workflows that classical solvers cannot currently support in these settings. By prioritising downstream reconstruction fidelity over exact spectral recovery, Quasi-SVD makes structured matrix factorisation practical for real-time imaging. 
+
+# 1 Introduction 
+
+Real-time, image-guided clinical workflows increasingly depend on GPU-accelerated imaging pipelines. Two such workflows anchor this work: intraoperative tissue characterisation, where surgeons rely on instantaneous polarimetric feedback to delineate tumour margins, and ultrasound localisation microscopy, where clinicians track microvascular flow in real time. A common computational core across medical imaging modalities is the Singular Value Decomposition (SVD), used for subspace denoising, dimensionality reduction, and structured signal separation in modalities ranging from spatio-temporal filtering in ultrasound localisation microscopy (ULM) Demené et al. [2015], Errico et al. [2015], Baranger et al. [2018], Hahne et al. [2024] to MRI coil compression Otazo et al. [2015], Zbontar et al. [2018], Johnson et al. [2021], Cole et al. [2022] and Mueller matrix polarimetry (MMP) for surgical guidance Lu and Chipman [1996], Moriconi et al. [2024], Hahne et al. [2025a]. In each of these settings, SVD is not a peripheral step but the rate-limiting one: existing solvers throttle ULM to approximately 4 FPS Moriconi et al. [2024], Hahne et al. [2025a] or force background subtraction into an offline step Demené et al. [2015], Hahne et al. [2024], well below the throughput required for live image-guided decision-making. This bottleneck is structural rather than incidental. Classical SVD algorithms Golub and Reinsch [1970], Hansen [1987, 1990], Halko et al. [2011], Musco and Musco [2015], Łukasz Struski et al. [2024] rely on Householder reflections, 
+
+> ∗
+
+Further information is found on the author website: https://hahne.website .arXiv:2607.25967v1 [cs.CV] 28 Jul 2026 Quasi-SVD A P REPRINT 
+
+pivoted QR, and iterative refinement that impose sequential data dependencies between steps. These dependencies prevent full use of the thousands of cores available on modern GPUs, leaving accelerators largely idle during the most expensive stages of decomposition regardless of how aggressively the algorithm is otherwise optimised. The problem manifests at two computational extremes that are both clinically relevant: high-throughput batches of small matrix decompositions, as in per-pixel Mueller matrix normalisation, and memory-intensive decompositions of high-dimensional data, as in temporal subspace filtering over hundreds of ultrasound frames. Neither extreme is well served by solvers designed around sequential bidiagonalisation, and the resulting latency is what currently keeps several SVD-dependent imaging pipelines offline. GPU-parallel and learning-based alternatives have each addressed part of this problem without resolving it. Parallel implementations of classical SVD, including CUDA-based bidiagonalisation Lahabar and Narayanan [2009] and Jacobi-type solvers exposed through cuSOLVER NVIDIA Corporation [2026], Demmel and Veseli´ c [1992], Novakovic [2015], improve throughput but either retain sequential reflection-based steps or restrict batched parallelism to small matrices, falling back to sequential routines beyond that regime. Learning-based decompositions such as SV-Learn Xu et al. [2022] and operator-level approaches Ryu et al. [2024] replace explicit factorisation with a learned mapping, but they enforce orthogonality only through soft penalties or omit it entirely, accumulating numerical drift that compromises the very property that makes SVD-based filtering reliable. Separately, matrix exponentials over Lie algebras have been used to enforce hard orthogonality constraints in neural network layers Lezcano-Casado and Martınez-Rubio [2019], Li et al. [2020] and in camera pose estimation Whelan et al. [2015], Teed and Deng [2021], Hayoz et al. [2023], Matsuki et al. [2024], but this machinery has not been used to constrain a learned matrix decomposition itself. As a result, no existing method combines GPU-native parallelism with a guarantee of exact orthogonality during decomposition: classical solvers are parallel-unfriendly by construction, while learning-based, parallel-friendly solvers cannot guarantee the orthogonality their downstream reconstructions implicitly assume. This work closes that gap with Quasi-SVD, a Lie-theoretic, fully differentiable matrix factorisation framework that resolves both limitations simultaneously. Rather than constraining both singular-vector factors, Quasi-SVD enforces 
+
+exact orthogonality on a single factor via the matrix exponential over a skew-symmetric Lie algebra, while recovering the remaining components through soft constraints. This asymmetric construction is provably sufficient for valid factorisation, and it deliberately trades exact spectral recovery for reconstruction fidelity and throughput, a trade-off validated directly on the two clinically motivated regimes above rather than on generic benchmarks. This reframes SVD approximation as a deployment-oriented design choice rather than a purely numerical one. 
+
+Contributions This work makes three key contributions: • Orthogonality via Lie theory : the first application of matrix exponentials from Lie algebra to enforce exact orthogonality on a single factor of a learned SVD decomposition, eliminating the numerical drift that affects approaches enforcing orthogonality only through soft penalties on all factors. • GPU-native parallelisable architecture : a fully differentiable, trainable framework that achieves > 3–20 ×
+
+speedup over algorithmic baselines while maintaining decomposition accuracy, demonstrated on real imaging data spanning complementary matrix dimensions ( 3 × 3 to 500 × 500 ). • Practical impact on real-time imaging : validation across ULM and MMP shows throughput exceeding 25 FPS at clinical matrix scales, making previously offline or sub-real-time pipelines deployable, including on cost-constrained deployment. 
+
+Outline The remainder of this paper is organised as follows. Section 2 situates the Quasi-SVD against classical sequential solvers, GPU-parallel implementations, learning-based decompositions, and Lie-theoretic orthogonality constraints, motivating the asymmetric design proposed here. Section 3 details the Quasi-SVD framework, including the analytic, neural, and end-to-end model variants, their training objectives, and a work–span complexity analysis relative to classical baselines. Section 4 evaluates proposed methods on MMP and ULM, reporting reconstruction fidelity, throughput, and cross-instrument domain transfer. Section 5 discusses the accuracy–throughput trade-off and limitations, before Section 6 concludes and outlines future directions. 
+
+# 2 Related work 
+
+Traditional SVD Methods Singular Value Decomposition decomposes a matrix A ∈ Rm×n as A = UΣV ⊤, where 
+
+U ∈ O( m) and V ∈ O( n) are orthogonal matrices and Σ contains ordered singular values Golub and Van Loan [2013]. The full SVD has cubic time complexity O(min( m, n ) · mn ) via Householder bidiagonalization and QR iteration Golub and Reinsch [1970], which impose sequential dependencies for batched matrix factorisations on modern parallel hardware and thus limit the throughput Lahabar and Narayanan [2009]. The computational burden 2Quasi-SVD A P REPRINT 
+
+is further compounded when moving to high-order arrays, where Tensor SVD Zhang and Xia [2018] encounters a fundamental statistical-computational gap that renders optimal recovery NP-hard under moderate signal-to-noise ratios. Approximation methods like Truncated SVD Hansen [1987, 1990], Stoll [2012] and Randomised SVD Halko et al. [2011], Musco and Musco [2015] reduce complexity but retain sequential bottlenecks that prevent efficient GPU parallelisation. Rank–revealing QR still hinges on pivoted column selection heuristics that require dependent branching and synchronization Chan [1987], Gu and Eisenstat [1996]. Nyström methods only postpone the problem by reducing the effective matrix size Drineas et al. [2006], Musco and Musco [2017], but the subsequent SVD on the reduced core is still sequential and remains the runtime limit. As alternatives, Streaming SVD updates decomposition dynamically as new data arrives Brand [2006] and k-SVD employs an iterative framework to learn sparse representations by optimizing dictionary atoms Aharon et al. [2006], Scetbon et al. [2021]. Despite their sophistication, these methods do not resolve the core structural barrier, which is to map cleanly to highly parallel computation architectures. 
+
+Parallel SVD Implementations To overcome sequential bottlenecks, CUDA-based implementations Lahabar and Narayanan [2009] accelerate SVD for large matrices using partial bidiagonalization followed by QR or divide-and-conquer routines, although Householder transformations remain inherently sequential and limit parallelism Golub and Reinsch [1970], Novakovic [2015]. Jacobi-based algorithms Demmel and Veseli´ c [1992], Golub and Van Loan [2013], Novakovic [2015] offer a more parallelizable alternative by decomposing rotations over independent 2 × 2 pivot submatrices, achieving high numerical accuracy and natural suitability for block-parallel computation. Modern GPU libraries such as NVIDIA cuSOLVER implement Jacobi-type solvers (e.g., gesvdj ) to exploit this parallelism NVIDIA Corporation [2026], but these batched Jacobi routines are practically restricted to small matrices ( m, n ≤ 32 ). For larger matrices, cuSOLVER falls back to traditional bidiagonalization-based SVD, which is sequential and less GPU-friendly but stable and general. 
+
+Learning-Based Approaches Recent work has explored neural networks for SVD-related tasks. SV-Learn Xu et al. [2022] uses MLPs to predict singular values but suffers from numerical instability due to soft constraints and cannot recover singular vectors. Dictionary - learning methods such as Deep K - SVD Scetbon et al. [2021] produce sparse representations via iterative dictionary updates which rely on solvers with loop - heavy control flow. Operator-SVD Ryu et al. [2024] learns spectral decompositions of linear operators through nested low-rank approximation, achieving theoretical elegance but at significant computational cost unsuitable for real-time imaging. Beyond normalisation, SVD is instrumental in spectral clustering layers, though the high computational cost of the decomposition often necessitates its replacement with dual autoencoder architectures to maintain end-to-end efficiency Yang et al. [2019]. While such replacements improve speed, they often sacrifice the explicit spectral interpretability of the SVD. This work addresses these limitations by maintaining a mathematically principled framework that approximates matrix decomposition directly, trading strict spectral exactness for the throughput required in real-time imaging. 
+
+Lie Groups and Orthogonal Constraints Matrix exponentials provide natural parameterisations of orthogonal groups through the exponential map from Lie algebras. While applied in visual odometry Whelan et al. [2015], Teed and Deng [2021], Hayoz et al. [2023], Matsuki et al. [2024] and investigated in ML for hard orthogonality constraints in network layers via the matrix exponential Lezcano-Casado and Martınez-Rubio [2019] and Cayley transform Li et al. [2020], no prior work has integrated these tools to enforce orthogonality in a learned decomposition of streaming input matrices. Existing learned SVD methods either enforce orthogonality implicitly through unconstrained optimisation Ryu et al. [2024] or omit it entirely Xu et al. [2022], accumulating numerical drift. Methods such as DiTASK Mantri et al. [2025] that do exploit Lie structure operate downstream of a fixed decomposition, adapting singular values of pre-trained weights rather than computing factors online. Across these lines of work, a structural tension recurs between parallelism and orthogonality guarantees. Classical and GPU-parallel approaches accelerate computation but retain sequential branching steps that resist SIMT parallelism La-habar and Narayanan [2009], NVIDIA Corporation [2026]; learning-based decompositions replace hard orthogonality with soft penalties that accumulate drift Xu et al. [2022], Ryu et al. [2024]; and Lie-theoretic constraints, though proven effective elsewhere Lezcano-Casado and Martınez-Rubio [2019], Li et al. [2020], have not been applied to learned decomposition. No prior method therefore satisfies both requirements simultaneously. 
+
+# 3 Proposed method 
+
+This work targets an efficient, learnable SVD approximation that preserves reconstruction and downstream accuracy while minimizing GPU wall -clock latency and keeping training cost practical. The Quasi -SVD framework comprises a spectrum of module variants illustrated in Fig. 1: analytic closed - form, unconstrained neural net (UNN), Lie -informed parametrizations, and end - to - end prediction where each trades off accuracy, latency, and training effort. Full derivations, work–span analyses, and implementation details appear in the supplement. 3Quasi-SVD A P REPRINT 
+
+Notation In close analogy to the SVD, an orthogonal matrix decomposition framework is proposed: 
+
+A = XDY ⊤, (1) where A ∈ Rm×n is decomposed into matrices X ∈ SO( m) and Y ∈ Rn×n whereas D ∈ GL( m, R) is a diagonal matrix. Let D = diag( d) denote the diagonal matrix with d ∈ Rm on its diagonal, and let d = diag −1(D) = [d1, d 2, . . . , d m]⊤ denote the vector of diagonal elements of D.  
+
+> (a) Analytic model (b) Unconstrained neural net (UNN)
+> (c) Lie-based neural net (LieNN) (d) End-to-end learning (E2E)
+
+Figure 1: Quasi-SVD model variants. The analytic model in (a) provides a closed-form solution using the matrix exponential for orthonormal projection without learnable components. The unconstrained neural network (UNN) in (b) introduces trainable weights and algebraic operations to factorise the input matrix. The Lie-based neural network (LieNN) in (c) predicts skew-symmetric parameters mapped to an exact orthogonal factor via the matrix exponential, combining learned flexibility with hard orthogonality guarantees. The end-to-end (E2E) network in (d) omits mathematical constraints entirely, producing only the composed matrix output M. These model variants are used for an ablation analysis. 
+
+3.1 Analytic decomposition 
+
+Orthogonality is central in many factorisation schemes underlying SVD. The present formulation enforces this structure directly inside the corresponding Lie group and parametrises orthogonal matrices through the Lie algebra so (m).A skew-symmetric matrix S ∈ so (m) ensures that exp( S) ∈ SO( m), making the matrix exponential an analytic mechanism for generating valid left/right factors. Given a matrix A, the construction proceeds as follows: 
+
+X = exp( S) , where S = A − A⊤ , (2) and S + S⊤ = 0 enforces skew-symmetry. The exponential map exp( ·) : so (m) 7 → SO( m) guarantees X is orthogonal. For rectangular inputs ( m̸ = n), A is zero-padded along the smaller dimension to form a square matrix. For higher-dimensional cases, the computational burden of the standard matrix exponential algorithm is efficiently reduced via Taylor expansion in: 
+
+exp ( S) ≈
+
+> k
+
+X
+
+> n=0
+
+Sn
+
+n! , (3) 4Quasi-SVD A P REPRINT 
+
+which is truncated at order k. In the special case of m = 3 , Rodrigues’ formula provides a closed-form expression: 
+
+exp r (S) = I + sin θθ S + 1 − cos θθ2 S2, (4) where θ = ∥S∥F /√2 and ∥·∥ F denotes the Frobenius norm. These methods yield a differentiable and algebraically grounded parameterization of orthogonal matrix components. From X, the singular values are estimated via the orthogonal similarity transform (spectral invariance under conjugation): 
+
+d = diag −1
+
+q 
+
+|X⊤AA ⊤X|
+
+
+
+(5) where the diagonal matrix is given by D = diag( d). The right singular vectors Y are then obtained as: 
+
+Y = A⊤XD −1 (6) which completes the analytical factorisation. For rectangular inputs ( m > n ), the scheme is applied to A⊤, after which the resulting factors are swapped back, such that singular values beyond the rank are implicitly forced to zero. 
+
+3.2 Neural decomposition 
+
+Extending on the work of SV-Learn Xu et al. [2022], a viable design choice for full neural SVD prediction is to let a network gθ predict singular vectors by: 
+
+Xg = gθ (A) where gθ : Rm×n 7 → Rm×m (7) where Xg ∈ Rm×m. To satisfy A = Xg Dg Y⊤ 
+
+> g
+
+, one borrows the concepts from Eqs. (5) and (6) to compute Dg and 
+
+Yg , respectively. This unconstrained model is illustrated in Fig. 1b. 
+
+3.3 Lie-informed neural decomposition 
+
+To enforce matrix orthogonality in a learning context, a neural model fθ predicts the upper triangle of the skew-symmetric matrix s via: 
+
+s = fθ (A) where fθ : Rm×n 7 → RL (8) where s = [ s1, s 2, . . . , s L]⊤ contains L elements that form the upper triangle of the skew-symmetric matrix by: 
+
+F (s) = 
+
+
+
+0 s1 s2 · · · sm−1
+
+−s1 0 sm · · · ...
+
+−s2 −sm 0 · · · ...... ... ... . . . sL
+
+−sm−1 · · · · · · −sL 0
+
+
+
+(9) for the mapping F : RL 7 → so (m). From this, the Lie-based neural network (LieNN) predicts the matrix Xf via: 
+
+Xf = exp  F (s) , (10) which is then used to compute Df and Yf analogous to eqs. (5) and (6). Implementation variants for the matrix exponential are detailed in Sec. 3.6. 
+
+Lemma 1 (Asymmetric orthogonality suffices) . For any A = UΣV ⊤ with det( U) = −1, jointly flipping the sign of one column of U and the corresponding column of V yields ˜U ∈ SO( m) with A = ˜UΣ ˜V⊤ unchanged. A left factor in SO( m), expressible as exp( S) for skew-symmetric S, therefore always exists, while the corresponding right factor may lie in the determinant (−1) component of O( n) and is recovered only approximately. Full proof in Supp. Sec. A.3. 
+
+This justifies treating Xf and Yf asymmetrically during training: Xf is exactly orthogonal by construction, while Yf
+
+is only encouraged towards orthogonality through a soft penalty. The mathematical properties on singular values and right-factor orthogonality are therefore left as soft constraints using the following learning objectives: 
+
+Lσ = diag −1(Σ) − diag −1(Df ) 22 (11) 5Quasi-SVD A P REPRINT 
+
+with a separate off-diagonal zero enforcement loss: 
+
+Loff = Df − diag(diag −1(Df )) 22 (12) and an orthogonality penalty on Yf :
+
+Lort = Yf Y⊤ 
+
+> f
+
+− I 22 (13) where I ∈ Rn×n is an identity matrix. These losses are aggregated for a total loss given by: 
+
+LT = λ1Lσ + λ2Loff + λ3Lort  (14) where (λ1, λ 2, λ 3) are the regularization constants. 
+
+3.4 End-to-end learning 
+
+Many applications of the SVD involve reconstructing a filtered version M of an input matrix A. For instance, the Lu-Chipman decomposition in Mueller matrix imaging produces M = UDV ⊤ after factorisation where D = diag( d)
+
+and d ∈ {− 1, 1}m Lu and Chipman [1996]. This offers the opportunity to learn the overarching objective of an SVD as a function Eθ : Rm×n 7 → Rs×t. Here, the loss simplifies to: 
+
+Lend (M, A) = ∥M − Eθ (A)∥22 (15) as the distance between the network’s prediction and final reconstruction matrix M for which the SVD is used in the processing chain. A key advantage of this end-to-end approach is that operations beyond the SVD can be learned implicitly by Eθ (A), po-tentially improving computational efficiency. However, this comes at the cost and may complicate training. The network must discover underlying data patterns from scratch, which can lead to unstable convergence or limited generalization to out-of-distribution samples. After all, the lack of explicit decomposed components reduces interpretability. 
+
+3.5 Neural module architectures 
+
+Each learned model variant employs an MLP with a single hidden layer of size h = max(64 , m/ 2) , where m
+
+determines input and output dimensions. To emulate iterative convergence of classical SVD solvers, the MLP is optionally augmented with a three-step RNN that refines input matrix A, where gated recurrent units (GRUs) are used due to balanced accuracy and efficiency Foucault and Meyniel [2021], Hassaan et al. [2025]. 
+
+3.6 Computational complexity 
+
+The following analysis considers Quasi-SVD under the work–span model Blelloch [1996] (EREW PRAM) for m ≤ n,highlighting its suitability for SIMT (Single Instruction, Multiple Threads) architectures. Unlike classical solvers limited by sequential steps, Quasi-SVD exploits a parallel computation graph comprising multiple stages: MLP of width 
+
+h, skew-symmetric scattering, matrix exponentiation, and a one-sided orthogonal decomposition. Table 1 summarises the comparison with classical baselines. While the Cayley-transform’s LU solve dictates the span for general cases, Table 1: Work–span complexity Blelloch [1996]. Full proofs are found in Supp. B.                                      
+
+> Method Work Span
+> Golub–Reinsch Golub and Reinsch [1970] O(mn 2)O(nlog n)
+> Truncated SVD (via bidiagonalization) Hansen [1987] O(mnK )O(Klog n)
+> Randomised SVD (rSVD) Halko et al. [2011] O(mnℓ +nℓ 2)O(ℓlog n)
+> Lanczos (rank K) Golub and Van Loan [2013] O(mnK )O(Klog n)
+> Subspace (block) iteration Musco and Musco [2015] O(mnK )O(Klog n)
+> Quasi-SVD : LieNN by Cayley O(mn 2)O(mlog m)
+> Quasi-SVD : LieNN by Rodrigues, m=n= 3 O(mn 2)O(log m)
+> Quasi-SVD : LieNN by Taylor O(mn 2)O(log m)
+
+employing a constant-degree Taylor expansion or the closed-form Rodrigues formula ( m = n = 3 ) reduces the span to 
+
+O(log m). By default, a 9-term Taylor expansion is employed for general matrices, whereas the Rodrigues formula is used for A ∈ R3×3.6Quasi-SVD A P REPRINT 
+
+# 4 Experiments 
+
+4.1 Datasets 
+
+The selected datasets represent complementary SVD workload regimes. The polarimetric dataset requires performing a very large number of small decompositions, whereas the ultrasound dataset involves fewer but substantially larger matrices. Together, these cases capture the range of memory and performance trade-offs targeted by the proposed method. 
+
+Polarimetric data Imaging modalities often rely on small SVDs to normalise or extract features by replacing singular values and reconstructing local measurements. For example, MMP is an imaging technique with growing diagnostic relevance in medical imaging Sampaio et al. [2023], Moriconi et al. [2024]. For visualization, the Mueller matrix is typically decomposed via SVD following Lu and Chipman Lu and Chipman [1996], enabling interpretation of polarimetric features. In neuropathology, the per-pixel i azimuth angle φi = 1/2 tan −1(M (2 ,4)  
+
+> i
+
+/M (4 ,3)  
+
+> i
+
+) derived from Mi
+
+in Eq. (15) encodes fiber orientation, a biomarker for tumor identification Hahne et al. [2025a]. Although near real-time MMP has been demonstrated Moriconi et al. [2024], instant visualization of Lu–Chipman features remains challenging. The proposed Quasi-SVD model is evaluated on two datasets: the NeuroPathoPol (NPP) and the public mouse uterine cervix (MUC) data Novikova et al. [2024], Pogudin [2024]. NPP comprises 388 × 516 -pixel images, each pixel associated with a 4 × 4 Mueller matrix Bi = B(u,v ) 
+
+> i
+
+. Training and validation use 12 tumor and 9 non-tumor brain samples, while testing employs 5 tumor and 3 healthy samples. For each pixel i, a normalised input matrix Ai ∈ R3×3
+
+is derived from Bi as 
+
+Ai = 1
+
+B(1 ,1) 
+
+> i
+
+
+
+B(2 ,2)  
+
+> i
+
+B(2 ,3)  
+
+> i
+
+B(2 ,4) 
+
+> i
+
+B(3 ,2)  
+
+> i
+
+B(3 ,3)  
+
+> i
+
+B(3 ,4) 
+
+> i
+
+B(4 ,2)  
+
+> i
+
+B(4 ,3)  
+
+> i
+
+B(4 ,4) 
+
+> i
+
+ . (16) Data augmentation through random rotation and flipping increases the diversity of training samples Hahne et al. [2025b]. 
+
+Ultrasound data Many imaging applications employ the SVD for background subtraction. In ULM, the SVD is a key processing step to suppress static reflectors (e.g., bone) and isolate microbubble flow, commonly realised through the Karhunen–Loève transform (KLT) Demené et al. [2015], Baranger et al. [2018], Heiles et al. [2022]. Given a Casorati matrix Bc ∈ Rh×n constructed from n frames with h pixels, each Bc forms the Hermitian matrix A = B⊤ 
+
+> c
+
+Bc and uses its singular vectors for subspace denoising. Evaluation uses publicly available in vivo ULM data from the PALA study Heiles et al. [2022], comprising rat brain perfusion sequences acquired with a 15.6 MHz linear probe (128 elements, 0.1 mm pitch) at 1 kHz frame rate with multi-angle plane waves. Beamformed B-mode data from rat 18 is employed, containing 250 sequences of 500 frames each. To demonstrate feasibility, the first 20 sequences are used for training and validation (0.9 split), and the final 5 sequences for testing. After beamforming, each B-mode image has a resolution of 143 × 167 pixels, yielding an input matrix A ∈ R500 ×500 when 500 frames are stacked. 
+
+4.2 Metrics 
+
+Reconstruction quality and decomposition accuracy are reported using both perceptual and numerical metrics. The structural similarity index (SSIM) measures local luminance, contrast, and structure using an 11-pixel Gaussian window. For matrix-level assessment, a relative Frobenius error is defined as ∥D∥rel  
+
+> F
+
+= ∥D − D(gt )∥F /∥D(gt )∥F and 
+
+∥Y∥ort  
+
+> F
+
+= ∥YY ⊤ − I∥F /∥I∥F from the Frobenius norm ∥ · ∥ F with (gt ) denoting the ground truth (GT) and I the identity matrix. 
+
+4.3 Training and testing 
+
+Models are trained using AdamW with gradient clipping and cosine-annealed learning rates converging to zero. Weights are initialised with Xavier (Glorot) uniform for linear layers, biases drawn from  N (0 , 10 −6), and batch -norm weights/biases set to  1 and  0, respectively. Checkpoints are selected by lowest validation metrics as detailed below. • Polarimetric data: Nvidia RTX 4090, batch size 776, 40 epochs, initial learning rate 1e −3; best checkpoint by lowest  Lort  from Eq. (13) , except when training with  Lend , where the validation  ∥φi − φ(gt ) 
+
+> i
+
+∥22 governs selection. 7Quasi-SVD A P REPRINT 
+
+• Ultrasound data: Nvidia H100, batch size 1, 5 epochs, initial learning 1e −5; best checkpoint by lowest  LT
+
+from Eq. (14), except when training with  Lend  from Eq. (15), where the validation  Lend  governs selection. 
+
+4.4 Comparison methods 
+
+The proposed framework is evaluated against classical and learning-based SVD techniques: • cuSOLVER (GT): Reference implementation using one-sided Jacobi SVD for small matrices ( m, n ≤ 32 )and traditional decomposition (bidiagonalization plus QR, divide-and-conquer) for larger matrices Golub and Reinsch [1970], NVIDIA Corporation [2026]. Treated as the GT for accuracy and orthogonality evaluation. • SV-Learn: MLP-based predictor of singular values only, without singular vector reconstruction Xu et al. [2022]. • End-to-end (E2E) learning: Differentiable networks trained to directly reconstruct application-specific SVD outputs (e.g., MRI coil compression) Cole et al. [2022]. • rSVD: Stochastic low-rank approximation with three power iterations, implemented in PyTorch Halko et al. [2011]. For ablation studies, the analytical and UNN variants are also included. All learnable models are optionally extended with an RNN. This setup spans classical, stochastic, and neural methods, providing comprehensive baselines to compare accuracy, orthogonality, and computational efficiency. 
+
+4.5 Materials availability 
+
+The MUC and PALA datasets are publicly available at Novikova et al. [2024], Pogudin [2024] and Heiles et al. [2022], respectively. The NPP dataset is available upon reasonable request. For reproducibility, source code for all model variants and training pipelines will be made available at *placeholder* .
+
+4.6 Results 
+
+This section outlines general experimental trends followed by domain-specific outcomes. Numerical evaluations for both MMP and ULM are summarised in Tables 2 and 4, with qualitative comparisons in Figs. 2 and 3. Table 2: NPP test set results for Lu–Chipman decomposition. Scores are reported as mean ± std across frames ( – for not applicable; std omitted when zero). Bold is best non-GT score and shaded second-best score. GT is excluded from ranking. Method RNN SSIM( M) ↑ ∥X∥ort                                                                    
+
+> F↓∥D∥rel
+> F↓∥Y∥ort
+> F↓Time [ms] ↓
+> GT NVIDIA Corporation [2026] ✗1.00 0.00 0.00 0.00 36.98 ± 1.81 rSVD Halko et al. [2011] ✗0.15 ± 0.05 0.00 0.00 0.00 2.12e4±92.42 SV-Learn Xu et al. [2022] ✗0.65 ± 0.08 –0.50 ± 0.01 –1.89 E2E Cole et al. [2022] ✗0.75 ± 0.07 –––0.66
+> Analytic ✗0.66 ± 0.08 0.00 0.09 ± 0.04 0.46 ± 0.08 8.48 ± 0.02 UNN ✗0.82 ± 0.05 0.13 ± 0.04 0.03 ± 0.01 0.23 ± 0.07 9.85 ± 0.01 LieNN ✗0.83 ± 0.06 0.00 0.03 ± 0.01 0.24 ± 0.07 9.93 ± 0.02 E2E ✓0.98 ± 0.01 –––4.91 UNN ✓0.85 ± 0.04 0.14 ± 0.03 0.02 0.08 ± 0.02 13.81 ± 0.01 LieNN ✓0.94 ± 0.03 0.00 0.01 0.10 ± 0.03 14.19 ± 0.02
+
+General Findings While RNN-enabled models achieve the highest reconstruction fidelity (SSIM and Frobenius errors), LieNN provides the best factorised-matrix approximation, halving SVD runtime for MMP and reaching a 20 ×
+
+speed-up for ULM. Without RNNs, LieNN delivers the strongest performance, matching traditional methods’ left-sided orthogonality accuracy at 3 × faster processing, whereas non-RNN end-to-end models are fastest. The Lie-theoretic constraint introduces negligible overhead compared to UNN, confirming that structural enforcement preserves real-time performance while simultaneously enhancing reconstruction accuracy. Conversely, the analytic variant excels on SV-Learn Xu et al. [2022] metrics but underperforms relative to learned modules. Energy-based models indicated no accuracy gains but incurred additional computational costs (see Supp. C). 8Quasi-SVD A P REPRINT rSVD E2E Analytic UNN LieNet E2E+RNN UNN+RNN Lie+RNN GT                        
+
+> 2.1e4 ms 0.66 ms 8.55 ms 9.85 ms 9.93 ms 4.91 ms 13.81 ms 14.19 ms 36.75 ms
+> (a) rSVD E2E Analytic UNN LieNet E2E+RNN UNN+RNN Lie+RNN GT
+> 4.3e4 ms 1.21 ms 17.14 ms 19.37 ms 19.86 ms 10.29 ms 28.37 ms 28.96 ms 98.80 ms
+> (b)
+
+Figure 2: MMP benchmark comparison. The images show the per-pixel azimuth φi decomposed by the various models. (a) contains azimuth frames (388 × 516 pixels) from the NPP test set (remaining test samples are found in Supp. 6). (b) shows the azimuth results for the mouse uterine cervix image (600 × 700 pixels) Novikova et al. [2024], Pogudin [2024] for which the same models were used to investigate a model’s ability to adapt to domain gaps. 
+
+Results for MMP at A ∈ R3×3 Neural components learn to approximate the algebraic operations of the Lu–Chipman decomposition Lu and Chipman [1996], suggesting the potential to replace symbolic computations with accelerated abstractions. End-to-end modules most effectively cover these decomposition and filter steps, explaining their speed advantage over the non-iterative analytic method. However, these end-to-end strategies do not produce explicit matrix factors, limiting their utility in applications requiring spectral analysis. Figure 2 shows the per-pixel i azimuth φi ∈ R
+
+image maps for the two polarimetric datasets. The analytic model reasonably approximates GT values despite appearing noisy, demonstrating that a deterministic, first-order SVD approximation can provide competitive quality which is useful when computational budgets are limited. Among learnable models without RNNs, the Lie-informed network performs best, though small local errors persist, and the end-to-end model shows a consistent offset. With RNNs, all learnable models closely track GT, with only minor deviations in the UNN. Figure 2b presents azimuth results on data from a different MMP instrument, testing domain transfer across optical setups. Without RNNs, the end-to-end model shows the largest deviations with offset artifacts indicating numerical instability. Activating the RNN, networks best reproduce the GT patterns, supporting the trends observed in Tables 2 and 3. As MMP-trained model variants predict per-pixel components without spatial context, they qualify for robust domain transfer. Table 3 reports out-of-distribution results from a separate MMP instrument with different optical magnifi-cation and resolution Novikova et al. [2024], Pogudin [2024]. This domain gap analysis indicates consistent relative performance, although all learned approaches sacrifice absolute accuracy. 
+
+Results for ULM at A ∈ R500 ×500 Table 4 reports quantitative results for ULM spatio-temporal decomposition. The LieNN with RNN achieves the highest SSIM, closely approximating the GT while preserving orthogonality and low relative errors across factors. This confirms that incorporating Lie constraints effectively guides the network toward physically meaningful decompositions, even in the presence of highly dynamic ultrasound data. Unlike in MMP, the end-to-end model without RNN performs poorly, indicating that task-specific structure is more consequential in ULM. Figure3 provides qualitative inspection of ULM results depicting filtered B-mode reconstructions across all methods. The LieNN produces the closest match to the GT, maintaining microbubble contrast and effective clutter suppression while operating more than an order of magnitude faster. This suggests that online ULM is achievable without compromising fidelity. Randomised SVD provides moderate acceleration but exhibits reduced contrast for deeper penetration areas. The remaining approaches show overall lower contrast, consistent with their weaker quantitative 9Quasi-SVD A P REPRINT 
+
+Table 3: Domain shift analysis using the public MUC image data Novikova et al. [2024], Pogudin [2024]. Method RNN SSIM( M) ↑ ∥X∥ort  
+
+> F
+
+↓ ∥D∥rel  
+
+> F
+
+↓ ∥Y∥ort  
+
+> F
+
+↓ Time [ms] ↓
+
+GT NVIDIA Corporation [2026] ✗ 1.00 0.00 0.00 0.00 98.80 rSVD Halko et al. [2011] ✗ 0.10 – 0.00 – 4.33e4 SV-Learn Xu et al. [2022] ✗ 0.41 – 0.55 – 3.14 E2E Cole et al. [2022] ✗ 0.50 – – – 1.21 
+
+Analytic ✗ 0.69 0.00 0.14 0.40 16.90 UNN ✗ 0.36 0.21 0.37 0.34 19.37 LieNN ✗ 0.74 0.00 0.13 0.38 19.86 E2E ✓ 0.89 – – – 10.29 UNN ✓ 0.68 0.38 0.11 0.16 28.37 LieNN ✓ 0.83 0.00 0.07 0.25 28.96 Table 4: ULM test set results for spatio-temporal filtering. Scores are reported as mean ± std across frames ( – for not applicable; NaN for numerical instability; std omitted when zero). Bold is best non-GT score and shaded second-best. GT is excluded from ranking. Method RNN SSIM( M) ↑ ∥X∥ort  
+
+> F
+
+↓ ∥D∥rel  
+
+> F
+
+↓ ∥Y∥ort  
+
+> F
+
+↓ Time [ms] ↓
+
+GT NVIDIA Corporation [2026] ✗ 1.00 0.00 0.00 0.00 75.16 ± 0.96 rSVD Halko et al. [2011] ✗ 0.72 ± 0.02 NaN NaN NaN 1.98 ± 0.02 Analytic ✗ 0.67 ± 0.03 NaN NaN NaN 1.23 
+
+E2E ✓ 0.71 ± 0.03 – – – 2.21 UNN ✓ 0.77 ± 0.03 0.84 0.93 22.24 ± 0.04 2.49 ± 0.01 LieNN ✓ 0.89 ± 0.03 0.00 0.97 20.80 ± 1.25 3.28 ± 0.04 rSVD Analytic E2E+RNN UNN+RNN Lie+RNN GT      
+
+> 1.98 ms 1.23 ms 2.21 ms 2.49 ms 3.28 ms 75.16 ms
+
+Figure 3: ULM clutter removal benchmark analysis. Each frame shows the B-mode intensity after spatio-temporal filtering. Rows depict results at different points in acquisition time with columns representing methods for comparison. Numbers at the bottom represent the average computation time for a m = n = 500 input matrix A. Images are colour-encoded for better visibility. performance. Taken together, the LieNN offers the strongest balance between accuracy and computational efficiency, with visual improvements that align with trends observed across benchmarks. 
+
+Scalability To evaluate the computational scaling of best-performing approaches, Fig. 4 plots measured execution times as a function of matrix dimension and batch size. The matrix-dimension sweep (Fig. 4a) reflects the increasing number of temporal frames utilised in ULM clutter removal, where deep temporal stacks are often preferred Demené et al. [2015], Baranger et al. [2018], Heiles et al. [2022]. Conversely, the batch-size sweep (Fig. 4b) corresponds to the spatial pixel count in a Mueller matrix image, where each pixel requires an independent 3×3 decomposition. 10 Quasi-SVD A P REPRINT 
+
+The plots use logarithmic axes (base-10 on the vertical and base-2 on the horizontal axis), which compress the rapid growth of absolute runtimes and let the curves appear deceptively linear. Up to moderate sizes ( ≈ 26 in matrix size; 
+
+≈ 213 in batch size), presented methods behave similarly while cuSOLVER (GT) benefits from the Jacobi routine, which is optimal for small matrices ( m, n ≤ 32 ). Beyond these ranges, the absolute gaps widen substantially although the log scaling masks their steep divergence. This underscores the practical advantage of the proposed approach as data scales toward high-throughput regimes. 
+
+# 5 Discussion 
+
+Quasi-SVD trades the zero-calibration convenience of classical SVD for a one-time, per-modality training cost, on the order of 4-6 GPU-hours, amortised once the model is deployed across many concurrent inference instances. This cost remains modest relative to the broader trend of escalating GPU prices and the growing reliance on data-centre-scale accelerators across imaging and learning-based research. The present evaluation covers two representative medical imaging regimes. Extending Quasi-SVD to substantially different modalities or matrix-size ranges would call for analogous retraining, consistent with standard practice for learned imaging components. The design choice for the one-sided hard-orthogonality constraint is corroborated empirically: enforcing the same hard orthogonality constraint on both X and Y causes the learned factors to fail to reconstruct A (Supp. Sec. C), confirming that the asymmetric constraint is necessary for a trainable solution in addition to being theoretically sufficient. RNN augmentation plays a central role in achieving top reconstruction fidelity, underscoring the value of learned iterative refinement over static one-shot prediction. This advantage is specific to the learned recurrent mechanism: extending the same iterative principle via classical energy-based optimisation instead increases computational cost without improving accuracy (Supp. Sec. C), confirming that the benefit stems from the network’s learned representation rather than iteration alone. The end-to-end variant’s fastest runtime comes at the cost of explicit factor recovery, trading interpretability for speed. This positions end-to-end learning as well suited to applications requiring only the final reconstructed output (e.g., MRI coil compression Cole et al. [2022]), whereas applications requiring access to intermediate spectral components for quality control or downstream spectral analysis benefit from the explicit factorisation preserved by LieNN. The diagnostic relevance of the azimuth angle as a fibre-orientation biomarker has already been established through pathologist-evaluated studies Hahne et al. [2025a]; the present evaluation therefore benchmarks Quasi-SVD against the established Lu–Chipman decomposition itself, ensuring that high fidelity to this reference translates directly into the same downstream clinical interpretation. Despite substantial differences in optical hardware and spatial resolution between the NPP and MUC instruments, the accuracy reduction under domain shift remains marginal (Table 3), with azimuth patterns closely matching the GT LieNN Real-time (20 fps) End-to-end GT          
+
+> (a) Varying matrix size m=nat constant batch dimension 1 LieNN Real-time (20 fps) End-to-end GT (b) Varying batch size at constant matrix dimension m=n= 3
+
+Figure 4: Computation time plots across matrix and batch sizes. Timings were measured on an Nvidia H100 GPU to accommodate large memory demands and averaged over 1000 iterations after 100 preceding warm-ups each. Runtime increases sharply with data size, amplifying the gap between the classical SVD and the proposed methods. The plots use logarithmic axes (base-10 on y, base-2 on x), visually compressing exponential growth in runtime. 11 Quasi-SVD A P REPRINT 
+
+qualitatively (Fig. 2b). This indicates that the per-pixel formulation generalises robustly across imaging instruments without requiring instrument-specific retraining. The robust domain transfer observed here likely benefits from the strictly per-pixel formulation, which avoids learning spatial or temporal dependencies specific to a given imaging setup. Future work could investigate incorporating explicit spatial and temporal context to further improve reconstruction accuracy. Such context-aware models may achieve higher task-specific performance, but could reduce cross-domain generalisation by relying more heavily on contextual correlations than on the intrinsic structure of the input matrix. 
+
+# 6 Conclusion 
+
+This work introduced Quasi-SVD, a Lie-informed differentiable approximation of SVD designed for massive GPU parallelism. By enforcing orthogonality analytically via skew-symmetric parametrization and the matrix exponential and relaxing singular-value exactness, the method achieves guaranteed structural constraints with real-time performance. Empirical evaluation on polarimetric and ultrasound benchmarks demonstrates that Lie-constrained models exceed non-constrained baselines in reconstruction fidelity while substantially reducing computation cost. This feature shows strong potential for hardware-aware edge deployment in embedded clincial devices. The proposd pixel-wise formulation yields strong domain transfer properties, making Quasi-SVD a robust and performant alternative for conventional SVD in imaging pipelines. The framework demonstrates that principled mathematical structure combined with targeted learning can reconcile numerical rigor with real-time computational demands. Future extensions may include imposing additional mathematical constraints for improved singular-value and left-factor fidelity, as well as complex-valued implementations. Overall, Quasi-SVD offers a practical pathway for deploying structured matrix decompositions in time-constrained imaging systems. 
+
+# References 
+
+Michal Aharon, Michael Elad, and Alfred Bruckstein. K-svd: An algorithm for designing overcomplete dictionaries for sparse representation. IEEE Transactions on signal processing , 54(11):4311–4322, 2006. Jérôme Baranger, Bastien Arnal, Fabienne Perren, Olivier Baud, Mickael Tanter, and Charlie Demené. Adaptive spatiotemporal svd clutter filtering for ultrafast doppler imaging using similarity of spatial singular vectors. IEEE transactions on medical imaging , 37(7):1574–1586, 2018. Guy E Blelloch. Programming parallel algorithms. Communications of the ACM , 39(3):85–97, 1996. Matthew Brand. Fast low-rank modifications of the thin singular value decomposition. Linear Algebra and its Applications , 415(1):20–30, 2006. ISSN 0024-3795. doi:https://doi.org/10.1016/j.laa.2005.07.021. URL https:// www.sciencedirect.com/science/article/pii/S0024379505003812 . Special Issue on Large Scale Linear and Nonlinear Eigenvalue Problems. Richard P Brent. The parallel evaluation of general arithmetic expressions. Journal of the ACM (JACM) , 21(2):201–206, 1974. Tony F Chan. Rank revealing qr factorizations. Linear Algebra and its Applications , 88:67–82, 1987. Elizabeth Cole, Qingxi Meng, John Pauly, and Shreyas Vasanawala. Learned compression of high dimensional image datasets. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1748–1752, 2022. Charlie Demené, Thomas Deffieux, Mathieu Pernot, Bruno-Félix Osmanski, Valérie Biran, Jean-Luc Gennisson, Lim-Anna Sieu, Antoine Bergel, Stéphanie Franqui, Jean-Michel Correas, Ivan Cohen, Olivier Baud, and Mickael Tanter. Spatiotemporal clutter filtering of ultrafast ultrasound data highly increases doppler and fultrasound sensitivity. 
+
+IEEE Transactions on Medical Imaging , 34(11):2271–2285, 2015. doi:10.1109/TMI.2015.2428634. James Demmel and Krešimir Veseli´ c. Jacobi’s method is more accurate than qr. SIAM journal on matrix analysis and applications , 13(4):1204–1245, 1992. Petros Drineas, Ravi Kannan, and Michael W Mahoney. Fast monte carlo algorithms for matrices ii: Computing a low-rank approximation to a matrix. SIAM Journal on Computing , 36(1):158–183, 2006. Claudia Errico, Juliette Pierre, Sophie Pezet, Yann Desailly, Zsolt Lenkei, Olivier Couture, and Mickael Tanter. Ultrafast ultrasound localization microscopy for deep super-resolution vascular imaging. Nature , 527(7579):499–502, 2015. 12 Quasi-SVD A P REPRINT 
+
+Cédric Foucault and Florent Meyniel. Gated recurrence enables simple and accurate sequence prediction in stochastic, changing, and structured environments. eLife , 10:e71801, dec 2021. ISSN 2050-084X. doi:10.7554/eLife.71801. URL https://doi.org/10.7554/eLife.71801 .G. H. Golub and C. Reinsch. Singular value decomposition and least squares solutions. Numerische Mathematik , 14(5): 403–420, 1970. ISSN 0945-3245. doi:10.1007/BF02163027. URL https://doi.org/10.1007/BF02163027 .Gene H Golub and Charles F Van Loan. Matrix computations . JHU press, 2013. Ming Gu and Stanley C Eisenstat. Efficient algorithms for computing a strong rank-revealing qr factorization. SIAM Journal on Scientific Computing , 17(4):848–869, 1996. Christopher Hahne, Georges Chabouh, Arthur Chavignon, Olivier Couture, and Raphael Sznitman. Rf-ulm: Ultrasound localization microscopy learned from radio-frequency wavefronts. IEEE Transactions on Medical Imaging , 43(9): 3253–3262, 2024. doi:10.1109/TMI.2024.3391297. Christopher Hahne, Ivan Diaz, Omar Rodriguez-Nunez, Elea Gros, Muriel Blatter, Theotim Lucas, David Hasler, Tatiana Novikova, Theoni Maragkou, Philippe Schucht, and Richard McKinley. Polarimetric feature analysis of mueller ma-trices for brain tumor image segmentation. Opt. Express , 33(20):43379–43392, Oct 2025a. doi:10.1364/OE.561518. URL https://opg.optica.org/oe/abstract.cfm?URI=oe-33-20-43379 .Christopher Hahne, Omar Rodriguez-Nunez, Elea Gros, Théotim Lucas, Ekkehard Hewer, Tatiana Novikova, Theoni Maragkou, Philippe Schucht, and Richard McKinley. Physically consistent image augmentation for deep learning in mueller matrix polarimetry. IEEE Transactions on Image Processing , 34:6953–6962, 2025b. doi:10.1109/TIP.2025.3618390. Nathan Halko, Per-Gunnar Martinsson, and Joel A Tropp. Finding structure with randomness: Probabilistic algorithms for constructing approximate matrix decompositions. SIAM review , 53(2):217–288, 2011. Per Christian Hansen. The truncated svd as a method for regularization. BIT Numerical Mathematics , 27:534–553, 1987. Per Christian Hansen. Truncated singular value decomposition solutions to discrete ill-posed problems with ill-determined numerical rank. SIAM Journal on Scientific and Statistical Computing , 11(3):503–518, 1990. Zeinab A. Hassaan, Mohammed H. Yacoub, and Lobna A. Said. Gated recurrent unit accelerators for financial time series prediction on field-programmable gate array. Engineering Applications of Artificial Intelligence , 162:112534, 2025. ISSN 0952-1976. doi:https://doi.org/10.1016/j.engappai.2025.112534. URL https://www.sciencedirect. com/science/article/pii/S0952197625025655 .Michel Hayoz, Christopher Hahne, Mathias Gallardo, Daniel Candinas, Thomas Kurmann, Maximilian Allan, and Raphael Sznitman. Learning how to robustly estimate camera pose in endoscopic videos. International journal of computer assisted radiology and surgery , 18(7):1185–1192, 2023. Baptiste Heiles, Arthur Chavignon, Vincent Hingot, Pauline Lopez, Eliott Teston, and Olivier Couture. Performance benchmarking of microbubble-localization algorithms for ultrasound localization microscopy. Nature Biomedical Engineering , 6(5):605–616, 2022. Patricia M Johnson, Geunu Jeong, Kerstin Hammernik, Jo Schlemper, Chen Qin, Jinming Duan, Daniel Rueckert, Jingu Lee, Nicola Pezzotti, Elwin De Weerdt, et al. Evaluation of the robustness of learned mr image reconstruction to systematic deviations between training and test data for the models from the fastmri challenge. In Machine Learning for Medical Image Reconstruction: 4th International Workshop, MLMIR 2021, Held in Conjunction with MICCAI 2021, Strasbourg, France, October 1, 2021, Proceedings 4 , pages 25–34. Springer, 2021. Sheetal Lahabar and PJ Narayanan. Singular value decomposition on gpu using cuda. In 2009 IEEE international symposium on parallel & distributed processing , pages 1–10. IEEE, 2009. Mario Lezcano-Casado and David Martınez-Rubio. Cheap orthogonal constraints in neural networks: A simple parametrization of the orthogonal and unitary group. In International Conference on Machine Learning , pages 3794–3803. PMLR, 2019. Jun Li, Li Fuxin, and Sinisa Todorovic. Efficient riemannian optimization on the stiefel manifold via the cayley transform. arXiv preprint arXiv:2002.01113 , 2020. Shih-Yau Lu and Russell A Chipman. Interpretation of mueller matrices based on polar decomposition. JOSA A , 13(5): 1106–1113, 1996. Krishna Sri Ipsit Mantri, Carola-Bibiane Schönlieb, Bruno Ribeiro, Chaim Baskin, and Moshe Eliasof. Ditask: Multi-task fine-tuning with diffeomorphic transformations. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 25218–25229, 2025. 13 Quasi-SVD A P REPRINT 
+
+Hidenobu Matsuki, Riku Murai, Paul HJ Kelly, and Andrew J Davison. Gaussian splatting slam. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 18039–18048, 2024. Stefano Moriconi, Omar Rodríguez-Núñez, Romain Gros, Leonard A Felger, Theoni Maragkou, Ekkehard Hewer, Angelo Pierangelo, Tatiana Novikova, Philippe Schucht, and Richard McKinley. Near-real-time mueller polarimetric image processing for neurosurgical intervention. International journal of computer assisted radiology and surgery ,pages 1–11, 2024. Cameron Musco and Christopher Musco. Randomized block krylov methods for stronger and faster approximate singular value decomposition. Advances in neural information processing systems , 28, 2015. Cameron Musco and Christopher Musco. The random Nyström method. Foundations and Trends in Machine Learning ,10(6):453–566, 2017. Vedran Novakovic. A hierarchically blocked jacobi svd algorithm for single and multiple graphics processing units. 
+
+SIAM journal on scientific computing , 37(1):C1–C30, 2015. Tatiana Novikova, Alexey Ovchinnikov, Gleb Pogudin, and Jessica C Ramella-Roman. Time-efficient filtering of imaging polarimetric data by checking physical realizability of experimental mueller matrices. Bioinformatics , 40 (7):btae348, 06 2024. ISSN 1367-4811. doi:10.1093/bioinformatics/btae348. URL https://doi.org/10.1093/ bioinformatics/btae348 .NVIDIA Corporation. cuSOLVER Library , 2026. URL https://docs.nvidia.com/cuda/cusolver/ . Version 13.1. Ricardo Otazo, Emmanuel Candes, and Daniel K Sodickson. Low-rank plus sparse matrix decomposition for accelerated dynamic mri with separation of background and dynamic components. Magnetic resonance in medicine , 73(3): 1125–1136, 2015. Gleb Pogudin. Github repository. https://github.com/pogudingleb/mueller_matrices , 2024. J Jon Ryu, Xiangxiang Xu, HS Erol, Yuheng Bu, Lizhong Zheng, and Gregory W Wornell. Operator svd with neural networks via nested low-rank approximation. arXiv preprint arXiv:2402.03655 , 2024. Paulo Sampaio, Maria Lopez-Antuña, Federico Storni, Jonatan Wicht, Greta Sökeland, Martin Wartenberg, Pablo Márquez-Neila, Daniel Candinas, Brice-Olivier Demory, Aurel Perren, et al. Müller matrix polarimetry for pancreatic tissue characterization. Sci. Rep. , 13(1):16417, 2023. Meyer Scetbon, Michael Elad, and Peyman Milanfar. Deep k-svd denoising. IEEE Transactions on Image Processing ,30:5944–5955, 2021. Martin Stoll. A krylov–schur approach to the truncated svd. Linear Algebra and its Applications , 436(8):2795–2806, 2012. ISSN 0024-3795. doi:https://doi.org/10.1016/j.laa.2011.07.022. URL https://www.sciencedirect.com/ science/article/pii/S0024379511005349 . Special Issue dedicated to Danny Sorensen’s 65th birthday. Zachary Teed and Jia Deng. Tangent space backpropagation for 3d transformation groups. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 10338–10347, 2021. Thomas Whelan, Stefan Leutenegger, Renato Salas-Moreno, Ben Glocker, and Andrew Davison. Elasticfusion: Dense slam without a pose graph. In Robotics: science and systems , volume 11, 2015. Derek Xu, William Shiao, Jia Chen, and Evangelos E Papalexakis. Sv-learn: Learning matrix singular values with neural networks. In 2022 IEEE International Conference on Data Mining Workshops (ICDMW) , pages 232–237. IEEE, 2022. Xu Yang, Cheng Deng, Feng Zheng, Junchi Yan, and Wei Liu. Deep spectral clustering using dual autoencoder network. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 4066–4075, 2019. Jure Zbontar, Florian Knoll, Anuroop Sriram, Tullie Murrell, Zhengnan Huang, Matthew J Muckley, Aaron Defazio, Ruben Stern, Patricia Johnson, Mary Bruno, et al. fastmri: An open dataset and benchmarks for accelerated mri. 
+
+arXiv preprint arXiv:1811.08839 , 2018. Anru Zhang and Dong Xia. Tensor svd: Statistical and computational limits. IEEE Transactions on Information Theory ,64(11):7311–7338, 2018. Łukasz Struski, Paweł Morkisz, Przemysław Spurek, Samuel Rodriguez Bernabeu, and Tomasz Trzci´ nski. Efficient gpu implementation of randomized svd and its applications. Expert Systems with Applications , 248:123462, 2024. ISSN 0957-4174. doi:https://doi.org/10.1016/j.eswa.2024.123462. URL https://www.sciencedirect.com/ science/article/pii/S0957417424003270 .14 Quasi-SVD A P REPRINT 
+
+# Supplementary Material 
+
+# A Mathematical foundations 
+
+A.1 Orthogonality via matrix exponential Theorem (Skew-Symmetric Exponential is Orthogonal) Let S ∈ so (m) be a real skew-symmetric matrix (i.e., 
+
+S⊤ = −S). Then the matrix exponential 
+
+exp( S) = 
+
+> ∞
+
+X
+
+> k=0
+
+Sk
+
+k!
+
+is an orthogonal matrix, meaning that 
+
+exp( S)⊤ exp( S) = I.
+
+Proof As S is skew-symmetric, we have S⊤ = −S. Consider the matrix exponential: 
+
+exp( S) = I + S + S2
+
+2! + S3
+
+3! + · · · .
+
+Taking the transpose, and using the linearity of the transpose along with the fact that (Sk)⊤ = ( S⊤)k, we obtain 
+
+exp( S)⊤ = I + S⊤ + (S⊤)2
+
+2! + (S⊤)3
+
+3! + · · · .
+
+Substitute S⊤ = −S:
+
+exp( S)⊤ = I − S + S2
+
+2! − S3
+
+3! + · · · = exp( −S).
+
+Now, consider the product: 
+
+exp( S)⊤ exp( S) = exp( −S) exp( S).
+
+Using the property of the exponential function on commuting matrices, 
+
+exp( −S) exp( S) = exp( −S + S) = exp( 0) = I.
+
+Thus, exp( S)⊤ exp( S) = I, which shows that exp( S) is orthogonal. 
+
+Corollary This guarantees that X = exp( S) ∈ SO( m) for any skew-symmetric S ∈ so (m).
+
+A.2 Special orthogonal group 
+
+The matrix exponential of a skew-symmetric matrix produces an element of the special orthogonal group, 
+
+exp( S) ∈ SO( m) ⊂ O( m),
+
+which enforces the constraint det( X) = 1 . In contrast, the full orthogonal group also contains matrices with negative determinant, i.e. det( X′) ∈ { 1, −1} for X′ ∈ O( m).In some applications, such as matching the sign structure of a target orthogonal factor, it is necessary to obtain an orthogonal matrix with either determinant. To allow this flexibility while still parameterizing X through a skew-symmetric generator, we introduce a diagonal by 
+
+B = diag( b), b ∈ {− 1, 1}m,
+
+which represents an element of O( m). The corrected orthogonal matrix is then computed as 
+
+X′ = BX .
+
+where left-multiplication by B flips selected column directions of X and adjusts the determinant when required, while preserving orthogonality: 
+
+(X′)⊤X′ = X⊤B2X = I.
+
+We evaluated the reflection correction during ablations and found that it neither improved approximation quality nor altered the stability of training. Because its effect was neutral and the method functions identically without it, we report the mechanism only in the supplementary to avoid diverting attention from components that materially influence performance. While this correction is theoretically available, we demonstrate in hereafter that restricting to SO( m) is sufficient for valid decomposition. 15 Quasi-SVD A P REPRINT 
+
+A.3 Why Asymmetric Constraints Suffice Lemma (Existence of a Decomposition with X ∈ SO( m)) Consider a matrix A ∈ Rm×n with A = XDY ⊤,where X, Y contain the left and right singular vectors of A and D = diag( d) contains the singular values, such that for the column vectors xk, yk holds 
+
+AA ⊤xk = σ2
+
+> k
+
+xk, A⊤Ay k = σ2
+
+> k
+
+yk.
+
+Now, if X ∈ O( m) such that det( X) = −1, define sign vectors bX = [−1, 1, . . . , 1] ⊤ ∈ Rm and bY =[−1, 1, . . . , 1] ⊤ ∈ Rn, and consider the matrices: 
+
+˜X = diag( bX )X , and ˜Y = diag( bY )Y.
+
+These ˜X, ˜Y remain orthogonal because they were obtained via multiplication of orthogonal matrices. Since 
+
+diag( bX )2 = Im and diag( bY )2 = In, it holds that 
+
+A = X D Y ⊤
+
+=   diag( bX ) X D   diag( bY ) Y⊤
+
+= ˜X D ˜Y⊤.
+
+˜X, ˜Y still contain the singular vectors corresponding to the same singular values: negating a singular vector xk yields 
+
+−xk, which satisfies AA ⊤(−xk) = σ2
+
+> k
+
+(−xk), so the singular value is unchanged. Moreover, ˜X ∈ SO( m):
+
+det( ˜X) = det(diag( bX )) det( X)= ( −1)( −1) = 1 .
+
+Note that this sign flexibility (discussed in A.2) is a theoretical convenience for the proof; the practical method does not require explicit sign matching. This lemma directly justifies the Quasi-SVD design: enforcing exact orthogonality on X via the exponential map is always sufficient to represent a valid left factor, while Y is recovered residually and only encouraged toward orthogonality through the soft constraint Lort . This asymmetric treatment is discussed further in Section 3 of the main paper. 
+
+A.4 Approximation Bounds A.4.1 Gershgorin Bounds on Singular Values Gershgorin Circle Theorem Let A ∈ Rn×n with entries denoted as aij . Then, the eigenvalues are contained in the circles whose radii are bounded by the sums of the matrix entries: 
+
+λ ∈ { z | | z − aii | < R i} where Ri =
+
+> n
+
+X 
+
+> j=1
+> j̸=i
+
+|aij |.
+
+Bounds on Singular Values via Coherence Consider the symmetric squared matrix B := A⊤A ∈ Rn×n such that 
+
+bik = Pnj=1 aji ajk = ⟨a.i , a.k ⟩, where a.i , a.k are the i-th and k-th columns of A. Applying the Gershgorin Circle Theorem to B, the eigenvalues of B (i.e., the squared singular values of A) satisfy 
+
+λ ∈ z | | z − ∥ a.i ∥2| < S i , Si := √n − 1 · μ(A)∥A∥F ∥a.i ∥,
+
+where the coherence of A is given by 
+
+μ(A) = max 
+
+> i̸=k
+
+⟨a.i , a.k ⟩∥a.i ∥∥ a.k ∥ .
+
+16 Quasi-SVD A P REPRINT 
+
+Proof By the Gershgorin Circle Theorem applied to B, the Gershgorin radius for row i is 
+
+RB 
+
+> i
+
+:= 
+
+> n
+
+X 
+
+> k=1
+> k̸=i
+
+|bik |.
+
+The diagonal elements satisfy 
+
+|bii | =
+
+> n
+
+X
+
+> j=1
+
+a2 
+
+> ji
+
+= ∥a.i ∥2,
+
+confirming the center of the i-th Gershgorin disc. For the off-diagonal radius, using the coherence bound |⟨ a.i , a.k ⟩| ≤ 
+
+μ(A)∥a.i ∥∥ a.k ∥:
+
+RB 
+
+> i
+
+=
+
+> n
+
+X 
+
+> k=1
+> k̸=i
+
+|bik | =
+
+> n
+
+X 
+
+> k=1
+> k̸=i
+
+|⟨ a.i , a.k ⟩| ≤ μ(A)∥a.i ∥
+
+> n
+
+X 
+
+> k=1
+> k̸=i
+
+∥a.k ∥ ≤ μ(A)∥a.i ∥√n − 1∥A∥F = Si,
+
+where the final step applies Cauchy–Schwarz, 
+
+> n
+
+X
+
+> k=1
+
+∥a.k ∥ ≤ √n∥A∥F ,
+
+restricted to the n − 1 terms k̸ = i. Thus RB 
+
+> i
+
+≤ Si, establishing Si as a valid Gershgorin radius bound. 
+
+Implication for Quasi-SVD The quality of our singular value approximation d = diag −1(p|X⊤AA ⊤X|) (Eq. (5) of the main paper) depends on: • Matrix coherence μ(A) (low coherence → tighter bounds); • Frobenius norm ∥A∥F (normalized inputs perform better); • How well X aligns with the true left singular vectors. The diagonal extraction in Eq. (5) recovers exact singular values when X equals the true left singular matrix; for the approximate X produced by the network, it yields the diagonal of X⊤AA ⊤X, which approximates the squared singular values under the assumption that X is close to the true left factor. 
+
+# B Complexity Proofs for Lie-based SVD 
+
+This section provides formal derivations for all work and span claims stated in Section 3.6 of the main paper. Throughout, we write r = m = min( m, n ), corresponding to the implicit rank used in the main paper’s complexity table. We adopt the EREW PRAM model Blelloch [1996]: processors may not simultaneously read or write the same memory cell. All reductions over p elements use balanced binary fan-in trees. 
+
+Notation and Model Assumptions 
+
+• A ∈ Rm×n, m ≤ n (enforced by transpose branch), r = min( m, n ) = m.• MLP hidden width h = O(r).• Work W : total arithmetic operations. • Span S: depth of the critical path in the DAG of operations. • Matrix multiply Ra×b · Rb×c: work O(abc ), span O(log b) (parallel dot products, each a reduction tree). • By Brent’s theorem Brent [1974], wall-clock time on P processors satisfies TP = O(W/P + S).17 Quasi-SVD A P REPRINT 
+
+Stage 1: Pre-processing MLP Proposition 2 (Pre-processing work and span) . A two-layer MLP f : Rmn → Rmn with hidden width h satisfies 
+
+Wpre = O(mnh ), Spre = O(log( mn )) .
+
+Proof. The MLP computes f (x) = W2 σ(W1x + b1) + b2 with W1 ∈ Rh×mn and W2 ∈ Rmn ×h.
+
+Layer 1. Each of the h output neurons computes an inner product over mn inputs. With unlimited processors, all h
+
+inner products run in parallel; each inner product is a reduction tree of depth ⌈log 2(mn )⌉. Hence W1 = O(h · mn ),
+
+S1 = O(log( mn )) .
+
+Activation. Elementwise σ on h values: W = O(h), S = O(1) .
+
+Layer 2. Each of the mn outputs is an inner product over h values: W2 = O(mn · h), S2 = O(log h).Summing, and noting log h ≤ log( mn ): Wpre = O(mnh ), Spre = O(log( mn )) .
+
+Stage 2: Reduction MLP Proposition 3 (Reduction work and span) . The reduction MLP g : Rmn → R(m 
+
+> 2
+
+) with hidden width h satisfies 
+
+Wred = O(mnh ), Sred = O(log( mn )) .
+
+Proof. Identical argument to Proposition 2. The output dimension is |T | = m(m − 1) /2 ≤ m2/2. Since m ≤ n,
+
+m2 ≤ mn , so the output layer cost O(|T | · h) = O(m2h) = O(mnh ) does not exceed the input layer cost. 
+
+Stage 3: Skew-Symmetric Scatter Proposition 4 (Fill skew-symmetric work and span) . Scattering |T | values into an m × m skew-symmetric matrix satisfies 
+
+Wskew = O(m2), Sskew = O(1) .
+
+Proof. Each of the |T | = m(m − 1) /2 entries is written to two locations (i, j ) and (j, i ) with sign flip; there are no dependencies between writes (EREW is satisfied since all target cells are distinct). Total writes: m2 − m = O(m2).All writes execute in one parallel step, so Sskew = O(1) .
+
+Stage 4: Matrix Exponential 4a. Cayley Transform Proposition 5 (Cayley transform work and span) . The Cayley map (I − S)−1(I + S) for S ∈ Rm×m skew-symmetric satisfies 
+
+WCay = O(m3), SCay = O(m log m).
+
+Proof. LU decomposition of (I − S). Gaussian elimination with partial pivoting proceeds through m − 1 sequential elimination steps. At step k, pivot search over m − k rows costs span O(log m), and row updates for the remaining 
+
+m − k rows cost span O(log m) (parallel scalar-multiply-add across m − k columns). Across m − 1 steps the span accumulates to O(m log m). Total work for LU: O(m3).
+
+Triangular solves. Forward and back substitution each require m sequential steps with O(log m) span per step: 
+
+S = O(m log m), W = O(m2).
+
+Matrix multiply (I − S)−1(I + S). Rm×m · Rm×m: W = O(m3), S = O(log m).Combining (LU dominates): WCay = O(m3), SCay = O(m log m).
+
+4b. Rodrigues Formula ( m = n = 3 )Proposition 6 (Rodrigues work and span) . For m = n = 3 , the Rodrigues rotation formula satisfies 
+
+WRod = O(1) , SRod = O(1) .
+
+18 Quasi-SVD A P REPRINT 
+
+Proof. With m = 3 , a skew-symmetric S has exactly 3 free parameters (θ1, θ 2, θ 3). The Rodrigues formula 
+
+X = I + sin θθ S + 1 − cos θθ2 S2, θ = ∥v∥2, v = ( θ1, θ 2, θ 3)⊤,
+
+involves a fixed number of scalar operations ( ∥ · ∥ , sin , cos , divisions) and two 3 × 3 matrix-scalar products, all independent of any variable-size dimension. Hence both work and span are O(1) .
+
+4c. Taylor Series (degree p)Proposition 7 (Taylor exponential work and span) . A degree-p Horner-form Taylor approximation eS ≈ Ppk=0 Sk/k !
+
+for S ∈ Rm×m satisfies 
+
+WTay = O(pm 3), STay = O(p log m).
+
+For constant p = O(1) this reduces to W = O(m3), S = O(log m).Proof. Horner evaluation ((( 1 
+
+> p!
+
+S + 1(p−1)! I)S + · · · )S + I) requires p sequential matrix multiplications, each costing 
+
+W = O(m3) and S = O(log m). Sequentiality of the p steps gives total span p · O (log m) = O(p log m).
+
+Stage 5: One-Sided Decomposition Proposition 8 (Decomposition work and span) . Given A ∈ Rm×n and X ∈ Rm×m orthogonal, computing (X, D, Y )
+
+satisfies 
+
+Wdec = O(mnr ), Sdec = O(log n),
+
+with r = m.Proof. The routine performs the following operations in order. 
+
+(i) AA ⊤ ∈ Rm×m: W = O(m2n), S = O(log n).
+
+(ii) (AA ⊤)X ∈ Rm×r : W = O(m2r), S = O(log m) ≤ O (log n).
+
+(iii) Diagonal extraction: Elementwise multiply X ⊙ [( AA ⊤)X] and sum each of r columns over m entries: W =
+
+O(mr ), S = O(log m). Square roots of r scalars: W = S = O(r) = O(m). This yields the diagonal of X⊤AA ⊤X,which equals the squared singular values when X is the exact left singular matrix, and approximates them for the Lie-constrained X.
+
+(iv) Right factor Y = D−1X⊤A ∈ Rr×n: Row-wise scaling D−1X⊤: O(m2) work, O(1) span. Matrix multiply 
+
+Rr×m · Rm×n: W = O(mnr ), S = O(log m).Summing, the dominant work term is O(m2n) = O(mnr ) (since r = m), and the dominant span is O(log n).
+
+End-to-End Theorem Proposition 9 (End-to-end complexity) . Under EREW PRAM with h = O(r) and m ≤ n, the full neural Lie-SVD forward pass satisfies: 
+
+Cayley, default: W = O(mnr ), S = O(m log m).
+
+Rodrigues, m = n = 3 : W = O(mn ), S = O(log m).
+
+Taylor, degree p = O(1) : W = O(mnr ), S = O(log m).
+
+Proof. Sum Propositions 2–8 for each variant, noting that stages execute sequentially so spans add while works add. 
+
+Cayley. W = O(mnh + mnh + m2 + m3 + mnr ). Since h = O(r) = O(m), mnh = O(mn 2); however, 
+
+mnr = O(m2n) ≥ m3 (as n ≥ m), so W = O(mnr ). Span: O(log( mn )) + O(log( mn )) + O(1) + O(m log m) + 
+
+O(log n) = O(m log m) (LU dominates). 
+
+Rodrigues. Stage 4 costs O(1) work and span; Stage 5 dominates: W = O(mnr ) = O(mn ) (with r = m = n = 3 
+
+constant), S = O(log n) = O(1) . Since all stages are O(1) for fixed m = n = 3 , we report S = O(log m) to convey scalability intent. 
+
+Taylor ( p = O(1) ). Stage 4 span becomes O(log m); Stage 5 span O(log n) dominates. With m ≈ n, S = O(log m).Work as in Cayley case: O(mnr ).19 Quasi-SVD A P REPRINT 
+
+Corollary 10 (GPU speedup via Brent’s theorem) . On a GPU with P SIMD lanes, the wall-clock time satisfies 
+
+TP = O
+
+ WP + Stotal 
+
+
+
+.
+
+The speedup relative to single-threaded Golub–Reinsch ( T GR 1 = O(mn 2), SGR = O(n log n)) is 
+
+T GR 1
+
+TP
+
+= O
+
+ mn 2
+
+W/P + Stotal 
+
+
+
+,
+
+which is meaningful when P ≫ r, i.e. the GPU is sufficiently wide relative to the matrix rank. 
+
+Remark 1 (Memory-access patterns) . The span bounds above assume unit-cost memory access. In practice, GPU coalesced access requires column-major layout for the matrix multiply in Stage 5 and row-major for the MLP weight matrices. Cache-miss penalties can inflate effective span by a constant factor that depends on matrix tile size relative to shared-memory capacity; this does not affect asymptotic span but is important for constant-factor comparisons. 
+
+# C Attempts that did not work 
+
+C.1 Two-sided orthogonality constraint 
+
+The proposed orthogonality constraint can be simultaneously applied to X and Y. This two-sided constraint requires matching orthogonal singular vectors in X and Y to satisfy A = XDY ⊤. In practice, the neural architectures used in this study fail to reconstruct valid combinations when enforcing both X ∈ SO (m) and Y ∈ SO (n) such that predicted components result in A̸ = XDY ⊤. Consequently, the inability to reconstruct A from XDY ⊤ does not qualify to be a valid decomposition technique. However, it is worth mentioning that this two-sided constraint achieved SSIM scores similar to the one-sided equivalent when trained using the Lend loss from Eq. (15). 
+
+C.2 Energy-based optimization 
+
+Building on the notation of Eqs. (11) , (12) , and (13) of the main paper, one can construct the following overall objective: 
+
+Σ⋆ = arg min 
+
+> Σ∈RL
+
+{λ1Lσ + λ2Loff + λ3Lort } , (17) for energy-based optimization. In this work, the optimization objective is solved using the limited-memory Broyden– Fletcher–Goldfarb–Shanno algorithm (LBFGS) as an efficient Hessian-based optimizer. From the optimal estimate Σ⋆,the components X⋆, D⋆, and Y⋆ are obtained analogous to Section 3 of the main paper. Table 5 supplements the MMP benchmark results in Table 2 of the main paper. The energy-based solutions are close to the corresponding initialization while incurring additional computational cost. Table 5: Energy-based optimization results complementing the NPP test set results from Table 2 in the main paper. Method RNN SSIM( M) ↑ ∥X∥ort  
+
+> F
+
+↓ ∥D∥rel  
+
+> F
+
+↓ ∥Y∥ort  
+
+> F
+
+↓ Time [ms] ↓
+
+Energy (Analytic init) ✗ 0.69 ± 0.08 0.00 0.08 ± 0.03 0.44 ± 0.08 28.13 ± 0.04 Hybrid (LieNN init) ✓ 0.94 ± 0.03 0.00 0.01 0.10 ± 0.03 33.69 ± 0.08 
+
+C.3 Hybrid learning and energy optimization 
+
+Using the energy-based optimization as an extension for the neural decompositions in Section 3 of the main paper did not improve on the results but added a large computational overhead. 
+
+C.4 Learned recurrent optimizer 
+
+While the RNN is used as A(t+1) = RNN  A(t) with step t in the presented results, an alternative approach implies computing residuals r from: 
+
+r = dX − dY
+
+20 Quasi-SVD A P REPRINT            
+
+> Error [a.u.] 2122232425
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4 ‖XDY >‖rel
+> F↓
+> ‖X‖ort
+> F↓
+> ‖D‖rel
+> F↓
+> ‖Y‖ort
+> F↓
+
+Matrix dimension m [#] Figure 5: Error growth for varying dimension m in square matrices. The curves depict the metrics from Section 4.2 of the main paper, representing the orthogonality errors ∥X∥ort  
+
+> F
+
+and ∥Y∥ort  
+
+> F
+
+as well as deviations for singular values in 
+
+∥D∥rel  
+
+> F
+
+and a matrix reconstruction error ∥XDY ⊤∥rel  
+
+> F
+
+after decomposition. with diagonal vectors dX and dY from Eq. (5) in the main paper for X and Y, respectively. The intuition is to then let networks be aware of singular value distances by: 
+
+D(t+1)  
+
+> X
+
+= D(t) 
+
+> X
+
++ RNN X(r(t)) ,
+
+D(t+1)  
+
+> Y
+
+= D(t) 
+
+> Y
+
++ RNN Y (r(t)) ,
+
+to achieve a matching set of left and right singular vectors. The results of such learned optimizers remain below 0.5 SSIM indicating that the network architectures struggle to find underlying data patterns using this scheme. 
+
+# D Additional Experimental Results 
+
+This appendix provides extended results that exceed the space constraints of the main paper. 
+
+D.1 Numerical error growth 
+
+We analyze how the metrics in Section 4.2 of the main paper evolve with the matrix dimension m. Since publicly available datasets rarely contain matrices sampled at uniform size intervals, we generate synthetic data with known ground-truth factors, as detailed below. Figure 5 shows how error metrics evolve with the square matrix dimension m.
+
+Synthetic matrix generation. We generate tuples (A, U, Σ, V) with known singular value decomposition, where 
+
+A = U Σ V ∗, U ∈ O(m), V ∈ O(n), and Σ ∈ Rm×n is diagonal. For each sample index i, two independent orthogonal matrices are created by drawing Gaussian random matrices and retaining only the orthogonal factor from QR factorisation: 
+
+U = QR  GU
+
+, where GU ∼ N (0 , 1) m×m
+
+V = QR  GV
+
+, where GV ∼ N (0 , 1) n×n.
+
+The singular values follow one of three patterns: linear decay, exponential decay, or a randomized monotone decay. Let 
+
+k = min( n, m ) and define a baseline grid 
+
+˜σj = 1 − j − 1
+
+k − 1 , j = 1 , . . . , k. 
+
+Each profile is obtained by an exponent α ∼ U (0 , 10) , a scale factor c ∈ [1 , 10 r ] with r ∈ { 0, 1, 2}, and an offset 
+
+o ∈ [10 −2, 10 0]. The offset o > 0 ensures that all singular values are strictly positive; the method is therefore evaluated 21 Quasi-SVD A P REPRINT 
+
+on full-rank matrices and results may not generalise to rank-deficient inputs. The singular values are then 
+
+σj =
+
+((˜ σj )α, linear or exponential ,
+
+(sort(rand( k))) α, random ,σjj = c σ j + o. 
+
+The resulting sequence is strictly non-increasing by design. Based on these components, the synthetic matrix is assembled as A = U Σ V ∗.
+
+Synthetic data training Assessment of varyingly sized matrices requires models to be trained for which an AdamW optimizer is used with gradient clipping and cosine-annealed learning rates converging to zero. Weights are initialized with Xavier (Glorot) uniform for linear layers, biases drawn from  N (0 , 10 −6), and batch-norm weights/biases set to  1
+
+and  0, respectively. For the GPU, we employ an Nvidia RTX 4090 with batch size 4, 10 epochs, initial learning rate 
+
+1e −3 and a best checkpoint selected by lowest  Lort  (Eq. (13) in main paper). 
+
+Synthetic data results The dominant source of error arises in the right-factor orthogonality Y, followed by deviations in the recovered singular values. In contrast, the orthogonality of X and the final reconstruction error remain compara-tively low. These trends likely stem from the approximation of the matrix exponential and the challenge of reliably recovering spectra with widely varying decay patterns. Relaxing strict orthogonality for Y enables low reconstruction errors. 
+
+D.2 Additional Polarimetric Test Images rSVD E2E Analytic UNN LieNet E2E+RNN UNN+RNN Lie+RNN GT         
+
+> 2.1e4 ms 0.66 ms 8.55 ms 9.85 ms 9.93 ms 4.91 ms 13.81 ms 14.19 ms 36.75 ms
+
+Figure 6: MMP benchmark comparison (pt. 2). The images show the remaining NPP test samples of the per-pixel azimuth φi decomposed by the various models. Figure 6 provides the remaining azimuth images from the NPP test set, complementing those shown in Fig. 2 of the main paper. The visual trends mirror the quantitative findings reported earlier. 22
