@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-07",
+  "date": "2026-08-07",
+  "generated_at": "2026-08-07T00:51:34",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/07/2608.03928v1-robust-low-tubal-rank-tensor-completion-under-cross-concentrated-sampling",
+      "section": "deep",
+      "title_en": "Robust Low-Tubal-Rank Tensor Completion under Cross-Concentrated Sampling",
+      "authors": "Hanqin Cai, Longxiu Huang, Jing Qin, Chengyue Wu",
+      "date": "2026-08-04",
+      "pdf": "https://arxiv.org/pdf/2608.03928v1",
+      "score": "8.0",
+      "evidence": "鲁棒低管秩张量补全方法，直接适用于高光谱张量数据恢复",
+      "tldr": "针对张量交叉集中采样（t-CCS）下含稀疏粗大异常值的低tubal秩张量补全问题，提出鲁棒迭代t-CUR（R-ItCUR）算法。该算法将采样交叉划分为外部块与交叉块，采用自适应块Welsch校正抑制异常值，并通过投影块梯度下降更新低秩分量。直接在采样结构上迭代避免了全张量重建，大幅降低内存与计算开销。在合成数据、心脏MRI和三维地震数据上验证了准确恢复能力与强鲁棒性，凸显显式利用交叉采样结构的重要性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Tensor cross-concentrated sampling (t-CCS) bridges entrywise sampling and t-CUR slice-wise sampling by observing entries only within selected horizontal and lateral slices. Existing t-CCS completion methods, however, assume that the observations are free of gross corruption. In this work, we study robust recovery of a third-order low-tubal-rank tensor from partial t-CCS observations contaminated by sparse, arbitrarily large outliers. We propose Robust Iterative t-CUR (R-ItCUR), a tensor-native algorithm that partitions the sampled tensor cross into two exterior blocks and an intersection block, applies adaptive blockwise Welsch correction for outlier suppression, and updates the low-rank component through projected blockwise gradient descent. By operating directly on the sampled cross, R-ItCUR avoids reconstructing the full tensor throughout the iterations, resulting in substantial memory and computational savings. Experiments on synthetic tensors, cardiac MRI data, and three-dimensional seismic data demonstrate accurate recovery and strong robustness to sparse gross corruptions. The results further highlight the importance of explicitly exploiting the cross-concentrated sampling structure in robust tensor completion.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/07/2608.03928v2-robust-low-tubal-rank-tensor-completion-under-cross-concentrated-sampling",
+      "section": "deep",
+      "title_en": "Robust Low-Tubal-Rank Tensor Completion under Cross-Concentrated Sampling",
+      "authors": "HanQin Cai, Longxiu Huang, Jing Qin, Chengyue Wu",
+      "date": "2026-08-04",
+      "pdf": "https://arxiv.org/pdf/2608.03928v2",
+      "score": "8.0",
+      "evidence": "鲁棒低管秩张量补全与异常值抑制，可迁移至高光谱张量恢复与去噪",
+      "tldr": "针对t-CCS采样下的低tubal秩张量补全，现有方法假设观测无异常值。提出R-ItCUR算法，直接在采样交叉块上做自适应Welsch修正和分块投影梯度下降，抑制稀疏大异常值，避免重构全张量。合成数据、心脏MRI和三维地震数据实验显示高精度恢复与强鲁棒性，证明显式利用交叉集中采样结构的重要性。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Tensor cross-concentrated sampling (t-CCS) bridges entrywise sampling and t-CUR slice-wise sampling by observing entries only within selected horizontal and lateral slices. Existing t-CCS completion methods, however, assume that the observations are free of gross corruption. In this work, we study robust recovery of a third-order low-tubal-rank tensor from partial t-CCS observations contaminated by sparse, arbitrarily large outliers. We propose Robust Iterative t-CUR (R-ItCUR), a tensor-native algorithm that partitions the sampled tensor cross into two exterior blocks and an intersection block, applies adaptive blockwise Welsch correction for outlier suppression, and updates the low-rank component through projected blockwise gradient descent. By operating directly on the sampled cross, R-ItCUR avoids reconstructing the full tensor throughout the iterations, resulting in substantial memory and computational savings. Experiments on synthetic tensors, cardiac MRI data, and three-dimensional seismic data demonstrate accurate recovery and strong robustness to sparse gross corruptions. The results further highlight the importance of explicitly exploiting the cross-concentrated sampling structure in robust tensor completion.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/07/2608.02401v1-usp-mamba-unmixing-derived-spectral-and-structural-prompting-for-hyperspectral-image-super-resolution",
+      "section": "quick",
+      "title_en": "USP-Mamba: Unmixing-Derived Spectral and Structural Prompting for Hyperspectral Image Super-Resolution",
+      "authors": "Shi Chen, Jie Zhang, Yicong Zhou",
+      "date": "2026-08-03",
+      "pdf": "https://arxiv.org/pdf/2608.02401v1",
+      "score": "7.0",
+      "evidence": "高光谱图像超分辨率与恢复，属于高光谱恢复领域",
+      "tldr": "高光谱图像超分辨率旨在重建高分辨率密集光谱图像。现有Mamba模型虽以线性复杂度捕捉长程依赖，但其因果序列建模展开特征会破坏空间邻接，且状态空间参数化源于通用表示，未对齐高光谱图像的内在特性。为此提出USP-Mamba，利用解混导出的光谱提示捕捉全局材料组成，并引入含空间与频率成分的结构提示提供局部引导，同时通过互补的Hilbert与语义引导邻域扫描保持空间连续性。在多个数据集上，该方法显著优于现有代表性方法，实现了组成一致且细节丰富的高光谱超分辨率。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral image super-resolution aims to reconstruct high-resolution imagery while preserving dense spectral information. Recently, Mamba-based models have shown promising potential for this task by capturing long-range dependencies with linear computational complexity. Nevertheless, their causal sequence modeling requires two-dimensional hyperspectral features to be unfolded along predefined scanning orders, which disrupts spatial adjacency and restricts the effective propagation of contextual information. Moreover, state-space parameterization of existing models is predominantly derived from generic learned representations, without explicit alignment with the intrinsic characteristics of the hyperspectral image. To address this issue, we propose an Unmixing-derived Spectral and Structural Prompting Mamba framework, termed USP-Mamba, which adapts Mamba state evolution through composition-aware spectral priors and image-dependent structural prompts. Specifically, an unmixing-informed spectral prompt captures the global material composition of the input image and provides persistent conditioning throughout reconstruction. Injected into the Mamba sequence and progressively adapted across layers, it steers state evolution toward composition-consistent reconstruction. We introduce feature-level structural prompts comprising spatial and frequency components to provide image-dependent local guidance. The spatial prompt promotes structure-sensitive state encoding for local detail preservation, while the frequency prompt enables region-adaptive transitions between homogeneous regions and high-frequency details. Finally, complementary Hilbert and Semantic-Guided Neighboring scans preserve spatial continuity and strengthen non-local semantic dependency modeling. Extensive experiments on different datasets demonstrate that the proposed method consistently outperforms representative approaches.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

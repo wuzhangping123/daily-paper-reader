@@ -1,0 +1,135 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-07T00:48:18.356771+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2608.03928v1",
+      "source": "arxiv",
+      "title": "Robust Low-Tubal-Rank Tensor Completion under Cross-Concentrated Sampling",
+      "abstract": "Tensor cross-concentrated sampling (t-CCS) bridges entrywise sampling and t-CUR slice-wise sampling by observing entries only within selected horizontal and lateral slices. Existing t-CCS completion methods, however, assume that the observations are free of gross corruption. In this work, we study robust recovery of a third-order low-tubal-rank tensor from partial t-CCS observations contaminated by sparse, arbitrarily large outliers. We propose Robust Iterative t-CUR (R-ItCUR), a tensor-native algorithm that partitions the sampled tensor cross into two exterior blocks and an intersection block, applies adaptive blockwise Welsch correction for outlier suppression, and updates the low-rank component through projected blockwise gradient descent. By operating directly on the sampled cross, R-ItCUR avoids reconstructing the full tensor throughout the iterations, resulting in substantial memory and computational savings. Experiments on synthetic tensors, cardiac MRI data, and three-dimensional seismic data demonstrate accurate recovery and strong robustness to sparse gross corruptions. The results further highlight the importance of explicitly exploiting the cross-concentrated sampling structure in robust tensor completion.",
+      "authors": [
+        "Hanqin Cai",
+        "Longxiu Huang",
+        "Jing Qin",
+        "Chengyue Wu"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.IT",
+        "cs.LG",
+        "math.NA"
+      ],
+      "published": "2026-08-04T16:59:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.03928v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "robust low-tubal-rank tensor completion from corrupted partial observations; directly applicable to hyperspectral tensor data recovery",
+      "llm_evidence_cn": "鲁棒低管秩张量补全方法，直接适用于高光谱张量数据恢复",
+      "llm_evidence": "鲁棒低管秩张量补全方法，直接适用于高光谱张量数据恢复",
+      "canonical_evidence": "鲁棒低管秩张量补全方法，直接适用于高光谱张量数据恢复",
+      "llm_tldr_en": "R-ItCUR robustly recovers a low-tubal-rank tensor from cross-concentrated samples with sparse gross outliers using adaptive Welsch correction and projected blockwise gradient descent; directly applicable to HSI tensor recovery.",
+      "llm_tldr_cn": "针对张量交叉集中采样下含有稀疏大异常值的低管秩张量恢复问题，提出鲁棒迭代t-CUR（R-ItCUR）算法。方法将采样张量交叉划分为外部块与交集块，利用自适应分块Welsch校正抑制异常值，并通过投影分块梯度下降更新低秩分量。实验表明该方法在强异常值干扰下仍能稳定恢复张量，为高光谱图像张量补全与去噪提供了新工具。",
+      "llm_tldr": "针对张量交叉集中采样下含有稀疏大异常值的低管秩张量恢复问题，提出鲁棒迭代t-CUR（R-ItCUR）算法。方法将采样张量交叉划分为外部块与交集块，利用自适应分块Welsch校正抑制异常值，并通过投影分块梯度下降更新低秩分量。实验表明该方法在强异常值干扰下仍能稳定恢复张量，为高光谱图像张量补全与去噪提供了新工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.03928v2",
+      "source": "arxiv",
+      "title": "Robust Low-Tubal-Rank Tensor Completion under Cross-Concentrated Sampling",
+      "abstract": "Tensor cross-concentrated sampling (t-CCS) bridges entrywise sampling and t-CUR slice-wise sampling by observing entries only within selected horizontal and lateral slices. Existing t-CCS completion methods, however, assume that the observations are free of gross corruption. In this work, we study robust recovery of a third-order low-tubal-rank tensor from partial t-CCS observations contaminated by sparse, arbitrarily large outliers. We propose Robust Iterative t-CUR (R-ItCUR), a tensor-native algorithm that partitions the sampled tensor cross into two exterior blocks and an intersection block, applies adaptive blockwise Welsch correction for outlier suppression, and updates the low-rank component through projected blockwise gradient descent. By operating directly on the sampled cross, R-ItCUR avoids reconstructing the full tensor throughout the iterations, resulting in substantial memory and computational savings. Experiments on synthetic tensors, cardiac MRI data, and three-dimensional seismic data demonstrate accurate recovery and strong robustness to sparse gross corruptions. The results further highlight the importance of explicitly exploiting the cross-concentrated sampling structure in robust tensor completion.",
+      "authors": [
+        "HanQin Cai",
+        "Longxiu Huang",
+        "Jing Qin",
+        "Chengyue Wu"
+      ],
+      "primary_category": "stat.ML",
+      "categories": [
+        "stat.ML",
+        "cs.IT",
+        "cs.LG",
+        "math.NA"
+      ],
+      "published": "2026-08-04T16:59:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.03928v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Robust low-tubal-rank tensor completion with outlier suppression; transferable to HSI tensor recovery and denoising",
+      "llm_evidence_cn": "鲁棒低管秩张量补全与异常值抑制，可迁移至高光谱张量恢复与去噪",
+      "llm_evidence": "鲁棒低管秩张量补全与异常值抑制，可迁移至高光谱张量恢复与去噪",
+      "canonical_evidence": "鲁棒低管秩张量补全与异常值抑制，可迁移至高光谱张量恢复与去噪",
+      "llm_tldr_en": "Addresses robust low-tubal-rank tensor completion from cross-concentrated samples with gross outliers; proposes R-ItCUR with adaptive Welsch correction and projected blockwise gradient descent, enabling accurate recovery and transfer to HSI denoising.",
+      "llm_tldr_cn": "针对交叉集中采样下存在稀疏任意大异常值的低管秩张量恢复问题，现有t-CCS补全方法未考虑粗大误差，导致性能退化。本文提出鲁棒迭代t-CUR算法R-ItCUR，利用张量叉结构将观测划分为外部块和交集块，采用自适应分块Welsch校正对异常值加权抑制，并结合投影分块梯度下降迭代更新低秩成分。实验表明，在稀疏异常值污染下R-ItCUR能准确恢复低管秩张量，显著优于已有补全方法，为高光谱图像去噪与恢复提供了强有力工具。",
+      "llm_tldr": "针对交叉集中采样下存在稀疏任意大异常值的低管秩张量恢复问题，现有t-CCS补全方法未考虑粗大误差，导致性能退化。本文提出鲁棒迭代t-CUR算法R-ItCUR，利用张量叉结构将观测划分为外部块和交集块，采用自适应分块Welsch校正对异常值加权抑制，并结合投影分块梯度下降迭代更新低秩成分。实验表明，在稀疏异常值污染下R-ItCUR能准确恢复低管秩张量，显著优于已有补全方法，为高光谱图像去噪与恢复提供了强有力工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.02401v1",
+      "source": "arxiv",
+      "title": "USP-Mamba: Unmixing-Derived Spectral and Structural Prompting for Hyperspectral Image Super-Resolution",
+      "abstract": "Hyperspectral image super-resolution aims to reconstruct high-resolution imagery while preserving dense spectral information. Recently, Mamba-based models have shown promising potential for this task by capturing long-range dependencies with linear computational complexity. Nevertheless, their causal sequence modeling requires two-dimensional hyperspectral features to be unfolded along predefined scanning orders, which disrupts spatial adjacency and restricts the effective propagation of contextual information. Moreover, state-space parameterization of existing models is predominantly derived from generic learned representations, without explicit alignment with the intrinsic characteristics of the hyperspectral image. To address this issue, we propose an Unmixing-derived Spectral and Structural Prompting Mamba framework, termed USP-Mamba, which adapts Mamba state evolution through composition-aware spectral priors and image-dependent structural prompts. Specifically, an unmixing-informed spectral prompt captures the global material composition of the input image and provides persistent conditioning throughout reconstruction. Injected into the Mamba sequence and progressively adapted across layers, it steers state evolution toward composition-consistent reconstruction. We introduce feature-level structural prompts comprising spatial and frequency components to provide image-dependent local guidance. The spatial prompt promotes structure-sensitive state encoding for local detail preservation, while the frequency prompt enables region-adaptive transitions between homogeneous regions and high-frequency details. Finally, complementary Hilbert and Semantic-Guided Neighboring scans preserve spatial continuity and strengthen non-local semantic dependency modeling. Extensive experiments on different datasets demonstrate that the proposed method consistently outperforms representative approaches.",
+      "authors": [
+        "Shi Chen",
+        "Jie Zhang",
+        "Yicong Zhou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T15:47:20+00:00",
+      "link": "https://arxiv.org/pdf/2608.02401v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Hyperspectral image super-resolution and restoration, directly in HSI restoration domain",
+      "llm_evidence_cn": "高光谱图像超分辨率与恢复，属于高光谱恢复领域",
+      "llm_evidence": "高光谱图像超分辨率与恢复，属于高光谱恢复领域",
+      "canonical_evidence": "高光谱图像超分辨率与恢复，属于高光谱恢复领域",
+      "llm_tldr_en": "USP-Mamba introduces unmixing-derived spectral and structural prompting for hyperspectral super-resolution, overcoming Mamba's spatial adjacency disruption and aligning state-space parameters with HSI characteristics at linear complexity.",
+      "llm_tldr_cn": "高光谱图像超分辨率需在重建高分辨率图像时保持密集光谱信息。现有Mamba模型尽管能高效捕获长程依赖，但因果序列建模会破坏空间邻接性，且状态空间参数化缺少与高光谱固有特征的显式对齐。为此提出USP-Mamba，利用解混派生的光谱与结构提示引导重建。该方法以线性复杂度改善上下文信息传播，并提升光谱保真度，对高光谱图像恢复与去噪任务具有参考价值。",
+      "llm_tldr": "高光谱图像超分辨率需在重建高分辨率图像时保持密集光谱信息。现有Mamba模型尽管能高效捕获长程依赖，但因果序列建模会破坏空间邻接性，且状态空间参数化缺少与高光谱固有特征的显式对齐。为此提出USP-Mamba，利用解混派生的光谱与结构提示引导重建。该方法以线性复杂度改善上下文信息传播，并提升光谱保真度，对高光谱图像恢复与去噪任务具有参考价值。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
