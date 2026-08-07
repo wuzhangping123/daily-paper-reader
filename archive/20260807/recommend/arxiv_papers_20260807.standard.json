@@ -1,15 +1,15 @@
 {
   "mode": "standard",
-  "generated_at": "2026-08-07T00:48:18.356771+00:00",
+  "generated_at": "2026-08-07T19:49:00.343898+00:00",
   "stats": {
     "mode": "standard",
     "tag_count": 1,
     "deep_divecandidates": 2,
     "deep_cap": 6,
     "deep_selected": 2,
-    "quick_candidates": 1,
+    "quick_candidates": 2,
     "quick_skim_target": 11,
-    "quick_selected": 1
+    "quick_selected": 2
   },
   "deep_dive": [
     {
@@ -37,13 +37,13 @@
         "query:hsi-denoise"
       ],
       "llm_score": 8.0,
-      "llm_evidence_en": "robust low-tubal-rank tensor completion from corrupted partial observations; directly applicable to hyperspectral tensor data recovery",
-      "llm_evidence_cn": "鲁棒低管秩张量补全方法，直接适用于高光谱张量数据恢复",
-      "llm_evidence": "鲁棒低管秩张量补全方法，直接适用于高光谱张量数据恢复",
-      "canonical_evidence": "鲁棒低管秩张量补全方法，直接适用于高光谱张量数据恢复",
-      "llm_tldr_en": "R-ItCUR robustly recovers a low-tubal-rank tensor from cross-concentrated samples with sparse gross outliers using adaptive Welsch correction and projected blockwise gradient descent; directly applicable to HSI tensor recovery.",
-      "llm_tldr_cn": "针对张量交叉集中采样下含有稀疏大异常值的低管秩张量恢复问题，提出鲁棒迭代t-CUR（R-ItCUR）算法。方法将采样张量交叉划分为外部块与交集块，利用自适应分块Welsch校正抑制异常值，并通过投影分块梯度下降更新低秩分量。实验表明该方法在强异常值干扰下仍能稳定恢复张量，为高光谱图像张量补全与去噪提供了新工具。",
-      "llm_tldr": "针对张量交叉集中采样下含有稀疏大异常值的低管秩张量恢复问题，提出鲁棒迭代t-CUR（R-ItCUR）算法。方法将采样张量交叉划分为外部块与交集块，利用自适应分块Welsch校正抑制异常值，并通过投影分块梯度下降更新低秩分量。实验表明该方法在强异常值干扰下仍能稳定恢复张量，为高光谱图像张量补全与去噪提供了新工具。",
+      "llm_evidence_en": "Robust low-tubal-rank tensor completion directly supports tensor-based HSI data recovery under outliers and missing entries.",
+      "llm_evidence_cn": "鲁棒低管秩张量补全方法直接支持高光谱图像张量数据恢复，可处理异常值和缺失项。",
+      "llm_evidence": "鲁棒低管秩张量补全方法直接支持高光谱图像张量数据恢复，可处理异常值和缺失项。",
+      "canonical_evidence": "鲁棒低管秩张量补全方法直接支持高光谱图像张量数据恢复，可处理异常值和缺失项。",
+      "llm_tldr_en": "Proposes R-ItCUR for robust low-tubal-rank tensor completion from partially observed slices with sparse large outliers, using blockwise Welsch correction and projected gradient descent.",
+      "llm_tldr_cn": "该文研究交叉集中采样下的鲁棒低管秩张量补全问题，观测数据含有稀疏大幅值异常值。提出张量原生算法R-ItCUR，将采样张量划分为外部块与交叠块，利用自适应分块Welsch校正抑制异常值，并通过投影分块梯度下降更新低秩分量。理论分析和实验表明该方法在粗差存在下仍能恢复低秩张量，为高光谱图像等张量数据的去噪与恢复提供了鲁棒方案。",
+      "llm_tldr": "该文研究交叉集中采样下的鲁棒低管秩张量补全问题，观测数据含有稀疏大幅值异常值。提出张量原生算法R-ItCUR，将采样张量划分为外部块与交叠块，利用自适应分块Welsch校正抑制异常值，并通过投影分块梯度下降更新低秩分量。理论分析和实验表明该方法在粗差存在下仍能恢复低秩张量，为高光谱图像等张量数据的去噪与恢复提供了鲁棒方案。",
       "llm_tags": [
         "query:hsi-denoise"
       ],
@@ -77,13 +77,13 @@
         "query:hsi-denoise"
       ],
       "llm_score": 8.0,
-      "llm_evidence_en": "Robust low-tubal-rank tensor completion with outlier suppression; transferable to HSI tensor recovery and denoising",
-      "llm_evidence_cn": "鲁棒低管秩张量补全与异常值抑制，可迁移至高光谱张量恢复与去噪",
-      "llm_evidence": "鲁棒低管秩张量补全与异常值抑制，可迁移至高光谱张量恢复与去噪",
-      "canonical_evidence": "鲁棒低管秩张量补全与异常值抑制，可迁移至高光谱张量恢复与去噪",
-      "llm_tldr_en": "Addresses robust low-tubal-rank tensor completion from cross-concentrated samples with gross outliers; proposes R-ItCUR with adaptive Welsch correction and projected blockwise gradient descent, enabling accurate recovery and transfer to HSI denoising.",
-      "llm_tldr_cn": "针对交叉集中采样下存在稀疏任意大异常值的低管秩张量恢复问题，现有t-CCS补全方法未考虑粗大误差，导致性能退化。本文提出鲁棒迭代t-CUR算法R-ItCUR，利用张量叉结构将观测划分为外部块和交集块，采用自适应分块Welsch校正对异常值加权抑制，并结合投影分块梯度下降迭代更新低秩成分。实验表明，在稀疏异常值污染下R-ItCUR能准确恢复低管秩张量，显著优于已有补全方法，为高光谱图像去噪与恢复提供了强有力工具。",
-      "llm_tldr": "针对交叉集中采样下存在稀疏任意大异常值的低管秩张量恢复问题，现有t-CCS补全方法未考虑粗大误差，导致性能退化。本文提出鲁棒迭代t-CUR算法R-ItCUR，利用张量叉结构将观测划分为外部块和交集块，采用自适应分块Welsch校正对异常值加权抑制，并结合投影分块梯度下降迭代更新低秩成分。实验表明，在稀疏异常值污染下R-ItCUR能准确恢复低管秩张量，显著优于已有补全方法，为高光谱图像去噪与恢复提供了强有力工具。",
+      "llm_evidence_en": "Robust low-tubal-rank tensor completion for corrupted observations, directly applicable to HSI tensor recovery.",
+      "llm_evidence_cn": "鲁棒低管秩张量补全，适用于含异常值的高维张量恢复，可直接服务高光谱图像去噪。",
+      "llm_evidence": "鲁棒低管秩张量补全，适用于含异常值的高维张量恢复，可直接服务高光谱图像去噪。",
+      "canonical_evidence": "鲁棒低管秩张量补全，适用于含异常值的高维张量恢复，可直接服务高光谱图像去噪。",
+      "llm_tldr_en": "Proposes R-ItCUR for robust low-tubal-rank tensor completion under cross-concentrated sampling, using blockwise Welsch correction to suppress sparse gross outliers and projected blockwise gradient descent for low-rank update.",
+      "llm_tldr_cn": "针对交叉集中采样下张量补全对粗差鲁棒性不足的问题，本文提出鲁棒迭代t-CUR算法R-ItCUR。该算法将采样张量交叉划分为外部块与交叉块，利用自适应分块Welsch校正抑制稀疏且任意大的离群值，并通过投影分块梯度下降更新低秩分量。实验表明，在含离群值的部分观测下，R-ItCUR能稳定地恢复第三阶低管秩张量，显著优于现有补全方法。该工作为高光谱图像等高维张量数据的恢复与去噪提供了有效的算法支撑。",
+      "llm_tldr": "针对交叉集中采样下张量补全对粗差鲁棒性不足的问题，本文提出鲁棒迭代t-CUR算法R-ItCUR。该算法将采样张量交叉划分为外部块与交叉块，利用自适应分块Welsch校正抑制稀疏且任意大的离群值，并通过投影分块梯度下降更新低秩分量。实验表明，在含离群值的部分观测下，R-ItCUR能稳定地恢复第三阶低管秩张量，显著优于现有补全方法。该工作为高光谱图像等高维张量数据的恢复与去噪提供了有效的算法支撑。",
       "llm_tags": [
         "query:hsi-denoise"
       ],
@@ -115,13 +115,13 @@
         "query:hsi-denoise"
       ],
       "llm_score": 7.0,
-      "llm_evidence_en": "Hyperspectral image super-resolution and restoration, directly in HSI restoration domain",
-      "llm_evidence_cn": "高光谱图像超分辨率与恢复，属于高光谱恢复领域",
-      "llm_evidence": "高光谱图像超分辨率与恢复，属于高光谱恢复领域",
-      "canonical_evidence": "高光谱图像超分辨率与恢复，属于高光谱恢复领域",
-      "llm_tldr_en": "USP-Mamba introduces unmixing-derived spectral and structural prompting for hyperspectral super-resolution, overcoming Mamba's spatial adjacency disruption and aligning state-space parameters with HSI characteristics at linear complexity.",
-      "llm_tldr_cn": "高光谱图像超分辨率需在重建高分辨率图像时保持密集光谱信息。现有Mamba模型尽管能高效捕获长程依赖，但因果序列建模会破坏空间邻接性，且状态空间参数化缺少与高光谱固有特征的显式对齐。为此提出USP-Mamba，利用解混派生的光谱与结构提示引导重建。该方法以线性复杂度改善上下文信息传播，并提升光谱保真度，对高光谱图像恢复与去噪任务具有参考价值。",
-      "llm_tldr": "高光谱图像超分辨率需在重建高分辨率图像时保持密集光谱信息。现有Mamba模型尽管能高效捕获长程依赖，但因果序列建模会破坏空间邻接性，且状态空间参数化缺少与高光谱固有特征的显式对齐。为此提出USP-Mamba，利用解混派生的光谱与结构提示引导重建。该方法以线性复杂度改善上下文信息传播，并提升光谱保真度，对高光谱图像恢复与去噪任务具有参考价值。",
+      "llm_evidence_en": "Hyperspectral image super-resolution via Mamba with unmixing-derived spectral and structural prompting, relevant to HSI restoration",
+      "llm_evidence_cn": "基于Mamba的高光谱图像超分辨率重建，属于高光谱影像恢复范畴",
+      "llm_evidence": "基于Mamba的高光谱图像超分辨率重建，属于高光谱影像恢复范畴",
+      "canonical_evidence": "基于Mamba的高光谱图像超分辨率重建，属于高光谱影像恢复范畴",
+      "llm_tldr_en": "Proposes USP-Mamba for hyperspectral image super-resolution, using unmixing-derived spectral and structural prompting to preserve spectral information while capturing long-range dependencies; advances HSI restoration.",
+      "llm_tldr_cn": "高光谱图像超分辨率旨在保持密集光谱信息的同时重建高分辨率图像，但现有Mamba模型的扫码展开会破坏空间邻接性。该文提出USP-Mamba，利用解混得到的谱间与结构提示来引导状态空间建模，缓解预定义扫描顺序带来的上下文传播限制。实验表明该方法在高光谱超分辨率任务上表现优异。该工作为高光谱影像恢复提供了新的结构引导思路，但不直接处理噪声去除。",
+      "llm_tldr": "高光谱图像超分辨率旨在保持密集光谱信息的同时重建高分辨率图像，但现有Mamba模型的扫码展开会破坏空间邻接性。该文提出USP-Mamba，利用解混得到的谱间与结构提示来引导状态空间建模，缓解预定义扫描顺序带来的上下文传播限制。实验表明该方法在高光谱超分辨率任务上表现优异。该工作为高光谱影像恢复提供了新的结构引导思路，但不直接处理噪声去除。",
       "llm_tags": [
         "query:hsi-denoise"
       ],
@@ -130,6 +130,44 @@
       "matched_requirement_id": "req-8",
       "selection_source": "fresh_fetch",
       "quick_tier": "7"
+    },
+    {
+      "id": "2608.04944v1",
+      "source": "arxiv",
+      "title": "A geometry-based deep equilibrium model for image restoration under multiplicative Gamma noise",
+      "abstract": "We propose a deep learning framework for image restoration from images degraded by both multiplicative Gamma noise and blur. Unlike conventional deep equilibrium (DEQ) models that rely on implicit neural regularization, the proposed method learns an explicit and interpretable regularizer parameterized by geometric priors associated with surface area and mean curvature. To minimize the resulting variational model, we develop a mirror descent algorithm tailored to the commonly used Gamma-noise fidelity terms. Leveraging the Kurdyka-Lojasiewicz property for functions defined in $o$-minimal structures, we establish the global convergence of the generated iterates to a critical point. Experimental results on both grayscale and color image restoration demonstrate that the proposed method consistently outperforms representative model-based approaches while achieving performance comparable to state-of-the-art DEQ models based on implicit regularization, despite requiring substantially fewer trainable parameters.",
+      "authors": [
+        "Shengkun Yang",
+        "Luca Ratti",
+        "Zhichang Guo"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "cs.LG"
+      ],
+      "published": "2026-08-05T15:10:44+00:00",
+      "link": "https://arxiv.org/pdf/2608.04944v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Deep image restoration under multiplicative Gamma noise with explicit geometric regularizer, transferable to HSI denoising",
+      "llm_evidence_cn": "乘性伽马噪声下的深度图像恢复，显式几何正则化，可迁移至高光谱去噪",
+      "llm_evidence": "乘性伽马噪声下的深度图像恢复，显式几何正则化，可迁移至高光谱去噪",
+      "canonical_evidence": "乘性伽马噪声下的深度图像恢复，显式几何正则化，可迁移至高光谱去噪",
+      "llm_tldr_en": "Proposes a deep equilibrium model with explicit geometric regularizer for image restoration under multiplicative Gamma noise and blur, using mirror descent and global convergence guarantees.",
+      "llm_tldr_cn": "针对乘性伽马噪声和模糊导致的图像退化问题，现有深度平衡模型依赖隐式正则且可解释性差。本文提出一种几何先验参数化的显式正则深度平衡模型，利用曲面面积和平均曲率构造可解释正则项，并设计适配伽马噪声保真项的镜像下降算法。理论上借助Kurdyka-Lojasiewicz性质证明迭代全局收敛，实验表明该方法在灰度与彩色图像恢复上表现优异。该工作为噪声图像恢复提供了一种可解释且收敛性有保证的新范式，可推广至高光谱去噪任务。",
+      "llm_tldr": "针对乘性伽马噪声和模糊导致的图像退化问题，现有深度平衡模型依赖隐式正则且可解释性差。本文提出一种几何先验参数化的显式正则深度平衡模型，利用曲面面积和平均曲率构造可解释正则项，并设计适配伽马噪声保真项的镜像下降算法。理论上借助Kurdyka-Lojasiewicz性质证明迭代全局收敛，实验表明该方法在灰度与彩色图像恢复上表现优异。该工作为噪声图像恢复提供了一种可解释且收敛性有保证的新范式，可推广至高光谱去噪任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
     }
   ]
 }

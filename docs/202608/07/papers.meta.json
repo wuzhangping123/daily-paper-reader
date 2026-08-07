@@ -1,8 +1,8 @@
 {
   "label": "2026-08-07",
   "date": "2026-08-07",
-  "generated_at": "2026-08-07T00:51:34",
-  "count": 3,
+  "generated_at": "2026-08-07T19:51:22",
+  "count": 4,
   "papers": [
     {
       "paper_id": "202608/07/2608.03928v1-robust-low-tubal-rank-tensor-completion-under-cross-concentrated-sampling",
@@ -46,6 +46,21 @@
       "tldr": "高光谱图像超分辨率旨在重建高分辨率密集光谱图像。现有Mamba模型虽以线性复杂度捕捉长程依赖，但其因果序列建模展开特征会破坏空间邻接，且状态空间参数化源于通用表示，未对齐高光谱图像的内在特性。为此提出USP-Mamba，利用解混导出的光谱提示捕捉全局材料组成，并引入含空间与频率成分的结构提示提供局部引导，同时通过互补的Hilbert与语义引导邻域扫描保持空间连续性。在多个数据集上，该方法显著优于现有代表性方法，实现了组成一致且细节丰富的高光谱超分辨率。",
       "tags": "query:hsi-denoise",
       "abstract_en": "Hyperspectral image super-resolution aims to reconstruct high-resolution imagery while preserving dense spectral information. Recently, Mamba-based models have shown promising potential for this task by capturing long-range dependencies with linear computational complexity. Nevertheless, their causal sequence modeling requires two-dimensional hyperspectral features to be unfolded along predefined scanning orders, which disrupts spatial adjacency and restricts the effective propagation of contextual information. Moreover, state-space parameterization of existing models is predominantly derived from generic learned representations, without explicit alignment with the intrinsic characteristics of the hyperspectral image. To address this issue, we propose an Unmixing-derived Spectral and Structural Prompting Mamba framework, termed USP-Mamba, which adapts Mamba state evolution through composition-aware spectral priors and image-dependent structural prompts. Specifically, an unmixing-informed spectral prompt captures the global material composition of the input image and provides persistent conditioning throughout reconstruction. Injected into the Mamba sequence and progressively adapted across layers, it steers state evolution toward composition-consistent reconstruction. We introduce feature-level structural prompts comprising spatial and frequency components to provide image-dependent local guidance. The spatial prompt promotes structure-sensitive state encoding for local detail preservation, while the frequency prompt enables region-adaptive transitions between homogeneous regions and high-frequency details. Finally, complementary Hilbert and Semantic-Guided Neighboring scans preserve spatial continuity and strengthen non-local semantic dependency modeling. Extensive experiments on different datasets demonstrate that the proposed method consistently outperforms representative approaches.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/07/2608.04944v1-a-geometry-based-deep-equilibrium-model-for-image-restoration-under-multiplicative-gamma-noise",
+      "section": "quick",
+      "title_en": "A geometry-based deep equilibrium model for image restoration under multiplicative Gamma noise",
+      "authors": "Shengkun Yang, Luca Ratti, Zhichang Guo",
+      "date": "2026-08-05",
+      "pdf": "https://arxiv.org/pdf/2608.04944v1",
+      "score": "6.0",
+      "evidence": "乘性伽马噪声下的深度图像恢复，显式几何正则化，可迁移至高光谱去噪",
+      "tldr": "针对乘性Gamma噪声和模糊导致的图像退化问题，现有深度平衡模型依赖隐式正则化，缺乏可解释性。本文提出基于几何先验的显式正则化框架，利用表面积和平均曲率参数化先验，并设计适配Gamma噪声保真项的镜像下降算法。利用Kurdyka-Lojasiewicz性质证明迭代全局收敛。实验表明，该方法优于传统模型驱动方法，性能媲美隐式正则化DEQ模型，且参数量大幅减少。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "We propose a deep learning framework for image restoration from images degraded by both multiplicative Gamma noise and blur. Unlike conventional deep equilibrium (DEQ) models that rely on implicit neural regularization, the proposed method learns an explicit and interpretable regularizer parameterized by geometric priors associated with surface area and mean curvature. To minimize the resulting variational model, we develop a mirror descent algorithm tailored to the commonly used Gamma-noise fidelity terms. Leveraging the Kurdyka-Lojasiewicz property for functions defined in $o$-minimal structures, we establish the global convergence of the generated iterates to a critical point. Experimental results on both grayscale and color image restoration demonstrate that the proposed method consistently outperforms representative model-based approaches while achieving performance comparable to state-of-the-art DEQ models based on implicit regularization, despite requiring substantially fewer trainable parameters.",
       "source": "arxiv",
       "selection_source": "fresh_fetch"
     }
