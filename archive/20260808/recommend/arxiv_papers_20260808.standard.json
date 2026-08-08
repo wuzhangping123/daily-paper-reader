@@ -1,0 +1,173 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-08T19:41:00.642768+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.00682v1",
+      "source": "arxiv",
+      "title": "BRIC-Net: Boundary-Reliable Illumination-Color Interaction for Remote Sensing Image Deshadowing",
+      "abstract": "Shadows in remote sensing images obscure surface appearance and disrupt radiometric continuity, reducing the reliability of visual interpretation and downstream analysis. Remote sensing image deshadowing is an ill-posed inverse problem that requires spatially varying illumination recovery while preserving chromatic and radiometric consistency in non-shadow regions. Existing methods commonly rely on hard shadow masks for compensation or directly regress RGB intensities. Hard masks may inadequately model gradual penumbra variations and are sensitive to localization errors, often producing residual shadows or halo artifacts; direct RGB regression entangles illumination recovery with chromatic reconstruction and can introduce color casts. To this end, we propose the Boundary-Reliable Illumination-Color Interaction Network (BRIC-Net), which decouples these failures at different representation levels. A Lightness Reliability Prior (LRP) derives reliability-aware guidance from CIELAB statistics. Boundary-Adaptive Gated Mixing (BAGM) performs gated interpolation between shallow RGB and lightness features around uncertain transitions, while Spatial-Channel Mutual Modulation (SCMM) coordinates deeper spatial and channel responses for appearance-preserving illumination recovery. BRIC-Net achieves 29.46~dB full-image peak signal-to-noise ratio (PSNR) on AeroDS-Syn and 27.96~dB on SRGTA. It also obtains the lowest Perception-based Image Quality Evaluator (PIQE) scores on AISD and AeroDS-Real. Region-wise evaluations and component ablations further support its effectiveness in shadow recovery and non-shadow preservation.",
+      "authors": [
+        "Wei Lu",
+        "Yi Liu",
+        "Si-Bao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-01T14:07:43+00:00",
+      "link": "https://arxiv.org/pdf/2608.00682v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "remote sensing image deshadowing for radiometric consistency, matches relative radiometric correction intent",
+      "llm_evidence_cn": "遥感影像去阴影以保持辐射一致性，符合相对辐射校正需求",
+      "llm_evidence": "遥感影像去阴影以保持辐射一致性，符合相对辐射校正需求",
+      "canonical_evidence": "遥感影像去阴影以保持辐射一致性，符合相对辐射校正需求",
+      "llm_tldr_en": "BRIC-Net restores shadowed remote sensing images through illumination-color interaction, improving radiometric continuity and reducing artifacts.",
+      "llm_tldr_cn": "该文提出BRIC-Net用于遥感影像去阴影，通过边界可靠的照明-颜色相互作用，在消除阴影的同时保持非阴影区域的辐射与色彩一致性。相比依赖硬阴影掩膜或直接回归RGB的方法，该方法更好地模拟了半影渐变，减少了残影和光晕伪影。实验结果验证了其在提升辐射连续性与视觉质量方面的优势。该工作与相对辐射校正的目标高度一致，可作为遥感影像辐射校正的有效方法。",
+      "llm_tldr": "该文提出BRIC-Net用于遥感影像去阴影，通过边界可靠的照明-颜色相互作用，在消除阴影的同时保持非阴影区域的辐射与色彩一致性。相比依赖硬阴影掩膜或直接回归RGB的方法，该方法更好地模拟了半影渐变，减少了残影和光晕伪影。实验结果验证了其在提升辐射连续性与视觉质量方面的优势。该工作与相对辐射校正的目标高度一致，可作为遥感影像辐射校正的有效方法。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "relative radiometric correction for remote sensing images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.02144v1",
+      "source": "arxiv",
+      "title": "Quaternion Tensor Modeling for Joint Color-Polarization Demosaicking",
+      "abstract": "Division-of-focal-plane (DoFP) color polarization cameras enable snapshot acquisition of color polarization mosaic images, but the inherently sparse sampling pattern makes color polarization demosaicking severely ill-posed. Existing methods often fail to jointly exploit the correlations among polarization channels and the physical constraints inherent in polarization imaging, resulting in noticeable demosaicking artifacts. To address this issue, a quaternion-tensor-based color polarization demosaicking (CPDM) method incorporating Stokes-domain total variation (TV) regularization is proposed. Correlation analysis shows that the correlations among polarization channels are stronger than those among color channels. Accordingly, the color polarization images acquired at $0^\\circ$, $45^\\circ$, $90^\\circ$, and $135^\\circ$ are encoded into the four components of a third-order quaternion tensor, with the color channels organized along its third mode. A low-rank prior is then imposed on the quaternion tensor to exploit the global structural redundancy in the color polarization data. Moreover, spatial gradients are mapped to the Stokes domain through an orthogonal transformation to separate intensity, polarization and residual variations, with adaptive quaternion weights enabling component-specific regularization and preserving the energy consistency of the reconstructed Stokes vectors. An efficient optimization algorithm is derived for the resulting model. Extensive experiments demonstrate the superior demosaicking performance of the proposed method.",
+      "authors": [
+        "Yanqing Song",
+        "Jifei Miao",
+        "Chaoqian Li",
+        "Rui Mei",
+        "Kit Ian Kou",
+        "Liqiao Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T12:29:45+00:00",
+      "link": "https://arxiv.org/pdf/2608.02144v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "quaternion tensor modeling with Stokes-domain total variation for joint demosaicking; tensor recovery methodology transferable to HSI denoising",
+      "llm_evidence_cn": "四元数张量建模与斯托克斯域全变分用于联合去马赛克，张量恢复方法可迁移至高光谱去噪",
+      "llm_evidence": "四元数张量建模与斯托克斯域全变分用于联合去马赛克，张量恢复方法可迁移至高光谱去噪",
+      "canonical_evidence": "四元数张量建模与斯托克斯域全变分用于联合去马赛克，张量恢复方法可迁移至高光谱去噪",
+      "llm_tldr_en": "A quaternion tensor model with Stokes-domain TV regularization is proposed for joint color-polarization demosaicking, exploiting channel correlations to suppress artifacts.",
+      "llm_tldr_cn": "针对彩色偏振分焦平面相机获取的稀疏马赛克图像重建问题，提出了一种基于四元数张量建模和斯托克斯域全变分正则化的联合去马赛克方法。通过挖掘偏振通道间更强的相关性，将彩色偏振图像表示为四元数张量，并利用全变分约束抑制伪影。实验验证该方法能有效去除去马赛克伪影，提升重建质量，其张量建模思路可推广至高光谱图像张量恢复任务。",
+      "llm_tldr": "针对彩色偏振分焦平面相机获取的稀疏马赛克图像重建问题，提出了一种基于四元数张量建模和斯托克斯域全变分正则化的联合去马赛克方法。通过挖掘偏振通道间更强的相关性，将彩色偏振图像表示为四元数张量，并利用全变分约束抑制伪影。实验验证该方法能有效去除去马赛克伪影，提升重建质量，其张量建模思路可推广至高光谱图像张量恢复任务。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.02322v1",
+      "source": "arxiv",
+      "title": "Global-Scale Self-Supervised Spatiotemporal Learning for NDVI Time-Series Reconstruction",
+      "abstract": "Accurate and efficient reconstruction of cloud-contaminated and noise-corrupted NDVI time series remains a challenge in remote sensing. Deep learning provides a promising solution for modeling complex spatiotemporal dependencies; however, its application is often limited by the difficulty of obtaining paired clear-sky and degraded NDVI data for identical spatiotemporal locations. To address this issue, we propose GloSSR, a Global-scale Self-supervised Spatiotemporal framework for NDVI Reconstruction. The framework constructs supervisory signals by artificially degrading relatively clean NDVI observations with realistic cloud contamination patterns, producing self-supervised training pairs that closely mimic real-world degradation. It further introduces an end-to-end spatiotemporal learning network that jointly captures long-range temporal dependencies and short-term spatiotemporal correlation through a bidirectional Transformer with a ConvLSTM architecture. A temporal-channel attention-based reconstruction module is incorporated to enhance informative features, while a spatiotemporal prior constraint is designed to preserve both fine-scale structures and long-term phenological trends during optimization. Extensive evaluations on MODIS NDVI data demonstrate the effectiveness of the proposed framework across both artificial and real-world scenarios. In artificial degraded-pixel reconstruction experiments, GloSSR consistently outperforms the comparison methods. Time-series analyses based on real observations further demonstrate that the proposed framework can accurately characterize vegetation dynamics and capture the key phenological states. Long-term vegetation trend analysis and the transferability analysis to AVHRR data validate the scalability of the framework and illustrate its broad applicability for large-scale environmental monitoring.",
+      "authors": [
+        "Ang Li",
+        "Menghui Jiang",
+        "Xiaobin Guan",
+        "Dong Chu",
+        "Huanfeng Shen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T14:46:25+00:00",
+      "link": "https://arxiv.org/pdf/2608.02322v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Deep self-supervised spatiotemporal reconstruction of noise-corrupted NDVI; method transferable to hyperspectral image denoising",
+      "llm_evidence_cn": "深度自监督时空重建噪声污染的NDVI，方法可迁移至高光谱去噪",
+      "llm_evidence": "深度自监督时空重建噪声污染的NDVI，方法可迁移至高光谱去噪",
+      "canonical_evidence": "深度自监督时空重建噪声污染的NDVI，方法可迁移至高光谱去噪",
+      "llm_tldr_en": "GloSSR reconstructs cloud-contaminated and noisy NDVI time series by generating realistic self-supervised training pairs, enabling global-scale remote sensing data recovery.",
+      "llm_tldr_cn": "云污染和噪声经常破坏NDVI时间序列，且难以获得真实清晰-退化数据对。GloSSR通过模拟真实云污染模式构造自监督训练对，学习时空依赖，实现全球尺度的NDVI重建。实验结果显示该方法能有效恢复噪声污染的NDVI数据。该框架为遥感图像恢复提供了一种自监督学习范式。",
+      "llm_tldr": "云污染和噪声经常破坏NDVI时间序列，且难以获得真实清晰-退化数据对。GloSSR通过模拟真实云污染模式构造自监督训练对，学习时空依赖，实现全球尺度的NDVI重建。实验结果显示该方法能有效恢复噪声污染的NDVI数据。该框架为遥感图像恢复提供了一种自监督学习范式。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.05839v1",
+      "source": "arxiv",
+      "title": "A neural operator view on U-Nets for inverse imaging problems",
+      "abstract": "Deep neural networks have shown great empirical success in the solution of a wide variety of ill-posed inverse problems in imaging. Yet, very few works have studied their behavior in the limit that turns the discretized ill-conditioned problems into truly ill-posed ones, i.e., for an increasing resolution of the discretization. In this work, we review common approaches to neural operator learning in architectures that resemble a U-Net, one of the most common classical architectures for inverse imaging problems. We discuss advantages and drawbacks of the respective approaches, consider a 1D toy example for improved interpretability, and present extensive numerical experiments on how different types of neural operator U-Nets can improve a first (crude) limited angle CT-reconstruction. In particular, we study how well networks trained for a certain resolution of the discretization generalize to other resolutions. Our finding is that while U-shaped neural operator architectures are by design resolution-invariant, the classical U-Net architecture seems to be more robust with respect to resolution changes than expected.",
+      "authors": [
+        "Alexander Auras",
+        "Martin Burger",
+        "Samira Kabri",
+        "Michael Moeller",
+        "Michael Schopf-Kuester"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "cs.LG"
+      ],
+      "published": "2026-08-06T10:07:33+00:00",
+      "link": "https://arxiv.org/pdf/2608.05839v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "theoretical and empirical analysis of U-Net architectures for inverse imaging problems, directly relevant to deep learning based HSI denoising",
+      "llm_evidence_cn": "对逆成像问题中U-Net架构的理论与实证分析，与基于深度学习的高光谱去噪直接相关",
+      "llm_evidence": "对逆成像问题中U-Net架构的理论与实证分析，与基于深度学习的高光谱去噪直接相关",
+      "canonical_evidence": "对逆成像问题中U-Net架构的理论与实证分析，与基于深度学习的高光谱去噪直接相关",
+      "llm_tldr_en": "This paper reviews and analyzes neural operator U-Nets for inverse imaging problems, showing how different operator formulations improve limited-angle reconstruction and benefit resolution-dependent tasks like denoising.",
+      "llm_tldr_cn": "深度学习在逆成像问题中表现优异，但离散化分辨率增加时行为鲜有研究。该文从神经算子视角综述U-Net类架构，讨论不同算子化方法的优缺点，并通过一维示例和数值实验展示其改善有限角度重建的效果。研究为分辨率变化下高光谱图像去噪等逆问题的深度学习网络设计提供了理论指导。",
+      "llm_tldr": "深度学习在逆成像问题中表现优异，但离散化分辨率增加时行为鲜有研究。该文从神经算子视角综述U-Net类架构，讨论不同算子化方法的优缺点，并通过一维示例和数值实验展示其改善有限角度重建的效果。研究为分辨率变化下高光谱图像去噪等逆问题的深度学习网络设计提供了理论指导。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
