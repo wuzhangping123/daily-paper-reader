@@ -1,0 +1,130 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-09T19:20:41.118817+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.05463v1",
+      "source": "arxiv",
+      "title": "Structured Tensor Approximation from Lateral Slice Sampling via Basis and Manifold Priors",
+      "abstract": "In this work, we consider a structured tensor approximation problem, where only a limited number of lateral slices are observed. The proposed algorithm , called Basis and Manifold prior Tensor Approximation (BMTA), exploits both global and local structures of the evolution of a global tensor. Specifically, BMTA integrates two signal models: (i) a quasi-basis model that captures smooth global variations along a physical trajectory, and (ii) a manifold-guided interpolation model that characterizes local relationships among tensor slices. A low-rank Tucker reconstruction framework is incorporated to efficiently capture the priors, resulting in coefficients for basis function estimation and a tensor optimization. In addition, we provide a theoretical analysis which establishes a non-asymptotic reconstruction error bound that characterizes the effects of sampling complexity, optimization convergence, and model mismatch. Numerical experiments are performed on both synthetic and real-world datasets, including quantum chemistry and spatiotemporal sensing applications.",
+      "authors": [
+        "Jeongmin Chae",
+        "Usama Saleem",
+        "Selin Bac",
+        "Shaama Mallikarjun Sharada",
+        "Urbashi Mitra"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-08-05T23:16:37+00:00",
+      "link": "https://arxiv.org/pdf/2608.05463v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "structured tensor approximation from lateral slice sampling with low-rank Tucker reconstruction supports high-dimensional tensor recovery",
+      "llm_evidence_cn": "从侧切片采样进行结构化张量逼近，利用低秩Tucker重建，支持高维张量恢复",
+      "llm_evidence": "从侧切片采样进行结构化张量逼近，利用低秩Tucker重建，支持高维张量恢复",
+      "canonical_evidence": "从侧切片采样进行结构化张量逼近，利用低秩Tucker重建，支持高维张量恢复",
+      "llm_tldr_en": "This paper proposes BMTA for tensor approximation from limited lateral slices, combining global basis and manifold priors with low-rank Tucker reconstruction. It demonstrates effective recovery under partial sampling, relevant to tensor-based HSI denoising.",
+      "llm_tldr_cn": "针对仅观测少量侧切片导致的结构张量恢复欠定问题，本文提出BMTA算法，结合准基模型与流形引导插值分别刻画全局演变和局部关系，并利用低秩Tucker重建框架捕获先验。实验表明该方法能在有限采样下高效逼近结构张量。该工作为高光谱图像等高维数据的张量恢复与去噪提供了可迁移的方法支撑。",
+      "llm_tldr": "针对仅观测少量侧切片导致的结构张量恢复欠定问题，本文提出BMTA算法，结合准基模型与流形引导插值分别刻画全局演变和局部关系，并利用低秩Tucker重建框架捕获先验。实验表明该方法能在有限采样下高效逼近结构张量。该工作为高光谱图像等高维数据的张量恢复与去噪提供了可迁移的方法支撑。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.05769v1",
+      "source": "arxiv",
+      "title": "Flow-Map Distillation on Relation Manifolds for Image Restoration",
+      "abstract": "Knowledge distillation for image restoration typically aligns intermediate features or relation matrices between teacher and student networks as static targets, ignoring the dynamic structure of the knowledge transfer process. In this paper, we propose Flow-Map Distillation on Relation Manifolds (FoRM), which reformulates relation-based knowledge transfer as a continuous flow mapping problem on the relation manifold. Rather than regressing a constant velocity field between student and teacher relation states, FoRM learns a flow map operator $\\mathcal{F}_θ(\\mathbf{z}, t, s)$ that directly predicts the relation state at any target time $s$ given the current state at time $t$, enabling richer trajectory-level supervision. To ensure global self-consistency of the learned flow map, we introduce a safe semigroup consistency constraint that enforces compositional agreement using ground-truth bridge states, eliminating phantom-state error accumulation. An endpoint anchoring loss further prevents the operator from drifting away from the teacher target. Extensive experiments on five image restoration tasks, including super-resolution, deraining, denoising, deblurring, and low-light enhancement, demonstrate consistent gains over state-of-the-art distillation baselines across multiple backbone architectures, reducing training variance by approximately 50\\% compared to naive flow matching distillation while achieving superior restoration quality.",
+      "authors": [
+        "Zihao He",
+        "Songhua Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-06T08:59:28+00:00",
+      "link": "https://arxiv.org/pdf/2608.05769v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "knowledge distillation for image restoration",
+      "llm_evidence_cn": "用于图像恢复的知识蒸馏方法",
+      "llm_evidence": "用于图像恢复的知识蒸馏方法",
+      "canonical_evidence": "用于图像恢复的知识蒸馏方法",
+      "llm_tldr_en": "Proposes Flow-Map Distillation on Relation Manifolds (FoRM) for image restoration, modeling relation-based knowledge transfer as continuous flow mapping and learning a flow map operator for trajectory-level supervision, enabling richer knowledge transfer and improved restoration quality.",
+      "llm_tldr_cn": "针对图像恢复知识蒸馏中静态对齐忽略知识迁移动态结构的问题，本文提出关系流形上的流图蒸馏（FoRM）。该方法将关系知识迁移建模为连续流映射，通过学习流图算子直接预测任意目标时刻的关系状态，从而提供轨迹级监督。与回归常速场的方法相比，FoRM能捕捉更丰富的动态关系信息，有望显著提升学生网络在图像恢复任务上的性能。这一思路为基于关系蒸馏的图像恢复方法提供了新视角。",
+      "llm_tldr": "针对图像恢复知识蒸馏中静态对齐忽略知识迁移动态结构的问题，本文提出关系流形上的流图蒸馏（FoRM）。该方法将关系知识迁移建模为连续流映射，通过学习流图算子直接预测任意目标时刻的关系状态，从而提供轨迹级监督。与回归常速场的方法相比，FoRM能捕捉更丰富的动态关系信息，有望显著提升学生网络在图像恢复任务上的性能。这一思路为基于关系蒸馏的图像恢复方法提供了新视角。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.05843v1",
+      "source": "arxiv",
+      "title": "Overcoming Attention Drift: Homogeneity-Heterogeneity Guided Feature Aggregation for Low-Light Remote Sensing Image Enhancement",
+      "abstract": "Restoring high-fidelity remote sensing imagery from extreme low-light degradation is indispensable for reliable Earth observation and downstream machine vision. However, under severe noise and illumination corruption, existing methods suffer from attention drift, erroneously aggregating features across distinct physical boundaries and causing severe structural blurring and color distortion. To address this, we propose HALO, a dual-prior-driven enhancement framework that formulates enhancement as a guided feature aggregation problem driven by foundation model priors. Specifically, an illumination-invariant semantic prior provides regional homogeneity as a positive bias for content-consistent aggregation, while a pseudo-3D topological prior provides boundary heterogeneity as a negative penalty to strictly prevent cross-boundary confusion. To cooperatively incorporate these two priors, we propose a Homogeneity-Heterogeneity Cooperative Attention Module (H2CAM) to resolve feature conflicts during cross-modal prior fusion. Extensive experiments demonstrate that HALO achieves state-of-the-art performance across 8 challenging synthetic and real-world remote sensing benchmarks, significantly improving physical boundary sharpness and color fidelity while maximizing the preservation of discriminative features for downstream Earth observation tasks.",
+      "authors": [
+        "Yaozi Zhong",
+        "Xingxing Yang",
+        "Shaohui Mei",
+        "Mingyang Ma"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-06T10:11:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.05843v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "low-light remote sensing image enhancement with dual-prior feature aggregation to combat noise",
+      "llm_evidence_cn": "低照度遥感图像增强，解决噪声和光照退化问题",
+      "llm_evidence": "低照度遥感图像增强，解决噪声和光照退化问题",
+      "canonical_evidence": "低照度遥感图像增强，解决噪声和光照退化问题",
+      "llm_tldr_en": "Proposes HALO, a dual-prior-driven feature aggregation framework for low-light remote sensing image enhancement that overcomes attention drift, suppressing noise and preserving structure and color under severe degradation.",
+      "llm_tldr_cn": "低照度遥感图像在严重噪声和光照退化下常出现注意力漂移，导致结构模糊与颜色失真。为克服这一难题，本文提出HALO，一种由基础模型先验驱动的增强框架，利用光照不变语义先验提供区域同质性，并通过同质-异质引导的特征聚合来恢复内容一致的细节。实验表明，HALO在抑制噪声、保持结构边界和颜色保真方面优于现有方法，为遥感图像恢复和后续视觉任务提供了高质量输入。",
+      "llm_tldr": "低照度遥感图像在严重噪声和光照退化下常出现注意力漂移，导致结构模糊与颜色失真。为克服这一难题，本文提出HALO，一种由基础模型先验驱动的增强框架，利用光照不变语义先验提供区域同质性，并通过同质-异质引导的特征聚合来恢复内容一致的细节。实验表明，HALO在抑制噪声、保持结构边界和颜色保真方面优于现有方法，为遥感图像恢复和后续视觉任务提供了高质量输入。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-09",
+  "date": "2026-08-09",
+  "generated_at": "2026-08-09T19:22:49",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/09/2608.05463v1-structured-tensor-approximation-from-lateral-slice-sampling-via-basis-and-manifold-priors",
+      "section": "quick",
+      "title_en": "Structured Tensor Approximation from Lateral Slice Sampling via Basis and Manifold Priors",
+      "authors": "Jeongmin Chae, Usama Saleem, Selin Bac, Shaama Mallikarjun Sharada, Urbashi Mitra",
+      "date": "2026-08-05",
+      "pdf": "https://arxiv.org/pdf/2608.05463v1",
+      "score": "7.0",
+      "evidence": "从侧切片采样进行结构化张量逼近，利用低秩Tucker重建，支持高维张量恢复",
+      "tldr": "针对仅观测少量侧切片导致的结构张量恢复欠定问题，本文提出BMTA算法，结合准基模型与流形引导插值分别刻画全局演变和局部关系，并利用低秩Tucker重建框架捕获先验。实验表明该方法能在有限采样下高效逼近结构张量。该工作为高光谱图像等高维数据的张量恢复与去噪提供了可迁移的方法支撑。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "In this work, we consider a structured tensor approximation problem, where only a limited number of lateral slices are observed. The proposed algorithm , called Basis and Manifold prior Tensor Approximation (BMTA), exploits both global and local structures of the evolution of a global tensor. Specifically, BMTA integrates two signal models: (i) a quasi-basis model that captures smooth global variations along a physical trajectory, and (ii) a manifold-guided interpolation model that characterizes local relationships among tensor slices. A low-rank Tucker reconstruction framework is incorporated to efficiently capture the priors, resulting in coefficients for basis function estimation and a tensor optimization. In addition, we provide a theoretical analysis which establishes a non-asymptotic reconstruction error bound that characterizes the effects of sampling complexity, optimization convergence, and model mismatch. Numerical experiments are performed on both synthetic and real-world datasets, including quantum chemistry and spatiotemporal sensing applications.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/09/2608.05843v1-overcoming-attention-drift-homogeneity-heterogeneity-guided-feature-aggregation-for-low-light-remote-sensing-image-enhancement",
+      "section": "quick",
+      "title_en": "Overcoming Attention Drift: Homogeneity-Heterogeneity Guided Feature Aggregation for Low-Light Remote Sensing Image Enhancement",
+      "authors": "Yaozi Zhong, Xingxing Yang, Shaohui Mei, Mingyang Ma",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.05843v1",
+      "score": "7.0",
+      "evidence": "低照度遥感图像增强，解决噪声和光照退化问题",
+      "tldr": "针对极端低光遥感图像增强中现有方法因注意力漂移而跨边界聚合特征、导致结构模糊和颜色失真问题，提出HALO框架。该框架利用光照不变语义先验提供区域同质性正偏置，伪3D拓扑先验提供边界异质性负惩罚，并通过同质-异质协同注意力模块融合两类先验，解决跨模态先验特征冲突。在8个合成和真实遥感基准上达到最优性能，显著提升边界锐度和色彩保真度。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Restoring high-fidelity remote sensing imagery from extreme low-light degradation is indispensable for reliable Earth observation and downstream machine vision. However, under severe noise and illumination corruption, existing methods suffer from attention drift, erroneously aggregating features across distinct physical boundaries and causing severe structural blurring and color distortion. To address this, we propose HALO, a dual-prior-driven enhancement framework that formulates enhancement as a guided feature aggregation problem driven by foundation model priors. Specifically, an illumination-invariant semantic prior provides regional homogeneity as a positive bias for content-consistent aggregation, while a pseudo-3D topological prior provides boundary heterogeneity as a negative penalty to strictly prevent cross-boundary confusion. To cooperatively incorporate these two priors, we propose a Homogeneity-Heterogeneity Cooperative Attention Module (H2CAM) to resolve feature conflicts during cross-modal prior fusion. Extensive experiments demonstrate that HALO achieves state-of-the-art performance across 8 challenging synthetic and real-world remote sensing benchmarks, significantly improving physical boundary sharpness and color fidelity while maximizing the preservation of discriminative features for downstream Earth observation tasks.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/09/2608.05769v1-flow-map-distillation-on-relation-manifolds-for-image-restoration",
+      "section": "quick",
+      "title_en": "Flow-Map Distillation on Relation Manifolds for Image Restoration",
+      "authors": "Zihao He, Songhua Liu",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.05769v1",
+      "score": "6.0",
+      "evidence": "用于图像恢复的知识蒸馏方法",
+      "tldr": "现有知识蒸馏多把师生关系矩阵作为静态目标，忽略了知识迁移的动态结构。本文提出FoRM，在关系流形上学习连续流映射算子，直接预测任意时刻的关系状态，实现轨迹级监督。引入安全半群一致性约束与端点锚定损失，避免幻影状态误差并稳定训练。在五个图像恢复任务上超越SOTA蒸馏方法，训练方差降低约50%，恢复质量更优。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Knowledge distillation for image restoration typically aligns intermediate features or relation matrices between teacher and student networks as static targets, ignoring the dynamic structure of the knowledge transfer process. In this paper, we propose Flow-Map Distillation on Relation Manifolds (FoRM), which reformulates relation-based knowledge transfer as a continuous flow mapping problem on the relation manifold. Rather than regressing a constant velocity field between student and teacher relation states, FoRM learns a flow map operator $\\mathcal{F}_θ(\\mathbf{z}, t, s)$ that directly predicts the relation state at any target time $s$ given the current state at time $t$, enabling richer trajectory-level supervision. To ensure global self-consistency of the learned flow map, we introduce a safe semigroup consistency constraint that enforces compositional agreement using ground-truth bridge states, eliminating phantom-state error accumulation. An endpoint anchoring loss further prevents the operator from drifting away from the teacher target. Extensive experiments on five image restoration tasks, including super-resolution, deraining, denoising, deblurring, and low-light enhancement, demonstrate consistent gains over state-of-the-art distillation baselines across multiple backbone architectures, reducing training variance by approximately 50\\% compared to naive flow matching distillation while achieving superior restoration quality.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

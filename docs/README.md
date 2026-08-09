@@ -6,37 +6,30 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-08
-- 运行时间：2026-08-08 19:45:07 UTC
+- 最新运行日期：2026-08-09
+- 运行时间：2026-08-09 19:22:44 UTC
 - 运行状态：成功
-- 本次总论文数：4
+- 本次总论文数：3
 - 精读区：0
-- 速读区：4
+- 速读区：3
 
 ### 今日简报（AI）
-今日完成4篇论文速读，无精读，重点关注遥感图像去阴影、偏振去马赛克和NDVI时序重建。
-
-最值得看的是《BRIC-Net》（7分），提出边界可靠的亮度-颜色交互模型用于遥感图像去阴影，思路新颖且评分最高。
-
-若想快速入门，建议优先精读BRIC-Net，并顺带浏览《Quaternion Tensor Modeling》中颜色-偏振联合处理的建模技巧。
-- 详情：[/202608/08/README](/202608/08/README)
+今日速读3篇论文，涵盖结构化张量近似、低光遥感图像增强与图像恢复。最值得关注的是《Structured Tensor Approximation》与《Overcoming Attention Drift》（均7.0分），前者基于基与流形先验，后者针对低光遥感中的注意力漂移问题。建议优先精读这两篇，把握张量采样与低光增强的前沿思路。
+- 详情：[/202608/09/README](/202608/09/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [BRIC-Net: Boundary-Reliable Illumination-Color Interaction for Remote Sensing Image Deshadowing](/202608/08/2608.00682v1-bric-net-boundary-reliable-illumination-color-interaction-for-remote-sensing-image-deshadowing)  
+1. [Structured Tensor Approximation from Lateral Slice Sampling via Basis and Manifold Priors](/202608/09/2608.05463v1-structured-tensor-approximation-from-lateral-slice-sampling-via-basis-and-manifold-priors)  
    标签：评分：7.0/10、query:hsi-denoise
-   evidence：遥感影像去阴影以保持辐射一致性，符合相对辐射校正需求
-2. [Quaternion Tensor Modeling for Joint Color-Polarization Demosaicking](/202608/08/2608.02144v1-quaternion-tensor-modeling-for-joint-color-polarization-demosaicking)  
+   evidence：从侧切片采样进行结构化张量逼近，利用低秩Tucker重建，支持高维张量恢复
+2. [Overcoming Attention Drift: Homogeneity-Heterogeneity Guided Feature Aggregation for Low-Light Remote Sensing Image Enhancement](/202608/09/2608.05843v1-overcoming-attention-drift-homogeneity-heterogeneity-guided-feature-aggregation-for-low-light-remote-sensing-image-enhancement)  
+   标签：评分：7.0/10、query:hsi-denoise
+   evidence：低照度遥感图像增强，解决噪声和光照退化问题
+3. [Flow-Map Distillation on Relation Manifolds for Image Restoration](/202608/09/2608.05769v1-flow-map-distillation-on-relation-manifolds-for-image-restoration)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：四元数张量建模与斯托克斯域全变分用于联合去马赛克，张量恢复方法可迁移至高光谱去噪
-3. [Global-Scale Self-Supervised Spatiotemporal Learning for NDVI Time-Series Reconstruction](/202608/08/2608.02322v1-global-scale-self-supervised-spatiotemporal-learning-for-ndvi-time-series-reconstruction)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：深度自监督时空重建噪声污染的NDVI，方法可迁移至高光谱去噪
-4. [A neural operator view on U-Nets for inverse imaging problems](/202608/08/2608.05839v1-a-neural-operator-view-on-u-nets-for-inverse-imaging-problems)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：对逆成像问题中U-Net架构的理论与实证分析，与基于深度学习的高光谱去噪直接相关
+   evidence：用于图像恢复的知识蒸馏方法
 
 
 <div class="dpr-home-promo-card">
