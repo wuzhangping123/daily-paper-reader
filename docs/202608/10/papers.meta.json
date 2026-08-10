@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-10",
+  "date": "2026-08-10",
+  "generated_at": "2026-08-10T20:47:34",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/10/2608.05739v1-litekd-net-lightweight-knowledge-distilled-network-for-mobile-image-denoising",
+      "section": "quick",
+      "title_en": "LiteKD-Net: Lightweight Knowledge-Distilled Network for Mobile Image Denoising",
+      "authors": "Zhou Zhiyi",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.05739v1",
+      "score": "7.0",
+      "evidence": "结合物理噪声模拟与知识蒸馏的轻量深度去噪网络，可应用于高光谱深度去噪",
+      "tldr": "移动端图像去噪既需高质量恢复，又需低计算成本，且难以获取大规模LQ-GT配对数据。为此提出LiteKD-Net，先用物理引导的噪声模拟生成训练数据，再以Real-ESRGAN为教师，基于深度可分离卷积的Lite-RRDB构建轻量学生网络，通过特征级知识蒸馏迁移恢复能力，不增加推理开销。实验表明该方法大幅降低运行时间、提升推理速度，并在所有指标上优于SwinIR，实现了质量与效率的良好权衡。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Mobile image denoising requires both good restoration quality and low computational cost. In addition, it's annoying to collect large-scale LQ-GT clean pairs. As a result, we propose LiteKD-Net, a lightweight knowledge-distilled network for mobile image denoising. First, a physics-guided noise simulation pipeline generates paired training data by adding pixel crosstalk compared with pipelines applied to cameras. Next, we adapt the Real-ESRGAN to identity-resolution denoising and construct a lightweight Student using Lite-RRDB blocks based on depthwise separable convolutions. Third, feature-level knowledge distillation is applied to transfer the Teacher's restoration capability to the Student without introducing additional inference cost. Experiments on real-world datasets show that our model reaches great reduction in runtime and increase in the inference rate with good restoration quality. Our model also reaches the best in all metrics compared with SwinIR. These results indicate that LiteKD-Net provides a great trade-off between restoration quality and computational efficiency.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/10/2608.06574v1-implicit-neural-speckle-denoising",
+      "section": "quick",
+      "title_en": "Implicit Neural Speckle Denoising",
+      "authors": "Matthew R. Ziemann, Casey J. Pellizzari, Tyler J. Hardy, Christopher A. Metzler",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.06574v1",
+      "score": "7.0",
+      "evidence": "针对散斑噪声的深度隐式神经去噪框架，可迁移至高光谱图像去噪",
+      "tldr": "相干成像中的散斑噪声为乘性且空间相关，动态场景难以通过平均去除。本文提出无需训练的去噪框架，利用时空隐式神经表示结合孔径感知最大似然，显式建模散斑协方差，适配任意瞳孔形状。通过FFT加速与共轭梯度实现高效优化，并利用盲holdout准则自动早停。模拟与实验表明其在空间保真、时间一致及对不同散斑统计的鲁棒性上优于多种基线。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Speckle fundamentally limits coherent imaging by introducing multiplicative, spatially correlated noise that obscures scene structure. Removing speckle noise from dynamic scenes--that do not benefit from conventional speckle averaging--is particularly challenging. We introduce a training-free framework that combines a spatiotemporal implicit neural representation with an aperture-aware maximum-likelihood formulation to recover dynamic, speckle-free imagery directly from noisy observations. The coherent likelihood explicitly models the aperture-dependent spatial covariance of speckle, enabling adaptation to arbitrary pupil geometries without retraining. A matrix-free implementation based on FFT-accelerated operators, stochastic approximations, and conjugate gradients makes optimization practical for realistic image sizes. Meanwhile, a blind holdout criterion provides automatic early stopping without clean reference data. Simulated and laboratory results demonstrate improved spatial fidelity, temporal consistency, and robustness to varying speckle statistics relative to classical, unsupervised, and supervised baselines.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/10/2608.06981v1-local-epistemic-uncertainty-guided-active-sampling-for-plug-and-play-diffusive-image-restoration",
+      "section": "quick",
+      "title_en": "Local Epistemic Uncertainty Guided Active Sampling for Plug-and-play Diffusive Image Restoration",
+      "authors": "Jiaqi Zhang, Zheng Pang, Rongrong Gao, Qiyuan Zhang, Yang Yang",
+      "date": "2026-08-07",
+      "pdf": "https://arxiv.org/pdf/2608.06981v1",
+      "score": "6.0",
+      "evidence": "提出基于局部认知不确定性的主动采样策略用于即插即用扩散图像恢复；该先进恢复方法可应用于高光谱图像去噪",
+      "tldr": "扩散模型在图像恢复中效果显著，但现有DMIR方法依赖固定数据约束和均匀步长，忽视生成过程的动态性，导致对空间非均匀退化敏感，易产生结构失真和细节丢失，且均匀步长带来计算冗余。为此提出LEADer框架，在空间域利用像素级不确定性动态调节零空间中的先验强度，平衡细节保留与伪影抑制；在时间域通过不确定性迹量化采样稳定性，实现自适应轨迹剪枝加速收敛。理论证明严格数据一致性和确定性误差界，插件式方法可无缝集成多种DMIR基线，显著提升性能并减少采样时间。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Diffusion models have demonstrated remarkable effectiveness in image restoration tasks. However, when guiding image reconstruction, existing Diffusion Model-based Image Restoration (DMIR) methods typically rely on fixed data constraints and uniform step sizes, thereby overlooking the dynamic nature of the generative process. Such rigid designs render the models vulnerable to spatially non-uniform degradations, thus resulting in structural distortions and loss of fine details. Meanwhile, uniform step sizes introduce computational redundancy, whereas naïve step reduction strategies tend to accumulate approximation errors. To address these limitations, we propose a Local Epistemic Uncertainty Guided Active Sampling framework (LEADer). In the spatial domain, LEADer leverages pixel-wise uncertainty to dynamically modulate the prior strength within the null space, which effectively balances detail preservation and artifact suppression. In the temporal domain, it quantifies sampling stability via the uncertainty trace to enable adaptive trajectory pruning, thereby accelerating convergence. Theoretical proofs demonstrate that our framework achieves strict data consistency, while the trajectory pruning strategy admits a deterministic error bound, thereby guaranteeing stable convergence under skip sampling. Notably, our plug-and-play method can be seamlessly integrated into various DMIR baselines. Extensive experiments show that LEADer improves the performance of multiple state-of-the-art DMIR methods, while significantly reducing sampling time with negligible memory overhead. Code is available at https://github.com/JiaqiZhang-Sengoku/LEADer.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

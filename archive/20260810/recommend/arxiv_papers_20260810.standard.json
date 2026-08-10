@@ -1,0 +1,131 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-10T20:45:54.831618+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.05739v1",
+      "source": "arxiv",
+      "title": "LiteKD-Net: Lightweight Knowledge-Distilled Network for Mobile Image Denoising",
+      "abstract": "Mobile image denoising requires both good restoration quality and low computational cost. In addition, it's annoying to collect large-scale LQ-GT clean pairs. As a result, we propose LiteKD-Net, a lightweight knowledge-distilled network for mobile image denoising. First, a physics-guided noise simulation pipeline generates paired training data by adding pixel crosstalk compared with pipelines applied to cameras. Next, we adapt the Real-ESRGAN to identity-resolution denoising and construct a lightweight Student using Lite-RRDB blocks based on depthwise separable convolutions. Third, feature-level knowledge distillation is applied to transfer the Teacher's restoration capability to the Student without introducing additional inference cost. Experiments on real-world datasets show that our model reaches great reduction in runtime and increase in the inference rate with good restoration quality. Our model also reaches the best in all metrics compared with SwinIR. These results indicate that LiteKD-Net provides a great trade-off between restoration quality and computational efficiency.",
+      "authors": [
+        "Zhou Zhiyi"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-06T08:21:45+00:00",
+      "link": "https://arxiv.org/pdf/2608.05739v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Lightweight deep network with knowledge distillation and physics-guided noise simulation for image denoising; applicable to hyperspectral deep denoising",
+      "llm_evidence_cn": "结合物理噪声模拟与知识蒸馏的轻量深度去噪网络，可应用于高光谱深度去噪",
+      "llm_evidence": "结合物理噪声模拟与知识蒸馏的轻量深度去噪网络，可应用于高光谱深度去噪",
+      "canonical_evidence": "结合物理噪声模拟与知识蒸馏的轻量深度去噪网络，可应用于高光谱深度去噪",
+      "llm_tldr_en": "Proposes LiteKD-Net, a lightweight knowledge-distilled network for mobile image denoising, using physics-guided noise simulation for paired data, Lite-RRDB blocks for the student, and feature-level distillation to transfer teacher capability.",
+      "llm_tldr_cn": "移动端图像去噪既要恢复质量高又要计算开销低，且难以成对采集低质-干净训练数据。该文提出LiteKD-Net轻量知识蒸馏网络，先用物理引导的噪声模拟生成训练数据，再用轻量Lite-RRDB块构建学生网络，并通过特征级知识蒸馏将教师网络能力迁移给学生。实验表明该方法在保持低推理成本的同时获得良好去噪效果，为资源受限场景下的深度去噪提供了有效方案。",
+      "llm_tldr": "移动端图像去噪既要恢复质量高又要计算开销低，且难以成对采集低质-干净训练数据。该文提出LiteKD-Net轻量知识蒸馏网络，先用物理引导的噪声模拟生成训练数据，再用轻量Lite-RRDB块构建学生网络，并通过特征级知识蒸馏将教师网络能力迁移给学生。实验表明该方法在保持低推理成本的同时获得良好去噪效果，为资源受限场景下的深度去噪提供了有效方案。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.06981v1",
+      "source": "arxiv",
+      "title": "Local Epistemic Uncertainty Guided Active Sampling for Plug-and-play Diffusive Image Restoration",
+      "abstract": "Diffusion models have demonstrated remarkable effectiveness in image restoration tasks. However, when guiding image reconstruction, existing Diffusion Model-based Image Restoration (DMIR) methods typically rely on fixed data constraints and uniform step sizes, thereby overlooking the dynamic nature of the generative process. Such rigid designs render the models vulnerable to spatially non-uniform degradations, thus resulting in structural distortions and loss of fine details. Meanwhile, uniform step sizes introduce computational redundancy, whereas naïve step reduction strategies tend to accumulate approximation errors. To address these limitations, we propose a Local Epistemic Uncertainty Guided Active Sampling framework (LEADer). In the spatial domain, LEADer leverages pixel-wise uncertainty to dynamically modulate the prior strength within the null space, which effectively balances detail preservation and artifact suppression. In the temporal domain, it quantifies sampling stability via the uncertainty trace to enable adaptive trajectory pruning, thereby accelerating convergence. Theoretical proofs demonstrate that our framework achieves strict data consistency, while the trajectory pruning strategy admits a deterministic error bound, thereby guaranteeing stable convergence under skip sampling. Notably, our plug-and-play method can be seamlessly integrated into various DMIR baselines. Extensive experiments show that LEADer improves the performance of multiple state-of-the-art DMIR methods, while significantly reducing sampling time with negligible memory overhead. Code is available at https://github.com/JiaqiZhang-Sengoku/LEADer.",
+      "authors": [
+        "Jiaqi Zhang",
+        "Zheng Pang",
+        "Rongrong Gao",
+        "Qiyuan Zhang",
+        "Yang Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-07T09:00:20+00:00",
+      "link": "https://arxiv.org/pdf/2608.06981v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "local epistemic uncertainty guided active sampling for plug-and-play diffusive image restoration; state-of-the-art restoration method transferable to HSI denoising",
+      "llm_evidence_cn": "提出基于局部认知不确定性的主动采样策略用于即插即用扩散图像恢复；该先进恢复方法可应用于高光谱图像去噪",
+      "llm_evidence": "提出基于局部认知不确定性的主动采样策略用于即插即用扩散图像恢复；该先进恢复方法可应用于高光谱图像去噪",
+      "canonical_evidence": "提出基于局部认知不确定性的主动采样策略用于即插即用扩散图像恢复；该先进恢复方法可应用于高光谱图像去噪",
+      "llm_tldr_en": "Proposes local epistemic uncertainty guided active sampling for plug-and-play diffusive image restoration, dynamically adjusting constraints and step sizes. It reduces distortion and computation, and is transferable to hyperspectral image denoising.",
+      "llm_tldr_cn": "本文指出现有扩散模型图像恢复方法采用固定数据约束和均匀步长，难以应对空间非均匀退化且存在计算冗余。为此提出局部认知不确定性引导的主动采样框架（LEA），在生成过程中动态调整约束与步长。实验表明该方法在恢复质量和计算效率上均优于现有方案。该框架可为高光谱图像去噪提供即插即用的先进恢复技术。",
+      "llm_tldr": "本文指出现有扩散模型图像恢复方法采用固定数据约束和均匀步长，难以应对空间非均匀退化且存在计算冗余。为此提出局部认知不确定性引导的主动采样框架（LEA），在生成过程中动态调整约束与步长。实验表明该方法在恢复质量和计算效率上均优于现有方案。该框架可为高光谱图像去噪提供即插即用的先进恢复技术。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.06574v1",
+      "source": "arxiv",
+      "title": "Implicit Neural Speckle Denoising",
+      "abstract": "Speckle fundamentally limits coherent imaging by introducing multiplicative, spatially correlated noise that obscures scene structure. Removing speckle noise from dynamic scenes--that do not benefit from conventional speckle averaging--is particularly challenging. We introduce a training-free framework that combines a spatiotemporal implicit neural representation with an aperture-aware maximum-likelihood formulation to recover dynamic, speckle-free imagery directly from noisy observations. The coherent likelihood explicitly models the aperture-dependent spatial covariance of speckle, enabling adaptation to arbitrary pupil geometries without retraining. A matrix-free implementation based on FFT-accelerated operators, stochastic approximations, and conjugate gradients makes optimization practical for realistic image sizes. Meanwhile, a blind holdout criterion provides automatic early stopping without clean reference data. Simulated and laboratory results demonstrate improved spatial fidelity, temporal consistency, and robustness to varying speckle statistics relative to classical, unsupervised, and supervised baselines.",
+      "authors": [
+        "Matthew R. Ziemann",
+        "Casey J. Pellizzari",
+        "Tyler J. Hardy",
+        "Christopher A. Metzler"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.CV",
+        "physics.optics"
+      ],
+      "published": "2026-08-06T20:36:51+00:00",
+      "link": "https://arxiv.org/pdf/2608.06574v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Deep implicit neural denoising framework for speckle-corrupted coherent imagery; transferable to hyperspectral deep denoising",
+      "llm_evidence_cn": "针对散斑噪声的深度隐式神经去噪框架，可迁移至高光谱图像去噪",
+      "llm_evidence": "针对散斑噪声的深度隐式神经去噪框架，可迁移至高光谱图像去噪",
+      "canonical_evidence": "针对散斑噪声的深度隐式神经去噪框架，可迁移至高光谱图像去噪",
+      "llm_tldr_en": "Presents a training-free framework combining spatiotemporal implicit neural representation and aperture-aware maximum likelihood to recover dynamic speckle-free imagery, adapting to arbitrary pupil geometries without retraining.",
+      "llm_tldr_cn": "动态相干成像中的散斑噪声呈乘性且空间相关，常规平均难以去除。该文提出免训练的时空隐式神经表示与孔径感知最大似然估计相结合的框架，直接从含噪观测恢复无散斑图像。方法显式建模孔径相关空间协方差，可适应任意光瞳几何而无需重新训练，并利用FFT加速算子与共轭梯度实现高效优化。实验表明该框架能有效恢复动态场景清晰图像，为图像去噪提供了新的建模思路。",
+      "llm_tldr": "动态相干成像中的散斑噪声呈乘性且空间相关，常规平均难以去除。该文提出免训练的时空隐式神经表示与孔径感知最大似然估计相结合的框架，直接从含噪观测恢复无散斑图像。方法显式建模孔径相关空间协方差，可适应任意光瞳几何而无需重新训练，并利用FFT加速算子与共轭梯度实现高效优化。实验表明该框架能有效恢复动态场景清晰图像，为图像去噪提供了新的建模思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
