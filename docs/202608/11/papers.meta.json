@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-11",
+  "date": "2026-08-11",
+  "generated_at": "2026-08-11T20:36:13",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/11/2608.06832v1-bend-the-basics-degradation-aware-deformable-tokenization-for-all-in-one-image-restoration",
+      "section": "quick",
+      "title_en": "Bend the Basics: Degradation-Aware Deformable Tokenization for All-in-One Image Restoration",
+      "authors": "Zihao He, Yunfeng Wu, Xinchao Wang, Songhua Liu",
+      "date": "2026-08-07",
+      "pdf": "https://arxiv.org/pdf/2608.06832v1",
+      "score": "6.0",
+      "evidence": "统一图像恢复框架，显式建模空间退化感知，对高光谱恢复/去噪有方法迁移价值",
+      "tldr": "统一图像恢复面临多样且空间不均匀退化，但现有Transformer依赖固定patch划分，退化条件只在token化后的骨干注入，嵌入与重建阶段忽视局部退化。为此提出FIT，引入轻量退化编码器预测全局向量与空间退化图，通过自适应变形同时条件化patch嵌入和重建，并以任务token dropout增强跨类型鲁棒性。在五个标准基准上，五退化平均30.72dB、三退化32.83dB PSNR，优于近期方法0.5~1.1dB，且学习偏移可直觉可视化退化感知的空间适应。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "All-in-one image restoration seeks a single model that can recover images degraded by diverse and spatially non-uniform corruptions. However, many unified Transformers rely on fixed patch partitioning: task/degradation condition is injected only into the backbone blocks after tokenization, leaving the embedding and reconstruction stages insensitive to local degradation variations. In contrast to previous approaches, we present Flexible Image Transformer (FIT) that explicitly models degradation awareness across the entire pipeline, from patch sampling to pixel reconstruction. Specifically, FIT employs a lightweight Degradation Encoder to predict a global degradation vector $\\mathbf{g}$ and a spatial degradation map $\\mathbf{M}$ from local degradation severity, which jointly condition the patch embedding and unembedding through adaptive deformation. Moreover, to improve robustness across degradation types, we introduce a task-token dropout strategy that regularizes task conditioning during training. On five standard benchmarks (BSD68, Rain100L, SOTS, GoPro, and LOLv1), FIT achieves state-of-the-art performance with 30.72 dB average PSNR on the five-degradation setting and 32.83 dB on the three-degradation setting, outperforming recent unified restoration methods by +0.5$\\sim$1.1 dB. Moreover, the learned offsets provide a direct handle for visualizing degradation-aware spatial adaptation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/11/2608.08594v1-sddbms-soft-denoising-diffusion-bridge-models",
+      "section": "quick",
+      "title_en": "SDDBMs: Soft Denoising Diffusion Bridge Models",
+      "authors": "Shiyi Qi, Kun He, Mingmou Liu",
+      "date": "2026-08-09",
+      "pdf": "https://arxiv.org/pdf/2608.08594v1",
+      "score": "6.0",
+      "evidence": "软扩散桥模型用于图像恢复，可应用于高光谱图像恢复",
+      "tldr": "现有扩散桥模型依赖硬端点约束，导致端点处终态分布退化和漂移系数病态。本文提出软去噪扩散桥模型SDDBMs，在端点约束层面进行正则化，避免精确匹配终点带来的数值问题。实验表明SDDBMs在图像翻译和恢复任务上表现更稳定，为包括高光谱图像恢复在内的应用提供了更平滑的桥结构生成框架。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Diffusion bridge models leverage Doob's \\(h\\)-transform to construct stochastic transports between arbitrary endpoint distributions, and have shown strong potential in image-to-image translation and restoration. However, most existing bridge models rely on hard endpoint conditioning, which forces the terminal state to match a prescribed target exactly. This hard constraint induces terminal-boundary singularities: the terminal law collapses to a Dirac measure, and the resulting drift coefficients become ill-conditioned near the endpoint. In this paper, we propose Soft Denoising Diffusion Bridge Models (SDDBMs), a generalized framework that regularizes diffusion bridges directly at the level of their terminal constraints. Instead of imposing an exact endpoint, SDDBMs prescribe a non-degenerate Gaussian terminal marginal under the transformed path measure, with a flexible terminal center and variance. Starting from this prescribed marginal, we develop a complete closed-form construction of the soft bridge, including the Gaussian terminal reweighting and soft \\(h\\)-function, the induced Gaussian forward marginals and \\(\\mathbf{x}_0\\)-free dynamics. Theoretically, SDDBMs provide a unified probabilistic perspective that encompasses existing diffusion bridge models, including DDBMs, GOUB, and UniDB, as special cases under specific parameter choices. Extensive experiments on image restoration tasks demonstrate that SDDBMs achieve improved numerical stability and superior generation quality over existing bridge-based methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

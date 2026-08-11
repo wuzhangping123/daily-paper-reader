@@ -6,30 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-10
-- 运行时间：2026-08-10 20:47:29 UTC
+- 最新运行日期：2026-08-11
+- 运行时间：2026-08-11 20:36:09 UTC
 - 运行状态：成功
-- 本次总论文数：3
+- 本次总论文数：2
 - 精读区：0
-- 速读区：3
+- 速读区：2
 
 ### 今日简报（AI）
-今日筛选3篇论文，聚焦图像去噪与恢复，均为速读。最值得看的是移动端轻量知识蒸馏去噪（LiteKD-Net）与隐式神经斑点去噪，二者评分最高。后续可优先关注移动端高效去噪方案的落地潜力。
-- 详情：[/202608/10/README](/202608/10/README)
+今日速读2篇论文，均获6分，暂无精读。  
+最值得关注：全能图像恢复的可变形分词方法，与软去噪扩散桥模型。  
+建议下一步优先精读图像恢复方向，因其应用场景更直观。
+- 详情：[/202608/11/README](/202608/11/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [LiteKD-Net: Lightweight Knowledge-Distilled Network for Mobile Image Denoising](/202608/10/2608.05739v1-litekd-net-lightweight-knowledge-distilled-network-for-mobile-image-denoising)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：结合物理噪声模拟与知识蒸馏的轻量深度去噪网络，可应用于高光谱深度去噪
-2. [Implicit Neural Speckle Denoising](/202608/10/2608.06574v1-implicit-neural-speckle-denoising)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：针对散斑噪声的深度隐式神经去噪框架，可迁移至高光谱图像去噪
-3. [Local Epistemic Uncertainty Guided Active Sampling for Plug-and-play Diffusive Image Restoration](/202608/10/2608.06981v1-local-epistemic-uncertainty-guided-active-sampling-for-plug-and-play-diffusive-image-restoration)  
+1. [Bend the Basics: Degradation-Aware Deformable Tokenization for All-in-One Image Restoration](/202608/11/2608.06832v1-bend-the-basics-degradation-aware-deformable-tokenization-for-all-in-one-image-restoration)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：提出基于局部认知不确定性的主动采样策略用于即插即用扩散图像恢复；该先进恢复方法可应用于高光谱图像去噪
+   evidence：统一图像恢复框架，显式建模空间退化感知，对高光谱恢复/去噪有方法迁移价值
+2. [SDDBMs: Soft Denoising Diffusion Bridge Models](/202608/11/2608.08594v1-sddbms-soft-denoising-diffusion-bridge-models)  
+   标签：评分：6.0/10、query:hsi-denoise
+   evidence：软扩散桥模型用于图像恢复，可应用于高光谱图像恢复
 
 
 <div class="dpr-home-promo-card">

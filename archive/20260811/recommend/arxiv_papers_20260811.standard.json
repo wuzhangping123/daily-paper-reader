@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-11T20:33:25.877314+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.06832v1",
+      "source": "arxiv",
+      "title": "Bend the Basics: Degradation-Aware Deformable Tokenization for All-in-One Image Restoration",
+      "abstract": "All-in-one image restoration seeks a single model that can recover images degraded by diverse and spatially non-uniform corruptions. However, many unified Transformers rely on fixed patch partitioning: task/degradation condition is injected only into the backbone blocks after tokenization, leaving the embedding and reconstruction stages insensitive to local degradation variations. In contrast to previous approaches, we present Flexible Image Transformer (FIT) that explicitly models degradation awareness across the entire pipeline, from patch sampling to pixel reconstruction. Specifically, FIT employs a lightweight Degradation Encoder to predict a global degradation vector $\\mathbf{g}$ and a spatial degradation map $\\mathbf{M}$ from local degradation severity, which jointly condition the patch embedding and unembedding through adaptive deformation. Moreover, to improve robustness across degradation types, we introduce a task-token dropout strategy that regularizes task conditioning during training. On five standard benchmarks (BSD68, Rain100L, SOTS, GoPro, and LOLv1), FIT achieves state-of-the-art performance with 30.72 dB average PSNR on the five-degradation setting and 32.83 dB on the three-degradation setting, outperforming recent unified restoration methods by +0.5$\\sim$1.1 dB. Moreover, the learned offsets provide a direct handle for visualizing degradation-aware spatial adaptation.",
+      "authors": [
+        "Zihao He",
+        "Yunfeng Wu",
+        "Xinchao Wang",
+        "Songhua Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-07T05:44:31+00:00",
+      "link": "https://arxiv.org/pdf/2608.06832v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "all-in-one image restoration framework focused on spatially varying degradation; transferable to hyperspectral restoration and denoising",
+      "llm_evidence_cn": "统一图像恢复框架，显式建模空间退化感知，对高光谱恢复/去噪有方法迁移价值",
+      "llm_evidence": "统一图像恢复框架，显式建模空间退化感知，对高光谱恢复/去噪有方法迁移价值",
+      "canonical_evidence": "统一图像恢复框架，显式建模空间退化感知，对高光谱恢复/去噪有方法迁移价值",
+      "llm_tldr_en": "FIT addresses all-in-one restoration by making tokenization degradation-aware: a lightweight encoder predicts global and spatial degradation maps that guide patch sampling and reconstruction, improving recovery across diverse non-uniform corruptions.",
+      "llm_tldr_cn": "现有统一图像恢复Transformer多采用固定分块，退化条件只在主干注入，难以适应空间不均匀的退化。为此提出Flexible Image Transformer，通过轻量退化编码器预测全局退化向量与空间退化图，并将其贯穿令牌采样至像素重建的整个过程。在多种退化类型的实验中，该方法相比固定分块方案取得了更优的恢复效果。这种退化感知的令牌化设计也为高光谱图像恢复与去噪提供了可迁移的通用思路。",
+      "llm_tldr": "现有统一图像恢复Transformer多采用固定分块，退化条件只在主干注入，难以适应空间不均匀的退化。为此提出Flexible Image Transformer，通过轻量退化编码器预测全局退化向量与空间退化图，并将其贯穿令牌采样至像素重建的整个过程。在多种退化类型的实验中，该方法相比固定分块方案取得了更优的恢复效果。这种退化感知的令牌化设计也为高光谱图像恢复与去噪提供了可迁移的通用思路。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.08594v1",
+      "source": "arxiv",
+      "title": "SDDBMs: Soft Denoising Diffusion Bridge Models",
+      "abstract": "Diffusion bridge models leverage Doob's \\(h\\)-transform to construct stochastic transports between arbitrary endpoint distributions, and have shown strong potential in image-to-image translation and restoration. However, most existing bridge models rely on hard endpoint conditioning, which forces the terminal state to match a prescribed target exactly. This hard constraint induces terminal-boundary singularities: the terminal law collapses to a Dirac measure, and the resulting drift coefficients become ill-conditioned near the endpoint. In this paper, we propose Soft Denoising Diffusion Bridge Models (SDDBMs), a generalized framework that regularizes diffusion bridges directly at the level of their terminal constraints. Instead of imposing an exact endpoint, SDDBMs prescribe a non-degenerate Gaussian terminal marginal under the transformed path measure, with a flexible terminal center and variance. Starting from this prescribed marginal, we develop a complete closed-form construction of the soft bridge, including the Gaussian terminal reweighting and soft \\(h\\)-function, the induced Gaussian forward marginals and \\(\\mathbf{x}_0\\)-free dynamics. Theoretically, SDDBMs provide a unified probabilistic perspective that encompasses existing diffusion bridge models, including DDBMs, GOUB, and UniDB, as special cases under specific parameter choices. Extensive experiments on image restoration tasks demonstrate that SDDBMs achieve improved numerical stability and superior generation quality over existing bridge-based methods.",
+      "authors": [
+        "Shiyi Qi",
+        "Kun He",
+        "Mingmou Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-09T09:19:46+00:00",
+      "link": "https://arxiv.org/pdf/2608.08594v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Soft diffusion bridge models for restoration; applicable to hyperspectral image recovery",
+      "llm_evidence_cn": "软扩散桥模型用于图像恢复，可应用于高光谱图像恢复",
+      "llm_evidence": "软扩散桥模型用于图像恢复，可应用于高光谱图像恢复",
+      "canonical_evidence": "软扩散桥模型用于图像恢复，可应用于高光谱图像恢复",
+      "llm_tldr_en": "SDDBMs regularize diffusion bridges at the terminal constraint level, avoiding hard endpoint singularities and ill-conditioned drifts. They improve image-to-image translation and restoration performance while offering a smoother framework applicable to hyperspectral image recovery.",
+      "llm_tldr_cn": "现有扩散桥模型依赖硬端点约束，导致端点处终态分布退化和漂移系数病态。本文提出软去噪扩散桥模型SDDBMs，在端点约束层面进行正则化，避免精确匹配终点带来的数值问题。实验表明SDDBMs在图像翻译和恢复任务上表现更稳定，为包括高光谱图像恢复在内的应用提供了更平滑的桥结构生成框架。",
+      "llm_tldr": "现有扩散桥模型依赖硬端点约束，导致端点处终态分布退化和漂移系数病态。本文提出软去噪扩散桥模型SDDBMs，在端点约束层面进行正则化，避免精确匹配终点带来的数值问题。实验表明SDDBMs在图像翻译和恢复任务上表现更稳定，为包括高光谱图像恢复在内的应用提供了更平滑的桥结构生成框架。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "state of the art hyperspectral image restoration and denoising methods",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
