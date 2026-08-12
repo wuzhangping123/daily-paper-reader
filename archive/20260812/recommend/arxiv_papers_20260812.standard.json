@@ -1,0 +1,90 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-12T19:48:41.731322+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.08594v2",
+      "source": "arxiv",
+      "title": "SDDBMs: Soft Denoising Diffusion Bridge Models",
+      "abstract": "Diffusion bridge models leverage Doob's \\(h\\)-transform to construct stochastic transports between arbitrary endpoint distributions, and have shown strong potential in image-to-image translation and restoration. However, most existing bridge models rely on hard endpoint conditioning, which forces the terminal state to match a prescribed target exactly. This hard constraint induces terminal-boundary singularities: the terminal law collapses to a Dirac measure, and the resulting drift coefficients become ill-conditioned near the endpoint. In this paper, we propose Soft Denoising Diffusion Bridge Models (SDDBMs), a generalized framework that regularizes diffusion bridges directly at the level of their terminal constraints. Instead of imposing an exact endpoint, SDDBMs prescribe a non-degenerate Gaussian terminal marginal under the transformed path measure, with a flexible terminal center and variance. Starting from this prescribed marginal, we develop a complete closed-form construction of the soft bridge, including the Gaussian terminal reweighting and soft \\(h\\)-function, the induced Gaussian forward marginals and \\(\\mathbf{x}_0\\)-free dynamics. Theoretically, SDDBMs provide a unified probabilistic perspective that encompasses existing diffusion bridge models, including DDBMs, GOUB, and UniDB, as special cases under specific parameter choices. Extensive experiments on image restoration tasks demonstrate that SDDBMs achieve improved numerical stability and superior generation quality over existing bridge-based methods.",
+      "authors": [
+        "Shiyi Qi",
+        "Kun He",
+        "Mingmou Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-09T09:19:46+00:00",
+      "link": "https://arxiv.org/pdf/2608.08594v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "softly-constrained diffusion bridge for image restoration, relevant to HS denoising",
+      "llm_evidence_cn": "软约束扩散桥用于图像恢复，与高光谱去噪相关",
+      "llm_evidence": "软约束扩散桥用于图像恢复，与高光谱去噪相关",
+      "canonical_evidence": "软约束扩散桥用于图像恢复，与高光谱去噪相关",
+      "llm_tldr_en": "SDDBMs regularize diffusion bridges at the terminal constraint level, avoiding boundary singularities and enabling stable diffusion-based image restoration and denoising, applicable to hyperspectral denoising.",
+      "llm_tldr_cn": "现有扩散桥模型采用硬端点约束，导致终端边界奇异性与漂移系数病态，限制其在图像恢复中的稳定性。为此提出软去噪扩散桥模型（SDDBMs），在终端约束层级进行正则化，用软约束替代精确匹配，从而避免奇异性并改善恢复质量。该框架适用于图像到图像转换与恢复任务，为高光谱图像去噪等逆问题提供了稳定且通用的扩散建模新思路。",
+      "llm_tldr": "现有扩散桥模型采用硬端点约束，导致终端边界奇异性与漂移系数病态，限制其在图像恢复中的稳定性。为此提出软去噪扩散桥模型（SDDBMs），在终端约束层级进行正则化，用软约束替代精确匹配，从而避免奇异性并改善恢复质量。该框架适用于图像到图像转换与恢复任务，为高光谱图像去噪等逆问题提供了稳定且通用的扩散建模新思路。",
+      "llm_tags": [
+        "query:hsi-denoise:composite"
+      ],
+      "matched_query_tag": "query:hsi-denoise:composite",
+      "matched_query_text": "Papers central to 高光谱影像噪声去除, especially work that connects or combines: low-rank representation for denoising; stripe noise removal in hyperspectral remote sensing images; high-dimensional tensor data recovery for hyperspectral images; relative radiometric correction for remote sensing images; hyperspectral image denoising methods; spectral-spatial denoising for hyperspectral images; hyperspectral image denoising using deep neural networks; state of the art hyperspectral image restoration and denoising methods; hyperspectral image stripe noise removal using deep learning; tensor based approaches for hyperspectral image anomaly detection and restoration.",
+      "matched_requirement_id": "req-composite-hsi-denoise",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.09923v1",
+      "source": "arxiv",
+      "title": "Unrolling a Graph-Laplacian Denoiser Realizes Only Compositions of Polynomial Graph Filters",
+      "abstract": "A recent construction of unrolled networks for graph-based image restoration forms a system matrix from a graph-Laplacian denoiser through a truncated Taylor expansion, then inverts it with a fixed number of conjugate-gradient steps, with the coefficients of both stages learned. This paper shows the resulting map is a polynomial in the denoising operator, of degree at most the product of the two truncation orders, for every setting of those coefficients and therefore at every point of training: the learned steps select an element of a Krylov subspace they cannot enlarge. At the orders used in practice the reachable set is moreover a measure-zero subset of the polynomial class of the network's own degree budget, so the composition constrains the hypothesis space rather than enlarging it. At the standard initialization the realized spectral response is obtained in closed form, exceeding the intended response throughout the interior of the spectrum and approaching a nonzero floor. A lower bound on the operator's condition number, internal to the graph construction rather than to image content, then places the order required for a prescribed accuracy well above the order used in practice. The confining class is precisely the spectral graph filters for which a direct, convex parameterization has long been available.",
+      "authors": [
+        "Seyed Alireza Hosseini"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP",
+        "eess.IV"
+      ],
+      "published": "2026-08-10T17:58:55+00:00",
+      "link": "https://arxiv.org/pdf/2608.09923v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "theoretical analysis of unrolled graph-Laplacian denoiser for deep image restoration",
+      "llm_evidence_cn": "对图拉普拉斯去噪器展开网络的理论分析，面向深度图像恢复",
+      "llm_evidence": "对图拉普拉斯去噪器展开网络的理论分析，面向深度图像恢复",
+      "canonical_evidence": "对图拉普拉斯去噪器展开网络的理论分析，面向深度图像恢复",
+      "llm_tldr_en": "This paper proves that unrolled graph-Laplacian denoisers for image restoration only realize polynomial graph filters of bounded degree, revealing a strong limitation of this deep denoising architecture.",
+      "llm_tldr_cn": "该论文聚焦基于图拉普拉斯去噪器的展开网络在图像恢复中的应用。作者通过理论分析证明，这类网络在学习过程中实现的映射只是去噪算子的多项式，其次数至多为两个截断阶数的乘积，并且在实践中可达函数集只是该多项式类的一个零测度子集。尽管网络具有深层结构，其表达能力被严格限制在低次多项式滤波器范围内。该发现揭示了当前图基深度去噪展开方法的结构性瓶颈，对改进深度图滤波器和设计更高效的图像去噪网络具有重要指导意义。",
+      "llm_tldr": "该论文聚焦基于图拉普拉斯去噪器的展开网络在图像恢复中的应用。作者通过理论分析证明，这类网络在学习过程中实现的映射只是去噪算子的多项式，其次数至多为两个截断阶数的乘积，并且在实践中可达函数集只是该多项式类的一个零测度子集。尽管网络具有深层结构，其表达能力被严格限制在低次多项式滤波器范围内。该发现揭示了当前图基深度去噪展开方法的结构性瓶颈，对改进深度图滤波器和设计更高效的图像去噪网络具有重要指导意义。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-12",
+  "date": "2026-08-12",
+  "generated_at": "2026-08-12T19:50:43",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/12/2608.08594v2-sddbms-soft-denoising-diffusion-bridge-models",
+      "section": "quick",
+      "title_en": "SDDBMs: Soft Denoising Diffusion Bridge Models",
+      "authors": "Shiyi Qi, Kun He, Mingmou Liu",
+      "date": "2026-08-09",
+      "pdf": "https://arxiv.org/pdf/2608.08594v2",
+      "score": "6.0",
+      "evidence": "软约束扩散桥用于图像恢复，与高光谱去噪相关",
+      "tldr": "扩散桥模型利用Doob h-变换实现任意端点分布间的随机传输，在图像翻译与复原中表现优异，但现有方法依赖硬端点约束，导致终态退化为狄拉克测度并在端点附近产生奇异漂移。为此提出软去噪扩散桥模型（SDDBMs），将端点约束替换为非退化高斯终态边缘，并给出闭式软桥构造，涵盖高斯终态重加权、软h-函数及前向边缘动态。理论上统一了DDBMs、GOUB、UniDB等现有模型，实验表明其在图像复原中数值稳定性与生成质量均更优。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Diffusion bridge models leverage Doob's \\(h\\)-transform to construct stochastic transports between arbitrary endpoint distributions, and have shown strong potential in image-to-image translation and restoration. However, most existing bridge models rely on hard endpoint conditioning, which forces the terminal state to match a prescribed target exactly. This hard constraint induces terminal-boundary singularities: the terminal law collapses to a Dirac measure, and the resulting drift coefficients become ill-conditioned near the endpoint. In this paper, we propose Soft Denoising Diffusion Bridge Models (SDDBMs), a generalized framework that regularizes diffusion bridges directly at the level of their terminal constraints. Instead of imposing an exact endpoint, SDDBMs prescribe a non-degenerate Gaussian terminal marginal under the transformed path measure, with a flexible terminal center and variance. Starting from this prescribed marginal, we develop a complete closed-form construction of the soft bridge, including the Gaussian terminal reweighting and soft \\(h\\)-function, the induced Gaussian forward marginals and \\(\\mathbf{x}_0\\)-free dynamics. Theoretically, SDDBMs provide a unified probabilistic perspective that encompasses existing diffusion bridge models, including DDBMs, GOUB, and UniDB, as special cases under specific parameter choices. Extensive experiments on image restoration tasks demonstrate that SDDBMs achieve improved numerical stability and superior generation quality over existing bridge-based methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/12/2608.09923v1-unrolling-a-graph-laplacian-denoiser-realizes-only-compositions-of-polynomial-graph-filters",
+      "section": "quick",
+      "title_en": "Unrolling a Graph-Laplacian Denoiser Realizes Only Compositions of Polynomial Graph Filters",
+      "authors": "Seyed Alireza Hosseini",
+      "date": "2026-08-10",
+      "pdf": "https://arxiv.org/pdf/2608.09923v1",
+      "score": "6.0",
+      "evidence": "对图拉普拉斯去噪器展开网络的理论分析，面向深度图像恢复",
+      "tldr": "针对基于展开图拉普拉斯去噪器的图像恢复网络，本文证明其实际映射仅为去噪算子的多项式，次数不超过两截断阶之积，学习步骤只能选取Krylov子空间元素而无法扩大。实践中可达集是多项式类的测度零子集，组合反而约束假设空间。标准初始化下谱响应闭式可解且偏大，条件数下界迫使所需阶数远超实践值。该结果揭示此类网络实现的正是已有直接凸参数化的谱图滤波器类。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "A recent construction of unrolled networks for graph-based image restoration forms a system matrix from a graph-Laplacian denoiser through a truncated Taylor expansion, then inverts it with a fixed number of conjugate-gradient steps, with the coefficients of both stages learned. This paper shows the resulting map is a polynomial in the denoising operator, of degree at most the product of the two truncation orders, for every setting of those coefficients and therefore at every point of training: the learned steps select an element of a Krylov subspace they cannot enlarge. At the orders used in practice the reachable set is moreover a measure-zero subset of the polynomial class of the network's own degree budget, so the composition constrains the hypothesis space rather than enlarging it. At the standard initialization the realized spectral response is obtained in closed form, exceeding the intended response throughout the interior of the spectrum and approaching a nonzero floor. A lower bound on the operator's condition number, internal to the graph construction rather than to image content, then places the order required for a prescribed accuracy well above the order used in practice. The confining class is precisely the spectral graph filters for which a direct, convex parameterization has long been available.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

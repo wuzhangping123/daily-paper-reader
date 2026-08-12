@@ -6,29 +6,27 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-11
-- 运行时间：2026-08-11 20:36:09 UTC
+- 最新运行日期：2026-08-12
+- 运行时间：2026-08-12 19:50:38 UTC
 - 运行状态：成功
 - 本次总论文数：2
 - 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今日速读2篇论文，均获6分，暂无精读。  
-最值得关注：全能图像恢复的可变形分词方法，与软去噪扩散桥模型。  
-建议下一步优先精读图像恢复方向，因其应用场景更直观。
-- 详情：[/202608/11/README](/202608/11/README)
+今日速读2篇论文，聚焦扩散桥模型与图拉普拉斯去噪方向。值得关注的是软去噪扩散桥模型（SDDBMs）和图去噪器的多项式滤波器本质，均获6分。建议普通读者优先浏览两篇的方法框架，对生成模型与图信号处理先建立直观印象。
+- 详情：[/202608/12/README](/202608/12/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Bend the Basics: Degradation-Aware Deformable Tokenization for All-in-One Image Restoration](/202608/11/2608.06832v1-bend-the-basics-degradation-aware-deformable-tokenization-for-all-in-one-image-restoration)  
+1. [SDDBMs: Soft Denoising Diffusion Bridge Models](/202608/12/2608.08594v2-sddbms-soft-denoising-diffusion-bridge-models)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：统一图像恢复框架，显式建模空间退化感知，对高光谱恢复/去噪有方法迁移价值
-2. [SDDBMs: Soft Denoising Diffusion Bridge Models](/202608/11/2608.08594v1-sddbms-soft-denoising-diffusion-bridge-models)  
+   evidence：软约束扩散桥用于图像恢复，与高光谱去噪相关
+2. [Unrolling a Graph-Laplacian Denoiser Realizes Only Compositions of Polynomial Graph Filters](/202608/12/2608.09923v1-unrolling-a-graph-laplacian-denoiser-realizes-only-compositions-of-polynomial-graph-filters)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：软扩散桥模型用于图像恢复，可应用于高光谱图像恢复
+   evidence：对图拉普拉斯去噪器展开网络的理论分析，面向深度图像恢复
 
 
 <div class="dpr-home-promo-card">
