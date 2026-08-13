@@ -1,0 +1,134 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-13T21:05:23.415555+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2608.11748v1",
+      "source": "arxiv",
+      "title": "Dual Modality Prompted Diffusion Priors for Zero Shot Hyperspectral Pansharpening",
+      "abstract": "Hyperspectral pansharpening aims to reconstruct a high resolution hyperspectral (HRHS) image from a panchromatic (PAN) image and a low resolution hyperspectral (LRHS) image while preserving both spatial details and spectral fidelity. Recent diffusion based methods exploit pretrained image priors by generating a low dimensional representation and subsequently mapping it to the hyperspectral domain. However, the observed panchromatic and hyperspectral images are typically imposed only through external reconstruction objectives, limiting their direct interaction with the diffusion prior. To address this issue, we propose dual-modality image-prompted diffusion model (DIDM) for zero shot hyperspectral pansharpening. DIDM encodes the low resolution hyperspectral and panchromatic observations into spectral and spatial prompt tokens, respectively, and injects them into intermediate features of a frozen remote sensing diffusion model through cross attention, allowing complementary spectral and spatial information to directly guide diffusion feature evolution. In addition, we introduce a panchromatic guided weighted pixel aware total variation regularizer that combines low resolution hyperspectral degradation fidelity and panchromatic response fidelity with gradient adaptive structural regularization, thereby preserving structural discontinuities while suppressing spurious variations in homogeneous regions. Extensive experiments on Pavia, Chikusei, and Houston under reduced resolution protocols show that DIDM achieves the best performance across all evaluated metrics, while full resolution evaluation on FR1 yields the highest HQNR among the compared methods. These results demonstrate that internal dual modality prompting and panchromatic guided structural regularization provide an effective balance between spatial detail enhancement and spectral preservation.",
+      "authors": [
+        "Pengwei Xie",
+        "Fei Zhu",
+        "Jiajun Li",
+        "Xiangyuan Liu",
+        "Xiangyuan Liu",
+        "Kangqing Shen",
+        "Gemine Vivone"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-12T07:40:57+00:00",
+      "link": "https://arxiv.org/pdf/2608.11748v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "hyperspectral pansharpening; high-dimensional hyperspectral image reconstruction from low-resolution HS and PAN",
+      "llm_evidence_cn": "高光谱全色锐化重建高分辨率高光谱图像，属高维高光谱恢复",
+      "llm_evidence": "高光谱全色锐化重建高分辨率高光谱图像，属高维高光谱恢复",
+      "canonical_evidence": "高光谱全色锐化重建高分辨率高光谱图像，属高维高光谱恢复",
+      "llm_tldr_en": "Proposes DIDM, a dual-modality prompted diffusion model for zero-shot hyperspectral pansharpening that lets the low-resolution hyperspectral and panchromatic images directly guide the diffusion prior, improving spatial-spectral reconstruction without task-specific training.",
+      "llm_tldr_cn": "针对现有扩散方法仅通过外部重建目标施加观测约束、扩散先验与高光谱/全色图像交互不足的问题，提出双模态图像提示扩散模型（DIDM）。DIDM 将低分辨率高光谱图像与全色图像编码为提示，直接参与扩散先验的内部生成过程，实现零样本高光谱全色锐化。实验表明该方法在保持空间细节和光谱保真度方面优于已有方案，无需目标任务训练即可推广。该工作为高光谱高维数据恢复提供了一种基于提示的先验融合新范式。",
+      "llm_tldr": "针对现有扩散方法仅通过外部重建目标施加观测约束、扩散先验与高光谱/全色图像交互不足的问题，提出双模态图像提示扩散模型（DIDM）。DIDM 将低分辨率高光谱图像与全色图像编码为提示，直接参与扩散先验的内部生成过程，实现零样本高光谱全色锐化。实验表明该方法在保持空间细节和光谱保真度方面优于已有方案，无需目标任务训练即可推广。该工作为高光谱高维数据恢复提供了一种基于提示的先验融合新范式。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.08594v2",
+      "source": "arxiv",
+      "title": "SDDBMs: Soft Denoising Diffusion Bridge Models",
+      "abstract": "Diffusion bridge models leverage Doob's \\(h\\)-transform to construct stochastic transports between arbitrary endpoint distributions, and have shown strong potential in image-to-image translation and restoration. However, most existing bridge models rely on hard endpoint conditioning, which forces the terminal state to match a prescribed target exactly. This hard constraint induces terminal-boundary singularities: the terminal law collapses to a Dirac measure, and the resulting drift coefficients become ill-conditioned near the endpoint. In this paper, we propose Soft Denoising Diffusion Bridge Models (SDDBMs), a generalized framework that regularizes diffusion bridges directly at the level of their terminal constraints. Instead of imposing an exact endpoint, SDDBMs prescribe a non-degenerate Gaussian terminal marginal under the transformed path measure, with a flexible terminal center and variance. Starting from this prescribed marginal, we develop a complete closed-form construction of the soft bridge, including the Gaussian terminal reweighting and soft \\(h\\)-function, the induced Gaussian forward marginals and \\(\\mathbf{x}_0\\)-free dynamics. Theoretically, SDDBMs provide a unified probabilistic perspective that encompasses existing diffusion bridge models, including DDBMs, GOUB, and UniDB, as special cases under specific parameter choices. Extensive experiments on image restoration tasks demonstrate that SDDBMs achieve improved numerical stability and superior generation quality over existing bridge-based methods.",
+      "authors": [
+        "Shiyi Qi",
+        "Kun He",
+        "Mingmou Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-09T09:19:46+00:00",
+      "link": "https://arxiv.org/pdf/2608.08594v2",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Deep diffusion bridge model for image restoration; applicable to denoising.",
+      "llm_evidence_cn": "用于图像恢复的深度扩散桥模型，可用于去噪。",
+      "llm_evidence": "用于图像恢复的深度扩散桥模型，可用于去噪。",
+      "canonical_evidence": "用于图像恢复的深度扩散桥模型，可用于去噪。",
+      "llm_tldr_en": "SDDBMs regularize diffusion bridges at terminal constraints to avoid Dirac collapse and ill-conditioned drifts, improving stability and performance for image restoration and translation.",
+      "llm_tldr_cn": "扩散桥模型在图像恢复中潜力巨大，但硬端点条件会导致终端边界奇异性。本文提出软去噪扩散桥模型（SDDBMs），直接在终端约束层面进行正则化，以软约束替代精确匹配，从而消除Dirac测度塌缩与漂移系数病态问题。通过通用框架统一多种桥模型，并在图像到图像翻译和恢复任务中验证了其稳定性和生成质量，为受限扩散模型的训练提供了有效方案。",
+      "llm_tldr": "扩散桥模型在图像恢复中潜力巨大，但硬端点条件会导致终端边界奇异性。本文提出软去噪扩散桥模型（SDDBMs），直接在终端约束层面进行正则化，以软约束替代精确匹配，从而消除Dirac测度塌缩与漂移系数病态问题。通过通用框架统一多种桥模型，并在图像到图像翻译和恢复任务中验证了其稳定性和生成质量，为受限扩散模型的训练提供了有效方案。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising using deep neural networks",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.10343v1",
+      "source": "arxiv",
+      "title": "ENCORE: Efficient Noise Context-Aware Representation for Low-Dose CT Denoising",
+      "abstract": "While deep learning-based denoising has become widely adopted in low-dose CT, conventional models use generic architectures designed for natural images, failing to account for non-stationary and spatially correlated CT noise characteristics. To address this, we propose an Efficient Noise COntext-aware REpresentation (ENCORE) framework that explicitly leverages CT noise characteristics and anatomical features. First, we reformulate the noise synthesis procedure based on a realistic noise distribution beyond the conventional Gaussian approximation, establishing a rigorous foundation for training pair generation. Next, we extract local noise power and correlation contexts to guide the denoising process. To fully leverage the potential of noise context, we propose a FlyingConv module, which adaptively changes convolution weights for each local image region. Notably, our approach demonstrates substantial gains in both denoising quality and computational efficiency. Furthermore, manipulating the intensity of the noise context maps at inference time enables zero-shot conditional denoising, allowing for dynamic control over the output image texture. The entire pipeline is available at https://github.com/minwoo-yu/ENCORE.git",
+      "authors": [
+        "Minwoo Yu",
+        "N. Robert Bennett",
+        "Jongduk Baek",
+        "Adam S. Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "physics.med-ph"
+      ],
+      "published": "2026-08-11T00:57:39+00:00",
+      "link": "https://arxiv.org/pdf/2608.10343v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deep learning denoising for low-dose CT; noise-context-aware representation transferable to HSI denoising",
+      "llm_evidence_cn": "低剂量CT深度学习去噪，噪声上下文感知表示可迁移至高光谱去噪",
+      "llm_evidence": "低剂量CT深度学习去噪，噪声上下文感知表示可迁移至高光谱去噪",
+      "canonical_evidence": "低剂量CT深度学习去噪，噪声上下文感知表示可迁移至高光谱去噪",
+      "llm_tldr_en": "A low-dose CT denoising framework that explicitly models non-stationary, spatially correlated noise via realistic noise synthesis and local noise-context extraction, offering transferable representation learning for hyperspectral image denoising.",
+      "llm_tldr_cn": "低剂量CT去噪中通用架构未考虑CT噪声的非平稳与空间相关特性。论文提出ENCORE框架，首先基于真实噪声分布而非高斯近似重构噪声合成过程，再提取局部噪声功率与相关上下文引导去噪。实验表明该方法能充分利用噪声上下文提升去噪性能。其噪声上下文感知表示对于高光谱图像去噪具有方法借鉴意义。",
+      "llm_tldr": "低剂量CT去噪中通用架构未考虑CT噪声的非平稳与空间相关特性。论文提出ENCORE框架，首先基于真实噪声分布而非高斯近似重构噪声合成过程，再提取局部噪声功率与相关上下文引导去噪。实验表明该方法能充分利用噪声上下文提升去噪性能。其噪声上下文感知表示对于高光谱图像去噪具有方法借鉴意义。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

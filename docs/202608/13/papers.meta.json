@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-13",
+  "date": "2026-08-13",
+  "generated_at": "2026-08-13T21:07:42",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/13/2608.11748v1-dual-modality-prompted-diffusion-priors-for-zero-shot-hyperspectral-pansharpening",
+      "section": "deep",
+      "title_en": "Dual Modality Prompted Diffusion Priors for Zero Shot Hyperspectral Pansharpening",
+      "authors": "Pengwei Xie, Fei Zhu, Jiajun Li, Xiangyuan Liu, Xiangyuan Liu, Kangqing Shen, Gemine Vivone",
+      "date": "2026-08-12",
+      "pdf": "https://arxiv.org/pdf/2608.11748v1",
+      "score": "8.0",
+      "evidence": "高光谱全色锐化重建高分辨率高光谱图像，属高维高光谱恢复",
+      "tldr": "高光谱全色锐化旨在融合PAN和LRHS图像得到HRHS。现有扩散方法仅用外部重建约束，观测信息与先验交互不足。本文提出双模态提示扩散模型，将光谱和空间信息作为提示注入冻结扩散模型，并设计全色引导加权TV正则化，在零样本下平衡空间增强与光谱保持。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Hyperspectral pansharpening aims to reconstruct a high resolution hyperspectral (HRHS) image from a panchromatic (PAN) image and a low resolution hyperspectral (LRHS) image while preserving both spatial details and spectral fidelity. Recent diffusion based methods exploit pretrained image priors by generating a low dimensional representation and subsequently mapping it to the hyperspectral domain. However, the observed panchromatic and hyperspectral images are typically imposed only through external reconstruction objectives, limiting their direct interaction with the diffusion prior. To address this issue, we propose dual-modality image-prompted diffusion model (DIDM) for zero shot hyperspectral pansharpening. DIDM encodes the low resolution hyperspectral and panchromatic observations into spectral and spatial prompt tokens, respectively, and injects them into intermediate features of a frozen remote sensing diffusion model through cross attention, allowing complementary spectral and spatial information to directly guide diffusion feature evolution. In addition, we introduce a panchromatic guided weighted pixel aware total variation regularizer that combines low resolution hyperspectral degradation fidelity and panchromatic response fidelity with gradient adaptive structural regularization, thereby preserving structural discontinuities while suppressing spurious variations in homogeneous regions. Extensive experiments on Pavia, Chikusei, and Houston under reduced resolution protocols show that DIDM achieves the best performance across all evaluated metrics, while full resolution evaluation on FR1 yields the highest HQNR among the compared methods. These results demonstrate that internal dual modality prompting and panchromatic guided structural regularization provide an effective balance between spatial detail enhancement and spectral preservation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/13/2608.08594v2-sddbms-soft-denoising-diffusion-bridge-models",
+      "section": "quick",
+      "title_en": "SDDBMs: Soft Denoising Diffusion Bridge Models",
+      "authors": "Shiyi Qi, Kun He, Mingmou Liu",
+      "date": "2026-08-09",
+      "pdf": "https://arxiv.org/pdf/2608.08594v2",
+      "score": "7.0",
+      "evidence": "用于图像恢复的深度扩散桥模型，可用于去噪。",
+      "tldr": "扩散桥模型通过Doob h变换构造端点分布间的随机输运，在图像翻译与恢复中表现出潜力，但现有方法依赖硬端点约束，导致终态退化为狄拉克测度且漂移系数在端点附近病态。本文提出软去噪扩散桥模型（SDDBMs），在路径测度下规定非退化高斯终态边缘，并给出闭式软桥构建，涵盖高斯终态重加权、软h函数及免x0动力学。理论上统一了DDBMs、GOUB、UniDB等现有模型，实验表明SDDBMs在图像恢复中数值稳定性与生成质量更优。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "Diffusion bridge models leverage Doob's \\(h\\)-transform to construct stochastic transports between arbitrary endpoint distributions, and have shown strong potential in image-to-image translation and restoration. However, most existing bridge models rely on hard endpoint conditioning, which forces the terminal state to match a prescribed target exactly. This hard constraint induces terminal-boundary singularities: the terminal law collapses to a Dirac measure, and the resulting drift coefficients become ill-conditioned near the endpoint. In this paper, we propose Soft Denoising Diffusion Bridge Models (SDDBMs), a generalized framework that regularizes diffusion bridges directly at the level of their terminal constraints. Instead of imposing an exact endpoint, SDDBMs prescribe a non-degenerate Gaussian terminal marginal under the transformed path measure, with a flexible terminal center and variance. Starting from this prescribed marginal, we develop a complete closed-form construction of the soft bridge, including the Gaussian terminal reweighting and soft \\(h\\)-function, the induced Gaussian forward marginals and \\(\\mathbf{x}_0\\)-free dynamics. Theoretically, SDDBMs provide a unified probabilistic perspective that encompasses existing diffusion bridge models, including DDBMs, GOUB, and UniDB, as special cases under specific parameter choices. Extensive experiments on image restoration tasks demonstrate that SDDBMs achieve improved numerical stability and superior generation quality over existing bridge-based methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/13/2608.10343v1-encore-efficient-noise-context-aware-representation-for-low-dose-ct-denoising",
+      "section": "quick",
+      "title_en": "ENCORE: Efficient Noise Context-Aware Representation for Low-Dose CT Denoising",
+      "authors": "Minwoo Yu, N. Robert Bennett, Jongduk Baek, Adam S. Wang",
+      "date": "2026-08-11",
+      "pdf": "https://arxiv.org/pdf/2608.10343v1",
+      "score": "6.0",
+      "evidence": "低剂量CT深度学习去噪，噪声上下文感知表示可迁移至高光谱去噪",
+      "tldr": "低剂量CT去噪常采用自然图像通用模型，忽略CT噪声的非平稳与空间相关性。本文提出ENCORE框架，基于真实噪声分布合成训练数据，提取局部噪声功率和相关性上下文，并设计FlyingConv模块自适应调整卷积权重。实验表明其在去噪质量与计算效率上均显著提升，且可通过操控噪声上下文图实现零样本条件去噪，动态控制输出纹理。",
+      "tags": "query:hsi-denoise",
+      "abstract_en": "While deep learning-based denoising has become widely adopted in low-dose CT, conventional models use generic architectures designed for natural images, failing to account for non-stationary and spatially correlated CT noise characteristics. To address this, we propose an Efficient Noise COntext-aware REpresentation (ENCORE) framework that explicitly leverages CT noise characteristics and anatomical features. First, we reformulate the noise synthesis procedure based on a realistic noise distribution beyond the conventional Gaussian approximation, establishing a rigorous foundation for training pair generation. Next, we extract local noise power and correlation contexts to guide the denoising process. To fully leverage the potential of noise context, we propose a FlyingConv module, which adaptively changes convolution weights for each local image region. Notably, our approach demonstrates substantial gains in both denoising quality and computational efficiency. Furthermore, manipulating the intensity of the noise context maps at inference time enables zero-shot conditional denoising, allowing for dynamic control over the output image texture. The entire pipeline is available at https://github.com/minwoo-yu/ENCORE.git",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
