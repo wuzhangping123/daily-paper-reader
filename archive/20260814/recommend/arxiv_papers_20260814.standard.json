@@ -1,0 +1,52 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-14T21:08:12.830662+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.13194v1",
+      "source": "arxiv",
+      "title": "Fidelity-Constrained Anchoring for Black-Box Denoisers",
+      "abstract": "We propose a fidelity-constrained framework that anchors the output of a black-box denoiser to its input without retraining and with little additional computation. The method linearly blends the denoised image with the input and selects the maximum blending factor that satisfies a prescribed local fidelity constraint using Peak Signal-to-Noise Ratio (PSNR) or Structural Similarity Index (SSIM). For PSNR control, a closed-form solution is obtained under a local constant-blending assumption. For SSIM control, we derive a tractable formulation based on inverse SSIM under the same assumption and solve it efficiently using iterative root finding. Experiments on DIV2K images with synthetic Gaussian noise and outputs from Real-ESRGAN and a non-local means denoiser show that the proposed anchoring strategy provides effective fidelity control while balancing denoising performance and statistical naturalness, as measured by the excess kurtosis of residual noise. In particular, SSIM-based anchoring yields more consistent behavior across noise levels than PSNR-based anchoring.",
+      "authors": [
+        "Masaki Satoh"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-13T12:59:32+00:00",
+      "link": "https://arxiv.org/pdf/2608.13194v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "fidelity-constrained anchoring for black-box denoisers, applicable as post-processing for HSI denoising",
+      "llm_evidence_cn": "面向黑盒去噪器的保真度约束锚定方法，可作为高光谱去噪的通用后处理",
+      "llm_evidence": "面向黑盒去噪器的保真度约束锚定方法，可作为高光谱去噪的通用后处理",
+      "canonical_evidence": "面向黑盒去噪器的保真度约束锚定方法，可作为高光谱去噪的通用后处理",
+      "llm_tldr_en": "This work introduces a fidelity-constrained anchoring framework that adjusts a black-box denoiser's output via linear blending with the input, enforcing local PSNR/SSIM constraints, providing a lightweight post-processing mechanism for any denoiser including HSI ones.",
+      "llm_tldr_cn": "针对黑盒去噪器输出可能偏离原始图像的问题，提出保真度约束锚定框架。该方法在不重新训练的情况下，将去噪图像与输入线性混合，并选择满足局部PSNR或SSIM约束的最大混合系数；对PSNR有闭式解，对SSIM则基于逆SSIM迭代求解。在DIV2K合成高斯噪声与Real-ESRGAN等去噪器上的实验表明其有效性和轻量性，可直接用作高光谱去噪的通用后处理模块。",
+      "llm_tldr": "针对黑盒去噪器输出可能偏离原始图像的问题，提出保真度约束锚定框架。该方法在不重新训练的情况下，将去噪图像与输入线性混合，并选择满足局部PSNR或SSIM约束的最大混合系数；对PSNR有闭式解，对SSIM则基于逆SSIM迭代求解。在DIV2K合成高斯噪声与Real-ESRGAN等去噪器上的实验表明其有效性和轻量性，可直接用作高光谱去噪的通用后处理模块。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

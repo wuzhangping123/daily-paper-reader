@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-08-14 <!--dpr-date:20260814-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/14/2608.13194v1-fidelity-constrained-anchoring-for-black-box-denoisers" data-sidebar-item="{&quot;title&quot;: &quot;Fidelity-Constrained Anchoring for Black-Box Denoisers&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2608.13194v1-fidelity-constrained-anchoring-for-black-box-denoisers&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;面向黑盒去噪器的保真度约束锚定方法，可作为高光谱去噪的通用后处理&quot;}">Fidelity-Constrained Anchoring for Black-Box Denoisers</a>
   * 2026-08-13 <!--dpr-date:20260813-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202608/13/2608.11748v1-dual-modality-prompted-diffusion-priors-for-zero-shot-hyperspectral-pansharpening" data-sidebar-item="{&quot;title&quot;: &quot;Dual Modality Prompted Diffusion Priors for Zero Shot Hyperspectral Pansharpening&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2608.11748v1-dual-modality-prompted-diffusion-priors-for-zero-shot-hyperspectral-pansharpening&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;hsi-denoise&quot;}], &quot;evidence&quot;: &quot;高光谱全色锐化重建高分辨率高光谱图像，属高维高光谱恢复&quot;}">Dual Modality Prompted Diffusion Priors for Zero Shot Hyperspectral Pansharpening</a>

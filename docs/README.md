@@ -6,29 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-13
-- 运行时间：2026-08-13 21:07:37 UTC
+- 最新运行日期：2026-08-14
+- 运行时间：2026-08-14 21:08:40 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：1
-- 速读区：2
+- 本次总论文数：1
+- 精读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-今日精读1篇、速读2篇，聚焦扩散模型在遥感与医学影像上的降噪与融合应用。最值得关注的是双模态提示扩散先验实现高光谱泛锐化零样本推理（8.0分），以及软去噪扩散桥模型（7.0分）带来的新生成范式。若想快速上手，建议优先复现高光谱泛锐化思路，并留意扩散桥模型对噪声建模的简化效果。
-- 详情：[/202608/13/README](/202608/13/README)
+今日仅速读1篇论文，聚焦黑盒去噪器研究。  
+值得关注的是《Fidelity-Constrained Anchoring for Black-Box Denoisers》，得分6.0，探讨保真约束下锚定策略的去噪效果。  
+下一步可针对该方法的实际图像去噪性能做对比验证，安排一次精读实践。
+- 详情：[/202608/14/README](/202608/14/README)
 
 ### 精读区论文标签
-1. [Dual Modality Prompted Diffusion Priors for Zero Shot Hyperspectral Pansharpening](/202608/13/2608.11748v1-dual-modality-prompted-diffusion-priors-for-zero-shot-hyperspectral-pansharpening)  
-   标签：评分：8.0/10、query:hsi-denoise
-   evidence：高光谱全色锐化重建高分辨率高光谱图像，属高维高光谱恢复
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [SDDBMs: Soft Denoising Diffusion Bridge Models](/202608/13/2608.08594v2-sddbms-soft-denoising-diffusion-bridge-models)  
-   标签：评分：7.0/10、query:hsi-denoise
-   evidence：用于图像恢复的深度扩散桥模型，可用于去噪。
-2. [ENCORE: Efficient Noise Context-Aware Representation for Low-Dose CT Denoising](/202608/13/2608.10343v1-encore-efficient-noise-context-aware-representation-for-low-dose-ct-denoising)  
+1. [Fidelity-Constrained Anchoring for Black-Box Denoisers](/202608/14/2608.13194v1-fidelity-constrained-anchoring-for-black-box-denoisers)  
    标签：评分：6.0/10、query:hsi-denoise
-   evidence：低剂量CT深度学习去噪，噪声上下文感知表示可迁移至高光谱去噪
+   evidence：面向黑盒去噪器的保真度约束锚定方法，可作为高光谱去噪的通用后处理
 
 
 <div class="dpr-home-promo-card">
