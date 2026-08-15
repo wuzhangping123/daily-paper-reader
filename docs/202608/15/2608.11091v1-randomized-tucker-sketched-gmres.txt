@@ -1,0 +1,2034 @@
+Randomized Tucker-Sketched GMRES
+Alberto Bucci1
+Martina Iannacito2
+Mirjeta Pasha3
+Rudi Smith3
+1School of Mathematics, The University of Edinburgh, Edinburgh, EH9 3FD, UK.
+Email: abucci2@ed.ac.uk, ORCID: 0009-0002-7550-6025
+2Department of Mathematics, University of Bologna, Bologna 40126, IT
+Email: martina.iannacito@unibo.it, ORCID: 0000-0003-3354-2538
+3Department of Mathematics, Virginia Tech, Blacksburg, VA 24061, USA.
+Email: mpasha@vt.edu, ORCID: 0000-0003-4249-2421
+Email: smithrgh@vt.edu, ORCID: 0000-0002-6592-2482
+Abstract: We address the problem of solving large-scale tensor-structured lin-
+ear systems in the Tucker format. In this setting, standard iterative solvers such
+as GMRES face a fundamental bottleneck: the multilinear ranks of the Krylov
+basis vectors grow with the iteration count, leading to rapidly increasing tensor
+operation costs and memory requirements. To overcome these challenges, we
+propose two randomized algorithms within the sketched GMRES framework
+that replace full Arnoldi orthogonalization with short recurrences. The first,
+RHOSVD-Tucker sGMRES, uses randomized HOSVD with per-iteration rank
+selection, providing robustness across a wide range of problems. The second
+method, MLN-Tucker sGMRES, leverages the multilinear Nyström approxi-
+mation with a fixed rank, enabling streaming computations; the streamability
+of the approximation further allows, at no additional cost, a memory-efficient
+reconstruction of the solution from a compact sketched representation of the
+Krylov basis. Both methods outperform standard low-rank Tucker solvers in
+symmetric and non-symmetric settings. Applied to inverse problems, the low-
+rank Tucker constraint acts as an implicit regularizer; combined with adaptive
+projected Tikhonov penalization and automatic regularization parameter se-
+lection, the methods yield stable reconstructions.
+Keywords: Tensor equations, randomized numerical linear algebra, Tucker
+decomposition, sketched GMRES, Krylov subspace method, inverse problem,
+preconditioning, compression
+Mathematics subject classification: 15A69, 65F10, 65F55, 68W20, 65J22,
+65N22, 65F22
+1 Introduction
+We consider large-scale tensor equations of the form
+L (X) = B,
+(1)
+Preprint.
+2026-08-12
+arXiv:2608.11091v1  [math.NA]  11 Aug 2026
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+2
+where X, B ∈Rn1×n2×···×nd are d-dimensional tensors and L is a linear operator express-
+ible as a sum of separable terms. Denoting vec(X) as the vectorization of X, Equation (1)
+takes the equivalent form
+ N
+X
+i=1
+A(i)
+1 ⊗· · · ⊗A(i)
+d
+!
+vec(X) = vec(B),
+(2)
+where A(i)
+j
+∈Rnj×nj. Equations of the form (1) arise in a wide range of scientific comput-
+ing applications, including the discretization of high-dimensional partial differential equa-
+tions [44], quantum many-body simulations and quantum chemistry [43], and uncertainty
+quantification [18, 19], where the underlying operators often admit exact or approximate
+representations as sums of Kronecker products. In many of these applications, the underly-
+ing operators admit exact or approximate representations as sums of Kronecker products,
+while the right-hand side B often has a low-rank tensor representation. Moreover, un-
+der suitable spectral assumptions on L , the solution X may inherit a similar low-rank
+structure (see, e.g., [5,7]). Low-rank tensor structure can also be exploited in applications
+where it is not naturally present but is instead imposed as a modeling or computational
+constraint, such as tensor-on-tensor regression [2,51] and imaging inverse problems [35,36].
+In particular, discrete inverse problems provide an important class of problems of the
+form (2), where L represents a discretized forward operator, such as the Radon transform
+in computed tomography [35], convolution in image deblurring [36], or partial Fourier sam-
+pling in MRI [11]. The data B are typically noisy, i.e., B = L (X true) + η = Btrue + η,
+with additive noise η. In these settings, L is severely ill-conditioned, with singular val-
+ues decaying to zero, so direct solution of (1) strongly amplifies noise. Classical iterative
+methods exhibit semi-convergence: the error initially decreases as dominant modes are
+captured, then increases as noise enters the solution. Regularization is therefore required
+to obtain a stable approximation of X true [34].
+Krylov-based iterative solvers, such as the Generalized Minimal RESidual (GMRES)
+method [68], have been widely used for solving large-scale linear tensor equations especially
+in the context of discretized PDEs and imaging inverse problems [9, 21, 27, 34, 42, 47, 70].
+Because of the curse of dimensionality where the number of elements of a tensor as well
+as the storage consumption grow exponentially with the number of the dimensions [32,46],
+Krylov solvers are not directly used on dense tensors defining the tensor equations, but are
+typically combined with low-rank tensor formats to reduce storage and computational costs.
+However, this introduces a well-known difficulty: rank growth during the iterations [15]. As
+Krylov vectors are repeatedly formed through linear combinations and orthogonalization
+steps, their tensor ranks tend to increase, progressively diminishing the advantages of
+the low-rank representation. To control this, rank truncation is commonly used, albeit
+at the cost of additional approximation error and algorithmic complexity. Several formats
+have been developed to represent high-dimensional data efficiently, including the Canonical
+Polyadic decomposition [23, 37], the Tucker format [74], and hierarchical representations
+such as Tensor Trains [60] and Hierarchical Tucker [31].
+For very high-order tensors,
+hierarchical formats are typically preferred to mitigate the curse of dimensionality, while
+the Tucker format offers a practical compromise between expressiveness and computational
+efficiency in moderate-order regimes (e.g., d = 3, 4) with large mode sizes. Although the
+low-rank format allows the adaptation of Krylov solver to large-scale settings, the storage
+and orthogonalization of the Krylov basis remain a major computational bottleneck. In
+particular, the memory required to store basis vectors grows linearly with the iteration
+count, while the cost of orthogonalization grows quadratically, quickly becoming prohibitive
+for problems with millions of unknowns [49, 64, 65]. These limitations have motivated a
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+3
+variety of approaches aimed at reducing the cost of Krylov subspace methods, including
+recycling strategies [20,63], restarted and memory-limited projection schemes [12,50,59],
+structured subspace techniques [49], and incomplete orthogonalization variants [68]. The
+latter class provides the basis for randomized GMRES-type methods, which replace exact
+orthogonalization with randomized projections based on oblivious subspace embeddings
+(OSEs) (see Definition 4).
+This perspective leads to randomized Krylov solvers that construct approximate bases
+at significantly reduced cost while preserving convergence properties with high probability.
+Representative examples include the randomized GMRES framework of [6] and sketched
+GMRES (sGMRES) [58] for the matrix cases. These two existing randomized GMRES
+variants differ primarily in their orthogonalization strategies. In [6], the Krylov basis is
+fully orthogonalized within the sketched space, closely following classical GMRES and
+therefore inheriting the same rank-growth limitations when adapted to high-dimensional
+settings. On the contrary, in [58], only a part of the sketched Krylov basis is orthogonal-
+ized, thanks to short recurrences, a particularly appealing result applicable to low-rank
+tensor computations [15]. Additionally, randomization can also be exploited beyond the
+Krylov solver itself. As observed in [72], sketching techniques can be combined with Kro-
+necker and Khatri–Rao structures to perform Tucker tensor operations, such as tensor
+summation and compression, without forming dense intermediate quantities. While this
+substantially reduces the cost of individual tensor operations, it does not eliminate the
+fundamental challenge posed by rank accumulation across the Krylov basis. Building on
+these premises, we focus on moderate-order Tucker tensors and investigate randomized
+strategies for efficiently adapting sketched GMRES (sGMRES) [58] to this setting.
+1.1 Contributions
+To address the limitations of existing tensor-based solvers, we propose two Tucker-based
+variants of sGMRES.
+1. A first solver, RHOSVD-Tucker sGMRES, builds upon the framework of [72] and
+integrates randomized Higher-Order Singular Value Decomposition (RHOSVD) [1]
+together with an effective heuristic for rank estimation into the Krylov iteration,
+yielding a more efficient implementation.
+2. The second solver, MLN-Tucker sGMRES, relies on a streamable Tucker compression
+strategy, the multilinear Nyström (MLN) approximation [16,73]. At the price of fixing
+a maximum rank a priori, the MLN variant enables efficient operator application, ten-
+sor summation, and solution reconstruction. Furthermore, for memory-constrained
+settings, we present an optional sketching strategy, adapting to the Tucker setting
+the approach of [15], that replaces the full Krylov basis with a compact sketched rep-
+resentation. This option is broadly applicable whenever the solution is numerically
+low-rank, but integrates particularly naturally into MLN-Tucker sGMRES, where it
+incurs no additional cost.
+While the fixed-rank constraint imposed by the MLN approach may alter the conver-
+gence behavior, it also acts as a form of implicit regularization by restricting the iterates
+to a manifold of bounded multilinear rank and thereby suppressing high-frequency noise.
+To more explicitly address ill-posedness, we incorporate an adaptive projected Tikhonov
+regularization strategy [21, 29] within each iteration. The regularization parameter is se-
+lected automatically via generalized cross-validation (GCV) [30], eliminating the need for
+oracle-based stopping criteria and enabling stable reconstructions even when the noise
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+4
+level is unknown. To the best of our knowledge, this is the first work demonstrating that
+compressed tensor decompositions can serve as an effective regularizer in the context of
+iterative methods for inverse problems. The interplay between explicit Tikhonov penal-
+ization and implicit low-rank truncation makes the proposed framework particularly well
+suited for large-scale, ill-posed tensor inverse problems, while the sGMRES architecture
+simultaneously addresses the memory and orthogonalization bottleneck described above.
+To demonstrate the effectiveness of our solvers, we consider three benchmark problems.
+First, a 3D Poisson equation: since our construction recovers short recurrences, the per-
+iteration cost is greatly reduced, and we show that our approach is competitive with, and
+in fact faster and more robust than, state-of-the-art CG-based Tucker methods [40] which
+are tailored to symmetric problems and enjoy short recurrences naturally. Second, a 3D
+convection-diffusion problem, a classical and challenging non-symmetric benchmark. Fi-
+nally, a 3D image deblurring inverse problem, which illustrates how the low-rank Tucker
+constraint simultaneously acts as an implicit regularizer and renders the problem compu-
+tationally tractable.
+Outline.
+The remainder of the paper is organized as follows. Section 2 reviews tensor
+notation and the Tucker decomposition, including randomized approximation techniques,
+GMRES and its low-rank variants such as RHOSVD-Tucker GMRES, which will serve as
+benchmark for the numerical experiments. Section 3 presents the two proposed algorithms:
+RHOSVD-Tucker sGMRES and MLN-Tucker sGMRES. Section 4 reports numerical ex-
+periments on a preconditioned 3D Poisson equation, a 3D convection–diffusion problem,
+and a 3D image deblurring inverse problem. Finally, Section 5 provides concluding remarks.
+2 Preliminaries
+2.1 Tensor Notation and Algebraic Operations
+We adopt standard notation whereby lowercase italic letters (x) represent scalars, bold
+lowercase letters (x) denote vectors, bold uppercase letters (X) signify matrices, bold
+calligraphic letters (X) identify tensors, and script letters are used for operators (L )
+or sets of matrices (X , Y ). An order d tensor is defined as X ∈Rn1×n2×···×nd, where
+individual elements are accessed through d indices xi1i2...id with 1 ≤ik ≤nk.
+2.2 Tensor Operations
+We rely on several foundational operations from tensor algebra [8]. The construction and
+manipulation of low-rank tensors depends on structured matrix products, which allow us
+to relate high-dimensional data to lower-dimensional factor matrices.
+Definition 1 (Khatri-Rao Products). For two matrices A ∈RI×r and B ∈RJ×r, the
+Khatri-Rao product, denoted by A ⊙B ∈RIJ×r, is defined as the column-wise Kronecker
+product
+A ⊙B =
+
+a1 ⊗b1
+a2 ⊗b2
+. . .
+ar ⊗br
+
+where ⊗denotes the Kronecker product.
+We also need to project or transform a tensor along a specific dimensions using the
+tensor-times-matrix and matricized tensor times Khatri-Rao products.
+Definition 2 (Tensor-Times-Matrix (TTM)). The mode-k tensor-times-matrix product
+(TTM) of a tensor X ∈Rn1×···×nd with a matrix U ∈RJ×nk is denoted by Y = X ×k U.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+5
+This operation applies the linear transformation U to each mode-k fiber of X, resulting
+in a new tensor Y ∈Rn1×···×nk−1×J×nk+1×···×nd. Computationally, the TTM is used in its
+matricized form, where the mode-k product corresponds to standard matrix multiplication
+of some unfolding. Denoting the mode-k unfolding of a tensor by the subscript (k), this is
+expressed as
+Y (k) = UX(k).
+To denote a sequence of successive TTMs across multiple modes, we use the product
+X ×1 U 1 ×2 U 2 ×3 U 3 := X ×3
+k=1 U k.
+(3)
+To contract a tensor with multiple factor matrices under the Khatri-Rao umbrella, we
+use the matricized tensor times Khatri-Rao product.
+Definition 3 (Matricized Tensor Times Khatri-Rao Product (MTTKRP)). Given an order-d
+tensor X ∈Rn1×···×nd and a sequence of factor matrices {U i ∈Rni×r}d
+i=1, the MTTKRP
+with respect to mode k produces a matrix M (k) ∈Rnk×r. It is formulated as the matrix
+multiplication of the mode-k unfolding of X and the Khatri-Rao product of all factor
+matrices except the k-th one
+M (k) = X(k) (U d ⊙. . . ⊙U k+1 ⊙U k−1 ⊙. . . ⊙U 1) .
+(4)
+and is denoted MTTKRP(X; {U j}j, k).
+2.3 The Tucker Decomposition
+The Tucker decomposition [74] is a low rank decomposition formed by projecting an order-d
+tensor onto smaller, mode-specific latent spaces through the TTM operation in Definition 2,
+yielding a d dimensional tensor core and a set of d factor matrices. Algorithms have been
+made to operate on the compact components of the Tucker format, however, the limitations
+of such algebraic operations usually lie with respect to the core.
+More formally, using Definition 2, an order-d tensor X ∈Rn1×···×nd with a specified
+multilinear rank (r1, . . . , rd) is factorized into a core tensor G ∈Rr1×···×rd and a collection
+of factor matrices {U k ∈Rnk×rk}d
+k=1. The Tucker approximation is constructed through
+a multi TTM through all the k modes
+X ≈G ×1 U 1 ×2 U 2 · · · ×d U d,
+(5)
+although we emphasize that this is rarely formed, but rather stored as a core and factors.
+While the factor matrices compress each mode from a dimension of nk to rk, the Tucker
+format still has its weakness through the core scaling requiring O(rd) units of memory. Con-
+sequently while valuable for low-order data, the Tucker format becomes intractable quickly,
+so usually sees its applications for modest dimension sizes. Throughout this paper, we op-
+erate under the assumption that the compressed representation of B from Equation (1) has
+been given a priori in Tucker format, and that the order d is sufficiently small to permit
+algorithmic manipulation of the core G.
+Several deterministic and randomized algorithms for computing Tucker approximations
+have been proposed in the literature [24,25,41,46,66]. In this work we primarily employ
+the randomized HOSVD [1] and the Multilinear Nyström method [16,73], although other
+Tucker compression schemes, such as sequential and parallel variants [13,38,54,55] could
+be used as well. These methods are employed to handle the operator applications and
+linear combinations arising in the GMRES orthogonalization phase and the reconstruction
+of the final solution.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+6
+2.4 GMRES and variants for linear systems
+The GMRES iterative solver [68] constructs an approximate solution to the linear system
+Ax = b within a Krylov subspace of growing dimension. In particular, starting from an
+initial guess x0, the approximate solution at the k-th iteration is given by
+xk = x0 + V kyk,
+(6)
+where V k ∈Rn×k forms a basis for the Krylov subspace Kk(A, r0) = span
+
+r0, Ar0, . . . , Ak−1r0
+	
+,
+with r0 = b −Ax0 denoting the initial residual. The vector yk ∈Rk is determined by
+solving the least-squares problem
+yk = arg min
+y∈Rk ∥AV ky −r0∥2.
+(7)
+In practice, if the basis for Kk is constructed using a full orthogonalization of its elements
+via the Arnoldi process, the resulting matrix V k has orthonormal columns. We then rely
+on the Arnoldi relation
+AV k = V k+1Hk,
+(8)
+where Hk ∈R(k+1)×k is an upper-Hessenberg matrix containing the orthogonalization
+coefficients. We can then rewrite (7) in a simplified manner as
+yk = arg min
+y∈Rk ∥Hky −βe1∥2,
+(9)
+where β = ∥r0∥2 and e1 = (1, 0, . . . , 0)T ∈Rk+1. The convergence of GMRES is sensitive
+to the orthogonality of the Krylov basis V k [62]. However, maintaining strict orthogonality
+across all basis vectors introduces a computational and memory bottleneck. To address
+this, various modifications to the classical GMRES algorithm have been proposed. Among
+the most widely adopted strategies to accelerate the solver and reduce costs are restart-
+ing [56,69], preconditioning [69], and incomplete orthogonalization [68], the latter of which
+serves as the foundation for randomized GMRES variants. In the incomplete orthogonal-
+ization approach, the newly generated basis vector vk is orthogonalized only against the
+ktrunc most recently computed basis vectors, reducing the computational overhead of the
+orthogonalization phase. Because of this, while the Arnoldi relation (8) remains satisfied
+and yk can still be computed via (9), the basis matrix V k loses its strict orthogonality.
+Consequently, the resulting yk no longer represents the exact mathematical solution to (7).
+As such, the cost per iteration is lowered but at the expense of delayed convergence. Moti-
+vated by reducing orthogonalization costs, randomized variants of GMRES have also been
+proposed [52,57,76] which rely on the use of oblivious subspace embeddings (OSEs). By
+implicitly embedding the high-dimensional Arnoldi process into a low-dimensional sketched
+space via an OSE, one can construct the Krylov basis and solve the corresponding least-
+squares problem (7) at a fraction of the cost without sacrificing accuracy.
+Definition 4 (Oblivious Subspace Embedding). Let ε ∈(0, 1) and δ ∈(0, 1). A random
+matrix S ∈Rs×n is said to satisfy the (ε, δ, k)-OSE property if, for any fixed k-dimensional
+subspace V ⊆Rn, the following holds with probability at least 1 −δ
+(1 −ε)∥x∥2
+2 ≤∥Sx∥2
+2 ≤(1 + ε)∥x∥2
+2
+∀x ∈V.
+(10)
+Since the set of all possible residual vectors forms a low-dimensional subspace, the OSE
+guarantees that minimizing the sketched norm ∥Sx∥2 yields a near-optimal approxima-
+tion to the true high-dimensional minimum. Exploiting this to reduce orthogonalization
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+7
+costs, [58] introduced the sketched GMRES (sGMRES) method. By projecting the high-
+dimensional Arnoldi process through an OSE, sGMRES avoids solving the exact least-
+squares problem (7). Instead, it derives an approximate solution by solving the reduced
+problem
+yk = arg min
+y∈Rk ∥SAV ky −Sr0∥2.
+(11)
+2.4.1 Low rank variants
+Several low-rank tensor variants of GMRES have been proposed [7, 27, 47, 53], both for
+classical linear equations and tensor multilinear ones. At iteration k, the tensor-adapted
+GMRES method constructs a tensor Vk to expand a basis of the Krylov tensor subspace
+Kk(L , B) := span{B, L (B), . . . , L k−1(B)}. This construction is carried out in a chosen
+low-rank tensor format. The orthonormalization coefficients, computed via tensor inner
+products, are used to assemble the upper-Hessenberg matrix Hk, which in turn defines the
+update vector yk as in (7).
+In all these low-rank GMRES adaptations, truncation at prescribed rank or accuracy
+is employed to prevent memory errors. Indeed, the computation of the new Krylov basis
+element during the Arnoldi iteration, and the orthogonalization against previous basis
+elements causes the rank to grow as in the matrix case, but with more severe memory
+usage. Without truncation, one would witness exponential rank growth and thus rapid
+memory usage leading to computational intractability.
+Typically, the SVD, HOSVD, ST-HOSVD [26,28,75], TT-SVD [61], or their randomized
+variants [3,13,16,17,48,55], are used depending on the chosen format. However, because
+of truncation, the new Krylov basis element does not, in general, lie exactly in the Krylov
+subspace, so that the resulting basis is only approximate [27,71].
+Combinations of GMRES with the Tucker format have been considered in [47, 53, 72].
+We note in the deterministic framework, the summation of Tucker tensors as part of GM-
+RES requires the densification of increasingly large core tensors in each iteration as part of
+the truncation step mentioned above. To avoid this the Tucker GMRES using KRPSum-
+Tucker [72], which we herein call RHOSVD-Tucker GMRES was proposed. In particular
+all necessary Tucker tensor summations are done in a randomized manner via Khatri-Rao
+or Kronecker sketching using an effective rank estimation. While the improved summa-
+tion handles the arithmetic efficiency of RHOSVD-Tucker GMRES compared to standard
+deterministic Tucker GMRES, it retains the full orthogonalization requirement of classical
+GMRES so can be expensive in long iteration schemes. Thus we propose sGMRES derived
+variants.
+3 The Algorithms
+In this section, we introduce our novel sketched GMRES algorithms for solving low-rank
+tensor equations in the Tucker format, RHOSVD-Tucker sGMRES and MLN-Tucker sGM-
+RES, alongside the existing method for baseline comparison RHOSVD-Tucker GMRES.
+Our first proposed algorithm, RHOSVD-Tucker sGMRES, naturally extends [72] by
+embedding the Khatri-Rao summation framework within the sGMRES architecture and
+replaces full orthogonalization with a short-recurrence.
+Our second proposed algorithm within the sGMRES framework, MLN-Tucker sGMRES,
+does not rely on RHOSVD techniques but instead approximations via the Multilinear
+Nyström method. By relying on a streamable Tucker approximation, it avoids storing the
+full Krylov basis tensors, as new iterates are generated while retaining only their sketches,
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+8
+reducing memory usage and potentially enabling the use of larger ranks or the avoidance
+of restarting strategies.
+3.1 RHOSVD-Tucker GMRES
+To overcome the summation memory issue in the Tucker format, [72] uses Khatri-Rao
+product based randomized sketching, which implicitly rounds the final sum without ever
+realizing the massive intermediate structure. This has successfully been applied to other
+tensor formats too such as TT [4]. Specifically, to approximate a sum of N Tucker tensors
+C = PN
+i=1 X (i) with cores G(i) ∈Rr(i)
+1 ×···×r(i)
+d
+and factors U (i)
+k
+∈Rnk×r(i)
+k , the authors use
+the MTTKRP (Definition 3) to find the sketched mode-k unfolding as
+Y k = C(k)S(k) =
+N
+X
+i=1
+U (i)
+k G(i)
+(k)
+
+K
+j̸=k
+M (i)
+d−j+1
+
+,
+(12)
+where M (i)
+j
+= (U (i)
+j )TSj ∈Rr(i)
+j ×s is constructed using parts of a global sketching oper-
+ator S(k) = J
+j̸=k Sj with independent Gaussian matrices Sj ∈Rnj×s. Subsequently a
+low-dimensional orthonormal basis bU k for each mode via an economy QR factorization is
+found and used in a core projection bC = PN
+i=1 G(i) ×1 ( bU
+T
+1U (i)
+1 ) · · · ×d ( bU
+T
+dU (i)
+d ) before
+finally applying the ST-HOSVD to the intermediate core bC, yielding a compact Tucker
+decomposition that satisfies some user-defined tolerance ϵ. Instead of using a static sketch
+size, the authors propose to dynamically determine the uniform sketch dimension s via
+estimating the effective rank of the sum by analyzing the spectral decay of the energy-
+weighted concatenated factor matrices V k =
+h
+∥G(1)∥FU (1)
+k , . . . , ∥G(N)∥FU (N)
+k
+i
+, whereby
+computing the eigenvalues of the Gram matrix V T
+kV k, a minimal rank erk required to cap-
+ture its dominant spectral energy up to a relative threshold can be found. The uniform
+target sketch size is then conservatively set to s = maxk(erk)+p, where p is an oversampling
+parameter. RHOSVD-Tucker GMRES, defined in Algorithm 1, takes GMRES with Tucker
+tensor input but allows for the summation steps in the operator application, orthogonal-
+ization, and reconstruction of the final solution to be done efficiently using randomization.
+Herein, we denote the randomized summation technique from [72] as RoundSum.
+3.2 RHOSVD-Tucker sGMRES
+While Algorithm 1 accelerates individual tensor operations, the cost of full Arnoldi or-
+thogonalization grows with the iteration count and becomes the dominant computational
+bottleneck which we overcome in sGMRES. More specifically, the primary algorithmic de-
+viations from the baseline RHOSVD-Tucker GMRES are within the orthogonalization and
+residual tracking phases, specifically at Lines 10, 17, and 19 of Algorithm 1. Rather than
+enforcing full orthogonalization, the newly generated basis tensor is orthogonalized strictly
+against the ktrunc > 0 most recently computed basis tensors (see Line 12 of Algorithm 2).
+As previously mentioned, the localized orthogonalization sacrifices orthogonality of the
+Krylov basis, so (9) is no longer valid. Instead, the sketched least-squares problem (11)
+is targeted (Line 18 of Algorithm 2). For algorithmic efficiency, a Khatri-Rao structured
+Gaussian matrix S is drawn at initialization and used to construct the sketched basis
+throughout the iteration. We also note the sketched residual may underestimate the true
+residual so a stopping criterion based directly on the prescribed tolerance tol may lead to
+premature termination. Thus we introduce a correction factor η ∈(0, 1) and terminate the
+iterations only when the sketched residual falls below η · tol (see Line 19 in Algorithm 2).
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+9
+Algorithm 1: RHOSVD-Tucker GMRES
+Input
+: Linear operator L ; Tucker tensor B; tolerance tol; max iterations Nmax
+Output: Approximate solution in Tucker format eX, such that ∥L ( eX) −B∥F ≤tol
+1 β ←∥B∥F
+2 V1 ←B/β
+3 Initialize Hessenberg matrix H ∈R(Nmax+1)×Nmax
+4 for k ←1 to Nmax do
+5
+W ←Vk
+6
+W ←RoundSum (L (W))
+7
+for j ←1 to k do
+8
+hj,k ←⟨Vj, W⟩F
+9
+end
+10
+W ←RoundSum
+
+W −Pk
+j=1 hj,kVj
+
+11
+hk+1,k ←∥W∥F
+12
+if hk+1,k ≈0 then
+13
+break
+14
+end
+15
+Vk+1 ←W/hk+1,k
+16
+yk ←arg miny ∥βe1 −H1:k+1,1:ky∥2(+λ∥y∥2
+2 if regularization is needed)
+17
+resk ←∥βe1 −H1:k+1,1:kyk∥2
+β
+// Relative residual
+18
+if resk < tol then
+19
+break
+20
+end
+21 end
+22 eX ←RoundSum
+Pk
+i=1 yiVi
+
+23 return eX
+3.3 MLN-Tucker sGMRES
+An alternate procedure for computing low-rank approximations in the Tucker format is
+the MLN algorithm, sometimes favored for its single-pass, streamable properties. Given
+a tensor X ∈Rn1×···×nd, finding a uniform rank r approximation begins by drawing two
+sets of dimension reduction matrices (DRMs), {Ωk}d
+k=1 and {Ψk}d
+k=1, of sizes Q
+j̸=k nj × r
+and nk × (r + p), respectively, where p is an oversampling parameter. The algorithm then
+computes the Tucker approximation via
+(X ×d
+k=1 ΨT
+k) ×d
+k=1 X(k)Ωk(ΨT
+kX(k)Ωk)†,
+(13)
+where † denotes the Moore-Penrose pseudoinverse. When the tensor X is already given in
+the Tucker format (5) the algorithm can be significantly accelerated by employing Khatri-
+Rao structured sketching matrices in place of Ωk. We refer the reader to [22] for a detailed
+analysis of the associated theoretical properties. As for the oversampling parameter p,
+one uses it for both improving the accuracy and numerical stability of the method [16].
+Typically, independent random matrices are drawn to perform the left and right sketching
+phases, however to recycle computations and reduce the overall cost, our algorithm instead
+uses a subset of the left sketching matrices to construct the right ones. Specifically, we let
+Ψk denote the matrix consisting of the first r columns of Ψk, and subsequently set Ωk as
+the Khatri-Rao product of these submatrices
+Ωk = Ψd ⊙· · · ⊙Ψk+1 ⊙Ψk−1 ⊙· · · ⊙Ψ1.
+(14)
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+10
+Algorithm 2: RHOSVD-Tucker sGMRES
+Input
+: Linear operator L ; Tucker tensor B; sketch size s; tolerance tol; sketched
+correction factor η; max iterations Nmax; truncation window ktrunc
+Output: Approximate solution in Tucker format eX, such that ∥L ( eX) −B∥F ≤tol
+1 β ←∥B∥F
+2 V1 ←B/β
+3 Generate Gaussian matrices {Sk}d
+k=1, with Sk ∈Rnk×s
+4 S ←⊙d
+k=1Sk
+5 bs ←STvec(B)
+6 βs ←∥bs∥2
+7 M ←[ ]
+// initialization for SAV k
+8 for k ←1 to Nmax do
+9
+W ←Vk
+10
+W ←RoundSum (L (W))
+11
+M ←[M, STvec(W)]
+12
+W ←RoundSum
+
+W −Pk
+j=max(1,k−ktrunc+1)⟨Vj, W⟩FVj
+
+13
+if ∥W∥F ≈0 then
+14
+break
+15
+end
+16
+Vk+1 ←W/∥W∥F
+17
+yk ←arg miny ∥My −bs∥2 (+λ∥y∥2
+2 if regularization is needed)
+18
+resk ←∥Myk −bs∥2
+βs
+// Sketched relative residual
+19
+if resk < η · tol then
+20
+break
+21
+end
+22 end
+23 eX ←RoundSum
+Pk
+i=1 yiVi
+
+24 return eX
+We now outline the process of computing a low-rank approximation of a linear combination
+of Tucker tensors using the MLN framework equipped with Khatri-Rao structured sketching
+operator. Importantly in this algorithm each constituent tensor X (j) is accessed exactly
+once, and only its compact sketched representation is accumulated in memory. Formally,
+let {X (j)}N
+j=1 be a collection of N tensors of order d, where each X (j) ∈Rn1×···×nd is
+represented by its Tucker decomposition X (j) = G(j) ×d
+k=1 U (j)
+k . Given a scalar coefficient
+vector c = [c1, . . . , cN]T ∈RN, our objective is to construct an efficient MLN approximation
+for the exact linear combination eX = eG ×d
+k=1 eU k ≈PN
+j=1 cjX (j). For each summand X (j)
+we first project the factor matrices onto these sketching operators
+U (j)
+Ψk := ΨT
+kU (j)
+k
+∈R(r+p)×r(j),
+U
+(j)
+Ψk := Ψ
+T
+kU (j)
+k
+∈Rr×r(j)
+k .
+(15)
+Because Ψk is strictly a block partition of Ψk, the matrix U
+(j)
+Ψk does not need to be explic-
+itly computed from scratch; it is extracted as the first r rows of U (j)
+Ψk, thereby bypassing
+any unnecessary dense matrix multiplications. Next we construct the corresponding MLN
+sketched cores and factor contributions for each summand. Because the linear projection
+distributes over the Tucker format, the j-th sketched core tensor G(j)
+Ψ is computed via small
+tensor-times-matrix products G(j)
+Ψ = X (j) ×d
+k=1 ΨT
+k = G(j) ×d
+k=1 U (j)
+Ψk. Simultaneously, the
+mode-k factor contributions F (j)
+k
+are obtained by applying the MTTKRP from Definition 3.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+11
+Applying the MTTKRP to the small core tensor and the truncated sketched factors yields
+F (j)
+Ψk = U (j)
+k MTTKRP
+
+G(j), {U
+(j)
+Ψℓ}ℓ, k
+
+.
+(16)
+By isolating the MTTKRP operation to the core tensor, we avoid forming the Khatri-Rao
+product of the full-dimension factor matrices. Once these summand-specific quantities have
+been computed, we sum them to form the global linear combinations. Given the scalar
+coefficients cj, the intermediate sketched core GΨ and the accumulated factor contributions
+F Ψk are assembled
+GΨ =
+N
+X
+j=1
+cjG(j)
+Ψ ,
+F Ψk =
+N
+X
+j=1
+cjF (j)
+Ψk.
+(17)
+The exact MLN approximation is now equivalent to the Tucker tensor GΨ×d
+k=1F Ψk(ΨT
+kF Ψk)†.
+However, because GΨ has uniform sizes r+p, this representation suffers from unnecessarily
+inflated multilinear ranks, taking on the dimension of the sketch sizes r + p rather than
+the desired target ranks r. To reduce the representation back to rank r, we use a QR
+compression step. Specifically, we compute the factorization
+QkRk = ΨT
+kF Ψk,
+(18)
+where Qk ∈R(r+p)×r has orthonormal columns and Rk ∈Rr×r is upper-triangular. Sub-
+stituting this factorization into the pseudoinverse yields (ΨT
+kF k)† = R†
+kQT
+k. We can then
+absorb the orthogonal matrix QT
+k directly into the core tensor while applying the pseudoin-
+verse of the upper-triangular factor Rk to the factor matrices. The final, rank-compressed
+core tensor eG and factor matrices eU k are thus computed as
+eG = GΨ ×d
+k=1 QT
+k,
+eU k = F ΨkR†
+k.
+(19)
+The overall procedure can be naturally divided into three phases:
+a sketching phase
+(MLN_Sketch, Algorithm 3), a summation phase (MLN_Sum, Algorithm 4), in which the
+sketched contributions are accumulated in a streaming fashion, and a recovery phase
+(MLN_Recovery, Algorithm 5). We further define MLN_RoundSum as the sequential appli-
+cation of these three routines. The full pseudocode for MLN-Tucker GMRES is outlined
+in Algorithm 6. Of particular note is a novelty in Lines 4 and 10 of Algorithm 6 where
+normally we would have to generate an additional sketching matrix and compute an ad-
+ditional sketch as in RHOSVD-Tucker sGMRES, Lines 5 and 11 of Algorithm 2. Instead
+from MLN_Sketch Algorithm 3 we can receive an optional output, diag(GΨ), the super-
+diagonal of GΨ, which is implicitly computed and reuse this as the sketch in these lines.
+To see why, let the exact linear combination be X = PN
+j=1 cjX (j), such that the global
+sketched core is defined as GΨ = X ×d
+k=1 ΨT
+k. The i-th scalar element of its superdiagonal,
+[diag(GΨ)]i, corresponds to the simultaneous projection of X exclusively onto the i-th
+row of each transposed sketching matrix. Letting ψk,i denote the i-th column of Ψk, this
+element evaluates to
+[diag(GΨ)]i = (X ×d
+k=1 ψT
+k,i).
+(20)
+Applying the standard identity connecting multilinear products to vectorization and the
+Kronecker product, this scalar operation can be flattened into an exact inner product
+[diag(GΨ)]i = (ψ1,i ⊗· · · ⊗ψd,i)Tvec(X).
+(21)
+By definition, the Kronecker product of the individual i-th columns, ψ1,i⊗· · ·⊗ψd,i, forms
+precisely the i-th column of the full Khatri-Rao product Ψ1 ⊙· · · ⊙Ψd. Stacking these
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+12
+scalar components for all i along the superdiagonal reconstructs the full matrix-vector
+operation, yielding the final equivalence diag(GΨ) = (Ψ1 ⊙· · · ⊙Ψd)Tvec
+PN
+j=1 cjX (j)
+.
+The MLN-Tucker sGMRES algorithm follows the same overall structure as RHOSVD-
+Tucker sGMRES, but differs in several important aspects. First, the target rank r and the
+sketch size r + p are fixed a priori and remain constant throughout the iterations. Second,
+the method stores only the last ktrunc full basis tensors, while retaining only the sketches
+of the older basis tensors, since these are sufficient for reconstructing the final solution.
+Memory efficient variant.
+However, with our choice of parameters, the sketches have size
+˜r := r +p, which may even exceed the storage required by the corresponding basis tensors.
+Consequently, in memory-constrained settings or when a large number of iterations is
+required, storing all sketches can still become prohibitively expensive. While restarting can
+alleviate this issue, it may substantially impair convergence. We avoid this by exploiting
+the fact that the leading columns of Ψk ∈Rnk×˜r themselves form a valid, smaller Nyström
+sketching operator. Specifically, if the desired solution rank is rsol ≤r, we fix a (typically
+small) reduced oversampling parameter psol and set ˜rsol := rsol + psol, retaining only the
+leading ˜rsol columns of each Ψk.
+Of these, only the leading rsol directions correspond
+to the target-rank contraction used to build F (j)
+Ψk (Definition 3), which by construction
+carries no oversampling buffer of its own; the remaining psol columns are retained solely to
+preserve the numerical stability of the Nyström reconstruction in MLN_Recovery, mirroring
+the role that p plays for the full-resolution sketch. We can therefore downsample every
+stored sketched core and factor to their corresponding leading indices,
+G(j)
+Ψ ←G(j)
+Ψ (1:˜rsol, . . . , 1:˜rsol),
+F (j)
+Ψk ←F (j)
+Ψk(:, 1:rsol),
+k = 1, . . . , d,
+(22)
+as done at line 35 of Algorithm 6.
+Since this is mathematically equivalent to having
+sketched with the reduced operator Ψ(˜rsol)
+k
+from the start, the operation reduces the mem-
+ory footprint of each stored basis tensor from O(d˜rd) to O(d˜rd
+sol) without altering the
+mathematical behavior or convergence of the algorithm, only the resolution at which the
+discarded basis tensors are retained. In our experiments we set psol = rsol, doubling the
+retained resolution relative to the target solution rank. Moreover, as discussed above, the
+sketching required to solve the least-squares problem arises naturally as a byproduct of
+the MLN sketching phase, and therefore does not require the construction of additional
+sketching operators. Finally, unlike RHOSVD-Tucker GMRES, the sketch is applied to the
+exact operator application rather than to a truncated approximation, resulting in a more
+faithful representation of the projected residual, and does not introduce a mismatch with
+the truncated basis that may, in principle, affect the accuracy of the solution.
+Memory comparison.
+We compare the memory required by the solvers, focusing on the
+dominant contributions: the stored Krylov basis tensors in Tucker format and, where
+applicable, their sketched representations. Auxiliary quantities are negligible in comparison
+and are omitted from the following estimates. For the RHOSVD-based methods, the rank ri
+of the i-th basis tensor is not fixed but is instead estimated adaptively by the effective-rank
+heuristic within RoundSum (Section 3.1), and can vary, typically growing, across iterations;
+we denote by rmax = maxi ri its worst-case value over the run.
+• RHOSVD-Tucker GMRES: stores all k basis tensors ⇒O
+ Pk
+i=1(dnri + rd
+i )
+
+=
+O(k(dnrmax + rd
+max)).
+• RHOSVD-Tucker sGMRES: stores all k basis tensors ⇒O
+ Pk
+i=1(dnri + rd
+i )
+
+=
+O(k(dnrmax + rd
+max)).
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+13
+Algorithm 6: MLN-Tucker sGMRES
+Input
+: Linear operator L ; Tucker tensor B; target rank r; tolerance tol; sketched
+correction factor η; max iterations Nmax; truncation window ktrunc;
+save_memory flag, if True do an additional truncation of the sketches based on
+rsol, psol, and ˜rsol = rsol + psol
+Output: Approximate solution in Tucker format eX, such that ∥L ( eX) −B∥F ≤tol
+1 β ←∥B∥F
+2 V1 ←B/β
+3 Generate Gaussian matrices {Ψk}d
+k=1, with Ψk ∈Rnk×r
+4
+h
+G(1)
+Ψ , {F (1)
+Ψk}d
+k=1, bs
+i
+←MLN_Sketch
+ {V1}, {Ψk}d
+k=1
+
+5 βs ←∥bs∥2
+6 M ←[ ]
+// initialization for SAV k
+7 for i ←1 to Nmax do
+8
+W ←Vi
+9
+
+GΨ,W, {F Ψk,W}d
+k=1, sW
+
+←MLN_Sketch
+ L (W), {Ψk}d
+k=1
+
+10
+M ←[M, sW]
+11
+W ←MLN_Recovery
+ GΨ,W, {F Ψk,W}d
+k=1, {Ψk}d
+k=1
+
+12
+for j ←max(1, i −ktrunc + 1) to i do
+13
+hj,i ←⟨Vj, W⟩
+14
+
+GΨ,W, {F Ψk,W}d
+k=1
+
+←
+MLN_Sum
+
+{GΨ,W, G(j)
+Ψ },
+
+{F Ψk,W}d
+k=1, {F (j)
+Ψk}d
+k=1
+	
+, {1, −hj,i}
+
+15
+end
+16
+if ∥W∥F ≈0 then
+17
+break
+18
+end
+19
+Vi+1 ←W/∥W∥F
+20
+h
+G(i+1)
+Ψ
+, {F (i+1)
+Ψk
+}d
+k=1
+i
+←MLN_Sketch
+ {Vi+1}, {Ψk}d
+k=1
+
+21
+if i > ktrunc then
+22
+Delete Vi−ktrunc from memory
+// keep local orthogonality window
+23
+if save_memory then
+24
+G(i−ktrunc)
+Ψ
+= G(i−ktrunc)
+Ψ
+(1 : ˜rsol, . . . , 1 : ˜rsol) and
+F (i−ktrunc)
+Ψk
+= F (i−ktrunc)
+Ψk
+(:, 1 : rsol) for every k = 1, . . . , d
+25
+end
+26
+end
+27
+yi ←arg miny ∥My −bs∥2 (+λ∥y∥2
+2 if regularization is needed)
+28
+resi ←∥Myi −bs∥2/βs
+// Sketched relative residual
+29
+if resi < η · tol then
+30
+break
+31
+end
+32 end
+33 if save_memory then
+34
+for j = i −ktrunc + 1, . . . , i do
+35
+G(j)
+Ψ = G(j)
+Ψ (1 : ˜rsol, . . . , 1 : ˜rsol) and F (j)
+Ψk = F (j)
+Ψk(:, 1 : rsol) for k = 1, . . . , d
+36
+end
+37 end
+38
+h
+Gsol
+Ψ , {F sol
+Ψk}d
+k=1
+i
+←MLN_Sum
+
+{G(m)
+Ψ }i
+m=1,
+
+{F (m)
+Ψk }d
+k=1
+	i
+m=1, yi
+
+39 eX ←MLN_Recovery
+ Gsol
+Ψ , {F sol
+Ψk}d
+k=1, {Ψk}d
+k=1
+
+40 return eX
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+14
+Algorithm 3: MLN_Sketch
+Input
+: Tucker tensors
+{X (j) = G(j) ×d
+k=1 U (j)
+k }N
+j=1,
+sketches {Ψk}d
+k=1
+Output: Cores {G(j)
+Ψ }N
+j=1,
+factors {{F (j)
+Ψk}d
+k=1}N
+j=1,
+(optional) diag(GΨ)
+1 for j ←1 to N do
+2
+for k ←1 to d do
+3
+U (j)
+Ψk ←Ψ⊤
+k U (j)
+k
+4
+U
+(j)
+Ψk ←1st rk rows of U (j)
+Ψk
+5
+end
+6
+G(j)
+Ψ ←G(j) ×d
+k=1 U (j)
+Ψk
+7
+for k ←1 to d do
+8
+T ←MTTKRP
+ G(j), {U
+(j)
+Ψℓ}ℓ, k
+
+F (j)
+Ψk ←U (j)
+k T
+9
+end
+10 end
+11 return {G(j)
+Ψ }N
+j=1, {{F (j)
+Ψk}d
+k=1}N
+j=1,
+(optional) diag(GΨ)
+Algorithm 4: MLN_Sum
+Input
+: Cores {G(j)
+Ψ }N
+j=1, factors
+{{F (j)
+Ψk}d
+k=1}N
+j=1, coeffs.
+{cj}N
+j=1
+Output: Core GΨ, factors {F Ψk}d
+k=1
+1 GΨ ←PN
+j=1 cjG(j)
+Ψ
+2 for k ←1 to d do
+3
+F Ψk ←PN
+j=1 cjF (j)
+Ψk
+4 end
+5 return GΨ, {F Ψk}d
+k=1
+Algorithm 5: MLN_Recovery
+Input
+: Core GΨ, factors {F Ψk}d
+k=1,
+sketches {Ψk}d
+k=1
+Output: Core eG, factors { eU k}d
+k=1
+1 for k ←1 to d do
+2
+Qk, Rk ←qr(Ψ⊤
+k F Ψk)
+// Econ
+QR
+3
+eU k ←F ΨkR†
+k
+4 end
+5 eG ←GΨ ×d
+k=1 Q⊤
+k
+6 return eG, { eU k}d
+k=1
+• MLN-Tucker sGMRES: stores only ktrunc basis tensors and their sketched rep-
+resentations ⇒O(ktrunc(dnr + rd) + k · d˜rd), where the second term accounts for
+the accumulated sketched cores and factors retained for the final solution assembly.
+Unlike the RHOSVD-based methods, here r (and hence ˜r = r + p) is fixed a priori
+by construction rather than estimated, so this bound is exact rather than a worst
+case. Note that ˜r is always slightly larger than r, so this term can exceed the cost of
+storing the basis tensors themselves.
+• MLN-Tucker sGMRES (memory efficient): stores only ktrunc basis tensors and
+downsampled sketches (Equation (22)) ⇒O(ktrunc(dnr + rd) + k · d ˜rd
+sol).
+Since ˜rsol ≤˜r, and typically ˜rsol ≪˜r whenever the solution is itself numerically low-rank,
+the memory efficient variant reduces the accumulated sketch cost substantially relative to
+the standard one; combined with ktrunc ≪k, this yields the largest overall memory reduc-
+tion among the four variants, and is the key advantage enabling MLN-Tucker sGMRES to
+reach higher Krylov-basis ranks or run for more iterations under a fixed memory budget.
+In contrast, because rmax for the RHOSVD-based methods is only known a posteriori and
+tends to grow with the iteration count, their memory footprint is comparatively harder to
+predict or bound in advance.
+3.4 Preconditioning
+Assume that M is an operator among tensor spaces of order and size compatible with
+L .
+Applying M to a Krylov basis tensor Vk causes rank growth in the multilinear
+rank of the resulting tensor meaning we have to do some form of truncation T to keep
+computational tractability. Therefore the preconditioned state at step k is actually given
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+15
+by Zk = T (M (Vk)) where the projection defined by T depends on the input tensor
+M (Vk).
+As such it is clear that the preconditioning operator Mk(·) := T (M (·)) is
+nonlinear and changes in every iteration, thus we use the flexible GMRES (FGMRES)
+procedure [67]. The only two variations from Algorithms 1 and 2 are that we now save the
+preconditioned Zk = Mk(Vk) before applying L directly, and update eX directly within
+the preconditioned space as eX ←RoundSum
+Pk
+i=1 yiZi
+
+, thus bypassing the non-linear
+issues from the truncation step. Similarly in Algorithm 6 we store and operate only with
+the core tensors G(i)
+Ψ,Z and the factor matrices {F (i)
+Ψk,Z}d
+k=1. A well-known preconditioning
+operator for PDEs results from an approximation of the inverse of the Laplacian operator,
+defined as
+∆d = ∆1 ⊗I ⊗· · · ⊗I + I ⊗∆1 ⊗· · · ⊗I + · · · + I ⊗· · · ⊗I ⊗∆1
+(23)
+where I is the identity matrix, and ∆1 is the (n + 1 × n + 1) discretized 1-dimensional
+Laplacian over a grid of step size h = 1/n, i.e., ∆1 = (n + 1)2tridiag(−1, 2, −1). In [33],
+the authors prove that the approximation of the inverse of the d-dimensional Laplacian
+can be expressed as
+∆−1
+d
+=
+q
+X
+h=−q
+ch exp(th∆1) ⊗· · · ⊗exp(th∆1)
+(24)
+where ch = ηth, th = exp(hη), η = π/√q. The action of this operator can be efficiently
+computed via spectral decomposition. Let V and Λ denote the eigenvectors and eigenvalues
+of ∆1. Then
+exp(th∆1) ⊗· · · ⊗exp(th∆1) = V exp
+ th(Λ ⊕· · · ⊕Λ)
+
+V −1,
+(25)
+where V = V ⊗· · · ⊗V , see [27,39]. For a Tucker tensor X = C ×d
+k=1 U k, the transfor-
+mations V −1X and V X reduce to applying the discrete sine transform of type I (DST-I)
+and its inverse to the factor matrices U k yielding an efficient implementation of the pre-
+conditioner.
+4 Numerical Experiments
+The reported numerical experiments in this section were performed with computational
+resources provided by Advanced Research Computing (ARC) at Virginia Tech (see acknowl-
+edgments) using a system with 128 GB of RAM running Linux (5.14.0-687.26.1.el9_8.x86_64)
+with MATLAB 25.2.0.2998904 (R2025b). The source codes, data, and results of the nu-
+merical experiments reported in this section are available at [14].
+We consider three test problems and compare the proposed RHOSVD-Tucker sGMRES
+and MLN-Tucker sGMRES methods with standard low-rank solvers, including RHOSVD-
+Tucker GMRES and, in the symmetric case, the Subspace Gradient Descent method in
+Tucker format (TK-SS-SD)[40]. Firstly we test on the preconditioned heat equation us-
+ing the Laplacian preconditioner described in Section 3.4 which typically favors methods
+that exploit symmetry, such as conjugate gradient variants, due to their short recurrences
+and low memory requirements, while GMRES is disadvantaged by its long recurrences.
+Secondly we consider a 3D convection-diffusion equation wherein we break the symmetry
+of the Laplacian operator and introduce a convection term, increasing the sensitivity of
+Krylov methods to orthogonalization. We do not, however, precondition this example,
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+16
+Table 1: Laplacian example: CPU time in seconds, algorithm iteration count, and true
+relative residual at convergence for differing tolerance levels.
+Tol: 10−3
+Tol: 10−5
+Tol: 10−7
+Method
+Time (Iter) True Res. Time (Iter) True Res. Time (Iter) True Res.
+TK-SS-SD
+0.1233 (2)
+9.99 · 10−4
+2.2878 (6)
+8.28 · 10−6
+94.4715 (16)
+8.91 · 10−8
+RHOSVD-Tucker GMRES
+0.1871 (5)
+5.22 · 10−4
+0.4987 (7)
+8.54 · 10−6
+11.572 (15)
+9.80 · 10−8
+RHOSVD-Tucker sGMRES
+0.1582 (5)
+5.79 · 10−4
+0.8225 (10)
+3.31 · 10−6
+8.9353 (14)
+9.44 · 10−8
+MLN-Tucker sGMRES
+0.0769 (5)
+5.32 · 10−4
+0.5017 (10)
+3.04 · 10−6
+7.594 (20)
+9.43 · 10−8
+MLN-Tucker sGMRES (Memory Efficient)
+0.0763 (5)
+5.32 · 10−4
+0.5017 (10)
+4.43 · 10−6
+7.6131 (20)
+3.28 · 10−7
+so that we may test the effect of a larger number of iterations on the solvers where pre-
+conditioners may not be available. Finally, we consider an inverse problem arising from
+image deblurring. By constructing a low-rank approximation to the right hand side we are
+able to compute a solution to the inverse problem which usually is intractable. While this
+truncation introduces an additional source of error, it also acts as a regularizer which we
+demonstrate.
+4.1 Laplacian
+The first problem we consider is a classical Poisson equation of the form −∆u = f where
+u is a function defined on a 3D domain, i.e., u := u(x, y, z). Discretizing it with a central
+finite-difference scheme, we obtain a tensor equation of the form (1) where the operator
+L corresponds to ∆3 defined in Equation (23) with d = 3. The right-hand is obtained
+by discretizing f and is represented in separable form as f = v1 ⊗v2 ⊗v3, where v1 is
+the normalized vector of all ones, and v2, v3 are the first canonical basis vectors. The
+chosen grid size is n = 1000. We focus on preconditioned iterations and use exponential
+sum preconditioners tailored to the structure of (23), described in Section 3.4. In Table 1,
+we report the solvers’ convergence at different accuracy values 10−3, 10−5, 10−7. For the
+three tolerances, we set the TK-SS-SD maximum ranks to 10, 20, and 30 with truncation
+tolerance of 10−12. For the sketched solvers, we set the Nyström sketching ranks to 10,
+25, and 40 with standard oversampling parameters of p = 10, 25, and 40, respectively,
+yielding ˜r = 20, 50, 80. For the memory-efficient MLN variant, we restrict ˜rsol = 20, 40, 60
+to be made up of rsol = psol = 10, 20, 30. Additionally, we choose the GMRES truncation
+index of ktrunc = 1, the sketching p-rank equal to 5, the sketching tolerance multiplier
+ηsketch = 0.4.
+In the low and medium accuracy setting, the convergence time of the GMRES variants
+is comparable to the TK-SS-SD. In the high accuracy case, the GMRES algorithms out-
+perform the SS-SD solver, which was originally designed for a low-to-medium accuracy
+setting. The small accuracy drop in the memory efficient version demonstrates that some-
+times you have to be careful choosing what rank to truncate the stored sketches to for
+reconstruction. Here we have chosen too small a reconstruction rank to demonstrate that
+such an accuracy drop can happen. Nonetheless, all methods in the finer tolerance scheme
+perform very well.
+4.2 Convection-diffusion
+We consider a 3D convection-diffusion equation of the form −∇· (κ∇u) + v · ∇u = f
+defined on the unit cube domain [0, 1]3.
+The non-symmetric convection term yields a
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+17
+non-self-adjoint operator, altering the spectral properties of the system and increasing
+the sensitivity of Krylov methods to the orthogonalization strategy, making it a good
+benchmark in tandem with Section 3.4. Using the Kronecker sum structure, the discrete
+operator L in (1) takes the separable form
+L = L1 ⊗I ⊗I + I ⊗L1 ⊗I + I ⊗I ⊗L1,
+(26)
+where L1 = κ∆1 + ω∇1 ∈Rn×n is the 1D discrete convection-diffusion operator, with
+ω the uniform scalar constant velocity in any single direction from v.
+Here, ∆1 =
+1
+h2 tridiag(−1, 2, −1) represents the 1D discrete negative Laplacian, and ∇1 is the backward
+difference matrix resulting from an upwind convection scheme, represented by subdiago-
+nals [−1, 0] with values [−1/h, 1/h]. We set the coefficients to κ = 10−2 and ω = 5 × 10−2.
+The right-hand side is a rank-1 tensor constructed as B = a1 ⊗b1 ⊗c1, where a1 = e/∥e∥2
+(with e being the vector of all ones), and b1 = c1 = e1/∥e1∥2 are normalized standard
+basis vectors. The chosen grid size is n = 1000. For this benchmark, we target a relative
+residual tolerance of 5 × 10−6 over a maximum of 120 iterations. We set the Nyström
+target rank to 60 with a standard oversampling p = 180. For the memory-efficient MLN
+variant, we use rsol = psol = 25 yielding ˜rsol = 50, a significant reduction in stored sketch
+dimension for the cores. Additionally, we choose a Khatri-Rao sketching p-rank equal to
+5 and a sketching tolerance multiplier ηsketch = 0.3. For the main convergence compari-
+son Figure 1a, the GMRES truncation index is fixed at ktrunc = 2; however, to analyze the
+sensitivity of the short recurrences to the non-symmetric convection term Figure 1b, we
+also evaluate the RHOSVD-Tucker sGMRES method across an orthogonalization window
+of ktrunc ∈{1, 2, 3}.
+Here we compare our proposed methods against standard RHOSVD-Tucker GMRES
+on the unpreconditioned system, demonstrating not only true residual convergence of the
+proposed methods with times and iteration count, but also the effect of increasing ktrunc
+in Algorithms 2 and 6 in the short recurrence. Our results in Figure 1b empirically demon-
+strate that using ktrunc = 2 is a good choice, and that under this choice the methods’ true
+residuals converge in Figure 1a. However, the higher iteration count here compared to the
+preconditioned Laplacian in Section 3.4 causes some issues. Namely, the faster accumula-
+tion of rank in RHOSVD-Tucker GMRES causes a slower run time compared to its sketched
+counterparts as seen in Table 2. Although RHOSVD-Tucker sGMRES outperforms in solve
+time, it does not show true residual convergence, namely premature convergence, so η = 0.3
+may not be strong enough here. The extra 3 iterations here would yield similar timings
+therefore to the MLN methods that do reach desired tolerance. Importantly, in the large
+iteration scheme we have successfully saved the memory in the memory efficient version
+by only storing the reconstruction sketches according to ˜rsol = 50 rather than ˜r = 240, a
+significant improvement. The memory efficient method nicely follows the true residual of
+the full MLN method closely, converging in the same number of iterations, and yielding a
+similar solve time.
+4.3 Image Deblurring
+Our third example addresses a large-scale inverse problem arising from three-dimensional
+image deblurring. Unlike the PDE-driven problems of the previous sections, inverse prob-
+lems are characterized by the presence of noise in the observed data and the severe
+ill-conditioning of the forward operator L , whose singular values decay gradually to
+zero [34, 36].
+As a consequence, naively solving (1) strongly amplifies the noise, and
+classical iterative methods exhibit semi-convergence: the reconstruction error first de-
+creases as dominant spectral components are captured, then increases as high-frequency
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+18
+0
+20
+40
+60
+80
+100
+100
+10−2
+10−4
+Iteration
+True Residual
+RHOSVD GMRES
+RHOSVD sGMRES
+MLN sGMRES
+MLN sGMRES
+(Memory Efficient)
+(a) True residual comparison
+0
+20
+40
+60
+80
+100
+100
+10−2
+10−4
+10−6
+Iteration
+True Residual
+k_trunc = 1
+k_trunc = 2
+k_trunc = 3
+(b) Effect of ktrunc on RHOSVD sGMRES
+Figure 1: Convergence profiles for the unpreconditioned 3D convection-diffusion problem.
+(a) True residual histories comparing the proposed MLN and RHOSVD sketched
+solvers against the full-orthogonalization baseline. (b) Influence of the partial
+orthogonalization window ktrunc on RHOSVD-Tucker sGMRES, demonstrating
+residual stagnation for ktrunc = 1 and robust convergence for ktrunc ≥2.
+Table 2: Performance summary for the unpreconditioned 3D convection-diffusion problem,
+comparing execution time, final true residual with target tolerance 5 × 10−5, and
+iteration count across the proposed and baseline Tucker-GMRES variants.
+Method
+k_trunc
+Solve Time (s)
+True Res.
+Iter.
+RHOSVD-Tucker sGMRES
+2
+13.06
+5.09 · 10−5
+97
+MLN-Tucker sGMRES
+2
+25.47
+4.21 · 10−5
+100
+MLN-Tucker sGMRES (Memory Efficient)
+2
+24.98
+4.88 · 10−5
+100
+RHOSVD-Tucker GMRES
+-
+57.41
+4.80 · 10−5
+83
+noise contaminates the approximation [34,36]. Regularization is therefore essential to ob-
+tain a stable reconstruction of the unknown X true. To assess reconstruction quality when
+the true solution is available, we use the relative reconstruction error (RRE), defined as
+∥X k −X true∥F/∥X true∥F where X k denotes the reconstructed solution at iteration k.
+When nd = 1, i.e., a single two-dimensional image, the blurring operator can be rep-
+resented as a matrix A ∈RN×N with N = n1n2, and hybrid projection methods that
+embed regularization within the Krylov iteration. Methods such as hybrid GMRES [29]
+have proven effective [21,34]. However, when nd ≫1 (e.g., a video sequence), the vector-
+ized system has dimension N = n1n2nd, and storing the full Arnoldi basis and the dense
+right-hand side becomes prohibitively expensive. Working entirely in the Tucker format
+offers a path to tractability: it reduces storage from O(N) to O(P
+k nkrk + Q
+k rk), and,
+as we demonstrate below, low-rank compression of the data acts as an implicit form of
+regularization.
+We consider a ground truth tensor X true ∈R128×128×64 given by a synthetic hollow
+bars phantom inspired by the EPFL DeconvolutionLab benchmark [10,45]. It contains six
+hollow cylindrical bars arranged on a 3 × 2 grid with outer radius 8 and inner radius 4
+pixels. Each bar has an axial intensity taper so that it smoothly vanishes near the top
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+19
+(a)
+(b)
+(c)
+Figure 2: Image deblurring problem. (a) Ground truth at time instance nd = 31 (128×128
+pixels).(b) PSF (15 × 15 pixels) (c) Blurred and noisy image.
+and bottom of the temporal slices. At the volume center the phantom contains a small
+spherical bead of radius 5 and a thin planar membrane at the mid-y plane. All intensities
+are normalized to [0, 1]. The true image at time instance 31 is shown in Figure 2a. The
+widefield point-spread function (PSF), displayed in Figure 2b, is modeled as a separable
+product of three one-dimensional Gaussians,
+h(i, j, k) = h1(i) h2(j) h3(k)
+where:
+h1(t) = h2(t) =
+1
+Zxy
+exp
+
+−t2
+2σ2xy
+
+h3(t) = 1
+Zz
+exp
+
+−t2
+2σ2z
+
+with σxy = 1.5 pixels (lateral), σz = 3.5 pixels (axial), and Zxy, Zz are normalization
+constants ensuring each kernel sums to one. Each 1-D kernel is embedded into an nk ×
+nk Toeplitz-like blurring matrix Ak, k = 1, 2, 3, with reflective (Neumann) boundary
+conditions. The blurred, simulated tensor is then obtained via successive mode-k products,
+Ytrue = X true ×1 A1 ×2 A2 ×3 A3. In vectorized form this reads
+vec(Ytrue) = (A3 ⊗A2 ⊗A1)
+|
+{z
+}
+A ∈RN×N
+vec(X true).
+where N = n1n2n3. The Kronecker structure of A is exploited so that the matrix is never
+formed explicitly; its action on a vector (or, equivalently, on a Tucker tensor) is evaluated
+through sequential mode-k multiplications with A1, A2, and A3. Gaussian noise is added
+at a controlled level such that
+Y = Ytrue + δ ∥Ytrue∥F
+∥η∥F
+η,
+η ∼N(0, I),
+where δ = 0.05 is the noise level and I denoting the identity covariance matrix.
+The
+blurred and noisy image at time frame 31 is shown in
+Figure 2c. The effectiveness of
+the Tucker format hinges on the data being compressible, i.e., admitting accurate low
+multilinear rank approximations.
+In an idealized noiseless setting, the data L (X true)
+would be exactly low-rank, meaning that storage and computation scale with the small
+multilinear ranks (r1, r2, r3) rather than the full tensor dimensions n1 × n2 × n3 an enor-
+mous reduction in both memory and computational cost. In practice, measurements are
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+20
+0
+50
+100
+10−178
+10−114
+10−50
+1014
+Index
+σi/σ1
+0
+50
+100
+10−3
+10−2
+10−1
+100
+Index
+σi/σ1
+mode-1
+mode-2
+mode-3
+Figure 3: Normalized singular values σi
+σ1 of the mode-k unfoldings (k = 1, 2, 3) of the ground
+truth X true (left) and the noisy blurred data Y (right). The rapid decay across
+all modes illustrates the low multilinear rank structure exploited by the Tucker-
+based solvers.
+corrupted by noise, so the observed data Y are only approximately low-rank. Neverthe-
+less, the underlying low-dimensional structure persists: the singular values of the mode-k
+unfoldings still decay rapidly, as shown in
+Figure 3 for both X true and Y, confirming
+that a low-rank Tucker approximation captures the essential information while discard-
+ing noise-dominated components. The price of noise is modest: we must retain slightly
+larger ranks than in the exact case to obtain an accurate approximation.
+We exploit
+this property by compressing the right-hand side Y via a truncated HOSVD with toler-
+ance τouter, yielding a Tucker tensor B = JG; U 1, U 2, U 3K of multilinear rank (r1, r2, r3)
+satisfying ∥Y −B∥F ≤τouter∥Y∥F. This compression introduces an additional perturba-
+tion to the right-hand side. Since Y = L (X true) + η, the compressed tensor B satisfies
+L (X) = B,
+B = L (X true) + η + ηtrunc, where η is the measurement noise and
+ηtrunc = B −Y is the truncation error introduced by the HOSVD compression, satisfying
+∥ηtrunc∥F ≤τouter∥Y∥F. For moderate tolerances τouter, this truncation error is small rel-
+ative to the measurement noise, and because the HOSVD discards components associated
+with the smallest singular values, the compression preferentially removes high-frequency
+noise rather than signal. As a result, the low-rank compression has a regularizing effect,
+suppressing noise before the iterative solver begins. To the best of our knowledge, this
+work is the first to leverage tensor data compression as an implicit regularization mech-
+anism within the iterative solution of inverse problems. To illustrate this effect, we run
+the MLN-Tucker sGMRES method for 100 iterations with three compression tolerances,
+tol = 0.01, 0.03, 0.05, and display the RRE versus iteration count in Figure 4. The results
+show that tighter compression tolerances retain more noise in the right-hand side and lead
+to earlier onset of semi-convergence, whereas a coarser tolerance (tol = 0.05) effectively
+suppresses high-frequency noise components and yields a monotonically decreasing RRE,
+confirming the regularizing role of the truncation.
+A key benefit of performing all computations entirely in Tucker format is the substantial
+reduction in memory requirements. Storing the full dense tensor Y ∈R128×128×64 requires
+N = 1,048,576 floating-point numbers. By contrast, with tol = 0.05 we obtain a Tucker
+tensor B = JG; U 1, U 2, U 3K of multilinear rank (80, 57, 3), which requires storing only
+31,408 floating-point numbers.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+21
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+0.3
+0.4
+0.5
+0.6
+Iteration
+RRE
+tol = 0.05
+tol = 0.03
+tol = 0.01
+Figure 4: RRE history showing the effect of varying the RHS compression tolerance on the
+MLN-Tucker sGMRES method.
+Although compression of the right-hand side already provides implicit regularization,
+the severe ill-conditioning of the blurring operator L [34] may require additional explicit
+regularization to fully suppress noise amplification. To this end, we propose an adaptive
+projected Tikhonov regularization step directly inside the GMRES iteration, following the
+hybrid projection approach of [21,29] that we describe below.
+Projected Tikhonov for RHOSVD-Tucker GMRES. In the deterministic Tucker GM-
+RES setting (Algorithm 1), the Arnoldi process produces the relation L (Vk) = Vk+1Hk,
+where Hk ∈R(k+1)×k is upper Hessenberg and V1, . . . , Vk+1 are Tucker tensors that
+are orthonormal in the Frobenius inner product, i.e., ⟨Vi, Vj⟩F = δij, where δij denotes
+the Kronecker delta. In the GMRES algorithm, the coefficient vector yk is obtained by
+minimizing ∥Hky −βe1∥2 (cf. (9)). For ill-posed problems this least-squares solution is
+dominated by noise, so we replace it with the Tikhonov-regularized projected problem
+y(λ)
+k
+= argmin
+y∈Rk
+Hky −βe1
+2
+2 + λ2
+k∥y∥2
+2.
+(27)
+Following the hybrid projection framework [34], regularization is applied to the small k ×k
+projected system rather than to the original N × N problem, making the selection of the
+regularization parameter λk computationally inexpensive. The approximate tensor solution
+at iteration k is then assembled as X k = RoundSum
+Pk
+i=1(yk)i Vi
+
+.
+Projected Tikhonov for the sketched variants.
+For the sketched methods (RHOSVD-
+Tucker sGMRES and MLN-Tucker sGMRES), the Hessenberg matrix is not available
+because the basis is only partially orthogonalised.
+Instead, both algorithms maintain
+a sketch matrix M k ∈Rs×k whose i-th column is the sketch of L (Vi), i.e. M k =
+[S vec(L (V1)), . . . , S vec(L (Vk))], where S is the Khatri–Rao sketching operator. The
+regularised projected problem becomes
+y(λ)
+k
+= argmin
+y∈Rk
+M ky −S vec(B)
+2
+2 + λ2
+k∥y∥2
+2.
+(28)
+For MLN-Tucker sGMRES, the sketch S vec(L (Vi)) is obtained without additional cost
+by extracting the diagonal of the Kronecker-sketched core tensor already computed during
+the Nyström compression step (see Section 3.3).
+In both cases, we follow an adaptive approach where the regularization parameter λk is
+selected independently at each iteration via generalized cross validation (GCV) [30]. Fig-
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+22
+ure 4(a) displays the RRE over 100 iterations. Figure 4(b) illustrates the effect of compres-
+sion and regularization. It is clear that in the absence of regularization and compression,
+the error propagates into the computed solution leading to semiconvergence.
+Figure 6(a)–(c) shows the reconstructions obtained by the unregularised RHOSVD GM-
+RES, RHOSVD sGMRES, and MLN sGMRES methods, while Figure 6(d)–(f) displays the
+corresponding reconstructions when right-hand side compression and GCV regularization
+are applied.
+0
+20
+40
+60
+80
+100
+0.2
+0.4
+0.6
+0.8
+1
+Iteration
+RRE
+(a) No compression, no regularization
+0
+20
+40
+60
+80
+100
+0.3
+0.4
+0.5
+Iteration
+RRE
+(b) Compression and regularization
+MLN sGMRES
+MLN sGMRES (Memory Efficient)
+RHOSVD sGMRES
+RHOSVD GMRES
+Figure 5: Convergence histories comparing RRE across the unregularised and regularised
+setups. All variants truncated at ktrunc = 2.
+5 Conclusions
+We have presented two novel randomized iterative solvers, namely, the RHOSVD-Tucker
+sGMRES and the MLN-Tucker sGMRES for large-scale tensor equations expressed as a
+sum of separable operators. Both methods operate entirely in the Tucker format, and work
+by combining sketched GMRES and randomized compression.
+RHOSVD-Tucker sGMRES extends Khatri–Rao sketching with adaptive rank estimation
+and replaces full Arnoldi orthogonalization with a short-recurrence partial orthogonaliza-
+tion that controls the multilinear ranks of the basis tensors. In contrast, MLN-Tucker
+sGMRES leverages a single-pass and streamable multilinear Nyström approximation: by
+fixing the rank a priori and discarding basis tensors after sketching, it avoids storing the
+full Krylov basis and, under low-rank assumption in the solution, allows to operate in
+compressed sketch spaces, leading to substantial savings in memory. Moreover, the cost is
+reduced as the Khatri–Rao sketch required by sGMRES is obtained as a by-product of the
+Nyström compression.
+Numerical experiments on representative 3D problems, including Poisson and convection-
+diffusion equations, as well as an image deblurring inverse problem, show that the proposed
+methods achieve accurate solutions while reducing memory usage and computational ef-
+fort by orders of magnitude compared to dense approaches. For the deblurring problem,
+compressing the data into Tucker format serves a dual purpose: it makes an otherwise in-
+tractable large-scale problem computationally accessible, and, combined with an adaptive
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+23
+(a)
+(b)
+(c)
+(d)
+(e)
+(f)
+(g)
+(h)
+Figure 6: Image deblurring reconstructions. Top row: unregularised (a) RHOSVD sGM-
+RES, (b) MLN sGMRES, (c) MLN sGMRES (save_memory), (d) RHOSVD
+GMRES. Bottom row: compressed RHS + GCV regularization (e) RHOSVD
+sGMRES, (f) MLN sGMRES, (g) MLN sGMRES (save_memory), (h) RHOSVD
+GMRES.
+projected Tikhonov penalty selected via GCV, acts as an implicit regularizer that yields
+stable reconstructions without prior knowledge of the noise level. To our knowledge, this is
+the first work to exploit compressed tensor decompositions as both a regularization mech-
+anism and an enabler of tractable computation within iterative Krylov solvers for inverse
+problems.
+Acknowledgments
+MP acknowledges support from the National Science Foundation (NSF) under Grant No.
+DMS-2410699. Any opinions, findings, conclusions, or recommendations expressed in this
+material are those of the authors and do not necessarily reflect the views of the National
+Science Foundation. RS and MP acknowledge Advanced Research Computing at Virginia
+Tech for providing computational resources and technical support that have contributed
+to the results reported within this paper. URL: https://arc.vt.edu/. RS, MP, and AB ac-
+knowledge support from the NSF under Grant No. DMS-1929284 while the authors were in
+residence at the Institute for Computational and Experimental Research in Mathematics
+in Providence, RI, during the Stochastic and Randomized Algorithms in Scientific Com-
+puting: Foundations and Applications semester program, where preliminary discussions of
+this work took place.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+24
+References
+[1] Salman Ahmadi-Asl, Stanislav Abukhovich, Maame G. Asante-Mensah, Andrzej Ci-
+chocki, Anh Huy Phan, Tohishisa Tanaka, and Ivan Oseledets. Randomized algo-
+rithms for computation of Tucker decomposition and higher order SVD (HOSVD).
+IEEE Access, 9:28684–28706, 2021. doi:10.1109/ACCESS.2021.3058103.
+[2] Taimoor Ahmed, Hassan Raja, and Waheed U. Bajwa. Tensor regression using low-
+rank and sparse Tucker decompositions. SIAM Journal on Mathematics of Data Sci-
+ence, 2(4):981–1011, 2020. doi:10.1137/19M1299335.
+[3] Hussam Al Daas, Grey Ballard, Paul Cazeaux, Eric Hallman, Agnieszka Międlar, Mir-
+jeta Pasha, Tim W. Reid, and Arvind K. Saibaba. Randomized algorithms for round-
+ing in the tensor-train format. SIAM Journal on Scientific Computing, 45(1):A74–A95,
+2023. doi:10.1137/21M1451191.
+[4] Hussam Al Daas, Grey Ballard, Laura Grigori, Mariana Martinez Aguilar, Arvind K.
+Saibaba, and Bhisham Dev Verma. Adaptive randomized tensor train rounding using
+Khatri-Rao products, 2025. arXiv:2511.03598.
+[5] Markus Bachmayr. Low-rank tensor methods for partial differential equations. Acta
+Numerica, 32:1–121, 2023. doi:10.1017/S0962492922000125.
+[6] Oleg Balabanov and Laura Grigori. Randomized Gram–Schmidt process with applica-
+tion to GMRES. SIAM Journal on Scientific Computing, 44(3):A1450–A1474, 2022.
+doi:10.1137/20M138870X.
+[7] Jonas Ballani and Lars Grasedyck.
+A projection method to solve linear systems
+in tensor format.
+Numerical Linear Algebra with Applications, 20(1):27–43, 2013.
+doi:10.1002/nla.1818.
+[8] Grey Ballard and Tamara Gibson Kolda. Tensor Decompositions for Data Science.
+Cambridge University Press, 2025. doi:10.1017/9781009471664.
+[9] Kim Batselier. Constructing structured tensor priors for Bayesian inverse problems,
+2024. arXiv:2406.17597.
+[10] Biomedical Imaging Group, EPFL. Synthetic hollow bars 3D deconvolution dataset.
+URL: https://bigwww.epfl.ch/deconvolution/bars/.
+[11] Mark A. Brown and Richard C. Semelka. MRI: Basic principles and applications.
+John Wiley & Sons, 2011.
+[12] Alberto Bucci, Silvia Gazzola, and Leonardo Robol. Randomized flexible LSQR and
+LSMR with applications to inverse problems, 2026. arXiv:2605.22281.
+[13] Alberto Bucci and Behnam Hashemi. A sequential multilinear Nyström algorithm for
+streaming low-rank approximation of tensors in tucker format. Applied Mathematics
+Letters, 159:109271, 2025. doi:10.1016/j.aml.2024.109271.
+[14] Alberto Bucci, Martina Iannacito, Mirjeta Pasha, and Rudi Smith. Code, data and
+results for numerical experiments in “Randomized Tucker-sketched GMRES” (version
+1.0), August 2026. doi:10.5281/zenodo.19074856.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+25
+[15] Alberto Bucci, Davide Palitta, and Leonardo Robol.
+Randomized sketched TT-
+GMRES for linear systems with tensor structure. SIAM Journal on Scientific Com-
+puting, 47(5):A2801–A2827, 2025. doi:10.1137/24M1694999.
+[16] Alberto Bucci and Leonardo Robol. A multilinear Nyström algorithm for low-rank
+approximation of tensors in Tucker format. SIAM Journal on Matrix Analysis and
+Applications, 45(4):1929–1953, 2024. doi:10.1137/23M1599343.
+[17] Alberto Bucci and Gianfranco Verzella. Randomized Algorithms for Streaming Low-
+Rank Approximation in Tree Tensor Network Format. Numerical Linear Algebra with
+Applications, 2026. doi:10.1002/nla.70107.
+[18] Tan Bui-Thanh, Omar Ghattas, James Martin, and Georg Stadler. A computational
+framework for infinite-dimensional Bayesian inverse problems Part I: The linearized
+case, with application to global seismic inversion. SIAM Journal on Scientific Com-
+puting, 35(6):A2494–A2523, 2013. doi:10.1137/12089586X.
+[19] Tan Bui-Thanh, Omar Ghattas, James Martin, and Georg Stadler. A computational
+framework for infinite-dimensional Bayesian inverse problems, Part II: Stochastic
+PDE-constrained inference.
+SIAM Journal on Scientific Computing, 35(6):A2833–
+A2854, 2013. doi:10.1137/130934805.
+[20] Liam Burke and Stefan Güttel. Krylov subspace recycling with randomized sketching
+for matrix functions. SIAM Journal on Matrix Analysis and Applications, 45(4):1540–
+1562, 2024. doi:10.1137/23M1595904.
+[21] Daniela Calvetti, Gene H. Golub, and Lothar Reichel.
+Estimation of the L-curve
+via Lanczos bidiagonalization.
+BIT Numerical Mathematics, 39(4):603–619, 1999.
+doi:10.1023/A:1022383005969.
+[22] Chris Camaño, Ethan N. Epperly, Raphael A. Meyer, and Joel A. Tropp. Faster linear
+algebra algorithms with structured random matrices, 2025. arXiv:2508.21189.
+[23] J. Douglas Carroll and Jih-Jie Chang. Analysis of individual differences in multi-
+dimensional scaling via an N-way generalization of “Eckart-Young” decomposition.
+Psychometrika, 35(3):283–319, 1970. doi:10.1007/BF02310791.
+[24] Maolin Che and Yimin Wei.
+Randomized algorithms for the approximations of
+Tucker and the tensor train decompositions. Advances in Computational Mathematics,
+45(1):395–428, 2019. doi:10.1007/s10444-018-9622-8.
+[25] Maolin Che, Yimin Wei, and Hong Yan. An efficient randomized algorithm for comput-
+ing the approximate Tucker decomposition. Journal of Scientific Computing, 88(2):32,
+2021. doi:10.1007/s10915-021-01545-5.
+[26] Lieven De Lathauwer, Bart De Moor, and Joos Vandewalle. A multilinear singular
+value decomposition. SIAM Journal on Matrix Analysis and Applications, 21(4):1253–
+1278, 2000. doi:10.1137/S0895479896305696.
+[27] S. V. Dolgov. TT-GMRES: solution to a linear system in the structured tensor format.
+Russian Journal of Numerical Analysis and Mathematical Modelling, 28(2):149–172,
+2013. doi:10.1515/rnam-2013-0009.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+26
+[28] Wandi Dong, Gaohang Yu, Liqun Qi, and Xiaohao Cai. Practical sketching algorithms
+for low-rank Tucker approximation of large tensors. Journal of Scientific Computing,
+95(2):52, 2023. doi:10.1007/s10915-023-02172-y.
+[29] Silvia Gazzola, Paolo Novati, and Maria Rosaria Russo.
+On Krylov projection
+methods and Tikhonov regularization. Electronic Transactions on Numerical Analy-
+sis, 44:83–123, 2015. URL: http://emis.icm.edu.pl/journals/ETNA/vol.44.2015/
+pp83-123.dir/pp83-123.pdf.
+[30] Gene H. Golub, Michael Heath, and Grace Wahba. Generalized cross-validation as
+a method for choosing a good ridge parameter. Technometrics, 21(2):215–223, 1979.
+doi:10.1080/00401706.1979.10489751.
+[31] Lars Grasedyck. Hierarchical singular value decomposition of tensors. SIAM Jour-
+nal on Matrix Analysis and Applications, 31(4):2029–2054, 2010.
+doi:10.1137/
+090764189.
+[32] Lars Grasedyck, Daniel Kressner, and Christine Tobler. A literature survey of low-
+rank tensor approximation techniques. GAMM-Mitteilungen, 36(1):53–78, 2013. doi:
+10.1002/gamm.201310004.
+[33] W. Hackbusch and B. N. Khoromskij. Low-rank Kronecker-product approximation to
+multi-dimensional nonlocal operators. Part II. HKT representation of certain opera-
+tors. Computing, 76(3):203–225, January 2006. doi:10.1007/s00607-005-0145-z.
+[34] Per Christian Hansen. Discrete Inverse Problems: Insight and Algorithms, volume 7
+of Fundamentals of Algorithms.
+SIAM, Philadelphia, PA, 2010.
+doi:10.1137/1.
+9780898718836.
+[35] Per Christian Hansen, Jakob Jørgensen, and William R. B. Lionheart.
+Computed
+tomography: algorithms, insight, and just enough theory. SIAM, 2021. doi:10.1137/
+1.9781611976670.
+[36] Per Christian Hansen, James G. Nagy, and Dianne P. O’Leary. Deblurring images:
+matrices, spectra, and filtering. SIAM, 2006. doi:10.1137/1.9780898718874.
+[37] Richard A. Harshman.
+Foundations of the PARAFAC procedure:
+Models and
+conditions for an “explanatory” multi-modal factor analysis.
+UCLA Working Pa-
+pers in Phonetics, 16:1–84, 1970.
+University Microfilms, Ann Arbor, Michigan,
+No. 10,085.
+URL: https://three-mode.leidenuniv.nl/bibliogr/harshmanra_
+thesis/harshman1970_uclawpp.pdf.
+[38] Behnam Hashemi and Yuji Nakatsukasa. RTSMS: Randomized Tucker with single-
+mode sketching. Electronic Transactions on Numerical Analysis, 63:247–280, 2025.
+doi:10.1553/etna_vol63s247.
+[39] Nicholas J. Higham.
+Functions of Matrices - Theory and Computation.
+SIAM,
+Philadelphia, USA, 2008. doi:10.1137/1.9780898717778.
+[40] Martina Iannacito, Lorenzo Piccinini, and Valeria Simoncini. Subspace gradient de-
+scent method for linear tensor equations, 2026. arXiv:2602.21974.
+[41] Martina Iannacito, Sascha Portaro, Davide Palitta, Claudio Arlandini, and Domitilla
+Brandoni. A practical mode-parallel implementation of the (h-)tucker decomposition
+via randomization, 2026. arXiv:2603.21379.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+27
+[42] Sahidul Islam, Andreas Mang, and Maxim Olshanskii. Tensor-based reduced-order
+modeling for optimization-based inverse problems, 2026. arXiv:2607.12613.
+[43] Venera Khoromskaia and Boris N. Khoromskij. Tensor numerical methods in quantum
+chemistry. Walter de Gruyter GmbH & Co KG, 2018. doi:10.1515/9783110365832.
+[44] Boris N. Khoromskij. Tensor numerical methods for multidimensional PDEs: theo-
+retical analysis and initial applications. ESAIM: Proceedings and Surveys, 48:1–28,
+2015. doi:10.1051/proc/201448001.
+[45] Hagai Kirshner, Franois Aguet, Daniel Sage, and Michael Unser. 3-D PSF fitting
+for fluorescence microscopy: implementation and localization application. Journal of
+Microscopy, 249(1):13–25, 2013. doi:10.1111/j.1365-2818.2012.03675.x.
+[46] Tamara G. Kolda and Brett W. Bader. Tensor decompositions and applications. SIAM
+Review, 51(3):455–500, 2009. doi:10.1137/07070111X.
+[47] Daniel Kressner and Christine Tobler. Krylov subspace methods for linear systems
+with tensor product structure. SIAM Journal on Matrix Analysis and Applications,
+32(4):1288–1316, 2011. doi:10.1137/100799010.
+[48] Daniel Kressner, Bart Vandereycken, and Rik Voorhaar.
+Streaming tensor train
+approximation. SIAM Journal on Scientific Computing, 45(5):A2610–A2631, 2023.
+doi:10.1137/22M1515045.
+[49] Shiwei Lan, Mirjeta Pasha, Shay Li, and Weining Shen. Spatiotemporal Besov priors
+for Bayesian inverse problems. Journal of the American Statistical Association, 2025.
+doi:10.1080/01621459.2025.2560688.
+[50] Jonathan Lindbloom, Mirjeta Pasha, Jan Glaubitz, and Youssef Marzouk. Priorcon-
+ditioned sparsity-promoting projection methods for deterministic and Bayesian linear
+inverse problems, 2025. arXiv:2505.01827.
+[51] Eric F. Lock. Tensor-on-tensor regression. Journal of Computational and Graphical
+Statistics, 27(3):638–647, 2018. doi:10.1080/10618600.2017.1401544.
+[52] Per-Gunnar Martinsson and Joel A. Tropp. Randomized numerical linear algebra:
+Foundations and algorithms.
+Acta Numerica, 29:403–572, 2020.
+doi:10.1017/
+S0962492920000021.
+[53] Shixu Meng, Daniel Appelö, and Yingda Cheng. Preconditioning low rank generalized
+minimal residual method (GMRES) for implicit discretizations of matrix differential
+equations. SIAM Journal on Matrix Analysis and Applications, 46(4):2475–2500, 2025.
+doi:10.1137/24M1701216.
+[54] Rachel Minster, Zitong Li, and Grey Ballard. Parallel randomized Tucker decompo-
+sition algorithms. SIAM Journal on Scientific Computing, 46(2):A1186–A1213, 2024.
+doi:10.1137/22M1540363.
+[55] Rachel Minster, Arvind K. Saibaba, and Misha E. Kilmer. Randomized algorithms for
+low-rank tensor decompositions in the Tucker format. SIAM Journal on Mathematics
+of Data Science, 2(1):189–215, 2020. doi:10.1137/19M1261043.
+[56] Ronald B. Morgan. GMRES with deflated restarting. SIAM Journal on Scientific
+Computing, 24(1):20–37, 2002. doi:10.1137/S1064827599364659.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+28
+[57] Riley Murray, James Demmel, Michael W. Mahoney, N. Benjamin Erichson, Maksim
+Melnichenko, Osman Asif Malik, Laura Grigori, Piotr Luszczek, Michał Dereziński,
+Miles E. Lopes, et al. Randomized numerical linear algebra: A perspective on the
+field with an eye to software, 2023. arXiv:2302.11474.
+[58] Yuji Nakatsukasa and Joel A. Tropp. Fast and accurate randomized algorithms for
+linear systems and eigenvalue problems. SIAM Journal on Matrix Analysis and Ap-
+plications, 45(2):1183–1214, 2024. doi:10.1137/23M1565413.
+[59] Toluwani Okunola, Mirjeta Pasha, Misha Kilmer, and Melina Freitag. Efficient dy-
+namic image reconstruction with motion estimation, 2025. arXiv:2501.12497.
+[60] Ivan V. Oseledets. Breaking the curse of dimensionality, or how to use SVD in many
+dimensions. SIAM Journal on Scientific Computing, 31(5):3744–3759, 2009. doi:
+10.1137/090748330.
+[61] Ivan V. Oseledets. Tensor-train decomposition. SIAM Journal on Scientific Comput-
+ing, 33(5):2295–2317, 2011. doi:10.1137/090752286.
+[62] Christopher C. Paige, Miroslav Rozlozník, and Zdenvek Strakos.
+Modified Gram-
+Schmidt (MGS), least squares, and backward stability of MGS-GMRES.
+SIAM
+Journal on Matrix Analysis and Applications, 28(1):264–284, 2006.
+doi:10.1137/
+050630416.
+[63] Mirjeta Pasha, Eric de Sturler, and Misha E. Kilmer. Recycling MMGKS for large-
+scale dynamic and streaming data, 2023. arXiv:2309.15759.
+[64] Mirjeta Pasha, Silvia Gazzola, Connor Sanderford, Ugochukwu O. Ugwu, Jonathan
+Lindbloom, and Toluwani Okunola.
+TRIPs-Py:
+Techniques for Regularization
+of Inverse Problems in Python.
+Numerical Algorithms, 2024.
+doi:10.1007/
+s11075-024-01878-w.
+[65] Mirjeta Pasha, Arvind K. Saibaba, Silvia Gazzola, Malena I. Español, and Eric de
+Sturler. A computational framework for edge-preserving regularization in dynamic
+inverse problems. Electronic Transactions on Numerical Analysis, 58:486–516, 2023.
+doi:10.1553/etna_vol58s486.
+[66] Katherine J. Pearce and Per-Gunnar Martinsson. Randomized algorithms for low-rank
+matrix and tensor decompositions, 2025. arXiv:2512.05286.
+[67] Youcef Saad. A flexible inner-outer preconditioned GMRES algorithm. SIAM Journal
+on Scientific Computing, 14(2):461–469, 1993. doi:10.1137/0914028.
+[68] Youcef Saad and Martin H. Schultz.
+GMRES: A generalized minimal residual al-
+gorithm for solving nonsymmetric linear systems. SIAM Journal on Scientific and
+Statistical Computing, 7(3):856–869, 1986. doi:10.1137/0907058.
+[69] Yousef Saad. Iterative Methods for Sparse Linear Systems. Society for Industrial and
+Applied Mathematics, second edition, 2003. doi:10.1137/1.9780898718003.
+[70] Oguz Semerci, Ning Hao, Misha E. Kilmer, and Eric L. Miller. Tensor-based formu-
+lation and nuclear norm regularization for multienergy computed tomography. IEEE
+Transactions on Image Processing, 23(4):1678–1693, 2014. doi:10.1109/TIP.2014.
+2305840.
+Preprint.
+2026-08-12
+
+
+A. Bucci, M. Iannacito, M. Pasha, R. Smith: Randomized Tucker Sketched GMRES
+29
+[71] Valeria Simoncini and Daniel B. Szyld. Theory of inexact Krylov subspace methods
+and applications to scientific computing.
+SIAM Journal on Scientific Computing,
+25(2):454–477, 2003. doi:10.1137/S1064827502406415.
+[72] Rudi Smith, Mirjeta Pasha, Andrés Galindo-Olarte, Hussam Al Daas, Grey Ballard,
+Joseph Nakao, Jing-Mei Qiu, and William Taitano. Efficient sketching-based summa-
+tion of Tucker tensors, 2026. arXiv:2603.13532.
+[73] Yiming Sun, Yang Guo, Charlene Luo, Joel Tropp, and Madeleine Udell. Low-rank
+Tucker approximation of a tensor from streaming data. SIAM Journal on Mathematics
+of Data Science, 2(4):1123–1150, 2020. doi:10.1137/19M1257718.
+[74] Ledyard R. Tucker. Some mathematical notes on three-mode factor analysis. Psy-
+chometrika, 31(3):279–311, 1966. doi:10.1007/BF02289464.
+[75] Nick Vannieuwenhoven, Raf Vandebril, and Karl Meerbergen. A new truncation strat-
+egy for the higher-order singular value decomposition. SIAM Journal on Scientific
+Computing, 34(2):A1027–A1052, 2012. doi:10.1137/110836067.
+[76] David P. Woodruff. Sketching as a tool for numerical linear algebra. Foundations
+and Trends® in Theoretical Computer Science, 10(1–2):1–157, 2014. URL: https:
+//www.cs.cmu.edu/afs/cs/user/dwoodruf/www/wNow3.pdf.
+Preprint.
+2026-08-12

@@ -1,0 +1,130 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-15T20:00:37.300211+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.10488v1",
+      "source": "arxiv",
+      "title": "Tensor-normal maximum likelihood estimation at the operator-norm sample threshold",
+      "abstract": "Let $X_1,\\ldots,X_n$ be independent Gaussian tensors in $\\mathbb{R}^{d_1}\\otimes\\cdots\\otimes\\mathbb{R}^{d_k}$ whose covariance is a Kronecker product of $k$ unknown positive-definite factors, and put $D=\\prod_{a=1}^k d_a$ and $d_{\\max}=\\max_a d_a$. A recent result of Franks et al. (2026) established condition-number-free nonasymptotic guarantees for the tensor-normal maximum likelihood estimator under the sample threshold $nD\\gtrsim k^2 d_{\\max}^3$. They asked whether the cubic dependence on $d_{\\max}$ could be replaced by the operator-norm scale $d_{\\max}^2$. We answer this question affirmatively. We prove that, for $t\\geq 1$, the maximum likelihood estimator exists uniquely with high probability whenever $nD\\geq Ck^2 d_{\\max}^2 t^2$, and satisfies $d_{\\mathrm{FR}}(\\widehatΘ,Θ)\\leq Ct\\sqrt{k}\\,d_{\\max}/\\sqrt{n}$ and $d_{\\mathrm{FR}}(\\widehatΘ_a,Θ_a)\\leq Ct\\sqrt{k d_a}\\,d_{\\max}/\\sqrt{nD}$. For every mode of largest dimension, we also obtain the sharp Thompson bound $d_{\\mathrm{op}}(\\widehatΘ_a,Θ_a)\\leq Ct\\,d_{\\max}/\\sqrt{nD}$. No sparsity, condition-number bound or warm start is assumed. For fixed $k$, the threshold has the information-theoretically optimal dependence on $d_{\\max}$, and the displayed rates for the full precision and the largest factor match Gaussian minimax lower bounds up to a factor $\\sqrt{k}$. The proof extends a random Gram bound for local group-orbit directions to the full local Lie algebra, transports it to a fixed Thompson ball by exact conjugation, and combines sensitivity of a constrained maximum likelihood estimator with an equivariant Kirszbraun extension and Gaussian concentration. This removes the Frobenius-to-operator loss responsible for the previous extra factor $d_{\\max}$ and resolves the explicit open problem posed in the earlier work.",
+      "authors": [
+        "Hengzhi He",
+        "Guang Cheng"
+      ],
+      "primary_category": "math.ST",
+      "categories": [
+        "math.ST",
+        "stat.ML"
+      ],
+      "published": "2026-08-11T05:03:38+00:00",
+      "link": "https://arxiv.org/pdf/2608.10488v1",
+      "tags": [
+        "keyword:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Tensor-normal MLE theory for high-dimensional tensor estimation and recovery.",
+      "llm_evidence_cn": "张量正态最大似然估计理论，适用于高维张量数据恢复。",
+      "llm_evidence": "张量正态最大似然估计理论，适用于高维张量数据恢复。",
+      "canonical_evidence": "张量正态最大似然估计理论，适用于高维张量数据恢复。",
+      "llm_tldr_en": "This paper tightens sample complexity for tensor-normal MLE from cubic to quadratic in max dimension, proving uniqueness at the operator-norm threshold, benefiting high-dimensional tensor recovery theory.",
+      "llm_tldr_cn": "张量正态模型广泛用于高维张量数据恢复，但现有最大似然估计的样本复杂度含d_max^3项，不够最优。本文证明在算子范数阈值nD≥Ck² d_max² t²下，极大似然估计以高概率存在且唯一，将d_max的指数从3降到2。这一理论结果为高维张量恢复算法的样本需求提供了更紧的界，对后续方法设计有指导意义。",
+      "llm_tldr": "张量正态模型广泛用于高维张量数据恢复，但现有最大似然估计的样本复杂度含d_max^3项，不够最优。本文证明在算子范数阈值nD≥Ck² d_max² t²下，极大似然估计以高概率存在且唯一，将d_max的指数从3降到2。这一理论结果为高维张量恢复算法的样本需求提供了更紧的界，对后续方法设计有指导意义。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.11091v1",
+      "source": "arxiv",
+      "title": "Randomized Tucker-Sketched GMRES",
+      "abstract": "We address the problem of solving large-scale tensor-structured linear systems in the Tucker format. In this setting, standard iterative solvers such as GMRES face a fundamental bottleneck: the multilinear ranks of the Krylov basis vectors grow with the iteration count, leading to rapidly increasing tensor operation costs and memory requirements. To overcome these challenges, we propose two randomized algorithms within the sketched GMRES framework that replace full Arnoldi orthogonalization with short recurrences. The first, RHOSVD-Tucker sGMRES, uses randomized HOSVD with per-iteration rank selection, providing robustness across a wide range of problems. The second method, MLN-Tucker sGMRES, leverages the multilinear Nyström approximation with a fixed rank, enabling streaming computations; the streamability of the approximation further allows, at no additional cost, a memory-efficient reconstruction of the solution from a compact sketched representation of the Krylov basis. Both methods outperform standard low-rank Tucker solvers in symmetric and non-symmetric settings. Applied to inverse problems, the low-rank Tucker constraint acts as an implicit regularizer; combined with adaptive projected Tikhonov penalization and automatic regularization parameter selection, the methods yield stable reconstructions.",
+      "authors": [
+        "Alberto Bucci",
+        "Martina Iannacito",
+        "Mirjeta Pasha",
+        "Rudi Smith"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-08-11T15:59:45+00:00",
+      "link": "https://arxiv.org/pdf/2608.11091v1",
+      "tags": [
+        "keyword:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Randomized iterative solvers for Tucker-structured tensor linear systems, supporting tensor recovery computations.",
+      "llm_evidence_cn": "求解Tucker格式张量线性系统的随机迭代方法，可支撑张量恢复计算。",
+      "llm_evidence": "求解Tucker格式张量线性系统的随机迭代方法，可支撑张量恢复计算。",
+      "canonical_evidence": "求解Tucker格式张量线性系统的随机迭代方法，可支撑张量恢复计算。",
+      "llm_tldr_en": "Randomized Tucker-sketched GMRES variants replace full orthogonalization with short recurrences, mitigating rank growth in Krylov bases for efficient large-scale tensor-structured linear solves.",
+      "llm_tldr_cn": "大规模Tucker格式张量线性系统在GMRES迭代中会遇到Krylov基秩增长带来的高成本。本文提出随机草图GMRES框架，用随机HOSVD或多线性Nyström近似构造短递推，避免完全Arnoldi正交化。两种算法分别支持逐次秩选择与固定秩流式计算，在多种问题上提供鲁棒的效率和内存优势，对张量恢复等数值任务有实用价值。",
+      "llm_tldr": "大规模Tucker格式张量线性系统在GMRES迭代中会遇到Krylov基秩增长带来的高成本。本文提出随机草图GMRES框架，用随机HOSVD或多线性Nyström近似构造短递推，避免完全Arnoldi正交化。两种算法分别支持逐次秩选择与固定秩流式计算，在多种问题上提供鲁棒的效率和内存优势，对张量恢复等数值任务有实用价值。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "high-dimensional tensor data recovery for hyperspectral images",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.11518v1",
+      "source": "arxiv",
+      "title": "New Orthogonal Multiwavelet Filters Derived by Matrix Spectral Factorization",
+      "abstract": "The paper considers the construction of two new orthogonal multiwavelets with supercompact support by using the Fast Bauer's method for matrix spectral factorization on the matrix product filter of the orthogonal CL multiwavelet filter. The new multiwavelets possess orthogonality, symmetry/antisymmetry, and one of them provides better coding and smoothness than other supercompact multiwavelets.   The performance of the new multiwavelet filters in subband-based edge detection, grayscale and color image compression and 1D and 2D signal denoising is compared with the GHM, SA4, CL, Integer Haar and Alpert multifilters. The comparative analysis shows that new multiwavelets can provides better human visual measures, SSIM and MS-SSIM in image compression and denoising applications.",
+      "authors": [
+        "Vasil Kolev",
+        "Todor Cooklev",
+        "Fritz Keinert"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.DB",
+        "math.NA",
+        "stat.AP"
+      ],
+      "published": "2026-08-12T00:13:35+00:00",
+      "link": "https://arxiv.org/pdf/2608.11518v1",
+      "tags": [
+        "keyword:hsi-denoise",
+        "query:hsi-denoise"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "new orthogonal multiwavelet filters with explicit 1D/2D signal denoising evaluation, transferable to image denoising methods",
+      "llm_evidence_cn": "新多小波滤波器用于图像与信号去噪，可迁移到高光谱图像去噪",
+      "llm_evidence": "新多小波滤波器用于图像与信号去噪，可迁移到高光谱图像去噪",
+      "canonical_evidence": "新多小波滤波器用于图像与信号去噪，可迁移到高光谱图像去噪",
+      "llm_tldr_en": "Constructs new orthogonal multiwavelet filters via matrix spectral factorization and evaluates them for edge detection, image compression, and 1D/2D signal denoising, showing improved SSIM and visual quality.",
+      "llm_tldr_cn": "针对超紧支撑多小波滤波器的构造与去噪性能问题，本文利用快速Bauer矩阵谱分解方法构造了两类新的正交多小波滤波器，具有正交、对称/反对称特性。在子带边缘检测、图像压缩以及一维/二维信号去噪实验中，新滤波器相比GHM、SA4、CL等基准在SSIM和人类视觉质量上表现更优。该滤波器为图像和信号去噪提供了可迁移的高质量工具。",
+      "llm_tldr": "针对超紧支撑多小波滤波器的构造与去噪性能问题，本文利用快速Bauer矩阵谱分解方法构造了两类新的正交多小波滤波器，具有正交、对称/反对称特性。在子带边缘检测、图像压缩以及一维/二维信号去噪实验中，新滤波器相比GHM、SA4、CL等基准在SSIM和人类视觉质量上表现更优。该滤波器为图像和信号去噪提供了可迁移的高质量工具。",
+      "llm_tags": [
+        "query:hsi-denoise"
+      ],
+      "matched_query_tag": "query:hsi-denoise",
+      "matched_query_text": "hyperspectral image denoising methods",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,1265 @@
+Tensor-normal maximum likelihood estimation at
+the operator-norm sample threshold
+By Hengzhi He and Guang Cheng
+Department of Statistics and Data Science, University of California, Los Angeles
+hengzhihe@g.ucla.edu; guangcheng@stat.ucla.edu
+Summary
+Let X1, . . . , Xn be independent Gaussian tensors in Rd1 ⊗· · · ⊗Rdk whose covariance
+is a Kronecker product of k unknown positive-definite factors, and put D = Qk
+a=1 da and
+dmax = maxa da. A recent result of Franks et al. (2026) established condition-number-free
+nonasymptotic guarantees for the tensor-normal maximum likelihood estimator under
+the sample threshold nD ≳k2d3
+max. They asked whether the cubic dependence on dmax
+could be replaced by the operator-norm scale d2
+max. We answer this question affirmatively.
+We prove that, for t ≥1, the maximum likelihood estimator exists uniquely with high
+probability whenever nD ≥Ck2d2
+maxt2, and satisfies
+dFR(bΘ, Θ) ≤Ct
+√
+k dmax/√n,
+dFR(bΘa, Θa) ≤Ct
+p
+kda dmax/
+√
+nD.
+For every mode of largest dimension, we also obtain the sharp Thompson bound
+dop(bΘa, Θa) ≤Ctdmax/
+√
+nD. No sparsity, condition-number bound or warm start is
+assumed. For fixed k, the threshold has the information-theoretically optimal dependence
+on dmax, and the displayed rates for the full precision and the largest factor match
+Gaussian minimax lower bounds up to a factor
+√
+k. The proof extends a random Gram
+bound for local group-orbit directions to the full local Lie algebra, transports it to a
+fixed Thompson ball by exact conjugation, and combines sensitivity of a constrained
+maximum likelihood estimator with an equivariant Kirszbraun extension and Gaussian
+concentration. This removes the Frobenius-to-operator loss responsible for the previous
+extra factor dmax and resolves the explicit open problem posed in the earlier work.
+The proof was developed with substantial assistance from GPT-5.6 and Claude Fable
+5, and was manually checked by the authors.
+Some key words: geodesic convexity; Kronecker covariance; maximum likelihood; operator norm; tensor
+normal model
+1.
+Introduction
+For tensor-valued observations, an unrestricted covariance matrix has dimension D × D,
+where D = Qk
+a=1 da can be much larger than the sample size. The tensor-normal model
+imposes the separable structure
+Xi ∼N (0, Σ1 ⊗· · · ⊗Σk) ,
+i = 1, . . . , n,
+(1.1)
+where Σa ∈PD(da). This structure makes likelihood inference possible in regimes in
+which ordinary covariance estimation is hopeless. The maximum likelihood estimator
+is attractive because it is equivariant, requires no tuning parameter and is computable
+arXiv:2608.10488v1  [math.ST]  11 Aug 2026
+
+
+by the classical flip-flop iteration (Dutilleul, 1999). Its finite-sample behavior is subtle,
+however: the likelihood need not be bounded, the maximum need not exist or be unique,
+and a naive Euclidean analysis introduces condition-number dependence.
+The almost-sure existence and uniqueness problem has been studied through matrix
+pencils, quiver representations and geometric invariant theory (Drton et al., 2021; Derksen
+& Makam, 2021; Derksen et al., 2022). These works give exact, format-dependent algebraic
+classifications, but do not provide nonasymptotic localization or estimation error bounds
+for the MLE. A different line of work studies alternative estimators and asymptotic
+geometry; see, for example, McCormack & Hoff (2025) and Drton et al. (2024).
+The direct predecessor of the present paper is Franks et al. (2026). Using the affine-
+invariant geometry of positive definite matrices and expansion of random completely
+positive maps, they proved condition-number-free guarantees for the tensor-normal MLE.
+If dmax = maxa da, their tensor result requires
+nD ≳k2d3
+max.
+(1.2)
+Under this condition the MLE exists uniquely and achieves nearly sharp Fisher–Rao error
+rates. Their Section 6 identifies as the main open question whether (1.2) can be weakened
+to
+nD ≳k2d2
+max.
+(1.3)
+The distinction is statistical rather than cosmetic. The cubic scale is the one at which
+constant Frobenius error becomes possible for the largest factor, whereas the quadratic
+scale is the natural threshold for constant operator-norm error. For a balanced third-order
+tensor, the improvement allows one sample once the mode dimension is sufficiently large.
+We prove that (1.3) suffices, while retaining the same Fisher–Rao error bounds. The
+result is uniform over the true Kronecker factors and assumes neither bounded condition
+number nor sparsity. For k = 2, it also yields the natural threshold n ≳dmax/dmin without
+the logarithmic factors in the earlier matrix-normal sufficient condition; Corollary 1 also
+gives factorwise Thompson-metric guarantees without those logarithmic factors. Our
+main motivation is the open problem for k ≥3.
+The proof uses the random-matrix estimate of Franks et al. (2026), itself based on work
+of Pisier (2012, 2014), but the localization argument is different from scaling-flow analyses.
+The recent ∞-expansion method of Lau & Ramachandran (2025) obtains optimal bounds
+for Tyler’s M-estimator and points to tensor-normal estimation as a possible application.
+A direct use of that framework would require uniform control of operator-norm errors
+along a scaling trajectory. Such a uniform contraction is unavailable for the pairwise
+completely positive maps arising here. To see the obstruction, even if Φ is balanced and has
+Kraus rank N, then for a unit vector u the matrix Φ∗(uuT ) is supported on a subspace of
+dimension at most N; a traceless matrix that is nearly constant on this support witnesses
+an ℓ∞contraction coefficient tending to one when N/d →0. An ∞-expansion approach
+would therefore have to exploit the particular data-dependent trajectory rather than
+arbitrary operator-norm directions. Our proof avoids a scaling-flow argument: it uses
+two-sided Hilbert-space control of the likelihood and concentration of the constrained,
+data-dependent optimizer.
+There is also a substantial literature on robust covariance estimation under structural
+constraints. Convexly constrained and relaxed versions of Tyler’s estimator were stud-
+ied by Soloveychik & Wiesel (2014), while Sun et al. (2016) treated general structural
+constraints, including a Kronecker model, through majorization–minimization. Those
+
+
+works target elliptical or heavy-tailed distributions and emphasize robustness and compu-
+tation. In contrast, our theorem concerns the unregularized Gaussian Kronecker MLE
+and gives condition-number-free, nonasymptotic localization at a dimension-dependent
+sample threshold. Spherical Tyler samples retain orthogonal invariance, but the Euclidean
+Gaussian Lipschitz concentration used after our equivariant-centering step does not ap-
+ply verbatim to normalized heavy-tailed observations. The localization principle could
+nevertheless extend to other smooth Gaussian models generated by group actions; a
+robust extension would additionally require an analogue of the full-Lie Gram bound and
+suitable control of the loss sensitivity together with a replacement for Gaussian Lipschitz
+concentration.
+1.1.
+Contributions and proof strategy
+The proof has four ingredients.
+First, Theorem C.1 in the supplementary material to Franks et al. (2026) is stated on
+the entire traceless matrix space, even though their final Hessian statement is restricted
+to symmetric tangents. Retaining this stronger event gives a well-conditioned Gram form
+on the full local Lie algebra
+R ⊕
+k
+M
+a=1
+Mat0(da; R).
+Second, a statistical tangent at a nonidentity point becomes nonsymmetric after conjuga-
+tion. The full-Lie bound therefore transports exactly to a fixed Thompson ball, with only
+a constant factor loss and no dependence on k or the dimensions.
+Third, we minimize the likelihood over that fixed ball. Uniform lower and upper Hessian
+bounds imply that this constrained optimizer is O((nD)−1/2)-Lipschitz as a function
+of the stacked data. Fourth, the logarithm of each determinant-normalized factor is a
+Hilbert-valued Lipschitz map on the good data set. Kirszbraun extension followed by
+averaging over the local orthogonal group produces a globally defined, exactly centered
+equivariant map. Gaussian concentration and a sphere net then localize every factor
+directly in operator norm. The constrained optimizer lies strictly inside the ball and hence
+equals the unconstrained MLE.
+The information-theoretic comparison is also clean. If all nuisance factors are known,
+estimating a factor of dimension da reduces to ordinary Gaussian precision estimation
+from nD/da samples. Thus constant operator accuracy for the largest factor requires
+nD = Ω(d2
+max). Our threshold is consequently optimal in its dependence on dmax for fixed
+k. We do not claim optimal dependence on k, an exact algebraic existence threshold, or
+flip-flop convergence at the improved sample size.
+2.
+Model, geometry and main result
+2.1.
+Likelihood and canonical factors
+Throughout, PD(d) denotes the cone of real d × d positive-definite matrices,
+Sym0(d) = {A ∈Rd×d : A = AT , tr A = 0},
+Mat0(d; R) = {A ∈Rd×d : tr A = 0}.
+It is convenient to parameterize by the precision factors Θa = Σ−1
+a . Let
+P = {Θ1 ⊗· · · ⊗Θk : Θa ∈PD(da)} .
+
+
+The factors are identifiable only up to reciprocal scalings. We use the canonical convention
+that (det Θa)1/da is the same for every a. Set
+D =
+k
+Y
+a=1
+da,
+M = nD,
+ρx = 1
+M
+n
+X
+i=1
+xixT
+i .
+Up to an irrelevant additive and multiplicative constant, the negative log-likelihood is
+fx(Θ) = tr(ρxΘ) −1
+D log det Θ,
+Θ ∈P.
+(2.1)
+Whenever the minimizer exists uniquely, it is denoted by bΘ = N
+a bΘa.
+For an operator A on N
+a Rda and a set of modes J, let A(J) be its partial trace,
+characterized by
+tr{A(J)H} = tr{AH(J)},
+(2.2)
+where H(J) acts as H on the modes in J and as the identity on the remaining modes. We
+abbreviate A(a) and A(ab).
+2.2.
+Affine-invariant coordinates
+At the identity, write a tangent as
+H = (h0, H1, . . . , Hk),
+Ha ∈Sym0(da),
+∥H∥2 = h2
+0 +
+X
+a
+∥Ha∥2
+F ,
+and associate the ambient generator
+KH = h0ID +
+k
+X
+a=1
+p
+da H(a)
+a .
+(2.3)
+If Θ = N
+a Θa, the corresponding exponential map is
+ExpΘ(H) = Θ1/2eKHΘ1/2
+= eh0
+k
+O
+a=1
+
+Θ1/2
+a e
+√daHaΘ1/2
+a
+
+.
+(2.4)
+Here and below the square root is the principal square root. The normalized affine-
+invariant distance d on P is chosen so that a constant-speed geodesic generated by H has
+speed ∥H∥. For positive-definite matrices A, B of the same dimension, the Fisher–Rao
+distance of the centered Gaussian model is
+dFR(A, B) =
+1
+√
+2
+log(A−1/2BA−1/2)
+
+F .
+(2.5)
+For full D × D precisions, our normalized distance is therefore
+d(Θ, Θ′) =
+r
+2
+D dFR(Θ, Θ′).
+(2.6)
+In particular, at the identity, if θ = eh0 N
+a Pa with det Pa = 1 and Fa = log Pa, then
+Ha = Fa
+√da
+,
+d(ID, θ)2 = h2
+0 +
+k
+X
+a=1
+∥Fa∥2
+F
+da
+.
+(2.7)
+
+
+For positive-definite matrices of any dimension, we use the Thompson distance
+dop(A, B) =
+log(A−1/2BA−1/2)
+
+op .
+The function (2.1) is geodesically convex on P; see Wiesel (2012) and Franks et al. (2026,
+§2.2).
+For later use, if x consists of standard Gaussian tensors, its gradient at the identity is
+∇0fx = tr ρx −1,
+∇afx =
+p
+da
+
+ρ(a)
+x
+−tr ρx
+da
+Ida
+
+.
+(2.8)
+We use the following concentration result from Proposition 2.11 of Franks et al. (2026):
+if 0 < ε < 1 and M ≥d2
+max/ε2, then, outside an event of probability at most 2(k +
+1) exp{−ε2M/(8dmax)},
+|∇0fx| ≤ε,
+∥∇afx∥op ≤
+9ε
+√da
+,
+∥∇fx∥≤
+√
+82k ε.
+(2.9)
+2.3.
+Main theorem
+Modes with da = 1 have no traceless parameter and may be removed. We state the
+theorem for da ≥2; k can always be replaced by the number of nontrivial modes.
+Theorem 1 (Tensor-normal MLE at the quadratic threshold). There are
+universal constants C, c, c′ > 0 such that the following holds. Let t ≥1, let X1, . . . , Xn
+follow (1.1), and suppose
+M = nD ≥Ck2d2
+maxt2.
+(2.10)
+For a < b, define
+pab = min
+
+
+1,
+ 
+c
+√
+M
+k(da + db)
+!−c′(da+db)/2
+
+.
+(2.11)
+Then, with probability at least
+1 −Ck exp
+
+−cM
+kdmax
+
+−
+X
+a<b
+pab −Ck exp{−ct2dmax},
+(2.12)
+the MLE exists uniquely and
+dFR(bΘ, Θ) ≤C
+√
+k dmax
+√n
+t,
+(2.13)
+dFR(bΘa, Θa) ≤C
+√kda dmax
+√
+nD
+t,
+a = 1, . . . , k,
+(2.14)
+max
+a:da=dmax dop(bΘa, Θa) ≤C dmax
+√
+nD
+t.
+(2.15)
+The factor representatives in these bounds are the canonical representatives specified in
+Section 2.1. In particular, a coarser form of the exceptional probability is
+Cke−ct2dmax + Ck2
+ 
+c
+√
+M
+kdmax
+!−c′dmin
+,
+(2.16)
+
+
+after changing universal constants.
+The same argument gives a dimension-adaptive bound for every mode. We record it
+separately because simultaneous control of small modes has a different tail probability.
+Corollary 1 (Factorwise Thompson bounds). Under the assumptions of Theo-
+rem 1, with probability at least
+1 −Ck exp
+
+−cM
+kdmax
+
+−
+X
+a<b
+pab −C
+k
+X
+a=1
+e−ct2da,
+(2.17)
+the MLE exists uniquely and, simultaneously for every a,
+dop(bΘa, Θa) ≤
+Ct
+√
+nD
+
+da + dmax
+√
+k
+
+.
+(2.18)
+For a largest mode, the additional failure probability is O(e−ct2dmax) and is absorbed by
+(2.12), giving (2.15).
+The sharper pairwise probability (2.12) is the appropriate statement if k is allowed to
+grow. For fixed k, the condition is simply n ≳d2
+max/D at constant confidence, subject of
+course to the integer constraint n ≥1.
+3.
+A full-Lie orbit Gram bound
+The central observation is that the random channel estimate used in the earlier work is
+naturally a statement on all traceless matrices. Define
+g = R ⊕
+k
+M
+a=1
+Mat0(da; R),
+∥Z∥2 = z2
+0 +
+X
+a
+∥Za∥2
+F ,
+where the Za need not be symmetric, and put
+KZ = z0ID +
+k
+X
+a=1
+p
+da Z(a)
+a ,
+Ex(Z) = 1
+M
+n
+X
+i=1
+∥KZxi∥2
+2 .
+(3.1)
+Lemma 1 (Full-Lie Gram event). Let x1, . . . , xn be independent N(0, ID) tensors.
+If M ≥Ck2d2
+max, there is an event G, invariant under Q
+a O(da), on which
+λ0 ∥Z∥2 ≤Ex(Z) ≤L0 ∥Z∥2 ,
+Z ∈g,
+(3.2)
+for universal constants 0 < λ0 < L0 < ∞. Moreover,
+P(Gc) ≤Ck exp
+
+−cM
+kdmax
+
++
+X
+a<b
+pab,
+(3.3)
+where pab is defined in (2.11). Here (U1, . . . , Uk) ∈Q
+a O(da) acts on the data by xi 7→
+(N
+a Ua)xi.
+Proof. Write q = tr ρx and
+∆a = daρ(a)
+x
+−qIda.
+
+
+Expanding (3.1) gives
+Ex(Z) = qz2
+0 + 2z0
+X
+a
+p
+da tr(ρ(a)
+x Za) +
+X
+a
+da tr(ρ(a)
+x ZT
+a Za)
++ 2
+X
+a<b
+p
+dadb tr{ρ(ab)
+x
+(ZT
+a ⊗Zb)}.
+(3.4)
+The diagonal blocks obey
+da tr(ρ(a)
+x ZT
+a Za) −q ∥Za∥2
+F
+ ≤∥∆a∥op ∥Za∥2
+F .
+(3.5)
+The scalar-to-mode block has norm ∥∆a∥F /√da.
+For a pair a < b, flatten the samples over these two modes. This produces N = M/(dadb)
+independent da × db standard Gaussian Kraus matrices A1, . . . , AN and the map
+Φab(K) = 1
+M
+N
+X
+r=1
+ArKAT
+r .
+(3.6)
+With the Frobenius inner product, the cross term in (3.4) is
+tr{ρ(ab)
+x
+(ZT
+a ⊗Zb)} =
+
+Za, Φab(ZT
+b )
+
+F .
+(3.7)
+Let Πa be orthogonal projection onto Mat0(da) and let T(K) = KT . Thus the cross block
+on traceless spaces is
+Bab =
+p
+dadb ΠaΦabTΠb.
+The transpose is an isometry and commutes with traceless projection.
+Theorem C.1 in the supplementary material to Franks et al. (2026) states that, for
+s ≥2, with failure probability at most s−c(da+db),
+
+ N
+X
+r=1
+Ar ⊗Ar
+!
+Πb
+
+op
+≤Cs2√
+N(da + db).
+(3.8)
+Importantly, (3.8) is an operator bound on the entire traceless matrix space, not only on
+symmetric matrices. Set
+s2
+ab =
+c0
+√
+M
+k(da + db).
+(3.9)
+The sample-size constant makes sab ≥2. Since N = M/(dadb), equations (3.6) and (3.8)
+yield
+∥Bab∥F→F ≤
+√dadb
+M
+Cs2
+ab
+√
+N(da + db) ≤c1
+k ,
+(3.10)
+where c1 is made arbitrarily small by choosing c0 small. The failure probability is bounded
+by (2.11), after adjusting constants.
+Fix a small numerical β > 0 and apply (2.9) with ε = β/(9
+√
+k). Outside an event of
+probability at most Ck exp{−cM/(kdmax)},
+|q −1| ≤
+β
+9
+√
+k
+,
+max
+a
+∥∆a∥op ≤β
+√
+k
+.
+(3.11)
+
+
+The prerequisite M ≥d2
+max/ε2 in (2.9) is satisfied because it is M ≥81kd2
+max/β2, which
+follows from M ≥Ck2d2
+max once the universal constant C is large enough. The block
+matrix formed by the mode-to-mode off-diagonal terms has norm at most (k −1)c1/k.
+Indeed, for a symmetric block matrix B,
+∥B∥op ≤
+(∥Bab∥op)a,b
+
+op ≤max
+a
+X
+b̸=a
+∥Bab∥op ,
+(3.12)
+which is the block Gershgorin estimate used here. The diagonal perturbation is at most
+β/
+√
+k, while the norm of the scalar-to-mode star is bounded by
+ X
+a
+∥∆a∥2
+F
+da
+!1/2
+≤
+ X
+a
+∥∆a∥2
+op
+!1/2
+≤β.
+(3.13)
+Therefore the full Gram operator differs from qI by less than a fixed constant, which
+proves (3.2) after choosing c1 and β sufficiently small.
+It remains to justify the probability statement uniformly in k. The pairwise tail is exactly
+(2.11). For completeness, split the pairs according as sab := da + db ≥A log(k + 1) or not.
+By M ≥Ck2d2
+max, the base bab = c
+√
+M/[k(da + db)] in (2.11) is at least a constant b0 > 1,
+made arbitrarily large by increasing C. Choose A so that b−c′A log(k+1)/2
+0
+≤(k + 1)−4.
+Then
+X
+sab≥A log(k+1)
+pab ≤k(k −1)
+2
+(k + 1)−4.
+(3.14)
+For the second class, the integer-sample constraint and dc ≥2 imply
+M = nD ≥D ≥dadb2k−2.
+(3.15)
+Consequently, for sab < A log(k + 1),
+bab ≥c 2(k−2)/2√dadb
+kA log(k + 1)
+≥
+c22k/2
+k log(k + 1).
+(3.16)
+Since sab ≥4, equations (2.11) and (3.16) give pab ≤e−c3k for all sufficiently large k, after
+adjusting constants, and hence
+X
+sab<A log(k+1)
+pab ≤k2e−c3k.
+(3.17)
+The finitely many bounded values of k are handled by increasing the universal sample
+constant. This proves (3.3). The event can be defined as the event that the finite-
+dimensional Gram operator has spectrum in [λ0, L0], so its invariance under the local
+orthogonal group is immediate.
+□
+4.
+Transport to a fixed Thompson ball
+For a fixed constant R > 0, define
+CR =
+
+Θ ∈P : e−RID ⪯Θ ⪯eRID
+	
+.
+(4.1)
+
+
+Choice of the radius. The radius is not a tuning parameter. From this point onward we
+fix one numerical value, say R = 1. We retain the subscript R only to display where the
+constants enter. Lemma 2 then turns the identity Gram constants into the universal
+constants λR = λ0e−3R and LR = L0e3R. In Section 6, factor logs are localized below
+R/(4k), and the sample constant in (2.10) is chosen large enough that the gradient
+displacement in (7.3) is below R/4. Thus the constrained optimizer is strictly inside CR;
+no choice of R depends on the data, the dimensions or the unknown precision.
+The set CR is closed, compact and geodesically convex. Indeed, write its canonical
+factors as Θ = eh0 N
+a Pa, with det Pa = 1. The order interval gives |h0| ≤R and κ(Pa) ≤
+κ(Θ) ≤e2R. Determinant normalization then bounds every eigenvalue of every Pa above
+and away from zero, so the canonical factors range over a compact set; closedness gives
+compactness. The Kronecker manifold is totally geodesic under the affine-invariant metric,
+and monotonicity of the weighted matrix geometric mean preserves the order interval in
+(4.1); see Wiesel (2012).
+Lemma 2 (Uniform Hessian bounds). On the event G of Lemma 1,
+λRI ⪯Hess fx(Θ) ⪯LRI,
+Θ ∈CR,
+(4.2)
+where λR = λ0e−3R and LR = L0e3R.
+Proof. Let G = Θ1/2 be the principal product square root. For a symmetric statistical
+tangent H = (h0, H1, . . . , Hk), the Hessian identity and its equivariance (Franks et al.,
+2026, Lemma 2.12 and Remark 2.13) give
+Hess fx(Θ)[H, H] = 1
+M
+n
+X
+i=1
+∥KHGxi∥2
+2 .
+(4.3)
+At the level of the product representation,
+KHG = GKZ,
+z0 = h0,
+Za = G−1
+a HaGa.
+(4.4)
+Indeed, mode by mode, H(a)
+a G = G(G−1
+a HaGa)(a); summing these identities and the scalar
+term gives (4.4). Although Ha is symmetric, Za need not be. This is the reason the Gram
+event in Lemma 1 must hold on all of Mat0(da).
+The order bound in (4.1) implies
+σ(G)2 ⊂[e−R, eR],
+κ(Ga) ≤κ(G) =
+Y
+b
+κ(Gb) ≤eR.
+(4.5)
+Consequently,
+e−2R ∥H∥2 ≤∥Z∥2 ≤e2R ∥H∥2 .
+(4.6)
+Combining (4.3), (4.4), Lemma 1, the singular-value bound on G, and (4.6) proves (4.2).
+The three exponential factors correspond respectively to multiplication by G and the
+two-sided conjugation of each tangent block.
+□
+The preceding transport is the first place where the quadratic threshold enters con-
+ceptually. A direct blockwise perturbation of the symmetric Hessian gives an additive
+bound proportional to k times the Thompson radius, forcing a shrinking neighborhood.
+Exact conjugation instead preserves a constant ball because the underlying random Gram
+estimate is available on the full Lie algebra.
+
+
+5.
+Sensitivity of a constrained maximum likelihood estimator
+For data x in G, let θx denote the minimizer of fx over CR. It exists by compactness
+and is unique by Lemma 2.
+Lemma 3 (Lipschitz solution map). For x, y ∈G,
+d(θx, θy) ≤CR
+√
+M
+∥x −y∥2 ,
+(5.1)
+where x and y denote the corresponding stacked samples in RM.
+Proof. Let d∗= d(θx, θy). Strong geodesic convexity and the variational inequality for
+a constrained minimizer give
+fx(θy) −fx(θx) ≥λR
+2 d2
+∗,
+fy(θx) −fy(θy) ≥λR
+2 d2
+∗.
+(5.2)
+To see the constrained first-order step explicitly, the directional derivative at a minimizer
+is nonnegative along every feasible geodesic in CR. Integrating the lower Hessian bound
+along the geodesic from that minimizer to the other point gives each inequality in (5.2).
+Adding these inequalities yields
+λRd2
+∗≤(fx −fy)(θy) −(fx −fy)(θx).
+(5.3)
+Let Θs, 0 ≤s ≤1, be the constant-speed geodesic between the two minimizers and
+define
+As = Θ−1/2
+s
+˙ΘsΘ−1/2
+s
+.
+If Hs is the corresponding statistical tangent, then As = KHs and the normalization in
+(2.6) gives
+1
+D tr(A2
+s) = ∥Hs∥2 = d2
+∗.
+(5.4)
+Because the log-determinant terms cancel from fx −fy, differentiation along the geodesic
+and the identity xxT −yyT = (x −y)xT + y(x −y)T give
+
+d
+ds(fx −fy)(Θs)
+ ≤1
+M
+Θ1/2
+s
+(x −y)
+
+2
+nAsΘ1/2
+s
+x
+
+2 +
+AsΘ1/2
+s
+y
+
+2
+o
+.
+(5.5)
+Here As acts block-diagonally on the stacked observations. Since the geodesic remains in
+CR,
+Θ1/2
+s
+(x −y)
+
+2 ≤eR/2 ∥x −y∥2. The upper Hessian bound gives
+1
+M
+AsΘ1/2
+s
+x
+
+2
+2 ≤LRd2
+∗,
+1
+M
+AsΘ1/2
+s
+y
+
+2
+2 ≤LRd2
+∗.
+(5.6)
+Thus
+
+d
+ds(fx −fy)(Θs)
+ ≤2eR/2√LR
+√
+M
+∥x −y∥2 d∗.
+(5.7)
+Integrating, substituting into (5.3), and cancelling d∗proves (5.1); the case d∗= 0 is
+immediate.
+□
+
+
+6.
+Equivariant operator-norm localization
+Write the canonical decomposition of a point in P as
+θ = eh0
+k
+O
+a=1
+Pa,
+det Pa = 1,
+Fa(θ) = log Pa ∈Sym0(da).
+(6.1)
+We first relate factor logs to the full affine-invariant geometry.
+Lemma 4 (Factor-log Lipschitz bound). For θ, θ′ ∈CR,
+Fa(θ) −Fa(θ′)
+
+F ≤CR
+p
+da d(θ, θ′).
+(6.2)
+Proof. The canonical factor log is recovered from the full log by
+Fa(θ) = Π0
+da
+D tr−a{log θ}
+
+,
+(6.3)
+where Π0 is traceless projection. The induced Frobenius-to-Frobenius norm of (da/D) tr−a
+equals
+p
+da/D.
+It remains to compare the full matrix logarithms. Let As be the affine-invariant geodesic
+from A to B, with velocity Vs. The order interval in (4.1) is geodesically convex, and
+along this path
+D logAs[Vs]
+
+F ≤eR ∥Vs∥F ≤e2R A−1/2
+s
+VsA−1/2
+s
+
+F .
+(6.4)
+The final norm is the constant affine-invariant speed. Integration gives
+∥log A −log B∥F ≤e2R log(A−1/2BA−1/2)
+
+F .
+(6.5)
+Combining (6.3), (6.5) and
+log(θ−1/2θ′θ−1/2)
+
+F =
+√
+D d(θ, θ′) proves the lemma.
+□
+By Lemmas 3 and 4, the map
+x 7−→Fa(θx),
+x ∈G,
+(6.6)
+is CR
+p
+da/M-Lipschitz into the Hilbert space Sym0(da). Kirszbraun’s extension theorem
+(Kirszbraun, 1934) extends it to all of RM without increasing the Lipschitz constant. Let
+eFa be one such extension and average it over the local orthogonal group:
+F a(x) =
+Z
+Q
+b O(db)
+UT
+a eFa ((⊗bUb)x) Ua dU.
+(6.7)
+Here dU denotes normalized Haar probability measure on the compact product group.
+The extension eFa is Lipschitz and hence continuous. Since the local orthogonal group is
+compact, the integrand in (6.7) is continuous and bounded, so the displayed Bochner
+integral is well defined and measurable. The event G and the constrained minimizer are
+equivariant. Hence, for x ∈G, every integrand in (6.7) equals Fa(θx), so F a agrees with
+(6.6) on G. It remains CR
+p
+da/M-Lipschitz, takes values in Sym0(da), and is globally
+equivariant.
+For standard Gaussian data, EF a(x) commutes with every orthogonal da × da matrix. It
+is therefore a scalar multiple of the identity. Since it is traceless, the expectation is exactly
+
+
+zero. For every unit vector u, the scalar map x 7→uT F a(x)u is centered and CR
+p
+da/M-
+Lipschitz. Gaussian concentration (Boucheron et al., 2013, Chapter 5) therefore implies
+P
+
+|uT Fa(θx)u| > s, x ∈G
+	
+≤2 exp
+
+−cMs2
+da
+
+.
+(6.8)
+No exceptional-set bias appears: concentration is applied to the global averaged extension,
+which is exactly centered, and the extension equals the optimizer map on G.
+Let Na be a 1/4-net of the unit sphere with |Na| ≤9da. For symmetric A, ∥A∥op ≤
+2 maxu∈Na |uT Au|. Taking s = R/(8k) in (6.8) gives
+P
+
+∥Fa(θx)∥op > R
+4k, x ∈G
+
+≤2 exp
+
+Cda −cMR2
+k2da
+
+.
+(6.9)
+Under (2.10), a union bound over the modes makes the right-hand side at most
+Ck exp{−ct2dmax} after increasing the universal sample constant.
+The same net argument at the statistical scale will give the Thompson rates. Taking
+s = C0tda/
+√
+M in (6.8), with C0 sufficiently large, yields
+P
+
+∥Fa(θx)∥op > Ctda
+√
+M
+, x ∈G
+
+≤2e−ct2da.
+(6.10)
+7.
+Proof of the main theorem
+By equivariance, it suffices first to consider true precision ID. On the gradient event
+(2.9), take
+ε = tdmax
+√
+M
+.
+(7.1)
+The sample condition ensures ε < 1, and (2.9) yields
+∥∇fx(ID)∥≤C
+√
+k tdmax
+√
+M
+(7.2)
+outside an event of probability at most Cke−ct2dmax.
+Because ID ∈CR and θx minimizes over CR, strong convexity and comparison with ID
+imply
+d(ID, θx) ≤2
+λR
+∥∇fx(ID)∥≤CR
+√
+k tdmax
+√
+M
+.
+(7.3)
+In the canonical decomposition (6.1), |h0| ≤d(ID, θx). On the event (6.9) for every mode,
+∥log θx∥op ≤|h0| +
+X
+a
+∥Fa(θx)∥op
+≤CR
+√
+k tdmax
+√
+M
++ R
+4 < R
+2 ,
+(7.4)
+where the final inequality follows by increasing C in (2.10). Thus the constrained minimizer
+lies strictly inside CR and is an unconstrained critical point of fx. Global geodesic convexity
+makes it a global minimizer. It is unique: if a second minimizer existed, the objective
+would be constant on the joining geodesic, contradicting the strictly positive Hessian on
+the initial segment contained in CR.
+
+
+Equation (7.3) and (2.6) give
+dFR(bΘ, ID) ≤C
+√
+k dmax
+√n
+t.
+(7.5)
+For the factors, write bΘa = eh0/kPa and Fa = log Pa. The coordinate normalization gives
+d(ID, bΘ)2 = h2
+0 +
+X
+b
+∥Fb∥2
+F
+db
+,
+(7.6)
+while
+dFR(bΘa, Ida)2 = 1
+2
+dah2
+0
+k2
++ ∥Fa∥2
+F
+
+≤da
+2 d(ID, bΘ)2.
+(7.7)
+Combining (7.7) and (7.3) proves (2.14).
+For the Thompson bounds, (6.10) and |h0| ≤CR
+√
+k tdmax/
+√
+M give
+dop(bΘa, Ida) =
+
+h0
+k Ida + Fa
+
+op
+≤Ct
+√
+M
+
+da + dmax
+√
+k
+
+.
+(7.8)
+A union bound proves Corollary 1. If da = dmax, the failure probability in (6.10) is
+O(e−ct2dmax), which is absorbed into (2.12); this proves (2.15).
+For a general true product precision Θ, whiten the observations by Θ1/2. To verify the
+factor normalization explicitly, write the true precision and the MLE for the whitened data
+in canonical form as Θ = N
+a Θa and bΩ= N
+a bΩa. The determinant roots of Θ1/2
+a
+bΩaΘ1/2
+a
+are the products of the two common determinant roots and hence are again identical across
+a. Consequently these matrices are precisely the canonical factors of Θ1/2bΩΘ1/2. The
+MLE transforms by this product congruence, while both the Fisher–Rao and Thompson
+metrics are congruence invariant, so all the same factor bounds hold at Θ; see Franks
+et al. (2026, Fact 2.6). The failure probabilities are supplied by Lemma 1, (2.9) and
+(6.9), together with (6.10) for the Thompson conclusions. This proves Theorem 1 and
+Corollary 1.
+8.
+Information-theoretic comparison
+We compare the upper bounds with a lower bound that already holds when all nuisance
+factors are known. Fix a mode a and restrict the parameter space by setting every other
+factor to the identity. After flattening over mode a, the observations contain
+Na = nD
+da
+(8.1)
+independent da-dimensional Gaussian vectors with precision Θa. The classical Gaussian
+lower bound therefore applies to this submodel.
+
+
+Proposition 1 (Gaussian submodel lower bounds). There is a universal c > 0
+such that, for every estimator of factor a,
+inf
+eΘa
+sup
+Θa
+EdFR(eΘa, Θa)2 ≥c min
+
+1, d3
+a
+nD
+
+,
+(8.2)
+inf
+eΘa
+sup
+Θa
+Edop(eΘa, Θa)2 ≥c min
+
+1, d2
+a
+nD
+
+,
+(8.3)
+where the supremum may be restricted to a fixed operator-norm neighborhood of the
+identity. For estimation of the full precision matrix,
+inf
+eΘ
+sup
+Θ
+EdFR(eΘ, Θ)2 ≥c min
+
+1, d2
+max
+n
+
+.
+(8.4)
+Proof. For N observations from an unrestricted d-dimensional Gaussian model, the
+squared Fisher–Rao and Thompson minimax risks are bounded below by c min{1, d2/N}
+and c min{1, d/N}, respectively; see Proposition 4.1 of Franks et al. (2026), which is
+proved from Proposition F.1 in their supplementary material. Substitution of d = da and
+N = Na from (8.1) proves (8.2)–(8.3).
+For the full model, two reductions are needed because a general full-matrix estimator
+need not lie in the one-factor submodel. First, given any PD(D)-valued estimator eΘ, let
+eΘP be its metric projection onto P. The set P is closed and geodesically convex, and the
+positive-definite manifold is a finite-dimensional Hadamard manifold, so this projection
+exists uniquely. For every true Θ ∈P, the triangle inequality and the nearest-point
+property give
+dFR(eΘP, Θ) ≤2dFR(eΘ, Θ).
+(8.5)
+Thus it suffices, up to a universal factor in squared risk, to consider P-valued estimators.
+Now choose a largest mode a and restrict the truth to
+Θ(A) = Id1 ⊗· · · ⊗Ida−1 ⊗A ⊗Ida+1 ⊗· · · ⊗Idk.
+Write the canonical decomposition of a P-valued estimator as eΘP = eh N
+b Pb, where
+det Pb = 1, and set eA = ehPa. If
+La = log(A−1/2 eAA−1/2),
+Lb = log Pb
+(b̸ = a),
+then tr Lb = 0 for b̸ = a. The embedded mode matrices are therefore Frobenius orthogonal,
+and the logarithm of the relative full precision gives
+2dFR(eΘP, Θ(A))2 =
+
+L(a)
+a
++
+X
+b̸=a
+L(b)
+b
+
+2
+F
+=
+D
+dmax
+∥La∥2
+F +
+X
+b̸=a
+D
+db
+∥Lb∥2
+F
+≥2D
+dmax
+dFR( eA, A)2.
+(8.6)
+The map from the data to eA is a valid estimator in the Gaussian submodel. Applying
+(8.2), multiplying by D/dmax, and using D/dmax ≥1 proves (8.4); the factor from (8.5)
+is absorbed into the universal constant.
+□
+
+
+For a largest factor, Theorem 1 gives squared Fisher–Rao risk of order
+kd3
+maxt2
+nD
+,
+whereas (8.2) is of order d3
+max/(nD). The distance bounds differ by at most
+√
+kt. Likewise,
+the full upper bound differs from (8.4) by at most
+√
+kt in distance. For a largest factor,
+(2.15) matches the Thompson lower bound (8.3) up to universal constants and the
+confidence parameter t. In particular, constant operator accuracy requires nD = Ω(d2
+max).
+Hence the sufficient threshold in Theorem 1 is optimal in its dependence on dmax for fixed
+k and constant confidence.
+For a smaller factor a, the comparison is less sharp: the ratio between our upper bound
+and the Gaussian lower bound in distance is O(
+√
+kt dmax/da). We therefore make no
+minimax claim for every small factor, nor do we claim that the k2 dependence in (2.10)
+is necessary.
+9.
+Discussion
+Theorem 1 resolves the explicit question posed in Section 6 of Franks et al. (2026): the
+guarantees of their tensor-normal MLE theorem continue to hold when d3
+max in the sample
+threshold is replaced by d2
+max. The proof does not require a new random-channel inequality.
+Instead, it retains the full-matrix form of an existing random Gram event and combines
+it with a geometric and probabilistic localization principle. The main conceptual lesson is
+that coercivity on the full orbit Lie algebra can be transported throughout a condition-
+number bounded region, while equivariance can turn Hilbert-valued sensitivity of an
+optimizer into operator-norm concentration without a Frobenius-to-operator conversion.
+Several questions remain. First, the exact existence and uniqueness boundary is format
+dependent and is described algebraically by Derksen et al. (2022); the present uniform
+sufficient condition is not intended to replace that classification. Second, the optimal
+dependence on k is unknown. Third, the argument establishes statistical properties
+of the MLE but does not prove linear convergence of the flip-flop algorithm at the
+improved sample threshold. Finally, it would be useful to isolate an abstract version of
+the constrained-optimizer localization argument for other Gaussian models generated by
+reductive group actions.
+Acknowledgement
+GPT-5.6 Sol and Claude Fable 5 (both used under the highest-tier subscription mode)
+were used to assist with proof development, verification and paper writing. The total
+usage time was approximately six hours.
+References
+Boucheron, S., Lugosi, G. & Massart, P. (2013). Concentration Inequalities: A Nonasymptotic Theory
+of Independence. Oxford University Press. doi:10.1093/acprof:oso/9780199535255.001.0001.
+Derksen, H. & Makam, V. (2021). Maximum likelihood estimation for matrix normal models via quiver
+representations. SIAM Journal on Applied Algebra and Geometry 5, 338–365. doi:10.1137/20M1369348.
+Derksen, H., Makam, V. & Walter, M. (2022). Maximum likelihood estimation for tensor normal
+models via castling transforms. Forum of Mathematics, Sigma 10, e50. doi:10.1017/fms.2022.37.
+Drton, M., Grosdos, A. & McCormack, A. (2024). Rational maximum likelihood estimators of
+Kronecker covariance matrices. Algebraic Statistics 15, 145–164. doi:10.2140/astat.2024.15.145.
+
+
+Drton, M., Kuriki, S. & Hoff, P. (2021). Existence and uniqueness of the Kronecker covariance MLE.
+Annals of Statistics 49, 2721–2754. doi:10.1214/21-AOS2052.
+Dutilleul, P. (1999). The MLE algorithm for the matrix normal distribution. Journal of Statistical
+Computation and Simulation 64, 105–123. doi:10.1080/00949659908811970.
+Franks, C., Oliveira, R., Ramachandran, A. & Walter, M. (2026). Near optimal sample com-
+plexity for matrix and tensor normal models via geodesic convexity. Annals of Statistics 54, 93–119.
+doi:10.1214/25-AOS2539.
+Kirszbraun, M. D. (1934). ¨Uber die zusammenziehende und Lipschitzsche Transformationen. Funda-
+menta Mathematicae 22, 77–108. doi:10.4064/fm-22-1-77-108.
+Lau, L. C. & Ramachandran, A. (2025).
+Optimal bounds for Tyler’s M-estimator for elliptical
+distributions. arXiv preprint arXiv:2510.13751.
+McCormack, A. & Hoff, P. (2025). Information geometry and asymptotics for Kronecker covariances.
+Bernoulli 31, 3165–3186. doi:10.3150/24-BEJ1842.
+Pisier, G. (2012). Grothendieck’s theorem, past and present. Bulletin of the American Mathematical
+Society 49, 237–323. doi:10.1090/S0273-0979-2011-01348-9.
+Pisier, G. (2014). Quantum expanders and geometry of operator spaces. Journal of the European
+Mathematical Society 16, 1183–1219. doi:10.4171/JEMS/458.
+Soloveychik, I. & Wiesel, A. (2014). Tyler’s covariance matrix estimator in elliptical models with convex
+structure. IEEE Transactions on Signal Processing 62, 5251–5259. doi:10.1109/TSP.2014.2348951.
+Sun, Y., Babu, P. & Palomar, D. P. (2016). Robust estimation of structured covariance matrix
+for heavy-tailed elliptical distributions.
+IEEE Transactions on Signal Processing 64, 3576–3590.
+doi:10.1109/TSP.2016.2546222.
+Wiesel, A. (2012). Geodesic convexity and covariance estimation. IEEE Transactions on Signal Processing
+60, 6182–6189. doi:10.1109/TSP.2012.2218241.
