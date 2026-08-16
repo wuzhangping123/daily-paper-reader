@@ -6,32 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-15
-- 运行时间：2026-08-15 20:04:22 UTC
+- 最新运行日期：2026-08-16
+- 运行时间：2026-08-16 19:39:39 UTC
 - 运行状态：成功
-- 本次总论文数：3
+- 本次总论文数：0
 - 精读区：0
-- 速读区：3
+- 速读区：0
 
 ### 今日简报（AI）
-- 今日共生成 3 篇推荐（精读 0 篇，速读 3 篇）
-- 速读：《Tensor-normal maximum likelihood estimation at the operator-norm sample threshold》（6.0/10）, 《Randomized Tucker-Sketched GMRES》（6.0/10）, 《New Orthogonal Multiwavelet Filters Derived by Matrix Spectral Factorization》（6.0/10）
-- 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
-- 详情：[/202608/15/README](/202608/15/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202608/16/README](/202608/16/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Tensor-normal maximum likelihood estimation at the operator-norm sample threshold](/202608/15/2608.10488v1-tensor-normal-maximum-likelihood-estimation-at-the-operator-norm-sample-threshold)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：张量正态最大似然估计理论，适用于高维张量数据恢复。
-2. [Randomized Tucker-Sketched GMRES](/202608/15/2608.11091v1-randomized-tucker-sketched-gmres)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：求解Tucker格式张量线性系统的随机迭代方法，可支撑张量恢复计算。
-3. [New Orthogonal Multiwavelet Filters Derived by Matrix Spectral Factorization](/202608/15/2608.11518v1-new-orthogonal-multiwavelet-filters-derived-by-matrix-spectral-factorization)  
-   标签：评分：6.0/10、query:hsi-denoise
-   evidence：新多小波滤波器用于图像与信号去噪，可迁移到高光谱图像去噪
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
